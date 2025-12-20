@@ -56,7 +56,7 @@ export default function Dashboard() {
   const fetchWeather = async (lat, lon) => {
     try {
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=auto&forecast_days=1`
       );
       const data = await response.json();
       
@@ -89,25 +89,55 @@ export default function Dashboard() {
           temperature: Math.round(data.current.temperature_2m),
           feelsLike: Math.round(data.current.apparent_temperature),
           description: weatherCodes[data.current.weather_code] || "Unknown",
-          wind: `${Math.round(data.current.wind_speed_10m)} km/h`
+          wind: `${Math.round(data.current.wind_speed_10m)} km/h`,
+          humidity: `${Math.round(data.current.relative_humidity_2m)}%`,
+          precipitation: `${data.current.precipitation} mm`,
+          cloudCover: `${data.current.cloud_cover}%`,
+          highLow: data.daily ? `H: ${Math.round(data.daily.temperature_2m_max[0])}°C / L: ${Math.round(data.daily.temperature_2m_min[0])}°C` : null
         });
 
-        // Generate sample alerts based on weather
+        // Generate alerts based on weather conditions
         const generatedAlerts = [];
-        if (data.current.weather_code >= 95) {
+        const code = data.current.weather_code;
+        const windSpeed = data.current.wind_speed_10m;
+        const precipitation = data.current.precipitation;
+        
+        // Severe weather alerts
+        if (code >= 95) {
           generatedAlerts.push({
             title: "Thunderstorm Warning",
-            message: "Severe thunderstorm in your area. Seek shelter.",
+            message: "Severe thunderstorm detected in your area. Move to safe shelter immediately.",
             severity: "danger"
           });
         }
-        if (data.current.weather_code >= 61 && data.current.weather_code <= 65) {
+        
+        // Heavy rain/snow alerts
+        if ((code >= 63 && code <= 65) || (code >= 73 && code <= 75)) {
           generatedAlerts.push({
-            title: "Flood Warning",
-            message: "Possible overflow of river banks.",
+            title: code >= 70 ? "Heavy Snow Alert" : "Heavy Rain Alert",
+            message: `Heavy ${code >= 70 ? 'snowfall' : 'rainfall'} may cause flooding or hazardous conditions.`,
             severity: "warning"
           });
         }
+        
+        // High wind alert
+        if (windSpeed > 50) {
+          generatedAlerts.push({
+            title: "High Wind Warning",
+            message: `Strong winds at ${Math.round(windSpeed)} km/h. Secure outdoor items.`,
+            severity: "warning"
+          });
+        }
+        
+        // Active precipitation
+        if (precipitation > 5) {
+          generatedAlerts.push({
+            title: "Active Precipitation",
+            message: `Heavy precipitation detected: ${precipitation} mm. Exercise caution.`,
+            severity: "warning"
+          });
+        }
+        
         setAlerts(generatedAlerts);
       }
     } catch (error) {

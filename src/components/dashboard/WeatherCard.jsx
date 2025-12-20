@@ -18,16 +18,24 @@ export default function WeatherCard({ weather, alerts }) {
               <div>
                 <p className="text-4xl font-bold text-gray-900">{weather.temperature}°C</p>
                 <p className="text-gray-500">{weather.description}</p>
+                {weather.highLow && (
+                  <p className="text-sm text-gray-400 mt-1">{weather.highLow}</p>
+                )}
               </div>
-              <div className="text-right text-sm text-gray-500">
+              <div className="text-right text-sm text-gray-500 space-y-1">
                 <div className="flex items-center gap-1 justify-end">
                   <Thermometer className="w-4 h-4" />
-                  <span>Feels like {weather.feelsLike}°C</span>
+                  <span>Feels {weather.feelsLike}°C</span>
                 </div>
-                <div className="flex items-center gap-1 justify-end mt-1">
+                <div className="flex items-center gap-1 justify-end">
                   <Wind className="w-4 h-4" />
-                  <span>Wind: {weather.wind}</span>
+                  <span>{weather.wind}</span>
                 </div>
+                {weather.humidity && (
+                  <div className="flex items-center gap-1 justify-end">
+                    <span>💧 {weather.humidity}</span>
+                  </div>
+                )}
               </div>
             </div>
 
