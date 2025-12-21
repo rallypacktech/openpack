@@ -80,9 +80,19 @@ export default function Offline() {
   }
 
   return (
-    <div className="min-h-screen bg-blue-50">
-      {/* Header */}
-      <div className="bg-blue-100 py-12 text-center">
+    <div className="min-h-screen bg-blue-50 relative">
+      {/* Work in Progress Banner */}
+      <div className="fixed top-16 left-0 right-0 z-50 bg-yellow-500 text-gray-900 py-3 px-4 text-center font-semibold shadow-lg">
+        🚧 Work in Progress - This page is currently under development
+      </div>
+
+      {/* Grey Overlay */}
+      <div className="absolute inset-0 bg-gray-500 bg-opacity-50 z-40 pointer-events-none"></div>
+
+      {/* Content (greyed out) */}
+      <div className="relative z-30 opacity-40">
+        {/* Header */}
+        <div className="bg-blue-100 py-12 text-center">
         <WifiOff className="w-12 h-12 mx-auto mb-4 text-blue-600" />
         <h1 className="text-2xl font-bold text-gray-900">Offline Mode Active</h1>
         <p className="text-gray-600 mt-2 max-w-xl mx-auto px-4">
@@ -369,6 +379,7 @@ export default function Offline() {
             </div>
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );
