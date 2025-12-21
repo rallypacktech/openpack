@@ -12,12 +12,40 @@ export default function ProfileForm({ user, profile, onSave }) {
     city: profile?.city || "",
     state_province: profile?.state_province || "",
     postal_code: profile?.postal_code || "",
-    country: profile?.country || ""
+    country: profile?.country || "",
+    latitude: profile?.latitude,
+    longitude: profile?.longitude
   });
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
+    
+    // Geocode the address using OpenStreetMap Nominatim
+    try {
+      const addressParts = [
+        formData.street_address,
+        formData.city,
+        formData.state_province,
+        formData.postal_code,
+        formData.country
+      ].filter(Boolean).join(', ');
+      
+      if (addressParts) {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressParts)}&format=json&limit=1`
+        );
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          formData.latitude = parseFloat(data[0].lat);
+          formData.longitude = parseFloat(data[0].lon);
+        }
+      }
+    } catch (error) {
+      console.error("Error geocoding address:", error);
+    }
+    
     await onSave(formData);
     setSaving(false);
     setEditing(false);
@@ -96,6 +124,15 @@ export default function ProfileForm({ user, profile, onSave }) {
                   className="mt-1"
                 />
               </div>
+              <div>
+                <Label htmlFor="country" className="text-gray-500 text-sm">Country</Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
             </>
           ) : (
             <>
@@ -114,6 +151,10 @@ export default function ProfileForm({ user, profile, onSave }) {
               <div>
                 <Label className="text-gray-500 text-sm">Postal Code</Label>
                 <p className="font-medium mt-1">{profile?.postal_code || "Not set"}</p>
+              </div>
+              <div>
+                <Label className="text-gray-500 text-sm">Country</Label>
+                <p className="font-medium mt-1">{profile?.country || "Not set"}</p>
               </div>
             </>
           )}
