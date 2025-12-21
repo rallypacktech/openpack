@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Save, X } from "lucide-react";
+import AddressAutocomplete from "./AddressAutocomplete";
 
 export default function ProfileForm({ user, profile, onSave }) {
   const [editing, setEditing] = useState(false);
@@ -18,34 +19,15 @@ export default function ProfileForm({ user, profile, onSave }) {
   });
   const [saving, setSaving] = useState(false);
 
+  const handleAddressSelect = (addressData) => {
+    setFormData({
+      ...formData,
+      ...addressData
+    });
+  };
+
   const handleSave = async () => {
     setSaving(true);
-    
-    // Geocode the address using OpenStreetMap Nominatim
-    try {
-      const addressParts = [
-        formData.street_address,
-        formData.city,
-        formData.state_province,
-        formData.postal_code,
-        formData.country
-      ].filter(Boolean).join(', ');
-      
-      if (addressParts) {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressParts)}&format=json&limit=1`
-        );
-        const data = await response.json();
-        
-        if (data && data.length > 0) {
-          formData.latitude = parseFloat(data[0].lat);
-          formData.longitude = parseFloat(data[0].lon);
-        }
-      }
-    } catch (error) {
-      console.error("Error geocoding address:", error);
-    }
-    
     await onSave(formData);
     setSaving(false);
     setEditing(false);
@@ -88,8 +70,20 @@ export default function ProfileForm({ user, profile, onSave }) {
           
           {editing ? (
             <>
+              <div className="md:col-span-2">
+                <AddressAutocomplete 
+                  onAddressSelect={handleAddressSelect}
+                  initialValue={formData.display_name || [
+                    formData.street_address,
+                    formData.city,
+                    formData.state_province,
+                    formData.postal_code,
+                    formData.country
+                  ].filter(Boolean).join(', ')}
+                />
+              </div>
               <div>
-                <Label htmlFor="street_address" className="text-gray-500 text-sm">Address</Label>
+                <Label htmlFor="street_address" className="text-gray-500 text-sm">Street Address</Label>
                 <Input
                   id="street_address"
                   value={formData.street_address}
