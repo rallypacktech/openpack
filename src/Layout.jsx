@@ -137,7 +137,7 @@ export default function Layout({ children, currentPageName }) {
                 <span className="text-lg font-bold text-blue-600">RallyPack</span>
               </div>
               <p className="text-gray-600 text-sm">
-                Your comprehensive emergency preparedness platform. Stay ready, stay safe.
+                Your comprehensive emergency preparedness platform. Stay ready, stay connected.
               </p>
             </div>
 
@@ -156,7 +156,7 @@ export default function Layout({ children, currentPageName }) {
 
           <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-gray-500">
             <p>© 2025 RallyPack. All rights reserved. | Ages 13+</p>
-            <p className="mt-1">GDPR & CCPA Compliant | AES-256 Encrypted</p>
+            <p className="mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
           </div>
         </div>
       </footer>

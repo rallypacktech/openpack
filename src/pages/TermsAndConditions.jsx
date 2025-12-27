@@ -151,6 +151,15 @@ export default function TermsAndConditions() {
                 <li>All data transmission occurs over secure HTTPS/TLS connections</li>
                 <li>Backup data is stored in encrypted format in separate secure databases</li>
               </ul>
+
+              <h3 className="font-semibold mt-4">SOC 2 Type I Compliance:</h3>
+              <ul>
+                <li>We maintain security controls aligned with SOC 2 Type I Trust Services Criteria</li>
+                <li>Our systems undergo regular security assessments and audits</li>
+                <li>We implement comprehensive information security policies and procedures</li>
+                <li>Access controls, monitoring, and incident response procedures are in place</li>
+                <li>Business continuity and disaster recovery plans ensure service availability</li>
+              </ul>
             </CardContent>
           </Card>
 

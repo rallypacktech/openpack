@@ -76,7 +76,14 @@ export default function PrivacyPolicy() {
               </CardTitle>
             </CardHeader>
             <CardContent className="prose prose-sm max-w-none">
-              <p className="font-semibold">Primary Database (Base44):</p>
+              <p className="font-semibold">SOC 2 Type I Compliance:</p>
+              <p>
+                RallyPack maintains security controls in accordance with SOC 2 Type I standards, addressing Security, 
+                Availability, Processing Integrity, Confidentiality, and Privacy criteria. Our infrastructure and processes 
+                are designed to protect customer data through comprehensive security policies and procedures.
+              </p>
+
+              <p className="font-semibold mt-4">Primary Database (Base44):</p>
               <p>
                 Your data is primarily stored in Base44's secure infrastructure with enterprise-grade security measures including encryption at rest and in transit.
               </p>
@@ -105,6 +112,16 @@ export default function PrivacyPolicy() {
                 <li>Encryption keys are stored separately from encrypted data</li>
                 <li>PBKDF2 key derivation with 100,000 iterations</li>
                 <li>AES-256-GCM authenticated encryption for sensitive fields</li>
+              </ul>
+
+              <p className="font-semibold mt-4">Security Controls (SOC 2 Compliance):</p>
+              <ul>
+                <li><strong>Access Controls:</strong> Multi-factor authentication, role-based access, and least privilege principles</li>
+                <li><strong>Monitoring:</strong> Continuous security monitoring, logging, and incident response procedures</li>
+                <li><strong>Data Protection:</strong> Encryption at rest and in transit, secure key management</li>
+                <li><strong>System Availability:</strong> Regular backups, disaster recovery plans, and uptime monitoring</li>
+                <li><strong>Change Management:</strong> Controlled deployment processes and code review procedures</li>
+                <li><strong>Vendor Management:</strong> Third-party security assessments and compliance verification</li>
               </ul>
             </CardContent>
           </Card>
@@ -193,6 +210,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Deleted Accounts:</strong> Data permanently deleted within 30 days of account deletion request</li>
                 <li><strong>Backup Data:</strong> Encrypted backups retained for 90 days for disaster recovery</li>
                 <li><strong>Compliance Records:</strong> Anonymized data may be retained longer for legal compliance</li>
+                <li><strong>Audit Logs:</strong> Security and access logs retained for 12 months for SOC 2 compliance</li>
               </ul>
             </CardContent>
           </Card>
