@@ -124,6 +124,54 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Main Content */}
       <main>{children}</main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-lg font-bold text-blue-600">RallyPack</span>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Your comprehensive emergency preparedness platform. Stay ready, stay safe.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
+              <div className="space-y-2">
+                <Link to={createPageUrl("PrivacyPolicy")} className="block text-sm text-gray-600 hover:text-blue-600">
+                  Privacy Policy
+                </Link>
+                <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-gray-600 hover:text-blue-600">
+                  Terms & Conditions
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Support</h3>
+              <div className="space-y-2">
+                <a href="mailto:support@rallypack.app" className="block text-sm text-gray-600 hover:text-blue-600">
+                  support@rallypack.app
+                </a>
+                <a href="mailto:privacy@rallypack.app" className="block text-sm text-gray-600 hover:text-blue-600">
+                  privacy@rallypack.app
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-gray-500">
+            <p>© 2025 RallyPack. All rights reserved. | Ages 13+</p>
+            <p className="mt-1">GDPR & CCPA Compliant | AES-256 Encrypted</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

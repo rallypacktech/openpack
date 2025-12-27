@@ -3,6 +3,8 @@ import Settings from './pages/Settings';
 import Resources from './pages/Resources';
 import Emergency from './pages/Emergency';
 import Offline from './pages/Offline';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
 import __Layout from './Layout.jsx';
 
 
@@ -12,6 +14,8 @@ export const PAGES = {
     "Resources": Resources,
     "Emergency": Emergency,
     "Offline": Offline,
+    "PrivacyPolicy": PrivacyPolicy,
+    "TermsAndConditions": TermsAndConditions,
 }
 
 export const pagesConfig = {
