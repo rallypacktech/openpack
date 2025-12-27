@@ -128,7 +128,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
@@ -150,18 +150,6 @@ export default function Layout({ children, currentPageName }) {
                 <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-gray-600 hover:text-blue-600">
                   Terms & Conditions
                 </Link>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Support</h3>
-              <div className="space-y-2">
-                <a href="mailto:gearup@rallypack.tech" className="block text-sm text-gray-600 hover:text-blue-600">
-                  gearup@rallypack.tech
-                </a>
-                <a href="mailto:privacy@rallypack.tech" className="block text-sm text-gray-600 hover:text-blue-600">
-                  privacy@rallypack.tech
-                </a>
               </div>
             </div>
           </div>
