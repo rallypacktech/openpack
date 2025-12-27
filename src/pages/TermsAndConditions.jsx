@@ -307,8 +307,8 @@ export default function TermsAndConditions() {
             <CardContent className="prose prose-sm max-w-none">
               <p>For questions about these Terms and Conditions:</p>
               <p className="mt-2">
-                <strong>Email:</strong> legal@rallypack.app<br />
-                <strong>Support:</strong> support@rallypack.app
+                <strong>Email:</strong> legal@rallypack.tech<br />
+                <strong>Support:</strong> gearup@rallypack.tech
               </p>
             </CardContent>
           </Card>

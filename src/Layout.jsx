@@ -156,11 +156,11 @@ export default function Layout({ children, currentPageName }) {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Support</h3>
               <div className="space-y-2">
-                <a href="mailto:support@rallypack.app" className="block text-sm text-gray-600 hover:text-blue-600">
-                  support@rallypack.app
+                <a href="mailto:gearup@rallypack.tech" className="block text-sm text-gray-600 hover:text-blue-600">
+                  gearup@rallypack.tech
                 </a>
-                <a href="mailto:privacy@rallypack.app" className="block text-sm text-gray-600 hover:text-blue-600">
-                  privacy@rallypack.app
+                <a href="mailto:privacy@rallypack.tech" className="block text-sm text-gray-600 hover:text-blue-600">
+                  privacy@rallypack.tech
                 </a>
               </div>
             </div>

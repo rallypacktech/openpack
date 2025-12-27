@@ -219,12 +219,12 @@ export default function PrivacyPolicy() {
             <CardContent className="prose prose-sm max-w-none">
               <p>If you have questions about this Privacy Policy or wish to exercise your privacy rights:</p>
               <p className="mt-2">
-                <strong>Email:</strong> privacy@rallypack.app<br />
-                <strong>Data Protection Officer:</strong> dpo@rallypack.app
+                <strong>Email:</strong> privacy@rallypack.tech<br />
+                <strong>Data Protection Officer:</strong> dpo@rallypack.tech
               </p>
               <p className="mt-4">
-                For GDPR requests: gdpr@rallypack.app<br />
-                For CCPA requests: ccpa@rallypack.app
+                For GDPR requests: gdpr@rallypack.tech<br />
+                For CCPA requests: ccpa@rallypack.tech
               </p>
             </CardContent>
           </Card>
