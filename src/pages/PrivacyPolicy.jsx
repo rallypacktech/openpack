@@ -139,6 +139,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Location Services:</strong> To deliver location-specific weather data and emergency shelter information</li>
                 <li><strong>Resource Management:</strong> To help you track emergency supplies, caches, and expiration dates</li>
                 <li><strong>Family Coordination:</strong> To facilitate family emergency planning and communication</li>
+                <li><strong>Aggregate Emergency Planning:</strong> To create anonymized, regional statistics (shelter demand, preparedness levels, special needs projections, resource availability) that support emergency response coordination and public safety planning. Your personal data is never shared; only aggregate counts by geographic area are used.</li>
                 <li><strong>Service Improvement:</strong> To analyze usage patterns and improve our platform (using anonymized data)</li>
                 <li><strong>Compliance:</strong> To maintain backup records for legal and regulatory compliance</li>
               </ul>
@@ -215,6 +216,15 @@ export default function PrivacyPolicy() {
                     <li>Pet species and breed</li>
                   </ul>
                   This information is retained indefinitely in an anonymized format to assist with emergency pet recovery and reunification during disasters. This practice complies with animal welfare laws and helps protect pets when traditional contact methods fail. Retained data is only accessible to authorized microchip registry partners and emergency response organizations. If you require complete pet data removal, contact privacy@rallypack.tech.
+                </li>
+                <li><strong>Aggregated Emergency Statistics (Permanent Retention):</strong> We maintain anonymized, aggregate statistics to support emergency response planning. These statistics are calculated from active user data and include:
+                  <ul>
+                    <li><strong>Shelter Demand Estimates:</strong> Aggregated counts of people and pets by geographic area (postal code or city level), used to project shelter capacity needs during emergencies</li>
+                    <li><strong>Regional Preparedness Index:</strong> Anonymous preparedness scores by region showing the percentage of households with emergency plans, supplies, or meet spots</li>
+                    <li><strong>Special Needs Projections:</strong> Aggregate counts (no individual identification) of populations requiring accessibility accommodations, medical support, or pet-friendly sheltering in specific areas</li>
+                    <li><strong>Resource Hotspots:</strong> General counts of emergency supplies and caches reported in geographic areas to identify resource availability during crises</li>
+                  </ul>
+                  These aggregate statistics cannot be traced back to individual users. They are retained indefinitely to support public safety, emergency planning, and disaster response coordination. When you delete your account, your personal data is removed, but you remain counted in these regional aggregates until the next data refresh cycle (typically 30 days).
                 </li>
                 <li><strong>Backup Data:</strong> Encrypted backups retained for 90 days for disaster recovery</li>
                 <li><strong>Compliance Records:</strong> Anonymized data may be retained longer for legal compliance</li>

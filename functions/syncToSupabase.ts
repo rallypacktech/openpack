@@ -153,6 +153,178 @@ Deno.serve(async (req) => {
             await supabase.from('base44_notifications').upsert(notificationsData, { onConflict: 'notification_id_hash' });
         }
 
+        // Aggregate Statistics (Anonymous, Regional Data)
+        // These tables store anonymized aggregate data for emergency response planning
+        
+        // 1. Shelter Demand Statistics (by postal code or city)
+        const allProfiles = await base44.asServiceRole.entities.UserProfile.list();
+        const allFamilyMembers = await base44.asServiceRole.entities.FamilyMember.list();
+        const allPets = await base44.asServiceRole.entities.Pet.list();
+        
+        // Group by location (postal code or city)
+        const locationStats = {};
+        
+        for (const profile of allProfiles) {
+            const locationKey = profile.postal_code || profile.city || 'unknown';
+            if (!locationStats[locationKey]) {
+                locationStats[locationKey] = {
+                    location_identifier: locationKey,
+                    city: profile.city,
+                    state_province: profile.state_province,
+                    country: profile.country,
+                    household_count: 0,
+                    estimated_people: 0,
+                    estimated_pets: 0,
+                    updated_at: new Date().toISOString()
+                };
+            }
+            locationStats[locationKey].household_count++;
+            
+            // Count family members for this household
+            const householdMembers = allFamilyMembers.filter(m => m.created_by === profile.created_by);
+            locationStats[locationKey].estimated_people += householdMembers.length + 1; // +1 for account holder
+            
+            // Count pets for this household
+            const householdPets = allPets.filter(p => p.created_by === profile.created_by);
+            locationStats[locationKey].estimated_pets += householdPets.length;
+        }
+        
+        const shelterDemandData = Object.values(locationStats);
+        if (shelterDemandData.length > 0) {
+            await supabase.from('aggregate_shelter_demand').upsert(shelterDemandData, { onConflict: 'location_identifier' });
+        }
+        
+        // 2. Regional Preparedness Index
+        const allCaches = await base44.asServiceRole.entities.EmergencyCache.list();
+        const allFirstAid = await base44.asServiceRole.entities.FirstAidItem.list();
+        const allMeetSpots = await base44.asServiceRole.entities.MeetSpot.list();
+        
+        const preparednessByLocation = {};
+        
+        for (const profile of allProfiles) {
+            const locationKey = profile.postal_code || profile.city || 'unknown';
+            if (!preparednessByLocation[locationKey]) {
+                preparednessByLocation[locationKey] = {
+                    location_identifier: locationKey,
+                    city: profile.city,
+                    state_province: profile.state_province,
+                    country: profile.country,
+                    households_with_caches: 0,
+                    households_with_first_aid: 0,
+                    households_with_meet_spots: 0,
+                    total_households: 0,
+                    preparedness_score: 0,
+                    updated_at: new Date().toISOString()
+                };
+            }
+            
+            preparednessByLocation[locationKey].total_households++;
+            
+            const userEmail = profile.created_by;
+            if (allCaches.some(c => c.created_by === userEmail)) {
+                preparednessByLocation[locationKey].households_with_caches++;
+            }
+            if (allFirstAid.some(f => f.created_by === userEmail)) {
+                preparednessByLocation[locationKey].households_with_first_aid++;
+            }
+            if (allMeetSpots.some(m => m.created_by === userEmail)) {
+                preparednessByLocation[locationKey].households_with_meet_spots++;
+            }
+        }
+        
+        // Calculate preparedness score (0-100)
+        Object.values(preparednessByLocation).forEach(loc => {
+            if (loc.total_households > 0) {
+                const cacheScore = (loc.households_with_caches / loc.total_households) * 40;
+                const firstAidScore = (loc.households_with_first_aid / loc.total_households) * 30;
+                const meetSpotScore = (loc.households_with_meet_spots / loc.total_households) * 30;
+                loc.preparedness_score = Math.round(cacheScore + firstAidScore + meetSpotScore);
+            }
+        });
+        
+        const preparednessData = Object.values(preparednessByLocation);
+        if (preparednessData.length > 0) {
+            await supabase.from('aggregate_preparedness_index').upsert(preparednessData, { onConflict: 'location_identifier' });
+        }
+        
+        // 3. Special Needs Projections (Aggregate counts only)
+        const specialNeedsByLocation = {};
+        
+        for (const profile of allProfiles) {
+            const locationKey = profile.postal_code || profile.city || 'unknown';
+            if (!specialNeedsByLocation[locationKey]) {
+                specialNeedsByLocation[locationKey] = {
+                    location_identifier: locationKey,
+                    city: profile.city,
+                    state_province: profile.state_province,
+                    country: profile.country,
+                    individuals_with_medical_conditions: 0,
+                    elderly_count: 0,
+                    children_count: 0,
+                    pets_requiring_accommodation: 0,
+                    updated_at: new Date().toISOString()
+                };
+            }
+            
+            const userEmail = profile.created_by;
+            const householdMembers = allFamilyMembers.filter(m => m.created_by === userEmail);
+            
+            householdMembers.forEach(member => {
+                if (member.medical_conditions) {
+                    specialNeedsByLocation[locationKey].individuals_with_medical_conditions++;
+                }
+                if (member.age && member.age >= 65) {
+                    specialNeedsByLocation[locationKey].elderly_count++;
+                }
+                if (member.age && member.age < 18) {
+                    specialNeedsByLocation[locationKey].children_count++;
+                }
+            });
+            
+            const householdPets = allPets.filter(p => p.created_by === userEmail);
+            specialNeedsByLocation[locationKey].pets_requiring_accommodation += householdPets.length;
+        }
+        
+        const specialNeedsData = Object.values(specialNeedsByLocation);
+        if (specialNeedsData.length > 0) {
+            await supabase.from('aggregate_special_needs').upsert(specialNeedsData, { onConflict: 'location_identifier' });
+        }
+        
+        // 4. Resource Hotspots (Available emergency supplies by area)
+        const resourcesByLocation = {};
+        
+        for (const profile of allProfiles) {
+            const locationKey = profile.postal_code || profile.city || 'unknown';
+            if (!resourcesByLocation[locationKey]) {
+                resourcesByLocation[locationKey] = {
+                    location_identifier: locationKey,
+                    city: profile.city,
+                    state_province: profile.state_province,
+                    country: profile.country,
+                    total_caches: 0,
+                    total_first_aid_items: 0,
+                    households_reporting_resources: 0,
+                    updated_at: new Date().toISOString()
+                };
+            }
+            
+            const userEmail = profile.created_by;
+            const userCaches = allCaches.filter(c => c.created_by === userEmail);
+            const userFirstAid = allFirstAid.filter(f => f.created_by === userEmail);
+            
+            if (userCaches.length > 0 || userFirstAid.length > 0) {
+                resourcesByLocation[locationKey].households_reporting_resources++;
+            }
+            
+            resourcesByLocation[locationKey].total_caches += userCaches.length;
+            resourcesByLocation[locationKey].total_first_aid_items += userFirstAid.length;
+        }
+        
+        const resourcesData = Object.values(resourcesByLocation);
+        if (resourcesData.length > 0) {
+            await supabase.from('aggregate_resource_hotspots').upsert(resourcesData, { onConflict: 'location_identifier' });
+        }
+
         return Response.json({ 
             success: true, 
             message: 'All data synced to Supabase with encryption',
@@ -160,7 +332,11 @@ Deno.serve(async (req) => {
                 profiles: userProfile ? 1 : 0,
                 family_members: familyData.length,
                 pets: petsData.length,
-                notifications: notificationsData.length
+                notifications: notificationsData.length,
+                aggregate_shelter_demand: shelterDemandData.length,
+                aggregate_preparedness: preparednessData.length,
+                aggregate_special_needs: specialNeedsData.length,
+                aggregate_resources: resourcesData.length
             }
         });
 

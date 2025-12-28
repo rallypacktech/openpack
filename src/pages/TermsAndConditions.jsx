@@ -292,6 +292,7 @@ export default function TermsAndConditions() {
                 <li>We may suspend or terminate accounts that violate these Terms</li>
                 <li>Upon termination, your personal data will be deleted per our Privacy Policy retention schedule</li>
                 <li><strong>Pet Microchip Data Retention:</strong> If you have registered pets with microchip numbers, this information (microchip number, last known owner name and address, pet species/breed) will be retained indefinitely for emergency pet recovery purposes. This data is anonymized, encrypted, and only accessible to authorized microchip companies and emergency response organizations. This practice complies with animal welfare and ownership laws. Contact privacy@rallypack.tech to request complete pet data removal.</li>
+                <li><strong>Aggregate Statistics Retention:</strong> After account deletion, your personal information is removed, but you may remain counted in anonymized regional statistics (e.g., "150 households in ZIP code 12345 have emergency plans"). These aggregate statistics support emergency response planning and cannot be traced back to you. They are updated periodically and your contribution to these counts will eventually phase out as data refreshes occur.</li>
               </ul>
             </CardContent>
           </Card>
