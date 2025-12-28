@@ -36,6 +36,13 @@ export default function AdminRecommendations() {
     try {
       const data = await base44.entities.ProductRecommendation.list("-priority");
       setRecommendations(data);
+      
+      // Auto-seed if empty
+      if (data.length === 0) {
+        await base44.functions.invoke('seedRecommendations');
+        const newData = await base44.entities.ProductRecommendation.list("-priority");
+        setRecommendations(newData);
+      }
     } catch (error) {
       console.error("Error loading recommendations:", error);
     } finally {
