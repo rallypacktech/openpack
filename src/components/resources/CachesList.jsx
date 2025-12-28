@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, MapPin, List, Package } from "lucide-react";
 
-export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewItems }) {
+export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewItems, onGenerateSamples }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCache, setEditingCache] = useState(null);
   const [formData, setFormData] = useState({
@@ -50,13 +50,18 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Your Emergency Caches</h2>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Cache
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button onClick={onGenerateSamples} variant="outline" className="border-green-600 text-green-600 hover:bg-green-50">
+            <Package className="w-4 h-4 mr-2" />
+            Generate Sample Caches
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Cache
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{editingCache ? "Edit" : "Add"} Emergency Cache</DialogTitle>

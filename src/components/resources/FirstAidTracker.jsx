@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Calendar, MapPin, AlertCircle, Check, FileDown } from "lucide-react";
 import { format } from "date-fns";
 
-export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete }) {
+export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete, onGenerateSamples }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -107,7 +107,11 @@ export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete }) {
           <TabsTrigger value="pets">Pets</TabsTrigger>
         </TabsList>
 
-        <div className="flex justify-end mt-4 mb-4">
+        <div className="flex justify-end gap-2 mt-4 mb-4">
+          <Button onClick={onGenerateSamples} variant="outline" className="border-green-600 text-green-600 hover:bg-green-50">
+            <Plus className="w-4 h-4 mr-2" />
+            Generate Sample Items
+          </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700">
