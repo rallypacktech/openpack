@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { Shield, Users, Package, AlertTriangle, Cloud, Heart, MapPin, CheckCircle } from "lucide-react";
@@ -7,6 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await base44.auth.me();
+        if (user) {
+          navigate(createPageUrl("Dashboard"));
+        }
+      } catch (e) {
+        // Not logged in, stay on home page
+      }
+    };
+    checkAuth();
+  }, [navigate]);
+
   const handleGetStarted = () => {
     base44.auth.redirectToLogin(window.location.pathname);
   };
