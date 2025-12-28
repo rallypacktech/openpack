@@ -26,11 +26,15 @@ export default function Layout({ children, currentPageName }) {
         const userData = await base44.auth.me();
         setUser(userData);
       } catch (e) {
-        // Not logged in
+        // Not logged in - redirect to Home if on protected page
+        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions"];
+        if (!publicPages.includes(currentPageName)) {
+          window.location.href = createPageUrl("Home");
+        }
       }
     };
     loadUser();
-  }, []);
+  }, [currentPageName]);
 
   const isAdmin = user?.role === "admin";
 
