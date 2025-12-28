@@ -1,29 +1,31 @@
+import AdminRecommendations from './pages/AdminRecommendations';
+import CacheDetail from './pages/CacheDetail';
+import CheckoutCancel from './pages/CheckoutCancel';
+import CheckoutSuccess from './pages/CheckoutSuccess';
 import Dashboard from './pages/Dashboard';
-import Settings from './pages/Settings';
-import Resources from './pages/Resources';
 import Emergency from './pages/Emergency';
 import Offline from './pages/Offline';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Resources from './pages/Resources';
+import Settings from './pages/Settings';
 import TermsAndConditions from './pages/TermsAndConditions';
-import CacheDetail from './pages/CacheDetail';
-import AdminRecommendations from './pages/AdminRecommendations';
-import CheckoutSuccess from './pages/CheckoutSuccess';
-import CheckoutCancel from './pages/CheckoutCancel';
+import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AdminRecommendations": AdminRecommendations,
+    "CacheDetail": CacheDetail,
+    "CheckoutCancel": CheckoutCancel,
+    "CheckoutSuccess": CheckoutSuccess,
     "Dashboard": Dashboard,
-    "Settings": Settings,
-    "Resources": Resources,
     "Emergency": Emergency,
     "Offline": Offline,
     "PrivacyPolicy": PrivacyPolicy,
+    "Resources": Resources,
+    "Settings": Settings,
     "TermsAndConditions": TermsAndConditions,
-    "CacheDetail": CacheDetail,
-    "AdminRecommendations": AdminRecommendations,
-    "CheckoutSuccess": CheckoutSuccess,
-    "CheckoutCancel": CheckoutCancel,
+    "Home": Home,
 }
 
 export const pagesConfig = {
