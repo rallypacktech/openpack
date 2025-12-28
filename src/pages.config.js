@@ -6,6 +6,7 @@ import Offline from './pages/Offline';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import CacheDetail from './pages/CacheDetail';
+import AdminRecommendations from './pages/AdminRecommendations';
 import __Layout from './Layout.jsx';
 
 
@@ -18,6 +19,7 @@ export const PAGES = {
     "PrivacyPolicy": PrivacyPolicy,
     "TermsAndConditions": TermsAndConditions,
     "CacheDetail": CacheDetail,
+    "AdminRecommendations": AdminRecommendations,
 }
 
 export const pagesConfig = {

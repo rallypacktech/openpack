@@ -7,15 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export default function CacheDetail() {
   const navigate = useNavigate();
   const [cache, setCache] = useState(null);
   const [items, setItems] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [userProgress, setUserProgress] = useState({});
+  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [barcode, setBarcode] = useState("");
   const [formData, setFormData] = useState({
     item_name: "",
     quantity: 1,
@@ -38,9 +44,11 @@ export default function CacheDetail() {
         return;
       }
 
-      const [cachesData, itemsData] = await Promise.all([
+      const [cachesData, itemsData, recsData, progressData] = await Promise.all([
         base44.entities.EmergencyCache.list(),
-        base44.entities.CacheItem.filter({ cache_id: cacheId })
+        base44.entities.CacheItem.filter({ cache_id: cacheId }),
+        base44.entities.ProductRecommendation.filter({ active: true }, "-priority"),
+        base44.entities.UserCacheProgress.filter({ cache_id: cacheId })
       ]);
 
       const foundCache = cachesData.find(c => c.id === cacheId);
@@ -51,6 +59,23 @@ export default function CacheDetail() {
 
       setCache(foundCache);
       setItems(itemsData);
+
+      // Determine cache type from name
+      const cacheType = foundCache.name.toLowerCase().includes("go bag") ? "go_bag" :
+                       foundCache.name.toLowerCase().includes("automobile") ? "automobile" : "general";
+      
+      // Filter recommendations for this cache type
+      const filteredRecs = recsData.filter(rec => 
+        rec.cache_type === cacheType || rec.cache_type === "general"
+      );
+      setRecommendations(filteredRecs);
+
+      // Build progress map
+      const progressMap = {};
+      progressData.forEach(p => {
+        progressMap[p.recommendation_id] = p;
+      });
+      setUserProgress(progressMap);
     } catch (error) {
       console.error("Error loading cache details:", error);
     } finally {
@@ -105,6 +130,118 @@ export default function CacheDetail() {
     loadData();
   };
 
+  const handleDismissRecommendation = async (recId) => {
+    await base44.entities.UserCacheProgress.create({
+      cache_id: cache.id,
+      recommendation_id: recId,
+      status: "dismissed"
+    });
+    loadData();
+  };
+
+  const handleAddRecommendationToCart = (rec) => {
+    setCartItems([...cartItems, rec]);
+  };
+
+  const handleRemoveFromCart = (recId) => {
+    setCartItems(cartItems.filter(item => item.id !== recId));
+  };
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) return;
+    
+    // Mark items as purchased
+    for (const item of cartItems) {
+      await base44.entities.UserCacheProgress.create({
+        cache_id: cache.id,
+        recommendation_id: item.id,
+        status: "purchased",
+        purchased_at: new Date().toISOString()
+      });
+      
+      // Add to cache items
+      await base44.entities.CacheItem.create({
+        cache_id: cache.id,
+        item_name: item.item_name,
+        quantity: item.quantity,
+        category: item.category,
+        notes: "Purchased via recommendation"
+      });
+    }
+    
+    setCartItems([]);
+    loadData();
+    alert("Items purchased and added to your cache!");
+  };
+
+  const handleBarcodeSubmit = async () => {
+    if (!barcode.trim()) return;
+    
+    // Add item with barcode
+    await base44.entities.CacheItem.create({
+      cache_id: cache.id,
+      item_name: `Product (Barcode: ${barcode})`,
+      quantity: 1,
+      category: "other",
+      notes: `Scanned barcode: ${barcode}`
+    });
+    
+    setBarcode("");
+    setScannerOpen(false);
+    loadData();
+  };
+
+  const handleCheckoffRecommendation = async (rec) => {
+    // Mark as manually added
+    await base44.entities.UserCacheProgress.create({
+      cache_id: cache.id,
+      recommendation_id: rec.id,
+      status: "manually_added"
+    });
+    
+    // Add to cache
+    await base44.entities.CacheItem.create({
+      cache_id: cache.id,
+      item_name: rec.item_name,
+      quantity: rec.quantity,
+      category: rec.category,
+      notes: "Added from recommendation"
+    });
+    
+    loadData();
+  };
+
+  const shouldShowRecommendation = (rec) => {
+    const progress = userProgress[rec.id];
+    
+    // Don't show if dismissed
+    if (progress && progress.status === "dismissed") return false;
+    
+    // Don't show if purchased
+    if (progress && progress.status === "purchased") return false;
+    
+    // Don't show if manually added
+    if (progress && progress.status === "manually_added") return false;
+    
+    // Check if item exists in cache
+    const existingItem = items.find(item => 
+      item.item_name.toLowerCase().includes(rec.item_name.toLowerCase()) ||
+      rec.item_name.toLowerCase().includes(item.item_name.toLowerCase())
+    );
+    
+    // Show if not exists OR if exists but has no/expired expiration
+    if (existingItem) {
+      if (!existingItem.expiration_date) return true;
+      const expDate = new Date(existingItem.expiration_date);
+      if (expDate < new Date()) return true;
+      return false;
+    }
+    
+    return true;
+  };
+
+  const visibleRecommendations = recommendations.filter(shouldShowRecommendation);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -142,9 +279,45 @@ export default function CacheDetail() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Shopping Cart */}
+        {cartItems.length > 0 && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  Shopping Cart ({cartItems.length} items)
+                </h3>
+                <Button onClick={handleCheckout} className="bg-green-600 hover:bg-green-700">
+                  Checkout ${(cartItems.reduce((sum, item) => sum + item.price_cents, 0) / 100).toFixed(2)}
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {cartItems.map(item => (
+                  <div key={item.id} className="flex items-center justify-between bg-white p-2 rounded">
+                    <span className="text-sm">{item.item_name} - ${(item.price_cents / 100).toFixed(2)}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveFromCart(item.id)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Cache Contents</h2>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <h2 className="text-xl font-semibold">Your Items</h2>
+          <div className="flex gap-2">
+            <Button onClick={() => setScannerOpen(true)} variant="outline">
+              <Barcode className="w-4 h-4 mr-2" />
+              Scan Barcode
+            </Button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="w-4 h-4 mr-2" />
@@ -212,7 +385,36 @@ export default function CacheDetail() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
+
+        {/* Barcode Scanner Dialog */}
+        <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Scan or Enter Barcode</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <Label>Barcode Number</Label>
+                <Input
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                  placeholder="Enter barcode manually or use camera"
+                  onKeyPress={(e) => e.key === "Enter" && handleBarcodeSubmit()}
+                />
+              </div>
+              <div className="text-sm text-gray-500 text-center">
+                <Camera className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                <p>Camera scanning available on mobile devices</p>
+                <p className="text-xs mt-1">Or enter the barcode number manually above</p>
+              </div>
+              <Button onClick={handleBarcodeSubmit} className="w-full bg-blue-600 hover:bg-blue-700">
+                Add Item
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {items && items.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -256,6 +458,85 @@ export default function CacheDetail() {
               <p className="text-gray-500">No items yet. Add your first item to this cache!</p>
             </CardContent>
           </Card>
+        )}
+
+        {/* Recommendations Section */}
+        {visibleRecommendations.length > 0 && (
+          <>
+            <Separator className="my-8" />
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-2">Recommended Items</h2>
+              <p className="text-sm text-gray-600">
+                Complete your cache with these recommended supplies
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visibleRecommendations.map((rec) => (
+                <Card key={rec.id} className="border-orange-200">
+                  <CardContent className="p-4">
+                    {rec.image_url && (
+                      <img 
+                        src={rec.image_url} 
+                        alt={rec.item_name}
+                        className="w-full h-32 object-cover rounded mb-3"
+                      />
+                    )}
+                    <h3 className="font-semibold text-gray-900 mb-1">{rec.item_name}</h3>
+                    {rec.description && (
+                      <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
+                    )}
+                    <div className="space-y-1 text-sm text-gray-600 mb-3">
+                      <div><strong>Qty:</strong> {rec.quantity}</div>
+                      <div><strong>Category:</strong> {rec.category}</div>
+                      {rec.price_cents > 0 && (
+                        <div className="text-lg font-bold text-green-600">
+                          ${(rec.price_cents / 100).toFixed(2)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {rec.stripe_product_id && (
+                        <Button
+                          onClick={() => handleAddRecommendationToCart(rec)}
+                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          disabled={cartItems.some(item => item.id === rec.id)}
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          {cartItems.some(item => item.id === rec.id) ? "In Cart" : "Add to Cart"}
+                        </Button>
+                      )}
+                      {rec.affiliate_link && !rec.stripe_product_id && (
+                        <Button
+                          onClick={() => window.open(rec.affiliate_link, "_blank")}
+                          className="w-full bg-purple-600 hover:bg-purple-700"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Buy External
+                        </Button>
+                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleCheckoffRecommendation(rec)}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          I Have This
+                        </Button>
+                        <Button
+                          onClick={() => handleDismissRecommendation(rec.id)}
+                          variant="ghost"
+                          size="icon"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

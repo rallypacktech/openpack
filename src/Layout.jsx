@@ -32,6 +32,8 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, []);
 
+  const isAdmin = user?.role === "admin";
+
   const navItems = [
     { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
     { name: "Resources", page: "Resources", icon: Package },
@@ -39,6 +41,10 @@ export default function Layout({ children, currentPageName }) {
     { name: "Offline", page: "Offline", icon: WifiOff },
     { name: "Settings", page: "Settings", icon: Settings },
   ];
+
+  if (isAdmin) {
+    navItems.push({ name: "Admin", page: "AdminRecommendations", icon: Users });
+  }
 
   const handleLogout = () => {
     base44.auth.logout();
