@@ -87,6 +87,7 @@ export default function TermsAndConditions() {
                 <li>Family and pet information management for emergency planning</li>
                 <li>Emergency meeting spot coordination</li>
                 <li>Offline access to critical emergency information</li>
+                <li>E-commerce functionality for purchasing recommended emergency supplies</li>
               </ul>
             </CardContent>
           </Card>
@@ -220,6 +221,36 @@ export default function TermsAndConditions() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Purchases & Payment Terms</CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <h3 className="font-semibold">Payment Processing:</h3>
+              <ul>
+                <li>All payments are processed securely through Stripe, a third-party payment processor</li>
+                <li>We do not store your full credit card information on our servers</li>
+                <li>Prices are listed in USD and are subject to change</li>
+                <li>You agree to pay all charges incurred by you or authorized users at the prices in effect when such charges are incurred</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Shopping Cart & Orders:</h3>
+              <ul>
+                <li>The shopping cart allows you to purchase multiple recommended emergency supplies in a single transaction</li>
+                <li>Once payment is confirmed, purchased items are automatically added to your emergency cache</li>
+                <li>Product recommendations are provided for convenience and may include affiliate links or direct purchase options</li>
+                <li>We are not responsible for product quality, delivery, or fulfillment issues - these are handled by the respective vendors or Stripe</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Refunds & Returns:</h3>
+              <ul>
+                <li>Refunds and returns are subject to Stripe's terms and the policies of individual product vendors</li>
+                <li>For refund requests, contact us at support@rallypack.tech with your order details</li>
+                <li>We do not guarantee refunds for all purchases</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Prohibited Activities</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-sm max-w-none">
@@ -233,6 +264,8 @@ export default function TermsAndConditions() {
                 <li>Interfere with or disrupt the Service</li>
                 <li>Use automated systems to access the Service without permission</li>
                 <li>Share or sell your account access</li>
+                <li>Make fraudulent purchases or chargebacks</li>
+                <li>Abuse the shopping cart or payment system</li>
               </ul>
             </CardContent>
           </Card>

@@ -139,6 +139,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Location Services:</strong> To deliver location-specific weather data and emergency shelter information</li>
                 <li><strong>Resource Management:</strong> To help you track emergency supplies, caches, and expiration dates</li>
                 <li><strong>Family Coordination:</strong> To facilitate family emergency planning and communication</li>
+                <li><strong>E-Commerce:</strong> To process purchases of recommended emergency supplies through our integrated shopping cart and Stripe payment system</li>
                 <li><strong>Aggregate Emergency Planning:</strong> To create anonymized, regional statistics (shelter demand, preparedness levels, special needs projections, resource availability) that support emergency response coordination and public safety planning. Your personal data is never shared; only aggregate counts by geographic area are used.</li>
                 <li><strong>Service Improvement:</strong> To analyze usage patterns and improve our platform (using anonymized data)</li>
                 <li><strong>Compliance:</strong> To maintain backup records for legal and regulatory compliance</li>
