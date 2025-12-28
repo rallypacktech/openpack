@@ -40,7 +40,18 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, [currentPageName]);
 
+  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions"];
+  const isPublicPage = publicPages.includes(currentPageName);
   const isAdmin = user?.role === "admin";
+
+  // Show loading while checking auth on protected pages
+  if (!authChecked && !isPublicPage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   const navItems = [
     { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
