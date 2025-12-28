@@ -60,9 +60,11 @@ export default function CacheDetail() {
       setCache(foundCache);
       setItems(itemsData);
 
-      // Determine cache type from name
-      const cacheType = foundCache.name.toLowerCase().includes("go bag") ? "go_bag" :
-                       foundCache.name.toLowerCase().includes("automobile") ? "automobile" : "general";
+      // Determine cache type from name (case insensitive matching)
+      const cacheName = foundCache.name.toLowerCase();
+      const cacheType = cacheName.includes("go bag") || cacheName.includes("gobag") ? "go_bag" :
+                       cacheName.includes("automobile") || cacheName.includes("auto") || cacheName.includes("car") ? "automobile" : 
+                       "general";
       
       // Filter recommendations for this cache type
       const filteredRecs = recsData.filter(rec => 
