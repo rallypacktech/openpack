@@ -19,17 +19,21 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const userData = await base44.auth.me();
         setUser(userData);
+        setAuthChecked(true);
       } catch (e) {
         // Not logged in - redirect to Home if on protected page
         const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions"];
         if (!publicPages.includes(currentPageName)) {
           window.location.href = createPageUrl("Home");
+        } else {
+          setAuthChecked(true);
         }
       }
     };
