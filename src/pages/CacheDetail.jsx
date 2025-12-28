@@ -470,67 +470,80 @@ export default function CacheDetail() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {visibleRecommendations.map((rec) => (
-                <Card key={rec.id} className="border-orange-200">
-                  <CardContent className="p-4">
-                    {rec.image_url && (
-                      <img 
-                        src={rec.image_url} 
-                        alt={rec.item_name}
-                        className="w-full h-32 object-cover rounded mb-3"
-                      />
-                    )}
-                    <h3 className="font-semibold text-gray-900 mb-1">{rec.item_name}</h3>
-                    {rec.description && (
-                      <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
-                    )}
-                    <div className="space-y-1 text-sm text-gray-600 mb-3">
-                      <div><strong>Qty:</strong> {rec.quantity}</div>
-                      <div><strong>Category:</strong> {rec.category}</div>
-                      {!rec.affiliate_link && rec.price_cents > 0 && (
-                        <div className="text-lg font-bold text-green-600">
-                          ${(rec.price_cents / 100).toFixed(2)}
-                        </div>
+              {visibleRecommendations.map((rec) => {
+                const isFirstAidKit = rec.item_name.toLowerCase().includes("first aid kit");
+
+                return (
+                  <Card key={rec.id} className="border-orange-200">
+                    <CardContent className="p-4">
+                      {rec.image_url && (
+                        <img 
+                          src={rec.image_url} 
+                          alt={rec.item_name}
+                          className="w-full h-32 object-cover rounded mb-3"
+                        />
                       )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      {rec.affiliate_link && (
-                        <Button
-                          onClick={() => window.open(rec.affiliate_link, "_blank", "noopener,noreferrer")}
-                          className="w-full bg-orange-600 hover:bg-orange-700"
-                        >
-                          {rec.affiliate_link.includes("amazon.com") ? (
-                            <img 
-                              src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
-                              alt="Amazon" 
-                              className="h-4 mr-2"
-                            />
-                          ) : (
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                          )}
-                          View on {rec.affiliate_link.includes("amazon.com") ? "Amazon" : "Partner Site"}
-                        </Button>
+                      <h3 className="font-semibold text-gray-900 mb-1">{rec.item_name}</h3>
+                      {rec.description && (
+                        <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
                       )}
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleCheckoffRecommendation(rec)}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          I Have This
-                        </Button>
-                        <Button
-                          onClick={() => handleDismissRecommendation(rec.id)}
-                          variant="ghost"
-                          size="icon"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
+                      <div className="space-y-1 text-sm text-gray-600 mb-3">
+                        <div><strong>Qty:</strong> {rec.quantity}</div>
+                        <div><strong>Category:</strong> {rec.category}</div>
+                        {!rec.affiliate_link && rec.price_cents > 0 && (
+                          <div className="text-lg font-bold text-green-600">
+                            ${(rec.price_cents / 100).toFixed(2)}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      <div className="flex flex-col gap-2">
+                        {isFirstAidKit ? (
+                          <Button
+                            onClick={() => navigate(createPageUrl("Resources") + "?tab=firstaid")}
+                            className="w-full bg-blue-600 hover:bg-blue-700"
+                          >
+                            Manage First Aid Kit
+                          </Button>
+                        ) : (
+                          rec.affiliate_link && (
+                            <Button
+                              onClick={() => window.open(rec.affiliate_link, "_blank", "noopener,noreferrer")}
+                              className="w-full bg-orange-600 hover:bg-orange-700"
+                            >
+                              {rec.affiliate_link.includes("amazon.com") ? (
+                                <img 
+                                  src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
+                                  alt="Amazon" 
+                                  className="h-4 mr-2"
+                                />
+                              ) : (
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                              )}
+                              View on {rec.affiliate_link.includes("amazon.com") ? "Amazon" : "Partner Site"}
+                            </Button>
+                          )
+                        )}
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleCheckoffRecommendation(rec)}
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            I Have This
+                          </Button>
+                          <Button
+                            onClick={() => handleDismissRecommendation(rec.id)}
+                            variant="ghost"
+                            size="icon"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </>
         )}

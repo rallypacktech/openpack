@@ -5,9 +5,27 @@ Deno.serve(async (req) => {
         const base44 = createClientFromRequest(req);
         
         const user = await base44.auth.me();
-        if (!user || user.role !== 'admin') {
-            return Response.json({ error: 'Admin access required' }, { status: 403 });
+        if (!user) {
+            return Response.json({ error: 'Authentication required' }, { status: 401 });
         }
+
+        // Fetch user data for personalization
+        const [familyMembers, pets, userProfiles] = await Promise.all([
+            base44.entities.FamilyMember.list(),
+            base44.entities.Pet.list(),
+            base44.entities.UserProfile.list()
+        ]);
+
+        const userProfile = userProfiles[0];
+        const climateZone = userProfile?.climate_zone || 'temperate';
+
+        // Count adults and children
+        const adults = familyMembers.filter(m => (m.age || 18) >= 18).length + 1; // +1 for user
+        const children = familyMembers.filter(m => (m.age || 18) < 18).length;
+        
+        // Count cats and dogs
+        const cats = pets.filter(p => p.species === 'cat').length;
+        const dogs = pets.filter(p => p.species === 'dog').length;
 
         // Check if recommendations already exist
         const existing = await base44.entities.ProductRecommendation.list();
@@ -18,7 +36,7 @@ Deno.serve(async (req) => {
             });
         }
 
-        // Go Bag Recommendations (Ready.gov essentials)
+        // Static Go Bag Recommendations
         const goBagRecs = [
             {
                 item_name: "Water (1 gallon per person per day)",
@@ -51,17 +69,6 @@ Deno.serve(async (req) => {
                 price_cents: 2999,
                 stripe_product_id: "prod_sample_radio",
                 priority: 90,
-                active: true
-            },
-            {
-                item_name: "First aid kit",
-                category: "medical",
-                cache_type: "go_bag",
-                description: "Comprehensive medical supplies and medications",
-                quantity: 1,
-                price_cents: 3499,
-                stripe_product_id: "prod_sample_firstaid",
-                priority: 85,
                 active: true
             },
             {
@@ -151,10 +158,124 @@ Deno.serve(async (req) => {
                 stripe_product_id: "prod_sample_charger",
                 priority: 45,
                 active: true
+            },
+            {
+                item_name: "Waterproof matches",
+                category: "tools",
+                cache_type: "go_bag",
+                description: "Essential for fire starting in wet conditions",
+                quantity: 1,
+                price_cents: 799,
+                stripe_product_id: "prod_sample_matches",
+                priority: 40,
+                active: true
+            },
+            {
+                item_name: "Firestarter stick",
+                category: "tools",
+                cache_type: "go_bag",
+                description: "Reliable fire starting tool",
+                quantity: 1,
+                price_cents: 1299,
+                stripe_product_id: "prod_sample_firestarter",
+                priority: 39,
+                active: true
             }
         ];
 
-        // Automobile Recommendations
+        // Dynamic Go Bag Recommendations
+        const dynamicGoBagRecs = [];
+
+        // Emergency hammock for each adult and child
+        const totalPeople = adults + children;
+        if (totalPeople > 0) {
+            dynamicGoBagRecs.push({
+                item_name: "Emergency hammock",
+                category: "other",
+                cache_type: "go_bag",
+                description: `Lightweight emergency hammock (${totalPeople} needed)`,
+                quantity: totalPeople,
+                price_cents: 1999,
+                stripe_product_id: "prod_sample_hammock",
+                priority: 38,
+                active: true
+            });
+        }
+
+        // Neon collar/harness and leash for each cat or dog
+        const totalCatsAndDogs = cats + dogs;
+        if (totalCatsAndDogs > 0) {
+            dynamicGoBagRecs.push({
+                item_name: "Neon collar or harness and leash",
+                category: "other",
+                cache_type: "go_bag",
+                description: `High-visibility pet collar/harness with leash (${totalCatsAndDogs} needed)`,
+                quantity: totalCatsAndDogs,
+                price_cents: 1499,
+                stripe_product_id: "prod_sample_pet_collar",
+                priority: 37,
+                active: true
+            });
+        }
+
+        // Nail clippers if any family members
+        if (familyMembers.length > 0) {
+            dynamicGoBagRecs.push({
+                item_name: "Nail clippers",
+                category: "hygiene",
+                cache_type: "go_bag",
+                description: "Essential grooming tool for emergency kits",
+                quantity: 1,
+                price_cents: 599,
+                stripe_product_id: "prod_sample_nail_clippers",
+                priority: 36,
+                active: true
+            });
+        }
+
+        // Pet nail clippers if any pets
+        if (pets.length > 0) {
+            dynamicGoBagRecs.push({
+                item_name: "Pet nail clippers",
+                category: "other",
+                cache_type: "go_bag",
+                description: "Specialized nail clippers for pets",
+                quantity: 1,
+                price_cents: 899,
+                stripe_product_id: "prod_sample_pet_nail_clippers",
+                priority: 35,
+                active: true
+            });
+        }
+
+        // Climate-specific first aid additions
+        if (climateZone === 'cold') {
+            dynamicGoBagRecs.push({
+                item_name: "Emergency blanket (for first aid kit)",
+                category: "medical",
+                cache_type: "go_bag",
+                description: "Thermal blanket for cold weather emergencies",
+                quantity: 2,
+                price_cents: 999,
+                stripe_product_id: "prod_sample_thermal_blanket",
+                priority: 34,
+                active: true
+            });
+        } else if (climateZone === 'warm') {
+            dynamicGoBagRecs.push({
+                item_name: "Snake bite kit (for first aid kit)",
+                category: "medical",
+                cache_type: "go_bag",
+                description: "Essential for warm climate areas with snake presence",
+                quantity: 1,
+                price_cents: 1899,
+                stripe_product_id: "prod_sample_snake_kit",
+                priority: 34,
+                active: true
+            });
+        }
+
+        // Automobile Recommendations (unchanged)
         const autoRecs = [
             {
                 item_name: "Jumper cables",
@@ -187,17 +308,6 @@ Deno.serve(async (req) => {
                 price_cents: 2499,
                 stripe_product_id: "prod_sample_flares",
                 priority: 90,
-                active: true
-            },
-            {
-                item_name: "First aid kit",
-                category: "medical",
-                cache_type: "automobile",
-                description: "Compact automotive first aid supplies",
-                quantity: 1,
-                price_cents: 2499,
-                stripe_product_id: "prod_sample_auto_firstaid",
-                priority: 85,
                 active: true
             },
             {
@@ -268,8 +378,8 @@ Deno.serve(async (req) => {
             }
         ];
 
-        // Create all recommendations
-        const allRecs = [...goBagRecs, ...autoRecs];
+        // Combine all recommendations
+        const allRecs = [...goBagRecs, ...dynamicGoBagRecs, ...autoRecs];
         await base44.entities.ProductRecommendation.bulkCreate(allRecs);
 
         return Response.json({ 
@@ -277,8 +387,17 @@ Deno.serve(async (req) => {
             message: 'Product recommendations seeded successfully',
             created: allRecs.length,
             breakdown: {
-                go_bag: goBagRecs.length,
+                go_bag: goBagRecs.length + dynamicGoBagRecs.length,
+                go_bag_static: goBagRecs.length,
+                go_bag_dynamic: dynamicGoBagRecs.length,
                 automobile: autoRecs.length
+            },
+            personalization: {
+                adults,
+                children,
+                cats,
+                dogs,
+                climate_zone: climateZone
             }
         });
 
