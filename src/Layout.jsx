@@ -29,7 +29,7 @@ export default function Layout({ children, currentPageName }) {
         setAuthChecked(true);
       } catch (e) {
         // Not logged in - redirect to Home if on protected page
-        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions"];
+        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore"];
         if (!publicPages.includes(currentPageName)) {
           window.location.href = createPageUrl("Home");
         } else {
@@ -40,7 +40,7 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, [currentPageName]);
 
-  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions"];
+  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore"];
   const isPublicPage = publicPages.includes(currentPageName);
   const isAdmin = user?.role === "admin";
 
