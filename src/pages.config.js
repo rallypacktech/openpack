@@ -4,13 +4,13 @@ import CheckoutCancel from './pages/CheckoutCancel';
 import CheckoutSuccess from './pages/CheckoutSuccess';
 import Dashboard from './pages/Dashboard';
 import Emergency from './pages/Emergency';
+import Home from './pages/Home';
+import LearnMore from './pages/LearnMore';
 import Offline from './pages/Offline';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import TermsAndConditions from './pages/TermsAndConditions';
-import Home from './pages/Home';
-import LearnMore from './pages/LearnMore';
 import __Layout from './Layout.jsx';
 
 
@@ -21,13 +21,13 @@ export const PAGES = {
     "CheckoutSuccess": CheckoutSuccess,
     "Dashboard": Dashboard,
     "Emergency": Emergency,
+    "Home": Home,
+    "LearnMore": LearnMore,
     "Offline": Offline,
     "PrivacyPolicy": PrivacyPolicy,
     "Resources": Resources,
     "Settings": Settings,
     "TermsAndConditions": TermsAndConditions,
-    "Home": Home,
-    "LearnMore": LearnMore,
 }
 
 export const pagesConfig = {

@@ -32,7 +32,7 @@ export default function LearnMore() {
       }
     };
     checkAuth();
-  }, []);
+  }, [navigate]);
 
   const handleGetStarted = () => {
     if (isLoggedIn) {
