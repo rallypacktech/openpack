@@ -487,30 +487,28 @@ export default function CacheDetail() {
                     <div className="space-y-1 text-sm text-gray-600 mb-3">
                       <div><strong>Qty:</strong> {rec.quantity}</div>
                       <div><strong>Category:</strong> {rec.category}</div>
-                      {rec.price_cents > 0 && (
+                      {!rec.affiliate_link && rec.price_cents > 0 && (
                         <div className="text-lg font-bold text-green-600">
                           ${(rec.price_cents / 100).toFixed(2)}
                         </div>
                       )}
                     </div>
                     <div className="flex flex-col gap-2">
-                      {rec.stripe_product_id && (
+                      {rec.affiliate_link && (
                         <Button
-                          onClick={() => handleAddRecommendationToCart(rec)}
-                          className="w-full bg-blue-600 hover:bg-blue-700"
-                          disabled={cartItems.some(item => item.id === rec.id)}
+                          onClick={() => window.open(rec.affiliate_link, "_blank", "noopener,noreferrer")}
+                          className="w-full bg-orange-600 hover:bg-orange-700"
                         >
-                          <ShoppingCart className="w-4 h-4 mr-2" />
-                          {cartItems.some(item => item.id === rec.id) ? "In Cart" : "Add to Cart"}
-                        </Button>
-                      )}
-                      {rec.affiliate_link && !rec.stripe_product_id && (
-                        <Button
-                          onClick={() => window.open(rec.affiliate_link, "_blank")}
-                          className="w-full bg-purple-600 hover:bg-purple-700"
-                        >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Buy External
+                          {rec.affiliate_link.includes("amazon.com") ? (
+                            <img 
+                              src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
+                              alt="Amazon" 
+                              className="h-4 mr-2"
+                            />
+                          ) : (
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                          )}
+                          View on {rec.affiliate_link.includes("amazon.com") ? "Amazon" : "Partner Site"}
                         </Button>
                       )}
                       <div className="flex gap-2">
