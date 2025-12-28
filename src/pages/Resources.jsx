@@ -108,6 +108,30 @@ export default function Resources() {
     navigate(createPageUrl("CacheDetail") + "?id=" + cache.id);
   };
 
+  const handleGenerateSampleCaches = async () => {
+    setLoading(true);
+    try {
+      await base44.functions.invoke('generateSampleCaches');
+      await loadData();
+    } catch (error) {
+      console.error("Error generating sample caches:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateSampleFirstAid = async () => {
+    setLoading(true);
+    try {
+      await base44.functions.invoke('generateSampleFirstAidItems');
+      await loadData();
+    } catch (error) {
+      console.error("Error generating sample first aid items:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -143,6 +167,7 @@ export default function Resources() {
               onUpdate={handleUpdateCache}
               onDelete={handleDeleteCache}
               onViewItems={handleViewCacheItems}
+              onGenerateSamples={handleGenerateSampleCaches}
             />
           </TabsContent>
 
@@ -161,6 +186,7 @@ export default function Resources() {
               onAdd={handleAddFirstAid}
               onUpdate={handleUpdateFirstAid}
               onDelete={handleDeleteFirstAid}
+              onGenerateSamples={handleGenerateSampleFirstAid}
             />
           </TabsContent>
         </Tabs>
