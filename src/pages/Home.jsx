@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [authChecked, setAuthChecked] = React.useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -15,9 +16,12 @@ export default function Home() {
         const user = await base44.auth.me();
         if (user) {
           navigate(createPageUrl("Dashboard"));
+        } else {
+          setAuthChecked(true);
         }
       } catch (e) {
         // Not logged in, stay on home page
+        setAuthChecked(true);
       }
     };
     checkAuth();
@@ -26,6 +30,14 @@ export default function Home() {
   const handleGetStarted = () => {
     base44.auth.redirectToLogin(window.location.pathname);
   };
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
