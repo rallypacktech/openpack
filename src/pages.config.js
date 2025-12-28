@@ -7,6 +7,8 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import CacheDetail from './pages/CacheDetail';
 import AdminRecommendations from './pages/AdminRecommendations';
+import CheckoutSuccess from './pages/CheckoutSuccess';
+import CheckoutCancel from './pages/CheckoutCancel';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +22,8 @@ export const PAGES = {
     "TermsAndConditions": TermsAndConditions,
     "CacheDetail": CacheDetail,
     "AdminRecommendations": AdminRecommendations,
+    "CheckoutSuccess": CheckoutSuccess,
+    "CheckoutCancel": CheckoutCancel,
 }
 
 export const pagesConfig = {

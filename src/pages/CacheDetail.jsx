@@ -152,28 +152,24 @@ export default function CacheDetail() {
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
     
-    // Mark items as purchased
-    for (const item of cartItems) {
-      await base44.entities.UserCacheProgress.create({
-        cache_id: cache.id,
-        recommendation_id: item.id,
-        status: "purchased",
-        purchased_at: new Date().toISOString()
-      });
+    try {
+      const appHost = window.location.origin;
+      const recIds = cartItems.map(item => item.id).join(",");
       
-      // Add to cache items
-      await base44.entities.CacheItem.create({
+      const response = await base44.functions.invoke('createCheckoutSession', {
+        items: cartItems,
         cache_id: cache.id,
-        item_name: item.item_name,
-        quantity: item.quantity,
-        category: item.category,
-        notes: "Purchased via recommendation"
+        success_url: `${appHost}${createPageUrl("CheckoutSuccess")}?session_id={CHECKOUT_SESSION_ID}&cache_id=${cache.id}&rec_ids=${recIds}`,
+        cancel_url: `${appHost}${createPageUrl("CheckoutCancel")}?cache_id=${cache.id}`
       });
+
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Error creating checkout session. Please try again.");
     }
-    
-    setCartItems([]);
-    loadData();
-    alert("Items purchased and added to your cache!");
   };
 
   const handleBarcodeSubmit = async () => {
