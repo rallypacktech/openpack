@@ -1,6 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
+import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -18,6 +19,28 @@ import {
 } from "lucide-react";
 
 export default function LearnMore() {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await base44.auth.me();
+        setIsLoggedIn(!!user);
+      } catch (e) {
+        setIsLoggedIn(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleGetStarted = () => {
+    if (isLoggedIn) {
+      navigate(createPageUrl("Dashboard"));
+    } else {
+      navigate(createPageUrl("Home"));
+    }
+  };
   const stats = [
     {
       value: "60%",
@@ -100,12 +123,10 @@ export default function LearnMore() {
             During disasters, families are separated, communication fails, and relief resources are scattered. 
             This creates emotional distress, a $2B–$3.9B annual financial burden, and prolonged displacement for millions.
           </p>
-          <Link to={createPageUrl("Home")}>
-            <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50">
-              Start Preparing Today
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
+          <Button size="lg" onClick={handleGetStarted} className="bg-white text-emerald-700 hover:bg-emerald-50">
+            Start Preparing Today
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
       </div>
 
@@ -202,11 +223,9 @@ export default function LearnMore() {
             Join thousands of families who've taken control of their safety. Start building your emergency plan today—it's free, private, and could save lives.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to={createPageUrl("Home")}>
-              <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50">
-                Get Started Free
-              </Button>
-            </Link>
+            <Button size="lg" onClick={handleGetStarted} className="bg-white text-emerald-700 hover:bg-emerald-50">
+              Get Started Free
+            </Button>
           </div>
         </div>
       </div>
