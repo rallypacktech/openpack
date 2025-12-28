@@ -193,6 +193,7 @@ export default function PrivacyPolicy() {
               <ul>
                 <li><strong>Base44:</strong> Primary application platform and database</li>
                 <li><strong>Supabase (PostgreSQL):</strong> Encrypted backup database for compliance</li>
+                <li><strong>Stripe:</strong> Secure payment processing (receives payment information, email, and transaction details)</li>
                 <li><strong>Open-Meteo:</strong> Weather data provider (location coordinates only, no personal data)</li>
                 <li><strong>OpenStreetMap Nominatim:</strong> Address geocoding (address data only, no account information)</li>
               </ul>
