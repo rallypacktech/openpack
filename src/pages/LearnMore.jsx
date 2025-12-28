@@ -38,7 +38,7 @@ export default function LearnMore() {
     if (isLoggedIn) {
       navigate(createPageUrl("Dashboard"));
     } else {
-      navigate(createPageUrl("Home"));
+      base44.auth.redirectToLogin(window.location.pathname);
     }
   };
   const stats = [
