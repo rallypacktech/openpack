@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "../utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CachesList from "../components/resources/CachesList";
 import MeetSpotsList from "../components/resources/MeetSpotsList";
 import FirstAidTracker from "../components/resources/FirstAidTracker";
 
 export default function Resources() {
+  const navigate = useNavigate();
   const [caches, setCaches] = useState([]);
   const [meetSpots, setMeetSpots] = useState([]);
   const [firstAidItems, setFirstAidItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("caches");
+  const [samplesCreated, setSamplesCreated] = useState(false);
 
   // Get tab from URL params
   useEffect(() => {
@@ -36,6 +40,15 @@ export default function Resources() {
       setCaches(cachesData);
       setMeetSpots(spotsData);
       setFirstAidItems(firstAidData);
+
+      // Create sample caches if user has none
+      if (!samplesCreated && cachesData.length === 0) {
+        await base44.functions.invoke('createSampleCaches');
+        setSamplesCreated(true);
+        // Reload data to show samples
+        const updatedCaches = await base44.entities.EmergencyCache.list();
+        setCaches(updatedCaches);
+      }
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -91,6 +104,10 @@ export default function Resources() {
     loadData();
   };
 
+  const handleViewCacheItems = (cache) => {
+    navigate(createPageUrl("CacheDetail") + "?id=" + cache.id);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -104,7 +121,7 @@ export default function Resources() {
       {/* Header */}
       <div className="bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-2xl font-bold">Emergency Resources</h1>
+          <h1 className="text-2xl font-bold">Your Caches</h1>
           <p className="text-blue-100 mt-1">
             Manage your emergency caches, meet spots, and first aid supplies to keep your family prepared and safe.
           </p>
@@ -125,7 +142,7 @@ export default function Resources() {
               onAdd={handleAddCache}
               onUpdate={handleUpdateCache}
               onDelete={handleDeleteCache}
-              onViewItems={() => {}}
+              onViewItems={handleViewCacheItems}
             />
           </TabsContent>
 

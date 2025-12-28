@@ -325,6 +325,34 @@ Deno.serve(async (req) => {
             await supabase.from('aggregate_resource_hotspots').upsert(resourcesData, { onConflict: 'location_identifier' });
         }
 
+        // Sync versioned cache data for outage resilience
+        const allCacheItems = await base44.asServiceRole.entities.CacheItem.list();
+        
+        for (const cache of allCaches) {
+            const cacheItems = allCacheItems.filter(item => item.cache_id === cache.id);
+            const hashedCacheId = await hashData(cache.id, salt);
+            const hashedOwnerId = await hashData(cache.created_by, salt);
+            
+            const versionedCacheData = {
+                cache_id_hash: hashedCacheId,
+                owner_id_hash: hashedOwnerId,
+                cache_name: cache.name,
+                cache_location: cache.location,
+                cache_description: cache.description || null,
+                items: cacheItems.map(item => ({
+                    item_name: item.item_name,
+                    quantity: item.quantity,
+                    category: item.category,
+                    expiration_date: item.expiration_date || null,
+                    notes: item.notes || null
+                })),
+                version: new Date().getTime(),
+                synced_at: new Date().toISOString()
+            };
+            
+            await supabase.from('versioned_caches').upsert(versionedCacheData, { onConflict: 'cache_id_hash' });
+        }
+
         return Response.json({ 
             success: true, 
             message: 'All data synced to Supabase with encryption',
@@ -336,7 +364,8 @@ Deno.serve(async (req) => {
                 aggregate_shelter_demand: shelterDemandData.length,
                 aggregate_preparedness: preparednessData.length,
                 aggregate_special_needs: specialNeedsData.length,
-                aggregate_resources: resourcesData.length
+                aggregate_resources: resourcesData.length,
+                versioned_caches: allCaches.length
             }
         });
 
