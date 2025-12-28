@@ -187,7 +187,7 @@ export default function Layout({ children, currentPageName }) {
             <p className="mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
           </div>
         </div>
-      </footer>
+        </footer>
       )}
     </div>
   );
