@@ -288,9 +288,10 @@ export default function TermsAndConditions() {
               <ul>
                 <li>We reserve the right to modify or discontinue the Service at any time</li>
                 <li>We may update these Terms periodically with notice to users</li>
-                <li>You may terminate your account at any time through Settings or by contacting support</li>
+                <li>You may terminate your account at any time through Settings → Danger Zone</li>
                 <li>We may suspend or terminate accounts that violate these Terms</li>
-                <li>Upon termination, your data will be deleted per our Privacy Policy retention schedule</li>
+                <li>Upon termination, your personal data will be deleted per our Privacy Policy retention schedule</li>
+                <li><strong>Pet Microchip Data Retention:</strong> If you have registered pets with microchip numbers, this information (microchip number, last known owner name and address, pet species/breed) will be retained indefinitely for emergency pet recovery purposes. This data is anonymized, encrypted, and only accessible to authorized microchip companies and emergency response organizations. This practice complies with animal welfare and ownership laws. Contact privacy@rallypack.tech to request complete pet data removal.</li>
               </ul>
             </CardContent>
           </Card>

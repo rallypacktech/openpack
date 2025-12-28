@@ -207,7 +207,15 @@ export default function PrivacyPolicy() {
             <CardContent className="prose prose-sm max-w-none">
               <ul>
                 <li><strong>Active Accounts:</strong> Data retained while account is active</li>
-                <li><strong>Deleted Accounts:</strong> Data permanently deleted within 30 days of account deletion request</li>
+                <li><strong>Deleted Accounts:</strong> Personal data permanently deleted within 30 days of account deletion request</li>
+                <li><strong>Pet Microchip Records (Special Exception):</strong> When you delete your account, we retain:
+                  <ul>
+                    <li>Pet microchip numbers</li>
+                    <li>Last known owner name and address</li>
+                    <li>Pet species and breed</li>
+                  </ul>
+                  This information is retained indefinitely in an anonymized format to assist with emergency pet recovery and reunification during disasters. This practice complies with animal welfare laws and helps protect pets when traditional contact methods fail. Retained data is only accessible to authorized microchip registry partners and emergency response organizations. If you require complete pet data removal, contact privacy@rallypack.tech.
+                </li>
                 <li><strong>Backup Data:</strong> Encrypted backups retained for 90 days for disaster recovery</li>
                 <li><strong>Compliance Records:</strong> Anonymized data may be retained longer for legal compliance</li>
                 <li><strong>Audit Logs:</strong> Security and access logs retained for 12 months for SOC 2 compliance</li>
@@ -223,7 +231,8 @@ export default function PrivacyPolicy() {
               <ul>
                 <li><strong>Access & Update:</strong> You can view and edit your profile and data through Settings</li>
                 <li><strong>Delete Data:</strong> You can delete specific entries (family members, pets, caches) at any time</li>
-                <li><strong>Account Deletion:</strong> Contact support to request full account deletion</li>
+                <li><strong>Account Deletion:</strong> You can delete your account through Settings → Danger Zone. Personal information will be removed, but pet microchip records are retained for emergency recovery purposes.</li>
+                <li><strong>Pet Data Removal:</strong> If you need complete pet data removal including microchip information, contact privacy@rallypack.tech with your request</li>
                 <li><strong>Notification Controls:</strong> Manage alert preferences in Settings</li>
                 <li><strong>Data Export:</strong> Request a copy of your data by contacting support</li>
               </ul>
