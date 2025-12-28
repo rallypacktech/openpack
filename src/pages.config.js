@@ -10,6 +10,7 @@ import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Home from './pages/Home';
+import LearnMore from './pages/LearnMore';
 import __Layout from './Layout.jsx';
 
 
@@ -26,6 +27,7 @@ export const PAGES = {
     "Settings": Settings,
     "TermsAndConditions": TermsAndConditions,
     "Home": Home,
+    "LearnMore": LearnMore,
 }
 
 export const pagesConfig = {
