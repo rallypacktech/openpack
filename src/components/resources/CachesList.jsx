@@ -62,7 +62,7 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                 Add Cache
               </Button>
             </DialogTrigger>
-          <DialogContent>
+            <DialogContent>
             <DialogHeader>
               <DialogTitle>{editingCache ? "Edit" : "Add"} Emergency Cache</DialogTitle>
             </DialogHeader>
@@ -95,8 +95,9 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                 {editingCache ? "Update" : "Add"} Cache
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {caches && caches.length > 0 ? (
