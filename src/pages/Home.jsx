@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { Shield, Users, Package, AlertTriangle, Cloud, Heart, MapPin, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,14 +50,15 @@ export default function Home() {
             >
               Get Started Free
             </Button>
-            <Button 
-              onClick={handleGetStarted}
-              variant="outline" 
-              size="lg"
-              className="text-lg px-8 py-6"
-            >
-              Learn More
-            </Button>
+            <Link to={createPageUrl("LearnMore")}>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="text-lg px-8 py-6"
+              >
+                Learn More
+              </Button>
+            </Link>
           </div>
           <p className="text-sm text-gray-500 mt-4">
             ✓ Always free  ✓ Your data stays private  ✓ No credit card required
