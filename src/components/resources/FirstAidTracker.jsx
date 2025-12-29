@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,10 +7,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Calendar, MapPin, AlertCircle, Check, FileDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Calendar, MapPin, AlertCircle, Check, FileDown, Heart } from "lucide-react";
 import { format } from "date-fns";
+import { base44 } from "@/api/base44Client";
 
 export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete, onGenerateSamples }) {
+  const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
+  const [cacheName, setCacheName] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -21,6 +25,28 @@ export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete, onGe
     owned: false,
     notes: ""
   });
+
+  useEffect(() => {
+    loadFirstAidKitLocation();
+  }, []);
+
+  const loadFirstAidKitLocation = async () => {
+    try {
+      const locations = await base44.entities.FirstAidKitLocation.list();
+      if (locations.length > 0) {
+        setFirstAidKitLocation(locations[0]);
+        
+        // Load cache name
+        const caches = await base44.entities.EmergencyCache.list();
+        const cache = caches.find(c => c.id === locations[0].emergency_cache_id);
+        if (cache) {
+          setCacheName(cache.name);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading first aid kit location:", error);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -83,6 +109,33 @@ export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete, onGe
 
   return (
     <div>
+      {/* First Aid Kit Location Badge */}
+      {firstAidKitLocation && cacheName && (
+        <Card className="mb-6 bg-red-50 border-red-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Heart className="w-5 h-5 text-red-600" />
+              <div>
+                <p className="text-sm font-semibold text-red-900">First Aid Kit Location</p>
+                <p className="text-sm text-red-700">Currently in: <strong>{cacheName}</strong></p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      {!firstAidKitLocation && (
+        <Card className="mb-6 bg-orange-50 border-orange-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-orange-600" />
+              <p className="text-sm text-orange-700">
+                No cache designated for First Aid Kit yet. Go to Caches tab to set a location.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Stats Bar */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-gray-100 rounded-lg p-4 text-center">

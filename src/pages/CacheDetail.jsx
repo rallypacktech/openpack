@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export default function CacheDetail() {
@@ -22,6 +22,8 @@ export default function CacheDetail() {
   const [editingItem, setEditingItem] = useState(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [barcode, setBarcode] = useState("");
+  const [isFirstAidKitLocation, setIsFirstAidKitLocation] = useState(false);
+  const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
   const [formData, setFormData] = useState({
     item_name: "",
     quantity: 1,
@@ -78,10 +80,36 @@ export default function CacheDetail() {
         progressMap[p.recommendation_id] = p;
       });
       setUserProgress(progressMap);
+
+      // Check if this cache is the first aid kit location
+      const firstAidLocations = await base44.entities.FirstAidKitLocation.list();
+      if (firstAidLocations.length > 0) {
+        setFirstAidKitLocation(firstAidLocations[0]);
+        setIsFirstAidKitLocation(firstAidLocations[0].emergency_cache_id === cacheId);
+      }
     } catch (error) {
       console.error("Error loading cache details:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDesignateFirstAidKit = async () => {
+    try {
+      if (firstAidKitLocation) {
+        // Update existing location
+        await base44.entities.FirstAidKitLocation.update(firstAidKitLocation.id, {
+          emergency_cache_id: cache.id
+        });
+      } else {
+        // Create new location
+        await base44.entities.FirstAidKitLocation.create({
+          emergency_cache_id: cache.id
+        });
+      }
+      await loadData();
+    } catch (error) {
+      console.error("Error designating first aid kit location:", error);
     }
   };
 
@@ -265,13 +293,31 @@ export default function CacheDetail() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Resources
           </Button>
-          <h1 className="text-2xl font-bold">{cache.name}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl font-bold">{cache.name}</h1>
+            {isFirstAidKitLocation && (
+              <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                <Heart className="w-4 h-4" />
+                First Aid Kit
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2 text-blue-100 mt-2">
             <MapPin className="w-4 h-4" />
             <span>{cache.location}</span>
           </div>
           {cache.description && (
             <p className="text-blue-100 mt-2">{cache.description}</p>
+          )}
+          {!isFirstAidKitLocation && (
+            <Button
+              variant="outline"
+              onClick={handleDesignateFirstAidKit}
+              className="mt-4 bg-white text-red-600 border-red-300 hover:bg-red-50"
+            >
+              <Heart className="w-4 h-4 mr-2" />
+              Set as First Aid Kit Location
+            </Button>
           )}
         </div>
       </div>

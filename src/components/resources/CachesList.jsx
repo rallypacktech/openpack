@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, MapPin, List, Package } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Pencil, Trash2, MapPin, List, Package, Heart } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewItems, onGenerateSamples }) {
+  const [firstAidKitLocationId, setFirstAidKitLocationId] = useState(null);
+  const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCache, setEditingCache] = useState(null);
   const [formData, setFormData] = useState({
@@ -15,6 +19,41 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
     location: "",
     description: ""
   });
+
+  useEffect(() => {
+    loadFirstAidKitLocation();
+  }, [caches]);
+
+  const loadFirstAidKitLocation = async () => {
+    try {
+      const locations = await base44.entities.FirstAidKitLocation.list();
+      if (locations.length > 0) {
+        setFirstAidKitLocation(locations[0]);
+        setFirstAidKitLocationId(locations[0].emergency_cache_id);
+      }
+    } catch (error) {
+      console.error("Error loading first aid kit location:", error);
+    }
+  };
+
+  const handleDesignateFirstAidKit = async (cacheId) => {
+    try {
+      if (firstAidKitLocation) {
+        // Update existing location
+        await base44.entities.FirstAidKitLocation.update(firstAidKitLocation.id, {
+          emergency_cache_id: cacheId
+        });
+      } else {
+        // Create new location
+        await base44.entities.FirstAidKitLocation.create({
+          emergency_cache_id: cacheId
+        });
+      }
+      await loadFirstAidKitLocation();
+    } catch (error) {
+      console.error("Error designating first aid kit location:", error);
+    }
+  };
 
   const resetForm = () => {
     setFormData({ name: "", location: "", description: "" });
@@ -106,7 +145,15 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
             <Card key={cache.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-semibold text-gray-900">{cache.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-gray-900">{cache.name}</h3>
+                    {firstAidKitLocationId === cache.id && (
+                      <Badge className="bg-red-100 text-red-700">
+                        <Heart className="w-3 h-3 mr-1" />
+                        First Aid Kit
+                      </Badge>
+                    )}
+                  </div>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => openEditDialog(cache)}>
                       <Pencil className="w-4 h-4" />
@@ -121,14 +168,35 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                   <span>{cache.location}</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-4">{cache.description}</p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => onViewItems(cache)}
-                >
-                  <List className="w-4 h-4 mr-2" />
-                  View Items
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => onViewItems(cache)}
+                  >
+                    <List className="w-4 h-4 mr-2" />
+                    View Items
+                  </Button>
+                  {firstAidKitLocationId === cache.id ? (
+                    <Button
+                      variant="outline"
+                      className="w-full border-red-300 text-red-700 hover:bg-red-50"
+                      disabled
+                    >
+                      <Heart className="w-4 h-4 mr-2" />
+                      Contains First Aid Kit
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                      onClick={() => handleDesignateFirstAidKit(cache.id)}
+                    >
+                      <Heart className="w-4 h-4 mr-2" />
+                      Set as First Aid Kit Location
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
