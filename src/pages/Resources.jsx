@@ -31,23 +31,37 @@ export default function Resources() {
 
   const loadData = async () => {
     try {
-      const [cachesData, spotsData, firstAidData] = await Promise.all([
-        base44.entities.EmergencyCache.list(),
-        base44.entities.MeetSpot.list(),
-        base44.entities.FirstAidItem.list()
+      const user = await base44.auth.me();
+      
+      // Get family members where current user is listed as emergency contact
+      const allFamilyMembers = await base44.entities.FamilyMember.list();
+      const packOwnerEmails = allFamilyMembers
+        .filter(fm => fm.emergency_contact === user.email)
+        .map(fm => fm.created_by);
+      
+      // Get caches created by user or by pack owners
+      const allCaches = await base44.entities.EmergencyCache.list();
+      const cachesData = allCaches.filter(cache => 
+        cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
+      );
+
+      // Filter other entities by created_by
+      const [spotsData, firstAidData] = await Promise.all([
+        base44.entities.MeetSpot.filter({ created_by: user.email }),
+        base44.entities.FirstAidItem.filter({ created_by: user.email })
       ]);
 
       setCaches(cachesData);
       setMeetSpots(spotsData);
       setFirstAidItems(firstAidData);
 
-      // Create sample caches if user has none
-      if (!samplesCreated && cachesData.length === 0) {
+      // Create sample caches if user has none of their own
+      const ownCaches = cachesData.filter(c => c.created_by === user.email);
+      if (!samplesCreated && ownCaches.length === 0) {
         await base44.functions.invoke('createSampleCaches');
         setSamplesCreated(true);
         // Reload data to show samples
-        const updatedCaches = await base44.entities.EmergencyCache.list();
-        setCaches(updatedCaches);
+        await loadData();
       }
     } catch (error) {
       console.error("Error loading data:", error);

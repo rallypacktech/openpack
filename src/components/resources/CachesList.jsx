@@ -12,6 +12,7 @@ import { base44 } from "@/api/base44Client";
 export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewItems, onGenerateSamples }) {
   const [firstAidKitLocationId, setFirstAidKitLocationId] = useState(null);
   const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCache, setEditingCache] = useState(null);
   const [formData, setFormData] = useState({
@@ -22,7 +23,17 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
 
   useEffect(() => {
     loadFirstAidKitLocation();
+    loadCurrentUser();
   }, [caches]);
+
+  const loadCurrentUser = async () => {
+    try {
+      const user = await base44.auth.me();
+      setCurrentUserEmail(user.email);
+    } catch (error) {
+      console.error("Error loading user:", error);
+    }
+  };
 
   const loadFirstAidKitLocation = async () => {
     try {
@@ -141,12 +152,19 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
 
       {caches && caches.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {caches.map((cache) => (
+          {caches.map((cache) => {
+            const isOwner = cache.created_by === currentUserEmail;
+            return (
             <Card key={cache.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-gray-900">{cache.name}</h3>
+                    {!isOwner && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        Pack Member
+                      </Badge>
+                    )}
                     {firstAidKitLocationId === cache.id && (
                       <Badge className="bg-red-100 text-red-700">
                         <Heart className="w-3 h-3 mr-1" />
@@ -154,14 +172,16 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                       </Badge>
                     )}
                   </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => openEditDialog(cache)}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onDelete(cache.id)} className="text-red-500 hover:text-red-600">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  {isOwner && (
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(cache)}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => onDelete(cache.id)} className="text-red-500 hover:text-red-600">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                   <MapPin className="w-4 h-4" />
@@ -177,29 +197,32 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                     <List className="w-4 h-4 mr-2" />
                     View Items
                   </Button>
-                  {firstAidKitLocationId === cache.id ? (
-                    <Button
-                      variant="outline"
-                      className="w-full border-red-300 text-red-700 hover:bg-red-50"
-                      disabled
-                    >
-                      <Heart className="w-4 h-4 mr-2" />
-                      Contains First Aid Kit
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="w-full border-red-300 text-red-600 hover:bg-red-50"
-                      onClick={() => handleDesignateFirstAidKit(cache.id)}
-                    >
-                      <Heart className="w-4 h-4 mr-2" />
-                      Set as First Aid Kit Location
-                    </Button>
+                  {isOwner && (
+                    firstAidKitLocationId === cache.id ? (
+                      <Button
+                        variant="outline"
+                        className="w-full border-red-300 text-red-700 hover:bg-red-50"
+                        disabled
+                      >
+                        <Heart className="w-4 h-4 mr-2" />
+                        Contains First Aid Kit
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                        onClick={() => handleDesignateFirstAidKit(cache.id)}
+                      >
+                        <Heart className="w-4 h-4 mr-2" />
+                        Set as First Aid Kit Location
+                      </Button>
+                    )
                   )}
                 </div>
               </CardContent>
             </Card>
-          ))}
+          );
+          })}
         </div>
       ) : (
         <Card>

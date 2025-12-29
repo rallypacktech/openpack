@@ -46,20 +46,36 @@ export default function CacheDetail() {
         return;
       }
 
-      const [cachesData, itemsData, recsData, progressData] = await Promise.all([
+      const user = await base44.auth.me();
+      
+      // Get family members where current user is emergency contact
+      const allFamilyMembers = await base44.entities.FamilyMember.list();
+      const packOwnerEmails = allFamilyMembers
+        .filter(fm => fm.emergency_contact === user.email)
+        .map(fm => fm.created_by);
+      
+      const [allCaches, itemsData, recsData, progressData] = await Promise.all([
         base44.entities.EmergencyCache.list(),
         base44.entities.CacheItem.filter({ cache_id: cacheId }),
         base44.entities.ProductRecommendation.filter({ active: true }, "-priority"),
         base44.entities.UserCacheProgress.filter({ cache_id: cacheId })
       ]);
+      
+      // Filter caches by ownership or pack membership
+      const cachesData = allCaches.filter(cache => 
+        cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
+      );
 
       const foundCache = cachesData.find(c => c.id === cacheId);
       if (!foundCache) {
         navigate(createPageUrl("Resources"));
         return;
       }
+      
+      // Check if user is owner (can edit) or just viewer
+      const isOwner = foundCache.created_by === user.email;
 
-      setCache(foundCache);
+      setCache({ ...foundCache, isOwner });
       setItems(itemsData);
 
       // Determine cache type from name (case insensitive matching)
@@ -355,19 +371,20 @@ export default function CacheDetail() {
         )}
 
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Your Items</h2>
-          <div className="flex gap-2">
-            <Button onClick={() => setScannerOpen(true)} variant="outline">
-              <Barcode className="w-4 h-4 mr-2" />
-              Scan Barcode
-            </Button>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Item
+          <h2 className="text-xl font-semibold">{cache.isOwner ? 'Your Items' : 'Pack Member Items (View Only)'}</h2>
+          {cache.isOwner && (
+            <div className="flex gap-2">
+              <Button onClick={() => setScannerOpen(true)} variant="outline">
+                <Barcode className="w-4 h-4 mr-2" />
+                Scan Barcode
               </Button>
-            </DialogTrigger>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Item
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{editingItem ? "Edit" : "Add"} Item</DialogTitle>
@@ -428,9 +445,10 @@ export default function CacheDetail() {
                 </Button>
               </div>
             </DialogContent>
-          </Dialog>
-          </div>
-        </div>
+            </Dialog>
+            </div>
+            )}
+            </div>
 
         {/* Barcode Scanner Dialog */}
         <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
@@ -489,19 +507,21 @@ export default function CacheDetail() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold text-gray-900">{item.item_name}</h3>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(item.id)}
-                        className="text-red-500 hover:text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    {cache.isOwner && (
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(item.id)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-1 text-sm text-gray-600">
                     <p><strong>Quantity:</strong> {item.quantity}</p>
