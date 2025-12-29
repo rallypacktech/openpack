@@ -462,6 +462,28 @@ export default function CacheDetail() {
 
         {items && items.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {isFirstAidKitLocation && (
+              <Card className="bg-red-50 border-red-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-red-600" />
+                      <h3 className="font-semibold text-gray-900">First Aid Kit</h3>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Your complete first aid supplies tracker
+                  </p>
+                  <Button
+                    onClick={() => navigate(createPageUrl("Resources") + "?tab=firstaid")}
+                    className="w-full bg-red-600 hover:bg-red-700"
+                  >
+                    <Heart className="w-4 h-4 mr-2" />
+                    Manage First Aid Kit
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             {items.map((item) => (
               <Card key={item.id}>
                 <CardContent className="p-4">
