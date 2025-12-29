@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
         }
 
         // Check if user already has SAMPLE caches
-        const existingCaches = await base44.entities.EmergencyCache.list();
+        const existingCaches = await base44.entities.EmergencyCache.filter({ created_by: user.email });
         const hasSampleCaches = existingCaches.some(cache => cache.name.includes('SAMPLE'));
         
         if (hasSampleCaches) {
