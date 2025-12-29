@@ -26,13 +26,26 @@ export default function Dashboard() {
 
   const loadData = async () => {
     try {
-      const [profileData, cachesData, spotsData, firstAidData, notifData] = await Promise.all([
+      const user = await base44.auth.me();
+      
+      const [profileData, allCaches, allFamilyMembers, spotsData, firstAidData, notifData] = await Promise.all([
         base44.entities.UserProfile.list(),
         base44.entities.EmergencyCache.list(),
+        base44.entities.FamilyMember.list(),
         base44.entities.MeetSpot.list(),
         base44.entities.FirstAidItem.list(),
         base44.entities.Notification.list("-created_date", 10)
       ]);
+
+      // Get pack members who listed current user as emergency contact
+      const packOwnerEmails = allFamilyMembers
+        .filter(fm => fm.emergency_contact === user.email)
+        .map(fm => fm.created_by);
+      
+      // Filter caches by ownership or pack membership
+      const cachesData = allCaches.filter(cache => 
+        cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
+      );
 
       if (profileData.length > 0) {
         setUserProfile(profileData[0]);
