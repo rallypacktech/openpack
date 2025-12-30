@@ -16,7 +16,7 @@ export default function WeatherCard({ weather, alerts }) {
           <div className="space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-4xl font-bold text-gray-900">{weather.temperature}°C</p>
+                <p className="text-4xl font-bold text-gray-900">{weather.temperature}{weather.unit || "°C"}</p>
                 <p className="text-gray-500">{weather.description}</p>
                 {weather.highLow && (
                   <p className="text-sm text-gray-400 mt-1">{weather.highLow}</p>
@@ -25,7 +25,7 @@ export default function WeatherCard({ weather, alerts }) {
               <div className="text-right text-sm text-gray-500 space-y-1">
                 <div className="flex items-center gap-1 justify-end">
                   <Thermometer className="w-4 h-4" />
-                  <span>Feels {weather.feelsLike}°C</span>
+                  <span>Feels {weather.feelsLike}{weather.unit || "°C"}</span>
                 </div>
                 <div className="flex items-center gap-1 justify-end">
                   <Wind className="w-4 h-4" />
