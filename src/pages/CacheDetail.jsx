@@ -225,23 +225,37 @@ export default function CacheDetail() {
       const html5QrCode = new Html5Qrcode("qr-reader");
       scannerRef.current = html5QrCode;
       
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 }
-        },
-        (decodedText) => {
-          // Success callback
-          setBarcode(decodedText);
-          stopScanner();
-        },
-        (errorMessage) => {
-          // Error callback - ignore continuous scanning errors
-        }
-      );
+      // Try to get camera ID first
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length > 0) {
+        // Use the back camera if available, otherwise use first camera
+        const backCamera = devices.find(device => 
+          device.label.toLowerCase().includes('back') || 
+          device.label.toLowerCase().includes('rear')
+        ) || devices[0];
+        
+        await html5QrCode.start(
+          backCamera.id,
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0
+          },
+          (decodedText) => {
+            setBarcode(decodedText);
+            stopScanner();
+          },
+          () => {
+            // Error callback - ignore continuous scanning errors
+          }
+        );
+      } else {
+        alert("No camera found on your device");
+        setScanning(false);
+      }
     } catch (err) {
-      console.error("Unable to start scanner:", err);
+      console.error("Camera error:", err);
+      alert("Unable to access camera. Please check permissions in your device settings.");
       setScanning(false);
     }
   };
