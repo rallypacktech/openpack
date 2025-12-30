@@ -19,25 +19,39 @@ Deno.serve(async (req) => {
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `Look up the product with UPC/barcode: ${barcode}. 
       
-      Provide the product name, appropriate emergency cache category, and typical expiration/shelf life information if applicable.
+      Return the ACTUAL PRODUCT NAME (brand + product type, e.g., "Dove Bar Soap" or "Irish Spring Body Wash"), not generic terms.
       
-      For category, choose the most appropriate from: water, food, medical, tools, clothing, documents, communication, hygiene, other
+      For category, choose the most appropriate:
+      - "hygiene" for: soaps, shampoo, body wash, deodorant, toothpaste, lotions, personal care items
+      - "medical" for: medications, first aid supplies, bandages
+      - "food" for: food items, snacks, beverages (non-water)
+      - "water" for: bottled water only
+      - "tools" for: hardware, equipment, flashlights, batteries
+      - "clothing" for: apparel items
+      - "communication" for: radios, phones, chargers
+      - "other" for: anything that doesn't fit above
       
-      For expiration, if the product has a typical shelf life, provide it in days (e.g., 730 for 2 years). If unknown or indefinite, return null.`,
+      For shelf_life_days, provide the typical unopened shelf life in days (e.g., food items: 365-1095 days, hygiene products: 730-1095 days, water: 365-730 days). Return null only if truly indefinite (like tools).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: "object",
         properties: {
-          name: { type: "string" },
+          name: { 
+            type: "string",
+            description: "The actual product name with brand"
+          },
           category: { 
             type: "string",
             enum: ["water", "food", "medical", "tools", "clothing", "documents", "communication", "hygiene", "other"]
           },
           shelf_life_days: { 
             type: ["number", "null"],
-            description: "Typical shelf life in days, or null if unknown/indefinite"
+            description: "Typical unopened shelf life in days from today"
           },
-          description: { type: "string" }
+          description: { 
+            type: "string",
+            description: "Brief product description"
+          }
         },
         required: ["name", "category"]
       }
