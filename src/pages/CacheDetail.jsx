@@ -23,6 +23,8 @@ export default function CacheDetail() {
   const [editingItem, setEditingItem] = useState(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [barcode, setBarcode] = useState("");
+  const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
+  const [scannedProduct, setScannedProduct] = useState(null);
   const [isFirstAidKitLocation, setIsFirstAidKitLocation] = useState(false);
   const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
   const [scanning, setScanning] = useState(false);
@@ -325,41 +327,94 @@ export default function CacheDetail() {
           expirationDate = expDate.toISOString().split('T')[0];
         }
         
-        // Add item with product details
-        await base44.entities.CacheItem.create({
-          cache_id: cache.id,
-          item_name: product.name,
-          quantity: 1,
+        // Show verification dialog
+        setScannedProduct({
+          barcode: barcode,
+          name: product.name,
           category: product.category,
           expiration_date: expirationDate,
-          notes: product.description ? `${product.description}\n\nBarcode: ${barcode}` : `Barcode: ${barcode}`
+          shelf_life_days: product.shelf_life_days,
+          description: product.description,
+          ai_suggested_name: product.name,
+          ai_suggested_category: product.category
         });
+        setVerifyDialogOpen(true);
       } else {
         // Fallback if lookup fails
-        await base44.entities.CacheItem.create({
-          cache_id: cache.id,
-          item_name: `Product (Barcode: ${barcode})`,
-          quantity: 1,
+        setScannedProduct({
+          barcode: barcode,
+          name: `Product (Barcode: ${barcode})`,
           category: "other",
-          notes: `Scanned barcode: ${barcode}`
+          expiration_date: "",
+          shelf_life_days: null,
+          description: "",
+          ai_suggested_name: "",
+          ai_suggested_category: ""
         });
+        setVerifyDialogOpen(true);
       }
     } catch (error) {
       console.error("Error processing barcode:", error);
       // Fallback on error
-      await base44.entities.CacheItem.create({
-        cache_id: cache.id,
-        item_name: `Product (Barcode: ${barcode})`,
-        quantity: 1,
+      setScannedProduct({
+        barcode: barcode,
+        name: `Product (Barcode: ${barcode})`,
         category: "other",
-        notes: `Scanned barcode: ${barcode}`
+        expiration_date: "",
+        shelf_life_days: null,
+        description: "",
+        ai_suggested_name: "",
+        ai_suggested_category: ""
       });
+      setVerifyDialogOpen(true);
     }
     
-    setBarcode("");
     setScannerOpen(false);
     setLoading(false);
-    loadData();
+  };
+
+  const handleConfirmScannedItem = async () => {
+    if (!scannedProduct) return;
+    
+    setLoading(true);
+    
+    try {
+      // Check if user made corrections
+      const wasCorrected = scannedProduct.ai_suggested_name && 
+        (scannedProduct.name !== scannedProduct.ai_suggested_name || 
+         scannedProduct.category !== scannedProduct.ai_suggested_category);
+      
+      // If corrected, save to corrections database
+      if (wasCorrected) {
+        await base44.entities.BarcodeCorrection.create({
+          barcode: scannedProduct.barcode,
+          ai_suggested_name: scannedProduct.ai_suggested_name,
+          ai_suggested_category: scannedProduct.ai_suggested_category,
+          corrected_name: scannedProduct.name,
+          corrected_category: scannedProduct.category,
+          corrected_shelf_life_days: scannedProduct.shelf_life_days
+        });
+      }
+      
+      // Add item to cache
+      await base44.entities.CacheItem.create({
+        cache_id: cache.id,
+        item_name: scannedProduct.name,
+        quantity: 1,
+        category: scannedProduct.category,
+        expiration_date: scannedProduct.expiration_date,
+        notes: scannedProduct.description ? `${scannedProduct.description}\n\nBarcode: ${scannedProduct.barcode}` : `Barcode: ${scannedProduct.barcode}`
+      });
+      
+      setVerifyDialogOpen(false);
+      setScannedProduct(null);
+      setBarcode("");
+      loadData();
+    } catch (error) {
+      console.error("Error saving item:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleScannerClose = (open) => {
@@ -602,7 +657,7 @@ export default function CacheDetail() {
                   onKeyPress={(e) => e.key === "Enter" && handleBarcodeSubmit()}
                 />
               </div>
-              
+
               {!scanning && !barcode && (
                 <Button 
                   onClick={startScanner} 
@@ -629,10 +684,80 @@ export default function CacheDetail() {
 
               {barcode && (
                 <Button onClick={handleBarcodeSubmit} className="w-full bg-blue-600 hover:bg-blue-700">
-                  Add Item
+                  Lookup Product
                 </Button>
               )}
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Verify Scanned Product Dialog */}
+        <Dialog open={verifyDialogOpen} onOpenChange={setVerifyDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Verify Product Details</DialogTitle>
+            </DialogHeader>
+            {scannedProduct && (
+              <div className="space-y-4 mt-4">
+                <div>
+                  <Label>Product Name</Label>
+                  <Input
+                    value={scannedProduct.name}
+                    onChange={(e) => setScannedProduct({...scannedProduct, name: e.target.value})}
+                    placeholder="e.g., First Aid Kit"
+                  />
+                </div>
+                <div>
+                  <Label>Category</Label>
+                  <select
+                    className="w-full border rounded-md px-3 py-2"
+                    value={scannedProduct.category}
+                    onChange={(e) => setScannedProduct({...scannedProduct, category: e.target.value})}
+                  >
+                    <option value="water">Water</option>
+                    <option value="food">Food</option>
+                    <option value="medical">Medical</option>
+                    <option value="tools">Tools</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="documents">Documents</option>
+                    <option value="communication">Communication</option>
+                    <option value="hygiene">Hygiene</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>Expiration Date</Label>
+                  <Input
+                    type="date"
+                    value={scannedProduct.expiration_date}
+                    onChange={(e) => setScannedProduct({...scannedProduct, expiration_date: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Shelf Life (days)</Label>
+                  <Input
+                    type="number"
+                    value={scannedProduct.shelf_life_days || ""}
+                    onChange={(e) => {
+                      const days = parseInt(e.target.value) || null;
+                      const newExpDate = days ? new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : "";
+                      setScannedProduct({
+                        ...scannedProduct, 
+                        shelf_life_days: days,
+                        expiration_date: newExpDate
+                      });
+                    }}
+                    placeholder="e.g., 730 for 2 years"
+                  />
+                </div>
+                <div className="bg-gray-50 p-3 rounded text-xs text-gray-600">
+                  <strong>Barcode:</strong> {scannedProduct.barcode}
+                </div>
+                <Button onClick={handleConfirmScannedItem} className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
+                  {loading ? "Adding..." : "Add to Cache"}
+                </Button>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
 
