@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Html5Qrcode } from "html5-qrcode";
 
 export default function CacheDetail() {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ export default function CacheDetail() {
   const [barcode, setBarcode] = useState("");
   const [isFirstAidKitLocation, setIsFirstAidKitLocation] = useState(false);
   const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
+  const [scanning, setScanning] = useState(false);
+  const scannerRef = useRef(null);
   const [formData, setFormData] = useState({
     item_name: "",
     quantity: 1,
@@ -216,8 +219,62 @@ export default function CacheDetail() {
     }
   };
 
+  const startScanner = async () => {
+    setScanning(true);
+    try {
+      const html5QrCode = new Html5Qrcode("qr-reader");
+      scannerRef.current = html5QrCode;
+      
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 }
+        },
+        (decodedText) => {
+          // Success callback
+          setBarcode(decodedText);
+          stopScanner();
+        },
+        (errorMessage) => {
+          // Error callback - ignore continuous scanning errors
+        }
+      );
+    } catch (err) {
+      console.error("Unable to start scanner:", err);
+      setScanning(false);
+    }
+  };
+
+  const stopScanner = () => {
+    if (scannerRef.current) {
+      scannerRef.current.stop().then(() => {
+        scannerRef.current.clear();
+        scannerRef.current = null;
+        setScanning(false);
+      }).catch(err => {
+        console.error("Error stopping scanner:", err);
+        setScanning(false);
+      });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup on unmount
+      if (scannerRef.current) {
+        stopScanner();
+      }
+    };
+  }, []);
+
   const handleBarcodeSubmit = async () => {
     if (!barcode.trim()) return;
+    
+    // Stop scanner if running
+    if (scanning) {
+      stopScanner();
+    }
     
     // Add item with barcode
     await base44.entities.CacheItem.create({
@@ -231,6 +288,13 @@ export default function CacheDetail() {
     setBarcode("");
     setScannerOpen(false);
     loadData();
+  };
+
+  const handleScannerClose = (open) => {
+    if (!open && scanning) {
+      stopScanner();
+    }
+    setScannerOpen(open);
   };
 
   const handleCheckoffRecommendation = async (rec) => {
@@ -451,8 +515,8 @@ export default function CacheDetail() {
             </div>
 
         {/* Barcode Scanner Dialog */}
-        <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
-          <DialogContent>
+        <Dialog open={scannerOpen} onOpenChange={handleScannerClose}>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Scan or Enter Barcode</DialogTitle>
             </DialogHeader>
@@ -462,18 +526,40 @@ export default function CacheDetail() {
                 <Input
                   value={barcode}
                   onChange={(e) => setBarcode(e.target.value)}
-                  placeholder="Enter barcode manually or use camera"
+                  placeholder="Enter barcode manually or scan"
                   onKeyPress={(e) => e.key === "Enter" && handleBarcodeSubmit()}
                 />
               </div>
-              <div className="text-sm text-gray-500 text-center">
-                <Camera className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p>Camera scanning available on mobile devices</p>
-                <p className="text-xs mt-1">Or enter the barcode number manually above</p>
-              </div>
-              <Button onClick={handleBarcodeSubmit} className="w-full bg-blue-600 hover:bg-blue-700">
-                Add Item
-              </Button>
+              
+              {!scanning && !barcode && (
+                <Button 
+                  onClick={startScanner} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Start Camera Scanner
+                </Button>
+              )}
+
+              {scanning && (
+                <div className="space-y-2">
+                  <div id="qr-reader" className="w-full rounded-lg overflow-hidden"></div>
+                  <Button 
+                    onClick={stopScanner} 
+                    variant="outline" 
+                    className="w-full"
+                  >
+                    Stop Scanner
+                  </Button>
+                </div>
+              )}
+
+              {barcode && (
+                <Button onClick={handleBarcodeSubmit} className="w-full bg-blue-600 hover:bg-blue-700">
+                  Add Item
+                </Button>
+              )}
             </div>
           </DialogContent>
         </Dialog>
