@@ -52,36 +52,29 @@ export default function CacheDetail() {
       }
 
       const user = await base44.auth.me();
-      
-      // Get family members where current user is emergency contact
-      const allFamilyMembers = await base44.entities.FamilyMember.list();
-      const packOwnerEmails = allFamilyMembers
-        .filter(fm => fm.emergency_contact === user.email)
-        .map(fm => fm.created_by);
-      
-      const [allCaches, itemsData, recsData, progressData] = await Promise.all([
-        base44.entities.EmergencyCache.list(),
-        base44.entities.CacheItem.filter({ cache_id: cacheId }),
+
+      const [cacheItemsResponse, recsData, progressData] = await Promise.all([
+        base44.functions.invoke('getCacheItems', { cacheId }),
         base44.entities.ProductRecommendation.filter({ active: true }, "-priority"),
         base44.entities.UserCacheProgress.filter({ cache_id: cacheId })
       ]);
-      
-      // Filter caches by ownership or pack membership
-      const cachesData = allCaches.filter(cache => 
-        cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
-      );
 
-      const foundCache = cachesData.find(c => c.id === cacheId);
+      if (cacheItemsResponse.data.error) {
+        navigate(createPageUrl("Resources"));
+        return;
+      }
+
+      // Get cache details
+      const allCaches = await base44.entities.EmergencyCache.list();
+      const foundCache = allCaches.find(c => c.id === cacheId);
+
       if (!foundCache) {
         navigate(createPageUrl("Resources"));
         return;
       }
-      
-      // Check if user is owner (can edit) or just viewer
-      const isOwner = foundCache.created_by === user.email;
 
-      setCache({ ...foundCache, isOwner });
-      setItems(itemsData);
+      setCache({ ...foundCache, isOwner: cacheItemsResponse.data.isOwner });
+      setItems(cacheItemsResponse.data.items);
 
       // Determine cache type from name (case insensitive matching)
       const cacheName = foundCache.name.toLowerCase();
@@ -379,17 +372,19 @@ export default function CacheDetail() {
     setLoading(true);
     
     try {
-      // Check if user made corrections
-      const wasCorrected = scannedProduct.ai_suggested_name && 
-        (scannedProduct.name !== scannedProduct.ai_suggested_name || 
-         scannedProduct.category !== scannedProduct.ai_suggested_category);
+      // Check if user made corrections (focus on category changes)
+      const categoryWasCorrected = scannedProduct.ai_suggested_category && 
+        scannedProduct.category !== scannedProduct.ai_suggested_category;
       
-      // If corrected, save to corrections database
-      if (wasCorrected) {
+      const nameWasCorrected = scannedProduct.ai_suggested_name && 
+        scannedProduct.name !== scannedProduct.ai_suggested_name;
+      
+      // Save correction if either category or name was changed
+      if (categoryWasCorrected || nameWasCorrected) {
         await base44.entities.BarcodeCorrection.create({
           barcode: scannedProduct.barcode,
-          ai_suggested_name: scannedProduct.ai_suggested_name,
-          ai_suggested_category: scannedProduct.ai_suggested_category,
+          ai_suggested_name: scannedProduct.ai_suggested_name || scannedProduct.name,
+          ai_suggested_category: scannedProduct.ai_suggested_category || scannedProduct.category,
           corrected_name: scannedProduct.name,
           corrected_category: scannedProduct.category,
           corrected_shelf_life_days: scannedProduct.shelf_life_days

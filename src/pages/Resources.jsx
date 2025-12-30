@@ -32,31 +32,16 @@ export default function Resources() {
   const loadData = async () => {
     try {
       const user = await base44.auth.me();
-      
-      // Get family members where current user is listed as emergency contact
-      const allFamilyMembers = await base44.entities.FamilyMember.list();
-      const packOwnerEmails = allFamilyMembers
-        .filter(fm => fm.emergency_contact === user.email)
-        .map(fm => fm.created_by);
-      
-      // Get caches created by user or by pack owners
-      const allCaches = await base44.entities.EmergencyCache.list();
-      const cachesData = allCaches.filter(cache => 
-        cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
-      );
 
-      // Filter meet spots and first aid items by ownership or pack membership
-      const [allSpots, firstAidData] = await Promise.all([
-        base44.entities.MeetSpot.list(),
+      // Use secure backend functions for data access
+      const [cachesResponse, spotsResponse, firstAidData] = await Promise.all([
+        base44.functions.invoke('getCaches'),
+        base44.functions.invoke('getMeetSpots'),
         base44.entities.FirstAidItem.filter({ created_by: user.email })
       ]);
 
-      const spotsData = allSpots.filter(spot => 
-        spot.created_by === user.email || packOwnerEmails.includes(spot.created_by)
-      );
-
-      setCaches(cachesData);
-      setMeetSpots(spotsData);
+      setCaches(cachesResponse.data.caches);
+      setMeetSpots(spotsResponse.data.spots);
       setFirstAidItems(firstAidData);
 
       // Create sample caches if user has none of their own
