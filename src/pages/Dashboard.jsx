@@ -42,9 +42,13 @@ export default function Dashboard() {
         .filter(fm => fm.emergency_contact === user.email)
         .map(fm => fm.created_by);
       
-      // Filter caches by ownership or pack membership
+      // Filter caches and meet spots by ownership or pack membership
       const cachesData = allCaches.filter(cache => 
         cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
+      );
+      
+      const filteredSpots = spotsData.filter(spot => 
+        spot.created_by === user.email || packOwnerEmails.includes(spot.created_by)
       );
 
       if (profileData.length > 0) {
@@ -56,7 +60,7 @@ export default function Dashboard() {
       }
       
       setCaches(cachesData);
-      setMeetSpots(spotsData);
+      setMeetSpots(filteredSpots);
       setFirstAidItems(firstAidData);
       setNotifications(notifData);
     } catch (error) {

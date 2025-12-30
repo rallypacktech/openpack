@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, MapPin, Navigation, Star } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSpot, setEditingSpot] = useState(null);
   const [formData, setFormData] = useState({
@@ -19,6 +22,14 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     description: "",
     is_primary: false
   });
+  
+  useEffect(() => {
+    const loadUser = async () => {
+      const user = await base44.auth.me();
+      setCurrentUserEmail(user.email);
+    };
+    loadUser();
+  }, []);
 
   const resetForm = () => {
     setFormData({
@@ -145,7 +156,9 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
 
       {spots && spots.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {spots.map((spot) => (
+          {spots.map((spot) => {
+            const isOwner = spot.created_by === currentUserEmail;
+            return (
             <Card key={spot.id} className={`hover:shadow-md transition-shadow ${spot.is_primary ? 'ring-2 ring-blue-500' : ''}`}>
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
@@ -154,15 +167,22 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                     {spot.is_primary && (
                       <Star className="w-4 h-4 text-yellow-500 fill-current" />
                     )}
+                    {!isOwner && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        Pack Member
+                      </Badge>
+                    )}
                   </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => openEditDialog(spot)}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onDelete(spot.id)} className="text-red-500 hover:text-red-600">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  {isOwner && (
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(spot)}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => onDelete(spot.id)} className="text-red-500 hover:text-red-600">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 {spot.address && (
                   <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
@@ -181,7 +201,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                 )}
               </CardContent>
             </Card>
-          ))}
+          );
+          })}
         </div>
       ) : (
         <Card>
