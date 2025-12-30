@@ -229,20 +229,24 @@ export default function CacheDetail() {
       return;
     }
 
+    let permissionStream = null;
     try {
       // Request camera permission first
-      await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      permissionStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      
+      // Stop the permission check stream before starting html5-qrcode
+      if (permissionStream) {
+        permissionStream.getTracks().forEach(track => track.stop());
+      }
       
       const html5QrCode = new Html5Qrcode("qr-reader");
       scannerRef.current = html5QrCode;
       
       await html5QrCode.start(
-        { facingMode: { ideal: "environment" } },
+        { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0,
-          formatsToSupport: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Support all barcode formats
+          qrbox: { width: 250, height: 250 }
         },
         (decodedText) => {
           setBarcode(decodedText);
@@ -254,12 +258,21 @@ export default function CacheDetail() {
       );
     } catch (err) {
       console.error("Camera error:", err);
+      
+      // Clean up permission stream if it exists
+      if (permissionStream) {
+        permissionStream.getTracks().forEach(track => track.stop());
+      }
+      
+      const errorMsg = err?.message || err?.toString() || "Unknown error";
+      
       if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
         alert("Camera permission denied. Please allow camera access in your browser settings.");
       } else if (err.name === "NotFoundError") {
         alert("No camera found on your device.");
       } else {
-        alert("Unable to start camera: " + err.message);
+        alert("Unable to start camera. Try entering the barcode manually.");
+        console.error("Full error:", errorMsg);
       }
       setScanning(false);
     }
