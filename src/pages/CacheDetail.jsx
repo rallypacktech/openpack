@@ -221,41 +221,46 @@ export default function CacheDetail() {
 
   const startScanner = async () => {
     setScanning(true);
+    
+    // Check if browser supports camera
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert("Camera not supported on this browser");
+      setScanning(false);
+      return;
+    }
+
     try {
+      // Request camera permission first
+      await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      
       const html5QrCode = new Html5Qrcode("qr-reader");
       scannerRef.current = html5QrCode;
       
-      // Try to get camera ID first
-      const devices = await Html5Qrcode.getCameras();
-      if (devices && devices.length > 0) {
-        // Use the back camera if available, otherwise use first camera
-        const backCamera = devices.find(device => 
-          device.label.toLowerCase().includes('back') || 
-          device.label.toLowerCase().includes('rear')
-        ) || devices[0];
-        
-        await html5QrCode.start(
-          backCamera.id,
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0
-          },
-          (decodedText) => {
-            setBarcode(decodedText);
-            stopScanner();
-          },
-          () => {
-            // Error callback - ignore continuous scanning errors
-          }
-        );
-      } else {
-        alert("No camera found on your device");
-        setScanning(false);
-      }
+      await html5QrCode.start(
+        { facingMode: { ideal: "environment" } },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
+          formatsToSupport: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Support all barcode formats
+        },
+        (decodedText) => {
+          setBarcode(decodedText);
+          stopScanner();
+        },
+        () => {
+          // Error callback - ignore continuous scanning errors
+        }
+      );
     } catch (err) {
       console.error("Camera error:", err);
-      alert("Unable to access camera. Please check permissions in your device settings.");
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        alert("Camera permission denied. Please allow camera access in your browser settings.");
+      } else if (err.name === "NotFoundError") {
+        alert("No camera found on your device.");
+      } else {
+        alert("Unable to start camera: " + err.message);
+      }
       setScanning(false);
     }
   };
