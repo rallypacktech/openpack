@@ -51,7 +51,7 @@ export default function Dashboard() {
         setUserProfile(profileData[0]);
         // Fetch weather if location is set
         if (profileData[0].latitude && profileData[0].longitude) {
-          fetchWeather(profileData[0].latitude, profileData[0].longitude);
+          fetchWeather(profileData[0].latitude, profileData[0].longitude, profileData[0].country);
         }
       }
       
@@ -66,7 +66,7 @@ export default function Dashboard() {
     }
   };
 
-  const fetchWeather = async (lat, lon) => {
+  const fetchWeather = async (lat, lon, country) => {
     try {
       const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=auto&forecast_days=1`
@@ -98,15 +98,28 @@ export default function Dashboard() {
           96: "Thunderstorm with hail"
         };
 
+        // Check if user is in United States to use Fahrenheit
+        const isUS = country && (country.toLowerCase().includes("united states") || country.toLowerCase() === "usa");
+        const tempUnit = isUS ? "°F" : "°C";
+
+        // Convert Celsius to Fahrenheit if needed
+        const convertTemp = (celsius) => {
+          if (isUS) {
+            return Math.round((celsius * 9/5) + 32);
+          }
+          return Math.round(celsius);
+        };
+
         setWeather({
-          temperature: Math.round(data.current.temperature_2m),
-          feelsLike: Math.round(data.current.apparent_temperature),
+          temperature: convertTemp(data.current.temperature_2m),
+          feelsLike: convertTemp(data.current.apparent_temperature),
           description: weatherCodes[data.current.weather_code] || "Unknown",
           wind: `${Math.round(data.current.wind_speed_10m)} km/h`,
           humidity: `${Math.round(data.current.relative_humidity_2m)}%`,
           precipitation: `${data.current.precipitation} mm`,
           cloudCover: `${data.current.cloud_cover}%`,
-          highLow: data.daily ? `H: ${Math.round(data.daily.temperature_2m_max[0])}°C / L: ${Math.round(data.daily.temperature_2m_min[0])}°C` : null
+          highLow: data.daily ? `H: ${convertTemp(data.daily.temperature_2m_max[0])}${tempUnit} / L: ${convertTemp(data.daily.temperature_2m_min[0])}${tempUnit}` : null,
+          unit: tempUnit
         });
 
         // Generate alerts based on weather conditions
