@@ -308,17 +308,57 @@ export default function CacheDetail() {
       stopScanner();
     }
     
-    // Add item with barcode
-    await base44.entities.CacheItem.create({
-      cache_id: cache.id,
-      item_name: `Product (Barcode: ${barcode})`,
-      quantity: 1,
-      category: "other",
-      notes: `Scanned barcode: ${barcode}`
-    });
+    setLoading(true);
+    
+    try {
+      // Look up product details from barcode
+      const response = await base44.functions.invoke('lookupBarcode', { barcode });
+      
+      if (response.data.success && response.data.product) {
+        const product = response.data.product;
+        
+        // Calculate expiration date if shelf life is provided
+        let expirationDate = "";
+        if (product.shelf_life_days) {
+          const expDate = new Date();
+          expDate.setDate(expDate.getDate() + product.shelf_life_days);
+          expirationDate = expDate.toISOString().split('T')[0];
+        }
+        
+        // Add item with product details
+        await base44.entities.CacheItem.create({
+          cache_id: cache.id,
+          item_name: product.name,
+          quantity: 1,
+          category: product.category,
+          expiration_date: expirationDate,
+          notes: product.description ? `${product.description}\n\nBarcode: ${barcode}` : `Barcode: ${barcode}`
+        });
+      } else {
+        // Fallback if lookup fails
+        await base44.entities.CacheItem.create({
+          cache_id: cache.id,
+          item_name: `Product (Barcode: ${barcode})`,
+          quantity: 1,
+          category: "other",
+          notes: `Scanned barcode: ${barcode}`
+        });
+      }
+    } catch (error) {
+      console.error("Error processing barcode:", error);
+      // Fallback on error
+      await base44.entities.CacheItem.create({
+        cache_id: cache.id,
+        item_name: `Product (Barcode: ${barcode})`,
+        quantity: 1,
+        category: "other",
+        notes: `Scanned barcode: ${barcode}`
+      });
+    }
     
     setBarcode("");
     setScannerOpen(false);
+    setLoading(false);
     loadData();
   };
 
