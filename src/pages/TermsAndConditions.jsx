@@ -84,10 +84,20 @@ export default function TermsAndConditions() {
               <ul>
                 <li>Personalized weather alerts and emergency notifications</li>
                 <li>Emergency resource tracking (caches, supplies, first aid)</li>
+                <li>Barcode and QR code scanning for quick inventory management using device camera</li>
                 <li>Family and pet information management for emergency planning</li>
                 <li>Emergency meeting spot coordination</li>
                 <li>Offline access to critical emergency information</li>
                 <li>E-commerce functionality for purchasing recommended emergency supplies</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Camera & Scanning Features:</h3>
+              <ul>
+                <li>Our barcode scanner uses your device camera to quickly add items to your emergency caches</li>
+                <li>Camera access is optional and only activated when you explicitly choose to scan a barcode</li>
+                <li>All scanning is processed locally on your device - no images are stored, uploaded, or transmitted</li>
+                <li>You can always enter barcodes manually without using the camera</li>
+                <li>By using the scanning feature, you consent to temporary camera access for barcode recognition purposes only</li>
               </ul>
             </CardContent>
           </Card>

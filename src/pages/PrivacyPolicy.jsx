@@ -65,6 +65,13 @@ export default function PrivacyPolicy() {
                 <li>Emergency cache and supply tracking data</li>
                 <li>Weather alert preferences and history</li>
               </ul>
+
+              <h3 className="font-semibold mt-4">Camera & Scanning:</h3>
+              <ul>
+                <li><strong>Camera Access:</strong> When you use our barcode scanning feature, the app requests access to your device camera. Camera access is only used for scanning barcodes/QR codes to add items to your emergency caches.</li>
+                <li><strong>No Storage or Transmission:</strong> Camera images are processed locally on your device and are never stored, uploaded, or transmitted to our servers. Only the decoded barcode text is saved to your cache inventory.</li>
+                <li><strong>Optional Feature:</strong> Camera access is completely optional. You can manually enter barcode numbers without granting camera permissions.</li>
+              </ul>
             </CardContent>
           </Card>
 
@@ -138,6 +145,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Emergency Preparedness:</strong> To provide personalized weather alerts, emergency notifications, and disaster planning tools</li>
                 <li><strong>Location Services:</strong> To deliver location-specific weather data and emergency shelter information</li>
                 <li><strong>Resource Management:</strong> To help you track emergency supplies, caches, and expiration dates</li>
+                <li><strong>Barcode Scanning:</strong> To quickly add items to your caches by scanning product barcodes using your device camera (processed locally, not stored or transmitted)</li>
                 <li><strong>Family Coordination:</strong> To facilitate family emergency planning and communication</li>
                 <li><strong>E-Commerce:</strong> To process purchases of recommended emergency supplies through our integrated shopping cart and Stripe payment system</li>
                 <li><strong>Aggregate Emergency Planning:</strong> To create anonymized, regional statistics (shelter demand, preparedness levels, special needs projections, resource availability) that support emergency response coordination and public safety planning. Your personal data is never shared; only aggregate counts by geographic area are used.</li>
