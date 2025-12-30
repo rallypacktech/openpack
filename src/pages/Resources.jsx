@@ -45,11 +45,15 @@ export default function Resources() {
         cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
       );
 
-      // Filter other entities by created_by
-      const [spotsData, firstAidData] = await Promise.all([
-        base44.entities.MeetSpot.filter({ created_by: user.email }),
+      // Filter meet spots and first aid items by ownership or pack membership
+      const [allSpots, firstAidData] = await Promise.all([
+        base44.entities.MeetSpot.list(),
         base44.entities.FirstAidItem.filter({ created_by: user.email })
       ]);
+
+      const spotsData = allSpots.filter(spot => 
+        spot.created_by === user.email || packOwnerEmails.includes(spot.created_by)
+      );
 
       setCaches(cachesData);
       setMeetSpots(spotsData);
