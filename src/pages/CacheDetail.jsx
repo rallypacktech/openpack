@@ -53,11 +53,7 @@ export default function CacheDetail() {
 
       const user = await base44.auth.me();
 
-      const [cacheItemsResponse, recsData, progressData] = await Promise.all([
-        base44.functions.invoke('getCacheItems', { cacheId }),
-        base44.entities.ProductRecommendation.filter({ active: true }, "-priority"),
-        base44.entities.UserCacheProgress.filter({ cache_id: cacheId })
-      ]);
+      const cacheItemsResponse = await base44.functions.invoke('getCacheItems', { cacheId });
 
       if (cacheItemsResponse.data.error) {
         navigate(createPageUrl("Resources"));
@@ -76,24 +72,10 @@ export default function CacheDetail() {
       setCache({ ...foundCache, isOwner: cacheItemsResponse.data.isOwner });
       setItems(cacheItemsResponse.data.items);
 
-      // Determine cache type from name (case insensitive matching)
-      const cacheName = foundCache.name.toLowerCase();
-      const cacheType = cacheName.includes("go bag") || cacheName.includes("gobag") ? "go_bag" :
-                       cacheName.includes("automobile") || cacheName.includes("auto") || cacheName.includes("car") ? "automobile" : 
-                       "general";
-      
-      // Filter recommendations for this cache type
-      const filteredRecs = recsData.filter(rec => 
-        rec.cache_type === cacheType || rec.cache_type === "general"
-      );
-      setRecommendations(filteredRecs);
-
-      // Build progress map
-      const progressMap = {};
-      progressData.forEach(p => {
-        progressMap[p.recommendation_id] = p;
-      });
-      setUserProgress(progressMap);
+      // Get dynamic recommendations based on region, cache type, and family
+      const recsResponse = await base44.functions.invoke('getDynamicRecommendations', { cacheId });
+      setRecommendations(recsResponse.data.recommendations);
+      setUserProgress(recsResponse.data.userProgress);
 
       // Check if this cache is the first aid kit location
       const firstAidLocations = await base44.entities.FirstAidKitLocation.list();

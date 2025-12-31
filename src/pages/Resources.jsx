@@ -45,9 +45,9 @@ export default function Resources() {
       setFirstAidItems(firstAidData);
 
       // Create sample caches if user has none of their own
-      const ownCaches = cachesData.filter(c => c.created_by === user.email);
+      const ownCaches = cachesResponse.data.caches.filter(c => c.created_by === user.email);
       if (!samplesCreated && ownCaches.length === 0) {
-        await base44.functions.invoke('createSampleCaches');
+        await base44.functions.invoke('generateSampleCaches');
         setSamplesCreated(true);
         // Reload data to show samples
         await loadData();
@@ -114,7 +114,10 @@ export default function Resources() {
   const handleGenerateSampleCaches = async () => {
     setLoading(true);
     try {
-      await base44.functions.invoke('generateSampleCaches');
+      const response = await base44.functions.invoke('generateSampleCaches');
+      if (response.data.error) {
+        alert(response.data.error);
+      }
       await loadData();
     } catch (error) {
       console.error("Error generating sample caches:", error);

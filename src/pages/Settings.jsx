@@ -55,6 +55,27 @@ export default function Settings() {
   };
 
   const handleProfileSave = async (data) => {
+    // Check if region changed
+    const oldRegion = profile?.fema_region;
+    
+    // Determine FEMA region if state changed
+    if (data.state_province) {
+      const regionResponse = await base44.functions.invoke('determineFemaRegion', {
+        state: data.state_province
+      });
+      data.fema_region = regionResponse.data.fema_region;
+      
+      // Generate notifications if region changed
+      if (oldRegion && oldRegion !== data.fema_region) {
+        await base44.functions.invoke('generateFamilyNeedsNotifications', {
+          type: 'region_change',
+          memberName: data.fema_region,
+          newRegion: data.fema_region,
+          disasterTypes: regionResponse.data.disaster_types
+        });
+      }
+    }
+    
     if (profile) {
       await base44.entities.UserProfile.update(profile.id, data);
     } else {
@@ -65,6 +86,13 @@ export default function Settings() {
 
   const handleAddFamilyMember = async (data) => {
     await base44.entities.FamilyMember.create(data);
+    
+    // Generate notifications for new family member
+    await base44.functions.invoke('generateFamilyNeedsNotifications', {
+      type: 'family_member',
+      memberName: data.name
+    });
+    
     loadData();
   };
 
@@ -80,6 +108,13 @@ export default function Settings() {
 
   const handleAddPet = async (data) => {
     await base44.entities.Pet.create(data);
+    
+    // Generate notifications for new pet
+    await base44.functions.invoke('generateFamilyNeedsNotifications', {
+      type: 'pet',
+      memberName: `${data.name} (${data.species})`
+    });
+    
     loadData();
   };
 
