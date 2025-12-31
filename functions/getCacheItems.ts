@@ -9,7 +9,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { cacheId } = await req.json();
+    const body = await req.json();
+    const cacheId = body.cacheId;
 
     if (!cacheId) {
       return Response.json({ error: 'Cache ID required' }, { status: 400 });
