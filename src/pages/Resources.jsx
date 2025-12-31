@@ -20,8 +20,8 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    if (tab === "firstaid") {
-      setActiveTab("firstaid");
+    if (tab && ["caches", "meetspots", "firstaid"].includes(tab)) {
+      setActiveTab(tab);
     }
   }, []);
 
