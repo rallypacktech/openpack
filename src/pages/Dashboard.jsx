@@ -213,7 +213,7 @@ export default function Dashboard() {
                 count={meetSpots.length}
                 subtitle={primaryMeetSpot ? `${primaryMeetSpot.name} - ${primaryMeetSpot.address || "Primary"}` : "No meet spots set"}
                 icon={MapPin}
-                onView={() => navigate(createPageUrl("Resources"))}
+                onView={() => navigate(createPageUrl("Resources") + "?tab=meetspots")}
               />
               <StatsCard
                 title="First Aid Tracker"
