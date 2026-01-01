@@ -16,6 +16,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [userHomeCoords, setUserHomeCoords] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSpot, setEditingSpot] = useState(null);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -128,7 +129,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         <div className="flex items-center gap-2 mb-3">
           <h2 className="text-xl font-semibold">Meeting Spots</h2>
           <TooltipProvider>
-            <Tooltip>
+            <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
               <TooltipTrigger asChild>
                 <button type="button" className="text-blue-600 hover:text-blue-800 focus:outline-none">
                   <Info className="w-5 h-5" />
@@ -191,7 +192,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700 mt-2">
               <Plus className="w-4 h-4 mr-2" />
               Add Meeting Spot
             </Button>
@@ -276,7 +277,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                   Include both near-home locations (quick exits) and out-of-town spots (evacuations). 
                   <button 
                     type="button"
-                    onClick={() => document.querySelector('[data-radix-collection-item]')?.click()}
+                    onClick={() => setTooltipOpen(true)}
                     className="text-blue-600 underline hover:text-blue-800 ml-1"
                   >
                     View examples
