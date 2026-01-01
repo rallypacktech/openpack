@@ -81,7 +81,31 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Family Meeting Spots</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold">Family Meeting Spots</h2>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="text-blue-600 hover:text-blue-800">
+                  <Info className="w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-md p-4">
+                <div className="space-y-2 text-sm">
+                  <p className="font-semibold">FEMA Recommendations for Meet Spots:</p>
+                  <ul className="list-disc pl-4 space-y-1">
+                    <li><strong>Near Home:</strong> A spot close to your home for quick exits (e.g., house fire) - like a neighbor's yard or street corner</li>
+                    <li><strong>Out-of-Town:</strong> A location outside your immediate area for evacuations (e.g., natural disaster)</li>
+                    <li><strong>Directional Coverage:</strong> Aim for at least 4 spots in different directions (N, S, E, W) from your address</li>
+                    <li><strong>Accessibility:</strong> Choose places reachable by foot, car, or public transport</li>
+                    <li><strong>Safety & Familiarity:</strong> Select well-known, safe locations like community centers, schools, or places of worship</li>
+                  </ul>
+                  <p className="text-xs text-gray-500 mt-2">Source: FEMA Basic Preparedness Guidelines</p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
@@ -154,6 +178,18 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           </DialogContent>
         </Dialog>
       </div>
+
+      {spots.length < 4 && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md mb-6">
+          <div className="flex items-center">
+            <MapPin className="h-5 w-5 text-yellow-600 mr-3" />
+            <div>
+              <p className="font-medium text-yellow-800">Recommended: At least 4 Meet Spots</p>
+              <p className="text-sm text-yellow-700">FEMA recommends establishing meet spots for different scenarios: one near home (for fires) and an out-of-town location (for evacuations). Click the info icon above for detailed guidance.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {spots && spots.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
