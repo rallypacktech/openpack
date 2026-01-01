@@ -198,7 +198,6 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
         {spots.length < 4 && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
