@@ -25,83 +25,83 @@ Deno.serve(async (req) => {
                 name: "Adhesive bandages (various sizes)",
                 category: "adults",
                 quantity: 50,
-                owned: true,
+                owned: false,
                 notes: "Assorted sizes for cuts and scrapes"
             },
             {
                 name: "Sterile gauze pads",
                 category: "adults",
                 quantity: 10,
-                owned: true,
+                owned: false,
                 notes: "4x4 inch pads"
             },
             {
                 name: "Medical tape",
                 category: "adults",
                 quantity: 2,
-                owned: true
+                owned: false
             },
             {
                 name: "Antiseptic wipes",
                 category: "adults",
                 quantity: 20,
-                owned: true
+                owned: false
             },
             {
                 name: "Antibiotic ointment",
                 category: "adults",
                 quantity: 2,
-                owned: true
+                owned: false
             },
             {
                 name: "Pain relievers (ibuprofen/acetaminophen)",
                 category: "adults",
                 quantity: 1,
-                owned: true,
+                owned: false,
                 notes: "Check expiration dates regularly"
             },
             {
                 name: "Tweezers",
                 category: "adults",
                 quantity: 1,
-                owned: true
+                owned: false
             },
             {
                 name: "Scissors (medical)",
                 category: "adults",
                 quantity: 1,
-                owned: true
+                owned: false
             },
             {
                 name: "Instant cold pack",
                 category: "adults",
                 quantity: 2,
-                owned: true
+                owned: false
             },
             {
                 name: "Children's pain reliever",
                 category: "youth",
                 quantity: 1,
-                owned: true,
+                owned: false,
                 notes: "Age-appropriate dosing"
             },
             {
                 name: "Pediatric bandages (character designs)",
                 category: "youth",
                 quantity: 20,
-                owned: true
+                owned: false
             },
             {
                 name: "Pet wound spray",
                 category: "pets",
                 quantity: 1,
-                owned: true
+                owned: false
             },
             {
                 name: "Pet gauze wrap",
                 category: "pets",
                 quantity: 2,
-                owned: true
+                owned: false
             }
         ];
 
@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
                 name: "Emergency thermal blanket",
                 category: "adults",
                 quantity: 2,
-                owned: true,
+                owned: false,
                 notes: "For cold weather emergencies"
             });
         } else if (climateZone === 'warm') {
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
                 name: "Snake bite kit",
                 category: "adults",
                 quantity: 1,
-                owned: true,
+                owned: false,
                 notes: "Essential for warm climates with snake presence"
             });
         }
