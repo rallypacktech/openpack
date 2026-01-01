@@ -13,6 +13,7 @@ import { base44 } from "@/api/base44Client";
 
 export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
+  const [userHomeCoords, setUserHomeCoords] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSpot, setEditingSpot] = useState(null);
   const [formData, setFormData] = useState({
@@ -28,6 +29,15 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     const loadUser = async () => {
       const user = await base44.auth.me();
       setCurrentUserEmail(user.email);
+      
+      // Get user's home coordinates
+      const profiles = await base44.entities.UserProfile.list();
+      if (profiles.length > 0 && profiles[0].latitude && profiles[0].longitude) {
+        setUserHomeCoords({
+          lat: profiles[0].latitude,
+          lon: profiles[0].longitude
+        });
+      }
     };
     loadUser();
   }, []);
@@ -78,6 +88,40 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     resetForm();
   };
 
+  // Calculate cardinal direction from home to a spot
+  const getDirection = (spotLat, spotLon) => {
+    if (!userHomeCoords || !spotLat || !spotLon) return null;
+    
+    const lat1 = userHomeCoords.lat * Math.PI / 180;
+    const lat2 = spotLat * Math.PI / 180;
+    const lon1 = userHomeCoords.lon * Math.PI / 180;
+    const lon2 = spotLon * Math.PI / 180;
+    
+    const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+    const bearing = Math.atan2(y, x) * 180 / Math.PI;
+    const normalizedBearing = (bearing + 360) % 360;
+    
+    if (normalizedBearing >= 315 || normalizedBearing < 45) return "North";
+    if (normalizedBearing >= 45 && normalizedBearing < 135) return "East";
+    if (normalizedBearing >= 135 && normalizedBearing < 225) return "South";
+    return "West";
+  };
+
+  // Get covered directions
+  const getCoveredDirections = () => {
+    const directions = new Set();
+    spots.forEach(spot => {
+      const dir = getDirection(spot.latitude, spot.longitude);
+      if (dir) directions.add(dir);
+    });
+    return directions;
+  };
+
+  const coveredDirections = getCoveredDirections();
+  const allDirections = ["North", "East", "South", "West"];
+  const missingDirections = allDirections.filter(dir => !coveredDirections.has(dir));
+
   return (
     <div>
       <div className="mb-6">
@@ -127,6 +171,24 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         <p className="text-sm text-gray-600 mb-4">
           Designate meeting locations in each cardinal direction from your home. Choose accessible, safe spots that all family members know.
         </p>
+
+        {userHomeCoords && spots.length > 0 && (
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-sm font-medium text-gray-700">Covered Directions:</span>
+            <div className="flex gap-2">
+              {allDirections.map(dir => (
+                <Badge 
+                  key={dir} 
+                  variant={coveredDirections.has(dir) ? "default" : "outline"}
+                  className={coveredDirections.has(dir) ? "bg-green-600" : "bg-gray-100 text-gray-400"}
+                >
+                  {dir}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
@@ -199,14 +261,18 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           </DialogContent>
         </Dialog>
 
-        {spots.length < 4 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        {(spots.length < 4 || missingDirections.length > 0) && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div className="flex items-start gap-3">
               <Navigation className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-medium text-blue-900 mb-1">Set waypoints in each direction</p>
                 <p className="text-sm text-blue-700">
-                  Establish at least 4 meeting spots: <strong>North, South, East, and West</strong> from your home. 
+                  {missingDirections.length > 0 ? (
+                    <>Missing directions: <strong>{missingDirections.join(", ")}</strong>. </>
+                  ) : (
+                    <>Establish at least 4 meeting spots: <strong>North, South, East, and West</strong> from your home. </>
+                  )}
                   Include both near-home locations (quick exits) and out-of-town spots (evacuations). 
                   <button 
                     type="button"
@@ -261,7 +327,12 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                 {spot.latitude && spot.longitude && (
                   <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                     <Navigation className="w-4 h-4" />
-                    <span>{spot.latitude.toFixed(4)}° N, {spot.longitude.toFixed(4)}° W</span>
+                    <span>{spot.latitude.toFixed(4)}°, {spot.longitude.toFixed(4)}°</span>
+                    {userHomeCoords && (
+                      <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
+                        {getDirection(spot.latitude, spot.longitude)}
+                      </Badge>
+                    )}
                   </div>
                 )}
                 {spot.description && (
