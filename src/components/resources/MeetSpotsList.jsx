@@ -80,37 +80,58 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold">Family Meeting Spots</h2>
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-xl font-semibold">Meeting Spots</h2>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button className="text-blue-600 hover:text-blue-800">
+                <button type="button" className="text-blue-600 hover:text-blue-800 focus:outline-none">
                   <Info className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent className="max-w-md p-4">
-                <div className="space-y-2 text-sm">
-                  <p className="font-semibold">FEMA Recommendations for Meet Spots:</p>
-                  <ul className="list-disc pl-4 space-y-1">
-                    <li><strong>Near Home:</strong> A spot close to your home for quick exits (e.g., house fire) - like a neighbor's yard or street corner</li>
-                    <li><strong>Out-of-Town:</strong> A location outside your immediate area for evacuations (e.g., natural disaster)</li>
-                    <li><strong>Directional Coverage:</strong> Aim for at least 4 spots in different directions (N, S, E, W) from your address</li>
-                    <li><strong>Accessibility:</strong> Choose places reachable by foot, car, or public transport</li>
-                    <li><strong>Safety & Familiarity:</strong> Select well-known, safe locations like community centers, schools, or places of worship</li>
-                  </ul>
-                  <p className="text-xs text-gray-500 mt-2">Source: FEMA Basic Preparedness Guidelines</p>
+              <TooltipContent side="right" className="max-w-lg p-4">
+                <div className="space-y-3 text-sm">
+                  <p className="font-semibold text-base">FEMA Recommendations:</p>
+                  
+                  <div>
+                    <p className="font-medium mb-1">Set waypoints in each direction (N, S, E, W)</p>
+                    <p className="text-gray-600">Establish at least 4 spots in different cardinal directions from your home to ensure options regardless of the emergency's origin.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium mb-1">Near Home (for quick exits):</p>
+                    <p className="text-gray-600">• Neighbor's yard, street corner, nearby park</p>
+                    <p className="text-gray-600">• Parking lot, gas station, convenience store</p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium mb-1">Out-of-Town (for evacuations):</p>
+                    <p className="text-gray-600">• Friend/relative's home, hotel, rest area</p>
+                    <p className="text-gray-600">• Community center, library, place of worship</p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium mb-1">Pet-Friendly Options:</p>
+                    <p className="text-gray-600">• Pet-friendly hotels, veterinary clinics</p>
+                    <p className="text-gray-600">• Friends/family who welcome pets, outdoor areas</p>
+                  </div>
+
+                  <p className="text-xs text-gray-500 mt-3 pt-2 border-t">Source: FEMA Basic Preparedness Guidelines</p>
                 </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
+        
+        <p className="text-sm text-gray-600 mb-4">
+          Designate meeting locations in each cardinal direction from your home. Choose accessible, safe spots that all family members know.
+        </p>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
-              Add Meet Spot
+              Add Meeting Spot
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -172,24 +193,35 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                 />
               </div>
               <Button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700">
-                {editingSpot ? "Update" : "Add"} Meet Spot
+                {editingSpot ? "Update" : "Add"} Meeting Spot
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {spots.length < 4 && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md mb-6">
-          <div className="flex items-center">
-            <MapPin className="h-5 w-5 text-yellow-600 mr-3" />
-            <div>
-              <p className="font-medium text-yellow-800">Recommended: At least 4 Meet Spots</p>
-              <p className="text-sm text-yellow-700">FEMA recommends establishing meet spots for different scenarios: one near home (for fires) and an out-of-town location (for evacuations). Click the info icon above for detailed guidance.</p>
+        {spots.length < 4 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <div className="flex items-start gap-3">
+              <Navigation className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-blue-900 mb-1">Set waypoints in each direction</p>
+                <p className="text-sm text-blue-700">
+                  Establish at least 4 meeting spots: <strong>North, South, East, and West</strong> from your home. 
+                  Include both near-home locations (quick exits) and out-of-town spots (evacuations). 
+                  <button 
+                    type="button"
+                    onClick={() => document.querySelector('[data-radix-collection-item]')?.click()}
+                    className="text-blue-600 underline hover:text-blue-800 ml-1"
+                  >
+                    View examples
+                  </button>
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {spots && spots.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -244,8 +276,9 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       ) : (
         <Card>
           <CardContent className="py-12 text-center">
-            <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-500">No meeting spots yet. Add a location for your family to meet!</p>
+            <Navigation className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+            <p className="text-gray-600 font-medium mb-2">No meeting spots yet</p>
+            <p className="text-gray-500 text-sm">Add locations in each direction (N, S, E, W) from your home</p>
           </CardContent>
         </Card>
       )}
