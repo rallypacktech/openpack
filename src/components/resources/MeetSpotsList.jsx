@@ -131,7 +131,11 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           <TooltipProvider>
             <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
               <TooltipTrigger asChild>
-                <button type="button" className="text-blue-600 hover:text-blue-800 focus:outline-none">
+                <button 
+                  type="button" 
+                  onClick={() => setTooltipOpen(!tooltipOpen)}
+                  className="text-blue-600 hover:text-blue-800 focus:outline-none"
+                >
                   <Info className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
@@ -263,7 +267,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         </Dialog>
 
         {(spots.length < 4 || missingDirections.length > 0) && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 mt-6">
             <div className="flex items-start gap-3">
               <Navigation className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
