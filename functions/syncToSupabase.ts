@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
         }
 
         const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://kajkzaufnaalniioobqx.supabase.co";
-        const supabaseKey = Deno.env.get("supasecret");
+        const supabaseKey = Deno.env.get("supapublish");
         
         if (!supabaseKey) {
             return Response.json({ error: 'Supabase credentials not configured' }, { status: 500 });
