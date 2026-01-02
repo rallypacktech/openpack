@@ -11,6 +11,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import TermsAndConditions from './pages/TermsAndConditions';
+import AdminProductSuggestions from './pages/AdminProductSuggestions';
 import __Layout from './Layout.jsx';
 
 
@@ -28,6 +29,7 @@ export const PAGES = {
     "Resources": Resources,
     "Settings": Settings,
     "TermsAndConditions": TermsAndConditions,
+    "AdminProductSuggestions": AdminProductSuggestions,
 }
 
 export const pagesConfig = {
