@@ -68,7 +68,7 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
   };
 
   const resetForm = () => {
-    setFormData({ name: "", location: "", description: "" });
+    setFormData({ name: "", location: "", cache_type: "general", description: "" });
     setEditingCache(null);
   };
 
@@ -136,6 +136,18 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                 />
               </div>
               <div>
+                <Label>Cache Type</Label>
+                <select
+                  className="w-full border rounded-md px-3 py-2"
+                  value={formData.cache_type}
+                  onChange={(e) => setFormData({ ...formData, cache_type: e.target.value })}
+                >
+                  <option value="general">General / Home Cache</option>
+                  <option value="go_bag">Go Bag / Bug Out Bag</option>
+                  <option value="automobile">Automobile / Car Kit</option>
+                </select>
+              </div>
+              <div>
                 <Label>Description</Label>
                 <Textarea
                   value={formData.description}
@@ -160,19 +172,25 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
             <Card key={cache.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
+                  <div>
                     <h3 className="font-semibold text-gray-900">{cache.name}</h3>
-                    {!isOwner && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                        Pack Member
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline">
+                        {cache.cache_type === 'go_bag' ? 'Go Bag' : 
+                         cache.cache_type === 'automobile' ? 'Automobile' : 'General'}
                       </Badge>
-                    )}
-                    {firstAidKitLocationId === cache.id && (
-                      <Badge className="bg-red-100 text-red-700">
-                        <Heart className="w-3 h-3 mr-1" />
-                        First Aid Kit
-                      </Badge>
-                    )}
+                      {!isOwner && (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          Pack Member
+                        </Badge>
+                      )}
+                      {firstAidKitLocationId === cache.id && (
+                        <Badge className="bg-red-100 text-red-700">
+                          <Heart className="w-3 h-3 mr-1" />
+                          First Aid Kit
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   {isOwner && (
                     <div className="flex gap-1">
