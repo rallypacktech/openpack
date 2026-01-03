@@ -222,7 +222,8 @@ Deno.serve(async (req) => {
 
         return Response.json({
             success: true,
-            message: `Created ${suggestions.length} placeholder product suggestions from emergency preparedness organizations`
+            message: `Created ${suggestions.length} placeholder product suggestions from emergency preparedness organizations`,
+            count: suggestions.length
         });
 
     } catch (error) {
