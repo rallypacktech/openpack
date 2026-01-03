@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart, Droplet, UtensilsCrossed, Info } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Html5Qrcode } from "html5-qrcode";
 
@@ -28,6 +28,9 @@ export default function CacheDetail() {
   const [isFirstAidKitLocation, setIsFirstAidKitLocation] = useState(false);
   const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
   const [scanning, setScanning] = useState(false);
+  const [familyMembers, setFamilyMembers] = useState([]);
+  const [pets, setPets] = useState([]);
+  const [showDescriptions, setShowDescriptions] = useState({});
   const scannerRef = useRef(null);
   const [formData, setFormData] = useState({
     item_name: "",
@@ -76,6 +79,14 @@ export default function CacheDetail() {
       const recsResponse = await base44.functions.invoke('getDynamicRecommendations', { cacheId });
       setRecommendations(recsResponse.data.recommendations);
       setUserProgress(recsResponse.data.userProgress);
+
+      // Get family members and pets for ration calculator
+      const [familyData, petData] = await Promise.all([
+        base44.entities.FamilyMember.list(),
+        base44.entities.Pet.list()
+      ]);
+      setFamilyMembers(familyData);
+      setPets(petData);
 
       // Check if this cache is the first aid kit location
       const firstAidLocations = await base44.entities.FirstAidKitLocation.list();
@@ -452,6 +463,32 @@ export default function CacheDetail() {
 
   const visibleRecommendations = recommendations.filter(shouldShowRecommendation);
 
+  const getRationDuration = (cacheType) => {
+    switch (cacheType) {
+      case "general":
+        return 5;
+      case "automobile":
+        return 1;
+      case "go_bag":
+        return 3;
+      default:
+        return 0;
+    }
+  };
+
+  const calculateRations = (numPeople, numPets, durationDays) => {
+    if (durationDays === 0) return { waterGallons: 0, foodLbs: 0 };
+    const waterPerPersonPerDay = 1;
+    const waterPerPetPerDay = 0.5;
+    const foodPerPersonPerDay = 1.5;
+    const foodPerPetPerDay = 0.5;
+
+    const totalWater = (numPeople * waterPerPersonPerDay + numPets * waterPerPetPerDay) * durationDays;
+    const totalFood = (numPeople * foodPerPersonPerDay + numPets * foodPerPetPerDay) * durationDays;
+
+    return { waterGallons: totalWater, foodLbs: totalFood };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -534,6 +571,73 @@ export default function CacheDetail() {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Ration Calculator */}
+        {cache && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <UtensilsCrossed className="w-5 h-5" />
+                Water & Food Ration Calculator
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Recommended supplies based on your pack size and cache type
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex justify-between items-center">
+                  <p className="font-medium text-gray-700">Cache Type:</p>
+                  <Badge variant="outline" className="bg-white">
+                    {cache.cache_type === 'go_bag' ? 'Go Bag (3 Days)' :
+                     cache.cache_type === 'automobile' ? 'Automobile (24 Hours)' :
+                     'General / Home (5 Days)'}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="font-medium text-gray-700">People in Pack:</p>
+                  <p className="font-semibold">{familyMembers.length + 1}</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="font-medium text-gray-700">Pets in Pack:</p>
+                  <p className="font-semibold">{pets.length}</p>
+                </div>
+              </div>
+              <Separator />
+              {(() => {
+                const numPeople = familyMembers.length + 1;
+                const numPets = pets.length;
+                const durationDays = getRationDuration(cache.cache_type);
+                const { waterGallons, foodLbs } = calculateRations(numPeople, numPets, durationDays);
+
+                return (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Droplet className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium text-gray-700">Water Needed</span>
+                      </div>
+                      <p className="text-2xl font-bold text-blue-600">{waterGallons} gal</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {numPeople} people × {durationDays}d + {numPets} pets × {durationDays}d
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <UtensilsCrossed className="w-5 h-5 text-green-600" />
+                        <span className="text-sm font-medium text-gray-700">Food Needed</span>
+                      </div>
+                      <p className="text-2xl font-bold text-green-600">{foodLbs} lbs</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {numPeople} people × {durationDays}d + {numPets} pets × {durationDays}d
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
         )}
@@ -828,12 +932,24 @@ export default function CacheDetail() {
                         <img 
                           src={rec.image_url} 
                           alt={rec.item_name}
-                          className="w-full h-32 object-cover rounded mb-3"
+                          className="w-full h-48 object-cover rounded mb-3"
                         />
                       )}
-                      <h3 className="font-semibold text-gray-900 mb-1">{rec.item_name}</h3>
-                      {rec.description && (
-                        <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-gray-900 flex-1">{rec.item_name}</h3>
+                        {rec.description && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 flex-shrink-0"
+                            onClick={() => setShowDescriptions({...showDescriptions, [rec.id]: !showDescriptions[rec.id]})}
+                          >
+                            <Info className="w-4 h-4 text-gray-400" />
+                          </Button>
+                        )}
+                      </div>
+                      {showDescriptions[rec.id] && rec.description && (
+                        <p className="text-sm text-gray-600 mb-2 p-2 bg-gray-50 rounded">{rec.description}</p>
                       )}
                       <div className="space-y-1 text-sm text-gray-600 mb-3">
                         <div><strong>Qty:</strong> {rec.quantity}</div>
