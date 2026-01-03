@@ -12,8 +12,8 @@ import Offline from './pages/Offline';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Resources from './pages/Resources';
 import Settings from './pages/Settings';
-import TermsAndConditions from './pages/TermsAndConditions';
 import Shopping from './pages/Shopping';
+import TermsAndConditions from './pages/TermsAndConditions';
 import __Layout from './Layout.jsx';
 
 
@@ -32,8 +32,8 @@ export const PAGES = {
     "PrivacyPolicy": PrivacyPolicy,
     "Resources": Resources,
     "Settings": Settings,
-    "TermsAndConditions": TermsAndConditions,
     "Shopping": Shopping,
+    "TermsAndConditions": TermsAndConditions,
 }
 
 export const pagesConfig = {

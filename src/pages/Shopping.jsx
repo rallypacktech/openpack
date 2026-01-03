@@ -115,6 +115,26 @@ export default function Shopping() {
     other: "bg-gray-100 text-gray-800"
   };
 
+  const getStoreName = (url) => {
+    if (!url) return "Partner Site";
+    try {
+      const domain = new URL(url).hostname.toLowerCase();
+      if (domain.includes('amazon') || domain.includes('amzn')) return "Amazon";
+      if (domain.includes('target')) return "Target";
+      if (domain.includes('walmart')) return "Walmart";
+      if (domain.includes('rei')) return "REI";
+      if (domain.includes('homedepot')) return "Home Depot";
+      if (domain.includes('lowes')) return "Lowe's";
+      if (domain.includes('costco')) return "Costco";
+      if (domain.includes('chewy')) return "Chewy";
+      if (domain.includes('petco')) return "Petco";
+      if (domain.includes('petsmart')) return "PetSmart";
+      return "Partner Site";
+    } catch {
+      return "Partner Site";
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -229,7 +249,7 @@ export default function Shopping() {
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    View Product
+                    View on {getStoreName(rec.affiliate_link)}
                   </Button>
                 ) : cart[rec.id] ? (
                   <div className="space-y-2">
