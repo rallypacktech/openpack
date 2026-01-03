@@ -6,29 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Building2, ExternalLink, AlertTriangle, Users, PawPrint } from "lucide-react";
-
-// Sample emergency resources data
-const sampleResources = [
-  {
-    id: 1,
-    name: "Flood Rescue Team",
-    type: "Emergency Response",
-    address: "321 Speedy Rd.",
-    phone: "(987) 654-3210",
-    description: "Fast response in flood-prone areas.",
-    available: true
-  },
-  {
-    id: 2,
-    name: "Hurricane Safe House",
-    type: "Shelter",
-    address: "789 Survive St.",
-    phone: "(123) 456-7890",
-    description: "Equipped with essentials.",
-    available: true
-  }
-];
+import { MapPin, Phone, Building2, ExternalLink, AlertTriangle, Users, PawPrint, Globe } from "lucide-react";
 
 const sampleShelters = [
   {
@@ -53,6 +31,7 @@ const sampleShelters = [
 
 export default function Emergency() {
   const [profile, setProfile] = useState(null);
+  const [disasterResources, setDisasterResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [locationForm, setLocationForm] = useState({
     street_address: "",
@@ -63,6 +42,7 @@ export default function Emergency() {
 
   useEffect(() => {
     loadProfile();
+    loadDisasterResources();
   }, []);
 
   const loadProfile = async () => {
@@ -82,6 +62,39 @@ export default function Emergency() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadDisasterResources = async () => {
+    try {
+      const resources = await base44.entities.DisasterResource.list();
+      setDisasterResources(resources);
+    } catch (error) {
+      console.error("Error loading disaster resources:", error);
+    }
+  };
+
+  const getResourceTypeLabel = (type) => {
+    const labels = {
+      federal_agency: "Federal Agency",
+      insurance: "Insurance",
+      relief_organization: "Relief Organization",
+      local_emergency: "Emergency Services",
+      mental_health: "Mental Health",
+      financial_assistance: "Financial Aid"
+    };
+    return labels[type] || type;
+  };
+
+  const getResourceTypeColor = (type) => {
+    const colors = {
+      federal_agency: "bg-blue-100 text-blue-800",
+      insurance: "bg-purple-100 text-purple-800",
+      relief_organization: "bg-green-100 text-green-800",
+      local_emergency: "bg-red-100 text-red-800",
+      mental_health: "bg-pink-100 text-pink-800",
+      financial_assistance: "bg-yellow-100 text-yellow-800"
+    };
+    return colors[type] || "bg-gray-100 text-gray-800";
   };
 
   const handleUpdateLocation = async () => {
@@ -179,38 +192,76 @@ export default function Emergency() {
           </TabsList>
 
           <TabsContent value="resources">
-            <h2 className="text-xl font-semibold mb-4">Nearby Disaster Resources</h2>
-            <p className="text-gray-500 mb-4">Emergency resources and support centers near your location</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {sampleResources.map((resource) => (
-                <Card key={resource.id}>
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{resource.name}</h3>
-                        <p className="text-sm text-gray-500">{resource.type}</p>
-                      </div>
-                      <Badge className="bg-green-100 text-green-700">yes</Badge>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <MapPin className="w-4 h-4" />
-                        <span>{resource.address}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Phone className="w-4 h-4" />
-                        <span>{resource.phone}</span>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-3">{resource.description}</p>
-                    <Button variant="outline" className="w-full mt-4">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      View on Map
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-semibold">National Disaster Resources</h2>
+                <p className="text-gray-500 mt-1">Federal agencies, insurance, relief organizations, and support services across America</p>
+              </div>
             </div>
+
+            {disasterResources.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Building2 className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-gray-500 mb-4">No resources loaded yet</p>
+                  <p className="text-sm text-gray-400">Admin can seed resources from the backend function</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {disasterResources.map((resource) => (
+                  <Card key={resource.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-1">{resource.name}</h3>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge className={getResourceTypeColor(resource.type)}>
+                              {getResourceTypeLabel(resource.type)}
+                            </Badge>
+                            {resource.available_24_7 && (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                24/7
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-gray-600 mb-3">{resource.description}</p>
+                      
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Phone className="w-4 h-4 flex-shrink-0" />
+                          <a href={`tel:${resource.phone}`} className="hover:text-blue-600 underline">
+                            {resource.phone}
+                          </a>
+                        </div>
+                        
+                        {resource.website && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Globe className="w-4 h-4 flex-shrink-0" />
+                            <a 
+                              href={resource.website} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="hover:text-blue-600 underline truncate"
+                            >
+                              Visit Website
+                            </a>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <MapPin className="w-4 h-4 flex-shrink-0" />
+                          <span className="text-xs">{resource.service_area}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="shelters">
