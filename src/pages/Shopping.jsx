@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShoppingCart, Package, ExternalLink, Search, Filter } from "lucide-react";
+import { ShoppingCart, Package, ExternalLink, Search, Filter, Info } from "lucide-react";
 
 export default function Shopping() {
   const [recommendations, setRecommendations] = useState([]);
@@ -15,6 +15,7 @@ export default function Shopping() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [cacheTypeFilter, setCacheTypeFilter] = useState("all");
   const [cart, setCart] = useState({});
+  const [showDescriptions, setShowDescriptions] = useState({});
 
   useEffect(() => {
     loadData();
@@ -217,22 +218,34 @@ export default function Shopping() {
                   <img 
                     src={rec.image_url} 
                     alt={rec.item_name}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
+                    className="w-full h-56 object-cover rounded-lg mb-4"
                   />
                 )}
                 
-                <h3 className="font-semibold text-lg mb-2">{rec.item_name}</h3>
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-semibold text-lg flex-1">{rec.item_name}</h3>
+                  {rec.description && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 flex-shrink-0"
+                      onClick={() => setShowDescriptions({...showDescriptions, [rec.id]: !showDescriptions[rec.id]})}
+                    >
+                      <Info className="w-4 h-4 text-gray-400" />
+                    </Button>
+                  )}
+                </div>
                 
-                <div className="flex gap-2 mb-3 flex-wrap">
+                {showDescriptions[rec.id] && rec.description && (
+                  <p className="text-sm text-gray-600 mb-3 p-2 bg-gray-50 rounded">{rec.description}</p>
+                )}
+                
+                <div className="flex gap-2 mb-4 flex-wrap">
                   <Badge className={categoryColors[rec.category]}>
                     {rec.category}
                   </Badge>
                   <Badge variant="outline">{rec.cache_type}</Badge>
                 </div>
-
-                {rec.description && (
-                  <p className="text-sm text-gray-600 mb-4">{rec.description}</p>
-                )}
 
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-2xl font-bold text-green-600">
