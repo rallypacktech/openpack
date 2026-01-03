@@ -1,4 +1,5 @@
 import AdminProductSuggestions from './pages/AdminProductSuggestions';
+import AdminProducts from './pages/AdminProducts';
 import AdminRecommendations from './pages/AdminRecommendations';
 import CacheDetail from './pages/CacheDetail';
 import CheckoutCancel from './pages/CheckoutCancel';
@@ -12,12 +13,13 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import TermsAndConditions from './pages/TermsAndConditions';
-import AdminProducts from './pages/AdminProducts';
+import Shopping from './pages/Shopping';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AdminProductSuggestions": AdminProductSuggestions,
+    "AdminProducts": AdminProducts,
     "AdminRecommendations": AdminRecommendations,
     "CacheDetail": CacheDetail,
     "CheckoutCancel": CheckoutCancel,
@@ -31,7 +33,7 @@ export const PAGES = {
     "Resources": Resources,
     "Settings": Settings,
     "TermsAndConditions": TermsAndConditions,
-    "AdminProducts": AdminProducts,
+    "Shopping": Shopping,
 }
 
 export const pagesConfig = {

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Bell } from "lucide-react";
 
 export default function NotificationsList({ notifications, onViewAll }) {
+  const navigate = useNavigate();
   return (
     <Card>
       <CardHeader className="pb-3">

@@ -18,6 +18,7 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
   const [formData, setFormData] = useState({
     name: "",
     location: "",
+    cache_type: "general",
     description: ""
   });
 
@@ -81,6 +82,7 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
     setFormData({
       name: cache.name || "",
       location: cache.location || "",
+      cache_type: cache.cache_type || "general",
       description: cache.description || ""
     });
     setDialogOpen(true);

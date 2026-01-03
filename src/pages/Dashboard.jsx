@@ -29,12 +29,14 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       
       // Use secure backend functions for data access
-      const [profileData, cachesResponse, spotsResponse, firstAidData, notifData] = await Promise.all([
+      const [profileData, cachesResponse, spotsResponse, firstAidData, notifData, allRecs, pets] = await Promise.all([
         base44.entities.UserProfile.list(),
         base44.functions.invoke('getCaches'),
         base44.functions.invoke('getMeetSpots'),
         base44.entities.FirstAidItem.list(),
-        base44.entities.Notification.list("-created_date", 10)
+        base44.entities.Notification.list("-created_date", 10),
+        base44.entities.ProductRecommendation.filter({ active: true }, "-priority", 3),
+        base44.entities.Pet.list()
       ]);
 
       const cachesData = cachesResponse.data.caches;
@@ -51,7 +53,37 @@ export default function Dashboard() {
       setCaches(cachesData);
       setMeetSpots(filteredSpots);
       setFirstAidItems(firstAidData);
-      setNotifications(notifData);
+
+      // If no notifications, add top recommendations
+      if (notifData.length === 0) {
+        const familyTypes = ['person'];
+        pets.forEach(pet => {
+          const petType = pet.species?.toLowerCase();
+          if (petType && !familyTypes.includes(petType)) {
+            familyTypes.push(petType);
+          }
+        });
+
+        const relevantRecs = allRecs.filter(rec => {
+          if (rec.family_member_types && rec.family_member_types.length > 0) {
+            return rec.family_member_types.some(type => familyTypes.includes(type?.toLowerCase()));
+          }
+          return true;
+        }).slice(0, 3);
+
+        const recNotifications = relevantRecs.map(rec => ({
+          id: `rec_${rec.id}`,
+          title: `Recommended: ${rec.item_name}`,
+          message: rec.description || `Consider adding this to your emergency cache`,
+          type: "info",
+          read: false,
+          recommendation: rec
+        }));
+
+        setNotifications(recNotifications);
+      } else {
+        setNotifications(notifData);
+      }
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -207,6 +239,7 @@ export default function Dashboard() {
                 subtitle={caches.length > 0 ? `${caches[0]?.name || "Emergency Kit"} - Updated recently` : "No caches yet"}
                 icon={Package}
                 onView={() => navigate(createPageUrl("Resources"))}
+                completionPercent={caches.length > 0 ? Math.round((caches[0].items?.length || 0) / 20 * 100) : 0}
               />
               <StatsCard
                 title="Meet Spots"

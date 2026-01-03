@@ -56,6 +56,7 @@ export default function Layout({ children, currentPageName }) {
   const navItems = [
     { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
     { name: "Resources", page: "Resources", icon: Package },
+    { name: "Shopping", page: "Shopping", icon: Package },
     { name: "Emergency", page: "Emergency", icon: AlertTriangle },
     { name: "Offline", page: "Offline", icon: WifiOff },
     { name: "Settings", page: "Settings", icon: Settings },

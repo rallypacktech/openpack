@@ -1,0 +1,286 @@
+import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ShoppingCart, Package, ExternalLink, Search, Filter } from "lucide-react";
+
+export default function Shopping() {
+  const [recommendations, setRecommendations] = useState([]);
+  const [caches, setCaches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [cacheTypeFilter, setCacheTypeFilter] = useState("all");
+  const [cart, setCart] = useState({});
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const user = await base44.auth.me();
+      const [allRecs, cachesResponse, profiles, familyMembers, pets] = await Promise.all([
+        base44.entities.ProductRecommendation.filter({ active: true }, "-priority"),
+        base44.functions.invoke('getCaches'),
+        base44.entities.UserProfile.filter({ created_by: user.email }),
+        base44.entities.FamilyMember.filter({ created_by: user.email }),
+        base44.entities.Pet.filter({ created_by: user.email })
+      ]);
+
+      const userProfile = profiles[0];
+      const familyTypes = ['person'];
+      pets.forEach(pet => {
+        const petType = pet.species.toLowerCase();
+        if (!familyTypes.includes(petType)) {
+          familyTypes.push(petType);
+        }
+      });
+
+      // Filter recommendations based on user's family composition
+      const filteredRecs = allRecs.filter(rec => {
+        if (rec.fema_regions && rec.fema_regions.length > 0) {
+          if (!userProfile || !userProfile.fema_region || !rec.fema_regions.includes(userProfile.fema_region)) {
+            return false;
+          }
+        }
+        if (rec.family_member_types && rec.family_member_types.length > 0) {
+          const hasMatch = rec.family_member_types.some(type => familyTypes.includes(type.toLowerCase()));
+          if (!hasMatch) return false;
+        }
+        return true;
+      });
+
+      setRecommendations(filteredRecs);
+      setCaches(cachesResponse.data.caches);
+    } catch (error) {
+      console.error("Error loading shopping data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addToCart = (rec, cacheId) => {
+    setCart(prev => ({
+      ...prev,
+      [rec.id]: { recommendation: rec, cacheId }
+    }));
+  };
+
+  const removeFromCart = (recId) => {
+    setCart(prev => {
+      const newCart = { ...prev };
+      delete newCart[recId];
+      return newCart;
+    });
+  };
+
+  const handleCheckout = async () => {
+    const items = Object.values(cart);
+    if (items.length === 0) return;
+
+    const cacheId = items[0].cacheId;
+    const recIds = items.map(item => item.recommendation.id);
+
+    const response = await base44.functions.invoke('createCheckoutSession', {
+      cache_id: cacheId,
+      recommendation_ids: recIds
+    });
+
+    if (response.data.url) {
+      window.location.href = response.data.url;
+    }
+  };
+
+  const filteredRecommendations = recommendations.filter(rec => {
+    const matchesSearch = rec.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          rec.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === "all" || rec.category === categoryFilter;
+    const matchesCacheType = cacheTypeFilter === "all" || rec.cache_type === cacheTypeFilter;
+    return matchesSearch && matchesCategory && matchesCacheType;
+  });
+
+  const categoryColors = {
+    water: "bg-blue-100 text-blue-800",
+    food: "bg-green-100 text-green-800",
+    medical: "bg-red-100 text-red-800",
+    tools: "bg-gray-100 text-gray-800",
+    clothing: "bg-purple-100 text-purple-800",
+    documents: "bg-yellow-100 text-yellow-800",
+    communication: "bg-indigo-100 text-indigo-800",
+    hygiene: "bg-pink-100 text-pink-800",
+    other: "bg-gray-100 text-gray-800"
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Shop Emergency Supplies</h1>
+              <p className="text-blue-100 mt-1">Browse and purchase recommended items for your emergency caches</p>
+            </div>
+            {Object.keys(cart).length > 0 && (
+              <Button onClick={handleCheckout} className="bg-white text-blue-600 hover:bg-blue-50">
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Checkout ({Object.keys(cart).length})
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search items..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="water">Water</SelectItem>
+                <SelectItem value="food">Food</SelectItem>
+                <SelectItem value="medical">Medical</SelectItem>
+                <SelectItem value="tools">Tools</SelectItem>
+                <SelectItem value="clothing">Clothing</SelectItem>
+                <SelectItem value="documents">Documents</SelectItem>
+                <SelectItem value="communication">Communication</SelectItem>
+                <SelectItem value="hygiene">Hygiene</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={cacheTypeFilter} onValueChange={setCacheTypeFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Cache Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="go_bag">Go Bag</SelectItem>
+                <SelectItem value="automobile">Automobile</SelectItem>
+                <SelectItem value="general">General</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredRecommendations.map((rec) => (
+            <Card key={rec.id} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-4">
+                {rec.image_url && (
+                  <img 
+                    src={rec.image_url} 
+                    alt={rec.item_name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                )}
+                
+                <h3 className="font-semibold text-lg mb-2">{rec.item_name}</h3>
+                
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  <Badge className={categoryColors[rec.category]}>
+                    {rec.category}
+                  </Badge>
+                  <Badge variant="outline">{rec.cache_type}</Badge>
+                </div>
+
+                {rec.description && (
+                  <p className="text-sm text-gray-600 mb-4">{rec.description}</p>
+                )}
+
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-2xl font-bold text-green-600">
+                    ${(rec.price_cents / 100).toFixed(2)}
+                  </span>
+                  {rec.quantity > 1 && (
+                    <span className="text-sm text-gray-500">Qty: {rec.quantity}</span>
+                  )}
+                </div>
+
+                {rec.affiliate_link ? (
+                  <Button
+                    onClick={() => window.open(rec.affiliate_link, '_blank')}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View Product
+                  </Button>
+                ) : cart[rec.id] ? (
+                  <div className="space-y-2">
+                    <Select value={cart[rec.id].cacheId} onValueChange={(val) => addToCart(rec, val)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select cache" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {caches.map(cache => (
+                          <SelectItem key={cache.id} value={cache.id}>
+                            {cache.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      onClick={() => removeFromCart(rec.id)}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Remove from Cart
+                    </Button>
+                  </div>
+                ) : (
+                  <Select onValueChange={(cacheId) => addToCart(rec, cacheId)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add to cache..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {caches.map(cache => (
+                        <SelectItem key={cache.id} value={cache.id}>
+                          {cache.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredRecommendations.length === 0 && (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p className="text-gray-600">No products found matching your filters</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
