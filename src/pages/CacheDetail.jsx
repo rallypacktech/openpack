@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart, Droplet, UtensilsCrossed, Info } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart, Droplet, UtensilsCrossed, Info, User, Users } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Html5Qrcode } from "html5-qrcode";
 
@@ -469,9 +469,9 @@ export default function CacheDetail() {
       case "general":
         return 5;
       case "automobile":
-        return 1;
-      case "go_bag":
         return 3;
+      case "go_bag":
+        return 1;
       default:
         return 0;
     }
@@ -589,22 +589,24 @@ export default function CacheDetail() {
               </p>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <div className="flex items-center gap-2">
                   <p className="font-medium text-gray-700">Cache Type:</p>
                   <Badge variant="outline" className="bg-white">
-                    {cache.cache_type === 'go_bag' ? 'Go Bag (3 Days)' :
-                     cache.cache_type === 'automobile' ? 'Automobile (24 Hours)' :
+                    {cache.cache_type === 'go_bag' ? 'Go Bag (1 Day)' :
+                     cache.cache_type === 'automobile' ? 'Automobile (3 Days)' :
                      'General / Home (5 Days)'}
                   </Badge>
                 </div>
-                <div className="flex justify-between items-center">
-                  <p className="font-medium text-gray-700">People in Pack:</p>
-                  <p className="font-semibold">{familyMembers.length + 1}</p>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="font-medium text-gray-700">Pets in Pack:</p>
-                  <p className="font-semibold">{pets.length}</p>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4 text-gray-600" />
+                    <span className="font-semibold">{familyMembers.length + 1}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-4 h-4 text-gray-600" />
+                    <span className="font-semibold">{pets.length}</span>
+                  </div>
                 </div>
               </div>
               <Separator />
