@@ -62,8 +62,7 @@ export default function Layout({ children, currentPageName }) {
   ];
 
   if (isAdmin) {
-    navItems.push({ name: "Admin", page: "AdminRecommendations", icon: Users });
-    navItems.push({ name: "Suggestions", page: "AdminProductSuggestions", icon: Package });
+    navItems.push({ name: "Products", page: "AdminProducts", icon: Package });
   }
 
   const handleLogout = () => {
