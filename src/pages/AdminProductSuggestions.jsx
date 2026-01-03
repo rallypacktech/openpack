@@ -64,8 +64,24 @@ export default function AdminProductSuggestions() {
       suggested_price_cents: suggestion.suggested_price_cents,
       suggested_image_url: suggestion.suggested_image_url,
       suggested_affiliate_link: suggestion.suggested_affiliate_link,
+      suggested_family_member_types: suggestion.suggested_family_member_types || [],
       admin_notes: suggestion.admin_notes || ""
     });
+  };
+
+  const toggleFamilyMemberType = (type) => {
+    const current = editForm.suggested_family_member_types || [];
+    if (current.includes(type)) {
+      setEditForm({
+        ...editForm,
+        suggested_family_member_types: current.filter(t => t !== type)
+      });
+    } else {
+      setEditForm({
+        ...editForm,
+        suggested_family_member_types: [...current, type]
+      });
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -221,8 +237,19 @@ export default function AdminProductSuggestions() {
                     </div>
 
                     {suggestion.suggested_family_member_types?.length > 0 && (
-                      <div className="text-xs text-gray-600 mb-2">
-                        <strong>For:</strong> {suggestion.suggested_family_member_types.join(", ")}
+                      <div className="flex gap-1 mb-2 flex-wrap">
+                        {suggestion.suggested_family_member_types.map(type => (
+                          <Badge 
+                            key={type} 
+                            variant="outline" 
+                            className={type === 'person' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'}
+                          >
+                            {type === 'person' ? '👤 Person' : 
+                             type === 'dog' ? '🐕 Dog' :
+                             type === 'cat' ? '🐈 Cat' :
+                             type === 'bird' ? '🐦 Bird' : '🐾 Other Pet'}
+                          </Badge>
+                        ))}
                       </div>
                     )}
 
@@ -378,6 +405,37 @@ export default function AdminProductSuggestions() {
                 value={editForm.suggested_affiliate_link || ""}
                 onChange={(e) => setEditForm({...editForm, suggested_affiliate_link: e.target.value})}
               />
+            </div>
+            <div>
+              <Label>Recommended For (Multi-select)</Label>
+              <div className="border rounded-md p-3 space-y-2">
+                {[
+                  { value: 'person', label: '👤 Person', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+                  { value: 'dog', label: '🐕 Dog', color: 'bg-green-50 border-green-200 text-green-700' },
+                  { value: 'cat', label: '🐈 Cat', color: 'bg-green-50 border-green-200 text-green-700' },
+                  { value: 'bird', label: '🐦 Bird', color: 'bg-green-50 border-green-200 text-green-700' },
+                  { value: 'other', label: '🐾 Other Pet', color: 'bg-green-50 border-green-200 text-green-700' }
+                ].map(({ value, label, color }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => toggleFamilyMemberType(value)}
+                    className={`w-full px-3 py-2 rounded border-2 text-left transition-all ${
+                      editForm.suggested_family_member_types?.includes(value)
+                        ? `${color} border-current font-medium`
+                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {label}
+                    {editForm.suggested_family_member_types?.includes(value) && (
+                      <span className="float-right">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Products tagged for pets will only show to users who have added that pet type in settings
+              </p>
             </div>
             <div>
               <Label>Admin Notes</Label>
