@@ -858,16 +858,25 @@ export default function CacheDetail() {
                               onClick={() => window.open(rec.affiliate_link, "_blank", "noopener,noreferrer")}
                               className="w-full bg-orange-600 hover:bg-orange-700"
                             >
-                              {rec.affiliate_link.includes("amazon.com") ? (
-                                <img 
-                                  src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" 
-                                  alt="Amazon" 
-                                  className="h-4 mr-2"
-                                />
-                              ) : (
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                              )}
-                              View on {rec.affiliate_link.includes("amazon.com") ? "Amazon" : "Partner Site"}
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              View on {(() => {
+                                try {
+                                  const domain = new URL(rec.affiliate_link).hostname.toLowerCase();
+                                  if (domain.includes('amazon') || domain.includes('amzn')) return "Amazon";
+                                  if (domain.includes('target')) return "Target";
+                                  if (domain.includes('walmart')) return "Walmart";
+                                  if (domain.includes('rei')) return "REI";
+                                  if (domain.includes('homedepot')) return "Home Depot";
+                                  if (domain.includes('lowes')) return "Lowe's";
+                                  if (domain.includes('costco')) return "Costco";
+                                  if (domain.includes('chewy')) return "Chewy";
+                                  if (domain.includes('petco')) return "Petco";
+                                  if (domain.includes('petsmart')) return "PetSmart";
+                                  return "Partner Site";
+                                } catch {
+                                  return "Partner Site";
+                                }
+                              })()}
                             </Button>
                           )
                         )}
