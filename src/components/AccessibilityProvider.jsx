@@ -56,6 +56,7 @@ export default function AccessibilityProvider({ children }) {
     setFontSize(size);
     localStorage.setItem('fontSize', size);
     document.documentElement.setAttribute('data-font-size', size);
+    document.body.setAttribute('data-font-size', size);
   };
 
   const toggleReducedMotion = () => {
