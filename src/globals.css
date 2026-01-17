@@ -86,28 +86,35 @@
     outline-offset: 2px;
   }
 
-  /* Skip to content link for screen readers and keyboard users */
+  /* Skip to content link - hidden until keyboard focused */
   .skip-to-content {
     position: absolute;
-    left: -9999px;
-    top: auto;
     width: 1px;
     height: 1px;
+    padding: 0;
+    margin: -1px;
     overflow: hidden;
-    z-index: 9999;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 
   .skip-to-content:focus {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 4px;
+    left: 4px;
     width: auto;
     height: auto;
+    padding: 8px 16px;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    padding: 8px 16px;
     text-decoration: none;
-    overflow: visible;
+    border-radius: 4px;
+    z-index: 9999;
   }
 
   /* Screen reader only text */
