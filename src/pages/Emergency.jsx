@@ -6,33 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Building2, ExternalLink, AlertTriangle, Users, PawPrint, Globe } from "lucide-react";
-
-const sampleShelters = [
-  {
-    id: 1,
-    name: "Animal Haven",
-    address: "112 Pet St.",
-    capacity: { current: 60, max: 100 },
-    contact: "info@animalhaven.com",
-    petFriendly: true,
-    active: true
-  },
-  {
-    id: 2,
-    name: "People's Haven",
-    address: "221 Safe Ave.",
-    capacity: { current: 180, max: 200 },
-    contact: "info@peopleshaven.com",
-    petFriendly: true,
-    active: true
-  }
-];
+import { MapPin, Phone, Building2, ExternalLink, AlertTriangle, Users, PawPrint, Globe, Heart } from "lucide-react";
 
 export default function Emergency() {
   const [profile, setProfile] = useState(null);
   const [disasterResources, setDisasterResources] = useState([]);
+  const [shelters, setShelters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sheltersLoading, setSheltersLoading] = useState(false);
   const [locationForm, setLocationForm] = useState({
     street_address: "",
     city: "",
@@ -43,6 +24,7 @@ export default function Emergency() {
   useEffect(() => {
     loadProfile();
     loadDisasterResources();
+    loadShelters();
   }, []);
 
   const loadProfile = async () => {
@@ -70,6 +52,18 @@ export default function Emergency() {
       setDisasterResources(resources);
     } catch (error) {
       console.error("Error loading disaster resources:", error);
+    }
+  };
+
+  const loadShelters = async () => {
+    setSheltersLoading(true);
+    try {
+      const response = await base44.functions.invoke('getShelters');
+      setShelters(response.data.shelters || []);
+    } catch (error) {
+      console.error("Error loading shelters:", error);
+    } finally {
+      setSheltersLoading(false);
     }
   };
 
@@ -265,51 +259,112 @@ export default function Emergency() {
           </TabsContent>
 
           <TabsContent value="shelters">
-            <h2 className="text-xl font-semibold mb-4">Emergency Shelters</h2>
-            <p className="text-gray-500 mb-4">Nearby shelters available during emergencies</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {sampleShelters.map((shelter) => (
-                <Card key={shelter.id}>
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="font-semibold text-gray-900">{shelter.name}</h3>
-                      <Badge className="bg-green-100 text-green-700">Active</Badge>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPin className="w-4 h-4" />
-                        <span>{shelter.address}</span>
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                          <Users className="w-4 h-4" />
-                          <span>Capacity</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-green-500 h-2 rounded-full"
-                              style={{ width: `${(shelter.capacity.current / shelter.capacity.max) * 100}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm text-gray-600">{shelter.capacity.current}/{shelter.capacity.max}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Phone className="w-4 h-4" />
-                        <span>{shelter.contact}</span>
-                      </div>
-                      {shelter.petFriendly && (
-                        <div className="flex items-center gap-2 text-sm text-green-600">
-                          <PawPrint className="w-4 h-4" />
-                          <span>Pet Friendly</span>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-semibold">Emergency Shelters</h2>
+                <p className="text-gray-500 mt-1">
+                  {profile?.fema_region 
+                    ? `Shelters in your FEMA region (${profile.fema_region}) and nearby areas` 
+                    : "Emergency shelters in your area"}
+                </p>
+              </div>
             </div>
+
+            {sheltersLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : shelters.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Building2 className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-gray-500 mb-2">No shelters available yet</p>
+                  <p className="text-sm text-gray-400">Shelters will appear here during active emergencies</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {shelters.map((shelter) => (
+                  <Card key={shelter.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="font-semibold text-gray-900">{shelter.name}</h3>
+                        <div className="flex items-center gap-2">
+                          {shelter.is_open ? (
+                            <Badge className="bg-green-100 text-green-700">Open</Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-gray-100 text-gray-700">Closed</Badge>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-2 text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <div>{shelter.address}</div>
+                            <div>{shelter.city}, {shelter.state} {shelter.zip_code}</div>
+                            {shelter.distance && (
+                              <div className="text-xs text-blue-600 mt-1">{shelter.distance} miles away</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {shelter.capacity && (
+                          <div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                              <Users className="w-4 h-4" />
+                              <span>Capacity: {shelter.capacity} people</span>
+                            </div>
+                            {shelter.current_occupancy !== undefined && (
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="bg-green-500 h-2 rounded-full"
+                                    style={{ width: `${Math.min((shelter.current_occupancy / shelter.capacity) * 100, 100)}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm text-gray-600">{shelter.current_occupancy}/{shelter.capacity}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {shelter.phone && (
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Phone className="w-4 h-4" />
+                            <a href={`tel:${shelter.phone}`} className="hover:text-blue-600 underline">
+                              {shelter.phone}
+                            </a>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-3 flex-wrap">
+                          {shelter.pets_allowed && (
+                            <div className="flex items-center gap-1 text-sm text-green-600">
+                              <PawPrint className="w-4 h-4" />
+                              <span>Pets OK</span>
+                            </div>
+                          )}
+                          {shelter.medical_services && (
+                            <div className="flex items-center gap-1 text-sm text-red-600">
+                              <Heart className="w-4 h-4" />
+                              <span>Medical</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {shelter.disaster_type && (
+                          <div className="text-xs text-gray-500">
+                            <span className="font-medium">For:</span> {shelter.disaster_type}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="lost-persons">
