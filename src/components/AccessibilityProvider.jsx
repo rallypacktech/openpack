@@ -45,8 +45,10 @@ export default function AccessibilityProvider({ children }) {
     
     if (newValue) {
       document.documentElement.classList.add('high-contrast');
+      document.body.classList.add('high-contrast');
     } else {
       document.documentElement.classList.remove('high-contrast');
+      document.body.classList.remove('high-contrast');
     }
   };
 
