@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Pencil, Trash2, MapPin, Navigation, Star, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { base44 } from "@/api/base44Client";
+import AddressAutocomplete from "../settings/AddressAutocomplete";
 
 export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
@@ -234,11 +235,16 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                 />
               </div>
               <div>
-                <Label>Address</Label>
-                <Input
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="123 Main St"
+                <AddressAutocomplete
+                  initialValue={formData.address}
+                  onAddressSelect={(addressData) => {
+                    setFormData({
+                      ...formData,
+                      address: addressData.display_name,
+                      latitude: addressData.latitude.toString(),
+                      longitude: addressData.longitude.toString()
+                    });
+                  }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -250,6 +256,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                     value={formData.latitude}
                     onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
                     placeholder="40.7128"
+                    disabled
+                    className="bg-gray-50"
                   />
                 </div>
                 <div>
@@ -260,6 +268,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                     value={formData.longitude}
                     onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
                     placeholder="-74.0060"
+                    disabled
+                    className="bg-gray-50"
                   />
                 </div>
               </div>
