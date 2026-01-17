@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [emergencyMode, setEmergencyMode] = useState(false);
+  const [familyMembers, setFamilyMembers] = useState([]);
 
   useEffect(() => {
     loadData();
@@ -30,14 +31,15 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       
       // Use secure backend functions for data access
-      const [profileData, cachesResponse, spotsResponse, firstAidData, notifData, allRecs, pets] = await Promise.all([
+      const [profileData, cachesResponse, spotsResponse, firstAidData, notifData, allRecs, pets, familyData] = await Promise.all([
         base44.entities.UserProfile.list(),
         base44.functions.invoke('getCaches'),
         base44.functions.invoke('getMeetSpots'),
         base44.entities.FirstAidItem.list(),
         base44.entities.Notification.list("-created_date", 10),
         base44.entities.ProductRecommendation.filter({ active: true }, "-priority", 3),
-        base44.entities.Pet.list()
+        base44.entities.Pet.list(),
+        base44.entities.FamilyMember.list()
       ]);
 
       const cachesData = cachesResponse.data.caches;
@@ -54,6 +56,7 @@ export default function Dashboard() {
       setCaches(cachesData);
       setMeetSpots(filteredSpots);
       setFirstAidItems(firstAidData);
+      setFamilyMembers(familyData);
 
       // If no notifications, add top recommendations
       if (notifData.length === 0) {
@@ -346,6 +349,159 @@ export default function Dashboard() {
                   <span className="text-gray-600">Precipitation:</span>
                   <span className="font-bold ml-2">{weather.precipitation}</span>
                 </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Onboarding Flow - Guide new users through setup
+  const needsFamilySetup = familyMembers.length === 0;
+  const needsMeetSpots = !needsFamilySetup && meetSpots.length === 0;
+  const needsCaches = !needsFamilySetup && !needsMeetSpots && caches.length === 0;
+  const isOnboarding = needsFamilySetup || needsMeetSpots || needsCaches;
+
+  if (isOnboarding) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+        <div className="bg-white border-b">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <h1 className="text-2xl font-bold text-gray-900">Welcome to RallyPack</h1>
+            <p className="text-gray-500 mt-1">Let's get you prepared in 3 simple steps</p>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Progress Bar */}
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`flex items-center ${needsFamilySetup ? 'text-blue-600' : 'text-green-600'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsFamilySetup ? 'bg-blue-100' : 'bg-green-100'} mr-2`}>
+                  {needsFamilySetup ? '1' : '✓'}
+                </div>
+                <span className="font-medium">Family Members</span>
+              </div>
+              <div className={`flex items-center ${needsMeetSpots ? 'text-blue-600' : needsFamilySetup ? 'text-gray-400' : 'text-green-600'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsMeetSpots ? 'bg-blue-100' : needsFamilySetup ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+                  {needsFamilySetup ? '2' : needsMeetSpots ? '2' : '✓'}
+                </div>
+                <span className="font-medium">Meet Spots</span>
+              </div>
+              <div className={`flex items-center ${needsCaches ? 'text-blue-600' : (needsFamilySetup || needsMeetSpots) ? 'text-gray-400' : 'text-green-600'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsCaches ? 'bg-blue-100' : (needsFamilySetup || needsMeetSpots) ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+                  {(needsFamilySetup || needsMeetSpots) ? '3' : needsCaches ? '3' : '✓'}
+                </div>
+                <span className="font-medium">Emergency Caches</span>
+              </div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                style={{ width: needsFamilySetup ? '33%' : needsMeetSpots ? '66%' : '100%' }}
+              />
+            </div>
+          </div>
+
+          {/* Step 1: Add Family Members */}
+          {needsFamilySetup && (
+            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-blue-500">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">👨‍👩‍👧‍👦</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 1: Add Your Family Members</h2>
+                <p className="text-gray-600">
+                  Start by adding everyone in your household. This helps us personalize your emergency plans and supply recommendations.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• Tailored supply recommendations for your family size</li>
+                    <li>• Medical needs tracking for each person</li>
+                    <li>• Emergency contact information all in one place</li>
+                  </ul>
+                </div>
+                <button
+                  onClick={() => navigate(createPageUrl("Settings"))}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                >
+                  Add Family Members Now
+                </button>
+                <p className="text-sm text-gray-500 text-center">
+                  💡 You can add or update family members anytime in <strong>Settings</strong>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Add Meet Spots */}
+          {needsMeetSpots && !needsFamilySetup && (
+            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-green-500">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📍</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 2: Define Your Meet Spots</h2>
+                <p className="text-gray-600">
+                  Set up safe meeting locations where your family can reunite during an emergency. FEMA recommends having spots in all four cardinal directions.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• Ensures everyone knows where to go in a crisis</li>
+                    <li>• Multiple locations for different emergency scenarios</li>
+                    <li>• Peace of mind knowing your family has a plan</li>
+                  </ul>
+                </div>
+                <button
+                  onClick={() => navigate(createPageUrl("Resources") + "?tab=meetspots")}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                >
+                  Set Up Meet Spots Now
+                </button>
+                <p className="text-sm text-gray-500 text-center">
+                  💡 You can manage meet spots anytime in <strong>Resources → Meet Spots tab</strong>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Build Caches */}
+          {needsCaches && !needsFamilySetup && !needsMeetSpots && (
+            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-orange-500">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📦</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3: Build Your Emergency Caches</h2>
+                <p className="text-gray-600">
+                  Create organized supply caches (Go Bag, Car Kit, Home Supplies) to ensure you're ready for any situation.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• Track what supplies you have and what you need</li>
+                    <li>• Get personalized recommendations based on your family</li>
+                    <li>• Monitor expiration dates and stay prepared</li>
+                  </ul>
+                </div>
+                <button
+                  onClick={() => navigate(createPageUrl("Resources"))}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                >
+                  Create Your First Cache
+                </button>
+                <p className="text-sm text-gray-500 text-center">
+                  💡 You can manage caches anytime in <strong>Resources → Caches tab</strong>
+                </p>
               </div>
             </div>
           )}
