@@ -66,8 +66,10 @@ export default function AccessibilityProvider({ children }) {
     
     if (newValue) {
       document.documentElement.classList.add('reduced-motion');
+      document.body.classList.add('reduced-motion');
     } else {
       document.documentElement.classList.remove('reduced-motion');
+      document.body.classList.remove('reduced-motion');
     }
   };
 
