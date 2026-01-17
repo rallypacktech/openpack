@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [weather, setWeather] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [emergencyMode, setEmergencyMode] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -83,6 +84,16 @@ export default function Dashboard() {
         setNotifications(recNotifications);
       } else {
         setNotifications(notifData);
+        
+        // Check for evacuation notices in notifications
+        const hasEvacuationNotice = notifData.some(notif => 
+          notif.title.toLowerCase().includes('evacuation') || 
+          notif.message.toLowerCase().includes('evacuation') ||
+          notif.type === 'alert'
+        );
+        if (hasEvacuationNotice) {
+          setEmergencyMode(true);
+        }
       }
     } catch (error) {
       console.error("Error loading data:", error);
@@ -160,6 +171,7 @@ export default function Dashboard() {
             message: "Severe thunderstorm detected in your area. Move to safe shelter immediately.",
             severity: "danger"
           });
+          setEmergencyMode(true);
         }
         
         // Heavy rain/snow alerts
@@ -214,6 +226,135 @@ export default function Dashboard() {
     );
   }
 
+  // Emergency View - Simplified for crisis situations
+  if (emergencyMode) {
+    return (
+      <div className="min-h-screen bg-red-50">
+        {/* Emergency Header */}
+        <div className="bg-red-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold">⚠️ EMERGENCY MODE</h1>
+                <p className="text-red-100 mt-1">Critical alerts active in your area</p>
+              </div>
+              <button
+                onClick={() => setEmergencyMode(false)}
+                className="px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-sm"
+              >
+                Exit Emergency View
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Active Alerts */}
+          {alerts.length > 0 && (
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 border-4 border-red-500">
+              <h2 className="text-2xl font-bold text-red-600 mb-4">Active Alerts</h2>
+              <div className="space-y-3">
+                {alerts.map((alert, idx) => (
+                  <div key={idx} className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                    <h3 className="font-bold text-lg text-red-900">{alert.title}</h3>
+                    <p className="text-red-800 mt-1">{alert.message}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Evacuation Notifications */}
+          {notifications.filter(n => n.type === 'alert' || n.title.toLowerCase().includes('evacuation')).length > 0 && (
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 border-4 border-orange-500">
+              <h2 className="text-2xl font-bold text-orange-600 mb-4">Evacuation Notices</h2>
+              <div className="space-y-3">
+                {notifications
+                  .filter(n => n.type === 'alert' || n.title.toLowerCase().includes('evacuation'))
+                  .map((notif, idx) => (
+                    <div key={idx} className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                      <h3 className="font-bold text-lg text-orange-900">{notif.title}</h3>
+                      <p className="text-orange-800 mt-1">{notif.message}</p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Primary Meet Spot */}
+          {primaryMeetSpot && (
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 border-2 border-blue-500">
+              <h2 className="text-2xl font-bold text-blue-600 mb-4">📍 Primary Meeting Point</h2>
+              <div className="text-lg">
+                <p className="font-bold text-gray-900 text-2xl">{primaryMeetSpot.name}</p>
+                {primaryMeetSpot.address && (
+                  <p className="text-gray-700 mt-2">{primaryMeetSpot.address}</p>
+                )}
+                {primaryMeetSpot.description && (
+                  <p className="text-gray-600 mt-3">{primaryMeetSpot.description}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <button
+              onClick={() => navigate(createPageUrl("Resources"))}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-xl font-bold shadow-lg"
+            >
+              📦 View Emergency Caches
+            </button>
+            <button
+              onClick={() => navigate(createPageUrl("Resources") + "?tab=meetspots")}
+              className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-xl font-bold shadow-lg"
+            >
+              🗺️ All Meet Spots
+            </button>
+            <button
+              onClick={() => navigate(createPageUrl("Resources") + "?tab=firstaid")}
+              className="bg-red-600 hover:bg-red-700 text-white p-6 rounded-lg text-xl font-bold shadow-lg"
+            >
+              🏥 First Aid Supplies
+            </button>
+            <button
+              onClick={() => navigate(createPageUrl("Emergency"))}
+              className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg text-xl font-bold shadow-lg"
+            >
+              📞 Emergency Contacts
+            </button>
+          </div>
+
+          {/* Weather Info */}
+          {weather && (
+            <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-300">
+              <h2 className="text-xl font-bold text-gray-800 mb-3">Current Weather</h2>
+              <div className="grid grid-cols-2 gap-4 text-lg">
+                <div>
+                  <span className="text-gray-600">Temperature:</span>
+                  <span className="font-bold ml-2">{weather.temperature}{weather.unit}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Conditions:</span>
+                  <span className="font-bold ml-2">{weather.description}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Wind:</span>
+                  <span className="font-bold ml-2">{weather.wind}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Precipitation:</span>
+                  <span className="font-bold ml-2">{weather.precipitation}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Normal Dashboard View
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
