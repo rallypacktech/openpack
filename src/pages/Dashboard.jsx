@@ -358,10 +358,11 @@ export default function Dashboard() {
   }
 
   // Onboarding Flow - Guide new users through setup
-  const needsFamilySetup = familyMembers.length === 0;
-  const needsMeetSpots = !needsFamilySetup && meetSpots.length === 0;
-  const needsCaches = !needsFamilySetup && !needsMeetSpots && caches.length === 0;
-  const isOnboarding = needsFamilySetup || needsMeetSpots || needsCaches;
+  const needsAddress = !userProfile || !userProfile.street_address;
+  const needsFamilySetup = !needsAddress && familyMembers.length === 0;
+  const needsMeetSpots = !needsAddress && !needsFamilySetup && meetSpots.length === 0;
+  const needsCaches = !needsAddress && !needsFamilySetup && !needsMeetSpots && caches.length === 0;
+  const isOnboarding = needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
 
   if (isOnboarding) {
     return (
@@ -377,47 +378,88 @@ export default function Dashboard() {
           {/* Progress Bar */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <div className={`flex items-center ${needsFamilySetup ? 'text-blue-600' : 'text-green-600'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsFamilySetup ? 'bg-blue-100' : 'bg-green-100'} mr-2`}>
-                  {needsFamilySetup ? '1' : '✓'}
+              <div className={`flex items-center ${needsAddress ? 'text-blue-600' : 'text-green-600'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsAddress ? 'bg-blue-100' : 'bg-green-100'} mr-2`}>
+                  {needsAddress ? '1' : '✓'}
                 </div>
-                <span className="font-medium">Family Members</span>
+                <span className="font-medium text-sm">Address</span>
               </div>
-              <div className={`flex items-center ${needsMeetSpots ? 'text-blue-600' : needsFamilySetup ? 'text-gray-400' : 'text-green-600'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsMeetSpots ? 'bg-blue-100' : needsFamilySetup ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
-                  {needsFamilySetup ? '2' : needsMeetSpots ? '2' : '✓'}
+              <div className={`flex items-center ${needsFamilySetup ? 'text-blue-600' : needsAddress ? 'text-gray-400' : 'text-green-600'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsFamilySetup ? 'bg-blue-100' : needsAddress ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+                  {needsAddress ? '2' : needsFamilySetup ? '2' : '✓'}
                 </div>
-                <span className="font-medium">Meet Spots</span>
+                <span className="font-medium text-sm">Family</span>
               </div>
-              <div className={`flex items-center ${needsCaches ? 'text-blue-600' : (needsFamilySetup || needsMeetSpots) ? 'text-gray-400' : 'text-green-600'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsCaches ? 'bg-blue-100' : (needsFamilySetup || needsMeetSpots) ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
-                  {(needsFamilySetup || needsMeetSpots) ? '3' : needsCaches ? '3' : '✓'}
+              <div className={`flex items-center ${needsMeetSpots ? 'text-blue-600' : (needsAddress || needsFamilySetup) ? 'text-gray-400' : 'text-green-600'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsMeetSpots ? 'bg-blue-100' : (needsAddress || needsFamilySetup) ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+                  {(needsAddress || needsFamilySetup) ? '3' : needsMeetSpots ? '3' : '✓'}
                 </div>
-                <span className="font-medium">Emergency Caches</span>
+                <span className="font-medium text-sm">Meet Spots</span>
+              </div>
+              <div className={`flex items-center ${needsCaches ? 'text-blue-600' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'text-gray-400' : 'text-green-600'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsCaches ? 'bg-blue-100' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+                  {(needsAddress || needsFamilySetup || needsMeetSpots) ? '4' : needsCaches ? '4' : '✓'}
+                </div>
+                <span className="font-medium text-sm">Caches</span>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                style={{ width: needsFamilySetup ? '33%' : needsMeetSpots ? '66%' : '100%' }}
+                style={{ width: needsAddress ? '25%' : needsFamilySetup ? '50%' : needsMeetSpots ? '75%' : '100%' }}
               />
             </div>
           </div>
 
-          {/* Step 1: Add Family Members */}
-          {needsFamilySetup && (
+          {/* Step 1: Add Address */}
+          {needsAddress && (
             <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-blue-500">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl">👨‍👩‍👧‍👦</span>
+                  <span className="text-3xl">📍</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 1: Add Your Family Members</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 1: Add Your Primary Address</h2>
                 <p className="text-gray-600">
-                  Start by adding everyone in your household. This helps us personalize your emergency plans and supply recommendations.
+                  Start by adding your home address. This helps us provide local weather alerts, personalized disaster preparedness recommendations, and region-specific emergency resources.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• Real-time weather alerts and severe weather warnings</li>
+                    <li>• FEMA region-specific disaster preparedness guidance</li>
+                    <li>• Localized emergency supply recommendations</li>
+                    <li>• Nearby shelter and resource location information</li>
+                  </ul>
+                </div>
+                <button
+                  onClick={() => navigate(createPageUrl("Settings"))}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                >
+                  Add Your Address Now
+                </button>
+                <p className="text-sm text-gray-500 text-center">
+                  💡 You can update your address anytime in <strong>Settings</strong>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Add Family Members */}
+          {needsFamilySetup && !needsAddress && (
+            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-purple-500">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">👨‍👩‍👧‍👦</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 2: Add Your Family Members</h2>
+                <p className="text-gray-600">
+                  Add everyone in your household. This helps us personalize your emergency plans and supply recommendations.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="bg-purple-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>• Tailored supply recommendations for your family size</li>
@@ -427,7 +469,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => navigate(createPageUrl("Settings"))}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
                 >
                   Add Family Members Now
                 </button>
@@ -438,14 +480,14 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Step 2: Add Meet Spots */}
-          {needsMeetSpots && !needsFamilySetup && (
+          {/* Step 3: Add Meet Spots */}
+          {needsMeetSpots && !needsAddress && !needsFamilySetup && (
             <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-green-500">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl">📍</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 2: Define Your Meet Spots</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3: Define Your Meet Spots</h2>
                 <p className="text-gray-600">
                   Set up safe meeting locations where your family can reunite during an emergency. FEMA recommends having spots in all four cardinal directions.
                 </p>
@@ -472,14 +514,14 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Step 3: Build Caches */}
-          {needsCaches && !needsFamilySetup && !needsMeetSpots && (
+          {/* Step 4: Build Caches */}
+          {needsCaches && !needsAddress && !needsFamilySetup && !needsMeetSpots && (
             <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-orange-500">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl">📦</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3: Build Your Emergency Caches</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 4: Build Your Emergency Caches</h2>
                 <p className="text-gray-600">
                   Create organized supply caches (Go Bag, Car Kit, Home Supplies) to ensure you're ready for any situation.
                 </p>
