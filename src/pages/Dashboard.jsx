@@ -57,6 +57,9 @@ export default function Dashboard() {
       setMeetSpots(filteredSpots);
       setFirstAidItems(firstAidData);
       setFamilyMembers(familyData);
+      
+      // Store user email for later use
+      window.currentUserEmail = user.email;
 
       // If no notifications, add top recommendations
       if (notifData.length === 0) {
@@ -361,7 +364,10 @@ export default function Dashboard() {
   const needsAddress = !userProfile || !userProfile.street_address;
   const needsFamilySetup = !needsAddress && familyMembers.length === 0;
   const needsMeetSpots = !needsAddress && !needsFamilySetup && meetSpots.length === 0;
-  const needsCaches = !needsAddress && !needsFamilySetup && !needsMeetSpots && caches.length === 0;
+  
+  // Check if user has any caches they actually own (not just samples)
+  const userOwnedCaches = caches.filter(cache => cache.created_by === window.currentUserEmail);
+  const needsCaches = !needsAddress && !needsFamilySetup && !needsMeetSpots && userOwnedCaches.length === 0;
   const isOnboarding = needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
 
   if (isOnboarding) {
