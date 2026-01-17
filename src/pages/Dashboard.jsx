@@ -226,7 +226,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading dashboard"></div>
       </div>
     );
   }
@@ -236,7 +236,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-red-50">
         {/* Emergency Header */}
-        <div className="bg-red-600 text-white">
+        <div className="bg-red-600 text-white" role="alert" aria-live="assertive">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
               <div>
@@ -246,6 +246,7 @@ export default function Dashboard() {
               <button
                 onClick={() => setEmergencyMode(false)}
                 className="px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-sm"
+                aria-label="Exit emergency mode view"
               >
                 Exit Emergency View
               </button>
@@ -256,40 +257,40 @@ export default function Dashboard() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Active Alerts */}
           {alerts.length > 0 && (
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 border-4 border-red-500">
-              <h2 className="text-2xl font-bold text-red-600 mb-4">Active Alerts</h2>
+            <section className="bg-white rounded-lg shadow-lg p-6 mb-6 border-4 border-red-500" aria-labelledby="active-alerts-heading">
+              <h2 id="active-alerts-heading" className="text-2xl font-bold text-red-600 mb-4">Active Alerts</h2>
               <div className="space-y-3">
                 {alerts.map((alert, idx) => (
-                  <div key={idx} className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                  <div key={idx} className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500" role="alert">
                     <h3 className="font-bold text-lg text-red-900">{alert.title}</h3>
                     <p className="text-red-800 mt-1">{alert.message}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Evacuation Notifications */}
           {notifications.filter(n => n.type === 'alert' || n.title.toLowerCase().includes('evacuation')).length > 0 && (
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 border-4 border-orange-500">
-              <h2 className="text-2xl font-bold text-orange-600 mb-4">Evacuation Notices</h2>
+            <section className="bg-white rounded-lg shadow-lg p-6 mb-6 border-4 border-orange-500" aria-labelledby="evacuation-notices-heading">
+              <h2 id="evacuation-notices-heading" className="text-2xl font-bold text-orange-600 mb-4">Evacuation Notices</h2>
               <div className="space-y-3">
                 {notifications
                   .filter(n => n.type === 'alert' || n.title.toLowerCase().includes('evacuation'))
                   .map((notif, idx) => (
-                    <div key={idx} className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                    <div key={idx} className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500" role="alert">
                       <h3 className="font-bold text-lg text-orange-900">{notif.title}</h3>
                       <p className="text-orange-800 mt-1">{notif.message}</p>
                     </div>
                   ))}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Primary Meet Spot */}
           {primaryMeetSpot && (
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-6 border-2 border-blue-500">
-              <h2 className="text-2xl font-bold text-blue-600 mb-4">📍 Primary Meeting Point</h2>
+            <section className="bg-white rounded-lg shadow-lg p-6 mb-6 border-2 border-blue-500" aria-labelledby="primary-meetspot-heading">
+              <h2 id="primary-meetspot-heading" className="text-2xl font-bold text-blue-600 mb-4">📍 Primary Meeting Point</h2>
               <div className="text-lg">
                 <p className="font-bold text-gray-900 text-2xl">{primaryMeetSpot.name}</p>
                 {primaryMeetSpot.address && (
@@ -299,11 +300,11 @@ export default function Dashboard() {
                   <p className="text-gray-600 mt-3">{primaryMeetSpot.description}</p>
                 )}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <nav className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" aria-label="Emergency quick actions">
             <button
               onClick={() => navigate(createPageUrl("Resources"))}
               className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-xl font-bold shadow-lg"
@@ -328,12 +329,12 @@ export default function Dashboard() {
             >
               📞 Emergency Contacts
             </button>
-          </div>
+          </nav>
 
           {/* Weather Info */}
           {weather && (
-            <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-300">
-              <h2 className="text-xl font-bold text-gray-800 mb-3">Current Weather</h2>
+            <section className="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-300" aria-labelledby="current-weather-heading">
+              <h2 id="current-weather-heading" className="text-xl font-bold text-gray-800 mb-3">Current Weather</h2>
               <div className="grid grid-cols-2 gap-4 text-lg">
                 <div>
                   <span className="text-gray-600">Temperature:</span>
@@ -352,7 +353,7 @@ export default function Dashboard() {
                   <span className="font-bold ml-2">{weather.precipitation}</span>
                 </div>
               </div>
-            </div>
+            </section>
           )}
         </div>
       </div>
@@ -370,72 +371,76 @@ export default function Dashboard() {
   const isOnboarding = needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
 
   if (isOnboarding) {
+    const currentStep = needsAddress ? 1 : needsFamilySetup ? 2 : needsMeetSpots ? 3 : 4;
+    const progressPercent = (currentStep / 4) * 100;
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
         <div className="bg-white border-b">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <h1 className="text-2xl font-bold text-gray-900">Welcome to RallyPack</h1>
-            <p className="text-gray-500 mt-1">Let's get you prepared in 3 simple steps</p>
+            <p className="text-gray-500 mt-1">Get prepared in 4 simple steps</p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Progress Bar */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`flex items-center ${needsAddress ? 'text-blue-600' : 'text-green-600'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsAddress ? 'bg-blue-100' : 'bg-green-100'} mr-2`}>
+          <section className="bg-white rounded-lg shadow-sm p-6 mb-6" aria-labelledby="onboarding-progress">
+            <h2 id="onboarding-progress" className="sr-only">Onboarding Progress</h2>
+            <div className="flex items-center justify-between mb-4" role="list">
+              <div className={`flex items-center ${needsAddress ? 'text-blue-600' : 'text-green-600'}`} role="listitem">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsAddress ? 'bg-blue-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
                   {needsAddress ? '1' : '✓'}
                 </div>
                 <span className="font-medium text-sm">Address</span>
               </div>
-              <div className={`flex items-center ${needsFamilySetup ? 'text-blue-600' : needsAddress ? 'text-gray-400' : 'text-green-600'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsFamilySetup ? 'bg-blue-100' : needsAddress ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+              <div className={`flex items-center ${needsFamilySetup ? 'text-blue-600' : needsAddress ? 'text-gray-400' : 'text-green-600'}`} role="listitem">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsFamilySetup ? 'bg-blue-100' : needsAddress ? 'bg-gray-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
                   {needsAddress ? '2' : needsFamilySetup ? '2' : '✓'}
                 </div>
                 <span className="font-medium text-sm">Family</span>
               </div>
-              <div className={`flex items-center ${needsMeetSpots ? 'text-blue-600' : (needsAddress || needsFamilySetup) ? 'text-gray-400' : 'text-green-600'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsMeetSpots ? 'bg-blue-100' : (needsAddress || needsFamilySetup) ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+              <div className={`flex items-center ${needsMeetSpots ? 'text-blue-600' : (needsAddress || needsFamilySetup) ? 'text-gray-400' : 'text-green-600'}`} role="listitem">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsMeetSpots ? 'bg-blue-100' : (needsAddress || needsFamilySetup) ? 'bg-gray-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
                   {(needsAddress || needsFamilySetup) ? '3' : needsMeetSpots ? '3' : '✓'}
                 </div>
                 <span className="font-medium text-sm">Meet Spots</span>
               </div>
-              <div className={`flex items-center ${needsCaches ? 'text-blue-600' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'text-gray-400' : 'text-green-600'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsCaches ? 'bg-blue-100' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'bg-gray-100' : 'bg-green-100'} mr-2`}>
+              <div className={`flex items-center ${needsCaches ? 'text-blue-600' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'text-gray-400' : 'text-green-600'}`} role="listitem">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsCaches ? 'bg-blue-100' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'bg-gray-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
                   {(needsAddress || needsFamilySetup || needsMeetSpots) ? '4' : needsCaches ? '4' : '✓'}
                 </div>
                 <span className="font-medium text-sm">Caches</span>
               </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuenow={progressPercent} aria-valuemin="0" aria-valuemax="100" aria-label={`Onboarding ${progressPercent}% complete`}>
               <div 
                 className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                style={{ width: needsAddress ? '25%' : needsFamilySetup ? '50%' : needsMeetSpots ? '75%' : '100%' }}
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
-          </div>
+            <p className="sr-only">You are on step {currentStep} of 4</p>
+          </section>
 
           {/* Step 1: Add Address */}
           {needsAddress && (
-            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-blue-500">
+            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-blue-500">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                   <span className="text-3xl">📍</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 1: Add Your Primary Address</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 1: Add Your Home Address</h2>
                 <p className="text-gray-600">
-                  Start by adding your home address. This helps us provide local weather alerts, personalized disaster preparedness recommendations, and region-specific emergency resources.
+                  Your address enables localized weather alerts, tailored disaster recommendations, and nearby emergency resources.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Real-time weather alerts and severe weather warnings</li>
-                    <li>• FEMA region-specific disaster preparedness guidance</li>
-                    <li>• Localized emergency supply recommendations</li>
-                    <li>• Nearby shelter and resource location information</li>
+                    <li>• Receive critical local weather and disaster alerts</li>
+                    <li>• Get personalized recommendations for your region</li>
+                    <li>• Find nearby shelters and emergency resources</li>
                   </ul>
                 </div>
                 <button
@@ -445,31 +450,31 @@ export default function Dashboard() {
                   Add Your Address Now
                 </button>
                 <p className="text-sm text-gray-500 text-center">
-                  💡 You can update your address anytime in <strong>Settings</strong>
+                  💡 Update your address anytime in <strong>Settings</strong>
                 </p>
               </div>
-            </div>
+            </article>
           )}
 
           {/* Step 2: Add Family Members */}
           {needsFamilySetup && !needsAddress && (
-            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-purple-500">
+            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-purple-500">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                   <span className="text-3xl">👨‍👩‍👧‍👦</span>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 2: Add Your Family Members</h2>
                 <p className="text-gray-600">
-                  Add everyone in your household. This helps us personalize your emergency plans and supply recommendations.
+                  Including household members and pets helps us tailor emergency plans and recommendations to your family's unique needs.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-purple-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Tailored supply recommendations for your family size</li>
-                    <li>• Medical needs tracking for each person</li>
-                    <li>• Emergency contact information all in one place</li>
+                    <li>• Ensures supply recommendations fit your entire household</li>
+                    <li>• Keeps track of everyone's medical needs</li>
+                    <li>• Centralizes emergency contacts for quick access</li>
                   </ul>
                 </div>
                 <button
@@ -479,65 +484,65 @@ export default function Dashboard() {
                   Add Family Members Now
                 </button>
                 <p className="text-sm text-gray-500 text-center">
-                  💡 You can add or update family members anytime in <strong>Settings</strong>
+                  💡 Update family members anytime in <strong>Settings</strong>
                 </p>
               </div>
-            </div>
+            </article>
           )}
 
           {/* Step 3: Add Meet Spots */}
           {needsMeetSpots && !needsAddress && !needsFamilySetup && (
-            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-green-500">
+            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-green-500">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                   <span className="text-3xl">📍</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3: Define Your Meet Spots</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3: Define Your Meeting Spots</h2>
                 <p className="text-gray-600">
-                  Set up safe meeting locations where your family can reunite during an emergency. FEMA recommends having spots in all four cardinal directions.
+                  Establish safe meeting points where your family can reunite if separated during an emergency. FEMA recommends having spots in all cardinal directions.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-green-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Ensures everyone knows where to go in a crisis</li>
-                    <li>• Multiple locations for different emergency scenarios</li>
-                    <li>• Peace of mind knowing your family has a plan</li>
+                    <li>• Critical for family reunification during crises</li>
+                    <li>• Provides designated safe zones for various scenarios</li>
+                    <li>• Gives peace of mind with a clear emergency plan</li>
                   </ul>
                 </div>
                 <button
                   onClick={() => navigate(createPageUrl("Resources") + "?tab=meetspots")}
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
                 >
-                  Set Up Meet Spots Now
+                  Set Up Meeting Spots Now
                 </button>
                 <p className="text-sm text-gray-500 text-center">
-                  💡 You can manage meet spots anytime in <strong>Resources → Meet Spots tab</strong>
+                  💡 Manage meet spots anytime in <strong>Resources → Meet Spots</strong>
                 </p>
               </div>
-            </div>
+            </article>
           )}
 
           {/* Step 4: Build Caches */}
           {needsCaches && !needsAddress && !needsFamilySetup && !needsMeetSpots && (
-            <div className="bg-white rounded-lg shadow-lg p-8 border-4 border-orange-500">
+            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-orange-500">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                   <span className="text-3xl">📦</span>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 4: Build Your Emergency Caches</h2>
                 <p className="text-gray-600">
-                  Create organized supply caches (Go Bag, Car Kit, Home Supplies) to ensure you're ready for any situation.
+                  Organize emergency supplies into dedicated caches (Go Bag, Car Kit, Home Supplies) to ensure you're always prepared.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-orange-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Track what supplies you have and what you need</li>
-                    <li>• Get personalized recommendations based on your family</li>
-                    <li>• Monitor expiration dates and stay prepared</li>
+                    <li>• Track and manage all your emergency supplies</li>
+                    <li>• Receive personalized supply recommendations</li>
+                    <li>• Stay on top of expiration dates for food and medicine</li>
                   </ul>
                 </div>
                 <button
@@ -547,10 +552,10 @@ export default function Dashboard() {
                   Create Your First Cache
                 </button>
                 <p className="text-sm text-gray-500 text-center">
-                  💡 You can manage caches anytime in <strong>Resources → Caches tab</strong>
+                  💡 Manage caches anytime in <strong>Resources → Caches</strong>
                 </p>
               </div>
-            </div>
+            </article>
           )}
         </div>
       </div>

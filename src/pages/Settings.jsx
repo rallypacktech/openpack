@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import ProfileForm from "../components/settings/ProfileForm";
 import FamilyMembersList from "../components/settings/FamilyMembersList";
 import PetsList from "../components/settings/PetsList";
+import AccessibilitySettings from "../components/settings/AccessibilitySettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,7 +152,7 @@ export default function Settings() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading settings"></div>
       </div>
     );
   }
@@ -162,11 +163,14 @@ export default function Settings() {
       <div className="bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-2xl font-bold">Settings & Profile</h1>
-          <p className="text-blue-100 mt-1">Manage your account, family members, pets, and security preferences</p>
+          <p className="text-blue-100 mt-1">Manage your account, family members, pets, and preferences</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Accessibility Settings */}
+        <AccessibilitySettings />
+
         {/* Profile Section */}
         <ProfileForm user={user} profile={profile} onSave={handleProfileSave} />
 
@@ -194,23 +198,23 @@ export default function Settings() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
-                <Shield className="w-5 h-5 text-gray-600" />
+                <Shield className="w-5 h-5 text-gray-600" aria-hidden="true" />
                 <div>
-                  <p className="font-medium">Cloudflare Security</p>
+                  <Label htmlFor="cloudflare-security" className="font-medium">Cloudflare Security</Label>
                   <p className="text-sm text-gray-500">Enhanced protection against threats and attacks</p>
                 </div>
               </div>
-              <Switch defaultChecked />
+              <Switch id="cloudflare-security" defaultChecked aria-label="Toggle Cloudflare security" />
             </div>
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
-                <Lock className="w-5 h-5 text-gray-600" />
+                <Lock className="w-5 h-5 text-gray-600" aria-hidden="true" />
                 <div>
-                  <p className="font-medium">Human Authentication</p>
+                  <Label htmlFor="human-auth" className="font-medium">Human Authentication</Label>
                   <p className="text-sm text-gray-500">Verify that users are human before accessing sensitive data</p>
                 </div>
               </div>
-              <Switch defaultChecked />
+              <Switch id="human-auth" defaultChecked aria-label="Toggle human authentication" />
             </div>
             <Button className="w-full bg-blue-600 hover:bg-blue-700">
               Save Security Settings
@@ -225,16 +229,16 @@ export default function Settings() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Current Password</Label>
-              <Input type="password" placeholder="Enter your current password" className="mt-1" />
+              <Label htmlFor="current-password">Current Password</Label>
+              <Input id="current-password" type="password" placeholder="Enter your current password" className="mt-1" />
             </div>
             <div>
-              <Label>New Password</Label>
-              <Input type="password" placeholder="Enter your new password" className="mt-1" />
+              <Label htmlFor="new-password">New Password</Label>
+              <Input id="new-password" type="password" placeholder="Enter your new password" className="mt-1" />
             </div>
             <div>
-              <Label>Confirm New Password</Label>
-              <Input type="password" placeholder="Confirm your new password" className="mt-1" />
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Input id="confirm-password" type="password" placeholder="Confirm your new password" className="mt-1" />
             </div>
             <Button className="w-full bg-blue-600 hover:bg-blue-700">
               Change Password
@@ -246,12 +250,12 @@ export default function Settings() {
         <Card className="border-red-200">
           <CardHeader className="pb-4 bg-red-50">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
               <CardTitle className="text-xl font-semibold text-red-900">Danger Zone</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4" role="note">
               <h3 className="font-semibold text-gray-900 mb-2">Important: Pet Microchip Data Retention</h3>
               <p className="text-sm text-gray-700 mb-2">
                 If you delete your account, your personal information will be permanently removed. However, for pet safety and emergency recovery purposes:
@@ -284,8 +288,9 @@ export default function Settings() {
                       Pet microchip information will be retained for emergency pet recovery purposes.
                     </p>
                     <div className="mt-4">
-                      <Label>Type "DELETE MY ACCOUNT" to confirm:</Label>
+                      <Label htmlFor="delete-confirm">Type "DELETE MY ACCOUNT" to confirm:</Label>
                       <Input
+                        id="delete-confirm"
                         className="mt-2"
                         value={deleteConfirmText}
                         onChange={(e) => setDeleteConfirmText(e.target.value)}
