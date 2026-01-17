@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import AccessibilityProvider from "./components/AccessibilityProvider";
 
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
@@ -48,7 +49,7 @@ export default function Layout({ children, currentPageName }) {
   if (!authChecked && !isPublicPage) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading"></div>
       </div>
     );
   }
@@ -82,8 +83,9 @@ export default function Layout({ children, currentPageName }) {
               ? "bg-blue-50 text-blue-600 font-medium"
               : "text-gray-600 hover:bg-gray-100"
           }`}
+          aria-current={currentPageName === item.page ? "page" : undefined}
         >
-          <item.icon className="w-5 h-5" />
+          <item.icon className="w-5 h-5" aria-hidden="true" />
           <span>{item.name}</span>
         </Link>
       ))}
@@ -91,105 +93,114 @@ export default function Layout({ children, currentPageName }) {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header - only show nav for authenticated users */}
-      {user && (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-blue-600">RallyPack</span>
-            </Link>
+    <AccessibilityProvider>
+      <div className="min-h-screen bg-gray-50">
+        {/* Skip to content link for keyboard users */}
+        <a href="#main-content" className="skip-to-content">
+          Skip to main content
+        </a>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              <NavLinks />
-            </nav>
-
-            {/* Right Section */}
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                className="hidden md:flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                Log Out
-              </Button>
-
-              {/* Mobile Menu */}
-              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="md:hidden">
-                    <Menu className="w-6 h-6" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-72">
-                  <div className="flex flex-col gap-2 mt-8">
-                    <NavLinks onClick={() => setMobileMenuOpen(false)} />
-                    <hr className="my-4" />
-                    <Button
-                      variant="outline"
-                      onClick={handleLogout}
-                      className="flex items-center gap-2"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Log Out
-                    </Button>
+        {/* Header - only show nav for authenticated users */}
+        {user && (
+          <header className="bg-white border-b border-gray-200 sticky top-0 z-50" role="banner">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center h-16">
+                {/* Logo */}
+                <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2" aria-label="RallyPack Home">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center" aria-hidden="true">
+                    <Users className="w-6 h-6 text-white" />
                   </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-          </div>
-        </div>
-        </header>
-      )}
+                  <span className="text-xl font-bold text-blue-600">RallyPack</span>
+                </Link>
 
-      {/* Main Content */}
-      <main>{children}</main>
+                {/* Desktop Navigation */}
+                <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
+                  <NavLinks />
+                </nav>
 
-      {/* Footer - only show for authenticated users */}
-      {user && (
-        <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
+                {/* Right Section */}
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="hidden md:flex items-center gap-2"
+                    aria-label="Log out of your account"
+                  >
+                    <LogOut className="w-4 h-4" aria-hidden="true" />
+                    Log Out
+                  </Button>
+
+                  {/* Mobile Menu */}
+                  <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                    <SheetTrigger asChild>
+                      <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+                        <Menu className="w-6 h-6" aria-hidden="true" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-72" aria-label="Mobile navigation">
+                      <nav className="flex flex-col gap-2 mt-8">
+                        <NavLinks onClick={() => setMobileMenuOpen(false)} />
+                        <hr className="my-4" />
+                        <Button
+                          variant="outline"
+                          onClick={handleLogout}
+                          className="flex items-center gap-2"
+                          aria-label="Log out of your account"
+                        >
+                          <LogOut className="w-4 h-4" aria-hidden="true" />
+                          Log Out
+                        </Button>
+                      </nav>
+                    </SheetContent>
+                  </Sheet>
                 </div>
-                <span className="text-lg font-bold text-blue-600">RallyPack</span>
-              </div>
-              <p className="text-gray-600 text-sm">
-                Your comprehensive emergency preparedness platform. Stay ready, stay connected.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
-              <div className="space-y-2">
-                <Link to={createPageUrl("PrivacyPolicy")} className="block text-sm text-gray-600 hover:text-blue-600">
-                  Privacy Policy
-                </Link>
-                <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-gray-600 hover:text-blue-600">
-                  Terms & Conditions
-                </Link>
               </div>
             </div>
-          </div>
+          </header>
+        )}
 
-          <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-gray-500">
-            <p>© 2026 RallyPack. All rights reserved. | Ages 13+</p>
-            <p className="mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
-          </div>
-        </div>
-        </footer>
-      )}
-    </div>
+        {/* Main Content */}
+        <main id="main-content" role="main">{children}</main>
+
+        {/* Footer - only show for authenticated users */}
+        {user && (
+          <footer className="bg-white border-t border-gray-200 mt-auto" role="contentinfo">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center" aria-hidden="true">
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-lg font-bold text-blue-600">RallyPack</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    Your comprehensive emergency preparedness platform. Stay ready, stay connected.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
+                  <nav className="space-y-2" aria-label="Legal navigation">
+                    <Link to={createPageUrl("PrivacyPolicy")} className="block text-sm text-gray-600 hover:text-blue-600">
+                      Privacy Policy
+                    </Link>
+                    <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-gray-600 hover:text-blue-600">
+                      Terms & Conditions
+                    </Link>
+                  </nav>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-gray-500">
+                <p>© 2026 RallyPack. All rights reserved. | Ages 13+</p>
+                <p className="mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
+              </div>
+            </div>
+          </footer>
+        )}
+      </div>
+    </AccessibilityProvider>
   );
 }
