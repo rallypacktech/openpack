@@ -17,6 +17,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSpot, setEditingSpot] = useState(null);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
+  const [loadingRecs, setLoadingRecs] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -39,9 +41,26 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           lon: profiles[0].longitude
         });
       }
+      
+      // Load recommendations
+      loadRecommendations();
     };
     loadUser();
-  }, []);
+  }, [spots]);
+
+  const loadRecommendations = async () => {
+    setLoadingRecs(true);
+    try {
+      const response = await base44.functions.invoke('recommendMeetSpots');
+      if (response.data.recommendations) {
+        setRecommendations(response.data.recommendations);
+      }
+    } catch (error) {
+      console.error('Error loading recommendations:', error);
+    } finally {
+      setLoadingRecs(false);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -266,7 +285,52 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           </DialogContent>
         </Dialog>
 
-        {(spots.length < 4 || missingDirections.length > 0) && (
+        {/* Personalized Recommendations */}
+        {recommendations.length > 0 && (
+          <div className="space-y-4 mb-6 mt-6">
+            <h3 className="text-lg font-semibold text-gray-900">Recommendations for You</h3>
+            {recommendations.map((rec, idx) => (
+              <div key={idx} className={`rounded-lg p-4 border ${
+                rec.type === 'coverage' ? 'bg-orange-50 border-orange-200' :
+                rec.type === 'regional' ? 'bg-blue-50 border-blue-200' :
+                'bg-green-50 border-green-200'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <Navigation className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                    rec.type === 'coverage' ? 'text-orange-600' :
+                    rec.type === 'regional' ? 'text-blue-600' :
+                    'text-green-600'
+                  }`} />
+                  <div>
+                    <p className={`font-medium mb-1 ${
+                      rec.type === 'coverage' ? 'text-orange-900' :
+                      rec.type === 'regional' ? 'text-blue-900' :
+                      'text-green-900'
+                    }`}>{rec.title}</p>
+                    <p className={`text-sm mb-2 ${
+                      rec.type === 'coverage' ? 'text-orange-700' :
+                      rec.type === 'regional' ? 'text-blue-700' :
+                      'text-green-700'
+                    }`}>{rec.description}</p>
+                    {rec.suggestions && rec.suggestions.length > 0 && (
+                      <ul className={`text-sm space-y-1 ${
+                        rec.type === 'coverage' ? 'text-orange-600' :
+                        rec.type === 'regional' ? 'text-blue-600' :
+                        'text-green-600'
+                      }`}>
+                        {rec.suggestions.map((suggestion, i) => (
+                          <li key={i}>• {suggestion}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {(spots.length < 4 || missingDirections.length > 0) && recommendations.length === 0 && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 mt-6">
             <div className="flex items-start gap-3">
               <Navigation className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
