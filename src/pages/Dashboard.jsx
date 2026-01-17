@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     loadData();
@@ -57,9 +58,7 @@ export default function Dashboard() {
       setMeetSpots(filteredSpots);
       setFirstAidItems(firstAidData);
       setFamilyMembers(familyData);
-      
-      // Store user email for later use
-      window.currentUserEmail = user.email;
+      setUserEmail(user.email);
 
       // If no notifications, add top recommendations
       if (notifData.length === 0) {
@@ -366,7 +365,7 @@ export default function Dashboard() {
   const needsMeetSpots = !needsAddress && !needsFamilySetup && meetSpots.length === 0;
   
   // Check if user has any caches they actually own (not just samples)
-  const userOwnedCaches = caches.filter(cache => cache.created_by === window.currentUserEmail);
+  const userOwnedCaches = caches.filter(cache => cache.created_by === userEmail);
   const needsCaches = !needsAddress && !needsFamilySetup && !needsMeetSpots && userOwnedCaches.length === 0;
   const isOnboarding = needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
 
@@ -589,7 +588,7 @@ export default function Dashboard() {
               <StatsCard
                 title="Meet Spots"
                 count={meetSpots.length}
-                subtitle={primaryMeetSpot ? `${primaryMeetSpot.name} - ${primaryMeetSpot.address || "Primary"}` : "No meet spots set"}
+                subtitle={primaryMeetSpot ? `Primary: ${primaryMeetSpot.name}` : meetSpots.length > 0 ? "Set up directional coverage" : "No meet spots set"}
                 icon={MapPin}
                 onView={() => navigate(createPageUrl("Resources") + "?tab=meetspots")}
               />
