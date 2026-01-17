@@ -36,11 +36,12 @@ export default function Settings() {
 
   const loadData = async () => {
     try {
-      const [userData, profileData, membersData, petsData] = await Promise.all([
-        base44.auth.me(),
-        base44.entities.UserProfile.list(),
-        base44.entities.FamilyMember.list(),
-        base44.entities.Pet.list()
+      const userData = await base44.auth.me();
+      
+      const [profileData, membersData, petsData] = await Promise.all([
+        base44.entities.UserProfile.filter({ created_by: userData.email }),
+        base44.entities.FamilyMember.filter({ created_by: userData.email }),
+        base44.entities.Pet.filter({ created_by: userData.email })
       ]);
 
       setUser(userData);
