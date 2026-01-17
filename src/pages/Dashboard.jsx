@@ -364,8 +364,8 @@ export default function Dashboard() {
   const needsFamilySetup = !needsAddress && familyMembers.length === 0;
   const needsMeetSpots = !needsAddress && !needsFamilySetup && meetSpots.length === 0;
   
-  // Check if user has any caches they actually own (not just samples)
-  const userOwnedCaches = caches.filter(cache => cache.created_by === userEmail);
+  // Check if user has any caches they actually own (not samples)
+  const userOwnedCaches = caches.filter(cache => !cache.is_sample);
   const needsCaches = !needsAddress && !needsFamilySetup && !needsMeetSpots && userOwnedCaches.length === 0;
   const isOnboarding = needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
 

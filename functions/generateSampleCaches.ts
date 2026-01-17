@@ -33,13 +33,15 @@ Deno.serve(async (req) => {
     const goBag = await base44.entities.EmergencyCache.create({
       name: "SAMPLE Go Bag",
       location: "Front Closet",
-      description: "72-hour emergency kit for quick evacuation"
+      description: "72-hour emergency kit for quick evacuation",
+      is_sample: true
     });
 
     const autoBag = await base44.entities.EmergencyCache.create({
       name: "SAMPLE Automobile",
       location: "Trunk",
-      description: "Emergency supplies kept in vehicle"
+      description: "Emergency supplies kept in vehicle",
+      is_sample: true
     });
 
     // Base items for everyone
