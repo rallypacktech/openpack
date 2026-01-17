@@ -28,11 +28,14 @@ export default function AccessibilityProvider({ children }) {
     // Apply to document
     if (savedHighContrast) {
       document.documentElement.classList.add('high-contrast');
+      document.body.classList.add('high-contrast');
     }
     if (savedReducedMotion) {
       document.documentElement.classList.add('reduced-motion');
+      document.body.classList.add('reduced-motion');
     }
     document.documentElement.setAttribute('data-font-size', savedFontSize);
+    document.body.setAttribute('data-font-size', savedFontSize);
   }, []);
 
   const toggleHighContrast = () => {
