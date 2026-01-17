@@ -96,7 +96,7 @@ export default function Layout({ children, currentPageName }) {
     <AccessibilityProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Skip to content link for keyboard users */}
-        <a href="#main-content" className="skip-to-content">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[99999] focus:px-4 focus:py-3 focus:bg-blue-600 focus:text-white focus:rounded-md focus:font-semibold focus:shadow-lg">
           Skip to main content
         </a>
 
