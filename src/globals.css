@@ -87,27 +87,31 @@ css
     outline-offset: 2px;
   }
 
-  /* Skip to content link - visually hidden until focused */
+  /* Skip to content link - hidden until focused */
   a.skip-to-content {
-    position: fixed;
-    top: -100vh;
-    left: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: none;
+    position: fixed !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    z-index: -1 !important;
   }
 
   a.skip-to-content:focus {
-    top: 4px;
-    left: 4px;
-    opacity: 1;
-    pointer-events: auto;
-    padding: 8px 16px;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    text-decoration: none;
-    border-radius: 4px;
-    z-index: 9999;
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 12px 20px !important;
+    background: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+    text-decoration: none !important;
+    border-radius: 6px !important;
+    z-index: 99999 !important;
+    overflow: visible !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
   }
 
   /* Screen reader only text */
