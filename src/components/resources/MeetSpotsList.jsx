@@ -236,6 +236,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
               </div>
               <div>
                 <AddressAutocomplete
+                  key={editingSpot?.id || 'new'}
                   initialValue={formData.address}
                   onAddressSelect={(addressData) => {
                     setFormData({
