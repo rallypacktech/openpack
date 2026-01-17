@@ -184,7 +184,7 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-gray-500">
-            <p>© 2025 RallyPack. All rights reserved. | Ages 13+</p>
+            <p>© 2026 RallyPack. All rights reserved. | Ages 13+</p>
             <p className="mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
           </div>
         </div>
