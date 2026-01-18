@@ -120,19 +120,27 @@ const applyStyles = (highContrast, fontSize, reducedMotion) => {
         color: black !important;
       }
       
-      nav, header, nav *, header * {
+      nav, header {
+        background-color: white !important;
+      }
+      
+      nav *, header *, 
+      nav a, header a, 
+      nav span, header span,
+      nav button, header button,
+      nav div, header div {
         color: black !important;
       }
       
       nav a, header a {
-        background-color: #f0f0f0 !important;
-        color: black !important;
+        background-color: #e8e8e8 !important;
       }
       
       nav a.bg-blue-50, nav a[class*="bg-blue"],
-      header a.bg-blue-50, header a[class*="bg-blue"] {
+      header a.bg-blue-50, header a[class*="bg-blue"],
+      nav a[aria-current="page"], header a[aria-current="page"] {
         background-color: #d0d0d0 !important;
-        color: black !important;
+        font-weight: bold !important;
       }
       
       nav svg, header svg {
