@@ -126,48 +126,56 @@ const applyStyles = (highContrast, fontSize, reducedMotion) => {
         background-color: white !important;
       }
       
-      /* Force ALL text in header/nav to be black */
-      header *, header *,
-      nav *, nav * {
-        color: black !important;
-      }
-      
-      /* Nav links - unselected state */
-      header nav a,
-      nav[aria-label="Main navigation"] a,
-      header a[href],
-      nav a[href] {
+      /* Nav links - unselected state - must target very specifically */
+      header nav a.text-gray-600,
+      header nav a[class*="text-gray"],
+      header nav a:not([aria-current="page"]),
+      nav[aria-label="Main navigation"] a.text-gray-600,
+      nav[aria-label="Main navigation"] a:not([aria-current="page"]) {
         background-color: #e0e0e0 !important;
         color: black !important;
       }
       
       /* Nav links - selected state */
       header nav a[aria-current="page"],
-      nav[aria-label="Main navigation"] a[aria-current="page"],
       header nav a.bg-blue-50,
-      nav a.bg-blue-50 {
+      header nav a.text-blue-600,
+      nav[aria-label="Main navigation"] a[aria-current="page"],
+      nav[aria-label="Main navigation"] a.bg-blue-50 {
         background-color: black !important;
         color: white !important;
         font-weight: bold !important;
       }
       
-      /* Override any text color classes in nav */
-      header .text-gray-600,
-      nav .text-gray-600,
-      header .text-blue-600,
-      nav .text-blue-600 {
+      /* Force ALL children of nav links to inherit correct color */
+      header nav a.text-gray-600 *,
+      header nav a:not([aria-current="page"]) *,
+      header nav a:not([aria-current="page"]) span,
+      nav a.text-gray-600 *,
+      nav a:not([aria-current="page"]) *,
+      nav a:not([aria-current="page"]) span {
         color: black !important;
       }
       
-      /* Icons in nav */
-      header svg, nav svg {
+      header nav a[aria-current="page"] *,
+      header nav a.bg-blue-50 *,
+      nav a[aria-current="page"] *,
+      nav a.bg-blue-50 * {
+        color: white !important;
+      }
+      
+      /* Icons in unselected nav links */
+      header nav a.text-gray-600 svg,
+      header nav a:not([aria-current="page"]) svg,
+      nav a.text-gray-600 svg,
+      nav a:not([aria-current="page"]) svg {
         filter: brightness(0) !important;
       }
       
       /* Icons in selected nav items */
       header nav a[aria-current="page"] svg,
-      nav a[aria-current="page"] svg,
       header nav a.bg-blue-50 svg,
+      nav a[aria-current="page"] svg,
       nav a.bg-blue-50 svg {
         filter: brightness(0) invert(1) !important;
       }
