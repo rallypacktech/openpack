@@ -61,22 +61,47 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="text-center max-w-3xl mx-auto">
+        <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Be Ready for Anything,<br />
-            <span className="text-blue-600">Wherever Life Takes You</span>
+            When Disaster Strikes,<br />
+            <span className="text-blue-600">Will Your Family Know What to Do?</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Your family's emergency preparedness companion. Track supplies, plan meet spots, 
-            protect your pets, and stay informed—all in one secure place.
+            I've seen families arrive at shelters without medications, at the wrong location, 
+            or separated from loved ones with no plan. In hurricanes, fires, floods, or even 
+            when cell service fails—<strong>having a plan saves lives</strong>.
           </p>
+          
+          {/* Problem Boxes */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <AlertTriangle className="w-5 h-5 text-red-600 mb-2" />
+              <p className="text-sm font-semibold text-gray-900 mb-1">Wrong Shelter</p>
+              <p className="text-sm text-gray-600">Families waste critical hours driving to the wrong location</p>
+            </div>
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+              <Package className="w-5 h-5 text-orange-600 mb-2" />
+              <p className="text-sm font-semibold text-gray-900 mb-1">Missing Essentials</p>
+              <p className="text-sm text-gray-600">Forget medications, pet supplies, or important documents</p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <Users className="w-5 h-5 text-blue-600 mb-2" />
+              <p className="text-sm font-semibold text-gray-900 mb-1">Lost Connection</p>
+              <p className="text-sm text-gray-600">When cell service fails, families get separated with no meetup plan</p>
+            </div>
+          </div>
+
+          <p className="text-lg text-gray-700 mb-8 font-medium">
+            RallyPack helps <span className="text-blue-600">every family be prepared and ready to react</span> when emergencies happen—from hurricanes and wildfires to car accidents and power outages.
+          </p>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={handleGetStarted} 
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6"
             >
-              Get Started Free
+              Start Your Family's Plan
             </Button>
             <Link to={createPageUrl("LearnMore")}>
               <Button 
@@ -211,7 +236,7 @@ export default function Home() {
               </div>
               <div>
                 <CheckCircle className="w-8 h-8 mx-auto mb-2" />
-                <div className="font-semibold">SOC 2 Compliant</div>
+                <div className="font-semibold">SOC 2 Ready</div>
               </div>
               <div>
                 <CheckCircle className="w-8 h-8 mx-auto mb-2" />
