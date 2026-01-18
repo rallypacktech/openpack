@@ -39,20 +39,20 @@
 /* ===========================
    FONT SIZE SETTINGS
    =========================== */
-html[data-font-size="small"] {
-  font-size: 14px;
+html[data-font-size="small"] * {
+  font-size: 0.875em !important;
 }
 
-html[data-font-size="normal"] {
-  font-size: 16px;
+html[data-font-size="normal"] * {
+  font-size: 1em !important;
 }
 
-html[data-font-size="large"] {
-  font-size: 18px;
+html[data-font-size="large"] * {
+  font-size: 1.125em !important;
 }
 
-html[data-font-size="xlarge"] {
-  font-size: 20px;
+html[data-font-size="xlarge"] * {
+  font-size: 1.25em !important;
 }
 
 /* ===========================
