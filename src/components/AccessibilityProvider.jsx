@@ -125,6 +125,11 @@ const applyStyles = (highContrast, fontSize, reducedMotion) => {
         color: black !important;
       }
       
+      nav a:not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]),
+      header a:not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]) {
+        background-color: #f0f0f0 !important;
+      }
+      
       input, select, textarea {
         background-color: white !important;
         color: black !important;
