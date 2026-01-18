@@ -9,19 +9,29 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get all family members where current user is emergency contact
-    const allFamilyMembers = await base44.entities.FamilyMember.list();
-    const packOwnerEmails = allFamilyMembers
-      .filter(fm => fm.emergency_contact === user.email)
-      .map(fm => fm.created_by);
+    // Get family members where current user is emergency contact
+    const packFamilyMembers = await base44.entities.FamilyMember.filter({
+      emergency_contact: user.email
+    });
+    const packOwnerEmails = packFamilyMembers.map(fm => fm.created_by);
 
-    // Get all meet spots
-    const allSpots = await base44.entities.MeetSpot.list();
+    // Get user's own meet spots
+    const userOwnSpots = await base44.entities.MeetSpot.filter({
+      created_by: user.email
+    });
     
-    // Filter meet spots by ownership or pack membership
-    const userSpots = allSpots.filter(spot => 
-      spot.created_by === user.email || packOwnerEmails.includes(spot.created_by)
-    );
+    // Get pack member meet spots if any
+    let packSpots = [];
+    if (packOwnerEmails.length > 0) {
+      const allPackSpots = await Promise.all(
+        packOwnerEmails.map(email => 
+          base44.entities.MeetSpot.filter({ created_by: email })
+        )
+      );
+      packSpots = allPackSpots.flat();
+    }
+    
+    const userSpots = [...userOwnSpots, ...packSpots];
 
     return Response.json({ spots: userSpots });
 

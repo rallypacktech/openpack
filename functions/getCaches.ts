@@ -9,19 +9,29 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get all family members where current user is emergency contact
-    const allFamilyMembers = await base44.entities.FamilyMember.list();
-    const packOwnerEmails = allFamilyMembers
-      .filter(fm => fm.emergency_contact === user.email)
-      .map(fm => fm.created_by);
+    // Get family members where current user is emergency contact
+    const packFamilyMembers = await base44.entities.FamilyMember.filter({
+      emergency_contact: user.email
+    });
+    const packOwnerEmails = packFamilyMembers.map(fm => fm.created_by);
 
-    // Get all caches
-    const allCaches = await base44.entities.EmergencyCache.list();
+    // Get user's own caches
+    const userOwnCaches = await base44.entities.EmergencyCache.filter({
+      created_by: user.email
+    });
     
-    // Filter caches by ownership or pack membership
-    const userCaches = allCaches.filter(cache => 
-      cache.created_by === user.email || packOwnerEmails.includes(cache.created_by)
-    );
+    // Get pack member caches if any
+    let packCaches = [];
+    if (packOwnerEmails.length > 0) {
+      const allPackCaches = await Promise.all(
+        packOwnerEmails.map(email => 
+          base44.entities.EmergencyCache.filter({ created_by: email })
+        )
+      );
+      packCaches = allPackCaches.flat();
+    }
+    
+    const userCaches = [...userOwnCaches, ...packCaches];
 
     return Response.json({ caches: userCaches });
 
