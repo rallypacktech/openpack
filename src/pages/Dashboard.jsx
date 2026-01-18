@@ -499,17 +499,24 @@ export default function Dashboard() {
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3: Define Your Meeting Spots</h2>
                 <p className="text-gray-600">
-                  Establish safe meeting points where your family can reunite if separated during an emergency. FEMA recommends having spots in all cardinal directions.
+                  When cell service fails during a terrorist incident, power outage, or natural disaster—where will your family meet?
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-green-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Critical for family reunification during crises</li>
-                    <li>• Provides designated safe zones for various scenarios</li>
-                    <li>• Gives peace of mind with a clear emergency plan</li>
+                    <li>• <strong>Cell service goes down</strong> in emergencies—you can't rely on phones</li>
+                    <li>• Family members may be separated at work, school, or on the road</li>
+                    <li>• Having predetermined spots in all directions prevents confusion</li>
+                    <li>• FEMA recommends multiple meetup locations for different scenarios</li>
                   </ul>
+                </div>
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                  <p className="text-sm text-gray-800">
+                    <strong>Real scenario:</strong> During Hurricane Harvey, families couldn't contact each other for days. 
+                    Those with pre-planned meeting spots reunited faster.
+                  </p>
                 </div>
                 <button
                   onClick={() => navigate(createPageUrl("Resources") + "?tab=meetspots")}
@@ -533,17 +540,24 @@ export default function Dashboard() {
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 4: Build Your Emergency Caches</h2>
                 <p className="text-gray-600">
-                  Organize emergency supplies into dedicated caches (Go Bag, Car Kit, Home Supplies) to ensure you're always prepared.
+                  Don't arrive at a shelter only to be turned away. Be prepared with the supplies that matter.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Track and manage all your emergency supplies</li>
-                    <li>• Receive personalized supply recommendations</li>
-                    <li>• Stay on top of expiration dates for food and medicine</li>
+                    <li>• <strong>Many shelters require</strong> proof of medication and pet supplies</li>
+                    <li>• Families without proper documentation get redirected or denied</li>
+                    <li>• Having organized caches means you grab and go—no scrambling</li>
+                    <li>• Track expiration dates so supplies are always ready</li>
                   </ul>
+                </div>
+                <div className="bg-red-50 border-l-4 border-red-500 p-4">
+                  <p className="text-sm text-gray-800">
+                    <strong>Common mistakes:</strong> Arriving without pet supplies, forgetting prescriptions, 
+                    or not having identification documents. These cause families to be turned away during critical moments.
+                  </p>
                 </div>
                 <button
                   onClick={() => navigate(createPageUrl("Resources"))}
