@@ -120,6 +120,11 @@ const applyStyles = (highContrast, fontSize, reducedMotion) => {
         color: black !important;
       }
       
+      nav a, header a, nav button, header button,
+      nav *, header * {
+        color: black !important;
+      }
+      
       input, select, textarea {
         background-color: white !important;
         color: black !important;
