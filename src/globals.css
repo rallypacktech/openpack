@@ -28,54 +28,73 @@ css
   }
 
   /* High Contrast Mode */
-  .high-contrast {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --primary: 221.2 83.2% 40%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 20%;
-    --accent: 0 0% 90%;
-    --accent-foreground: 0 0% 0%;
-    --border: 0 0% 60%;
-    --input: 0 0% 80%;
+  .high-contrast,
+  .high-contrast *,
+  body.high-contrast,
+  body.high-contrast * {
+    --background: 0 0% 100% !important;
+    --foreground: 0 0% 0% !important;
+    --card: 0 0% 100% !important;
+    --card-foreground: 0 0% 0% !important;
+    --primary: 221.2 83.2% 40% !important;
+    --primary-foreground: 0 0% 100% !important;
+    --secondary: 0 0% 90% !important;
+    --secondary-foreground: 0 0% 0% !important;
+    --muted: 0 0% 95% !important;
+    --muted-foreground: 0 0% 20% !important;
+    --accent: 0 0% 90% !important;
+    --accent-foreground: 0 0% 0% !important;
+    --border: 0 0% 60% !important;
+    --input: 0 0% 80% !important;
   }
 
   /* High contrast border emphasis */
-  .high-contrast * {
+  .high-contrast *,
+  body.high-contrast * {
     border-width: 2px !important;
   }
 
   .high-contrast button,
-  .high-contrast a {
-    text-decoration: underline;
+  .high-contrast a,
+  body.high-contrast button,
+  body.high-contrast a {
+    text-decoration: underline !important;
   }
 
   /* Font size scaling */
-  [data-font-size="small"] {
-    font-size: 87.5%;
+  [data-font-size="small"],
+  [data-font-size="small"] *,
+  body[data-font-size="small"],
+  body[data-font-size="small"] * {
+    font-size: 87.5% !important;
   }
 
-  [data-font-size="normal"] {
-    font-size: 100%;
+  [data-font-size="normal"],
+  body[data-font-size="normal"] {
+    font-size: 100% !important;
   }
 
-  [data-font-size="large"] {
-    font-size: 112.5%;
+  [data-font-size="large"],
+  [data-font-size="large"] *,
+  body[data-font-size="large"],
+  body[data-font-size="large"] * {
+    font-size: 112.5% !important;
   }
 
-  [data-font-size="xlarge"] {
-    font-size: 125%;
+  [data-font-size="xlarge"],
+  [data-font-size="xlarge"] *,
+  body[data-font-size="xlarge"],
+  body[data-font-size="xlarge"] * {
+    font-size: 125% !important;
   }
 
   /* Reduced motion */
   .reduced-motion *,
   .reduced-motion *::before,
-  .reduced-motion *::after {
+  .reduced-motion *::after,
+  body.reduced-motion *,
+  body.reduced-motion *::before,
+  body.reduced-motion *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
