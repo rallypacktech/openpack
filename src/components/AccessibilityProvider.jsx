@@ -120,14 +120,23 @@ const applyStyles = (highContrast, fontSize, reducedMotion) => {
         color: black !important;
       }
       
-      nav a, header a, nav button, header button,
-      nav *, header * {
+      nav, header, nav *, header * {
         color: black !important;
       }
       
-      nav a:not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]),
-      header a:not([class*="bg-blue"]):not([class*="bg-green"]):not([class*="bg-red"]) {
+      nav a, header a {
         background-color: #f0f0f0 !important;
+        color: black !important;
+      }
+      
+      nav a.bg-blue-50, nav a[class*="bg-blue"],
+      header a.bg-blue-50, header a[class*="bg-blue"] {
+        background-color: #d0d0d0 !important;
+        color: black !important;
+      }
+      
+      nav svg, header svg {
+        filter: brightness(0) !important;
       }
       
       input, select, textarea {
@@ -152,6 +161,21 @@ const applyStyles = (highContrast, fontSize, reducedMotion) => {
       * {
         box-shadow: none !important;
         text-shadow: none !important;
+      }
+      
+      /* Toggle switches */
+      button[role="switch"] {
+        background-color: #cccccc !important;
+        border: 3px solid black !important;
+      }
+      
+      button[role="switch"][data-state="checked"] {
+        background-color: black !important;
+      }
+      
+      button[role="switch"] span {
+        background-color: white !important;
+        border: 2px solid black !important;
       }
     `;
   }
