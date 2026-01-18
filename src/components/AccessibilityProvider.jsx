@@ -25,17 +25,19 @@ export default function AccessibilityProvider({ children }) {
     setFontSize(savedFontSize);
     setReducedMotion(savedReducedMotion);
 
-    // Apply to document
+    // Apply to document - force re-render
     if (savedHighContrast) {
       document.documentElement.classList.add('high-contrast');
-      document.body.classList.add('high-contrast');
     }
     if (savedReducedMotion) {
       document.documentElement.classList.add('reduced-motion');
-      document.body.classList.add('reduced-motion');
     }
     document.documentElement.setAttribute('data-font-size', savedFontSize);
-    document.body.setAttribute('data-font-size', savedFontSize);
+    
+    // Force style recalculation
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // trigger reflow
+    document.body.style.display = '';
   }, []);
 
   const toggleHighContrast = () => {
@@ -45,18 +47,25 @@ export default function AccessibilityProvider({ children }) {
     
     if (newValue) {
       document.documentElement.classList.add('high-contrast');
-      document.body.classList.add('high-contrast');
     } else {
       document.documentElement.classList.remove('high-contrast');
-      document.body.classList.remove('high-contrast');
     }
+    
+    // Force style recalculation
+    document.body.style.display = 'none';
+    document.body.offsetHeight;
+    document.body.style.display = '';
   };
 
   const changeFontSize = (size) => {
     setFontSize(size);
     localStorage.setItem('fontSize', size);
     document.documentElement.setAttribute('data-font-size', size);
-    document.body.setAttribute('data-font-size', size);
+    
+    // Force style recalculation
+    document.body.style.display = 'none';
+    document.body.offsetHeight;
+    document.body.style.display = '';
   };
 
   const toggleReducedMotion = () => {
@@ -66,11 +75,14 @@ export default function AccessibilityProvider({ children }) {
     
     if (newValue) {
       document.documentElement.classList.add('reduced-motion');
-      document.body.classList.add('reduced-motion');
     } else {
       document.documentElement.classList.remove('reduced-motion');
-      document.body.classList.remove('reduced-motion');
     }
+    
+    // Force style recalculation
+    document.body.style.display = 'none';
+    document.body.offsetHeight;
+    document.body.style.display = '';
   };
 
   return (

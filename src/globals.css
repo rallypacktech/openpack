@@ -28,10 +28,8 @@ css
   }
 
   /* High Contrast Mode */
-  .high-contrast,
-  .high-contrast *,
-  body.high-contrast,
-  body.high-contrast * {
+  html.high-contrast,
+  html.high-contrast body {
     --background: 0 0% 100% !important;
     --foreground: 0 0% 0% !important;
     --card: 0 0% 100% !important;
@@ -46,46 +44,50 @@ css
     --accent-foreground: 0 0% 0% !important;
     --border: 0 0% 60% !important;
     --input: 0 0% 80% !important;
+    background: white !important;
+    color: black !important;
   }
 
   /* High contrast border emphasis */
-  .high-contrast *,
-  body.high-contrast * {
-    border-width: 2px !important;
+  html.high-contrast * {
+    border-color: #666 !important;
   }
 
-  .high-contrast button,
-  .high-contrast a,
-  body.high-contrast button,
-  body.high-contrast a {
+  html.high-contrast button,
+  html.high-contrast a {
     text-decoration: underline !important;
+    border: 2px solid #000 !important;
   }
 
-  /* Font size scaling */
-  [data-font-size="small"],
-  [data-font-size="small"] *,
-  body[data-font-size="small"],
-  body[data-font-size="small"] * {
-    font-size: 87.5% !important;
+  html.high-contrast .bg-gray-50,
+  html.high-contrast .bg-gray-100 {
+    background: #f0f0f0 !important;
   }
 
-  [data-font-size="normal"],
-  body[data-font-size="normal"] {
-    font-size: 100% !important;
+  html.high-contrast .text-gray-600,
+  html.high-contrast .text-gray-500 {
+    color: #333 !important;
   }
 
-  [data-font-size="large"],
-  [data-font-size="large"] *,
-  body[data-font-size="large"],
-  body[data-font-size="large"] * {
-    font-size: 112.5% !important;
+  /* Font size scaling - apply to root only to avoid compounding */
+  html[data-font-size="small"],
+  html[data-font-size="small"] body {
+    font-size: 14px !important;
   }
 
-  [data-font-size="xlarge"],
-  [data-font-size="xlarge"] *,
-  body[data-font-size="xlarge"],
-  body[data-font-size="xlarge"] * {
-    font-size: 125% !important;
+  html[data-font-size="normal"],
+  html[data-font-size="normal"] body {
+    font-size: 16px !important;
+  }
+
+  html[data-font-size="large"],
+  html[data-font-size="large"] body {
+    font-size: 18px !important;
+  }
+
+  html[data-font-size="xlarge"],
+  html[data-font-size="xlarge"] body {
+    font-size: 20px !important;
   }
 
   /* Reduced motion */
