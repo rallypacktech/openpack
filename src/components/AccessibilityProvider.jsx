@@ -120,31 +120,56 @@ const applyStyles = (highContrast, fontSize, reducedMotion) => {
         color: black !important;
       }
       
-      nav, header {
+      /* Force header and nav backgrounds */
+      header, header[role="banner"],
+      nav, nav[aria-label="Main navigation"] {
         background-color: white !important;
       }
       
-      nav *, header *, 
-      nav a, header a, 
-      nav span, header span,
-      nav button, header button,
-      nav div, header div {
+      /* Force ALL text in header/nav to be black */
+      header *, header *,
+      nav *, nav * {
         color: black !important;
       }
       
-      nav a, header a {
-        background-color: #e8e8e8 !important;
+      /* Nav links - unselected state */
+      header nav a,
+      nav[aria-label="Main navigation"] a,
+      header a[href],
+      nav a[href] {
+        background-color: #e0e0e0 !important;
+        color: black !important;
       }
       
-      nav a.bg-blue-50, nav a[class*="bg-blue"],
-      header a.bg-blue-50, header a[class*="bg-blue"],
-      nav a[aria-current="page"], header a[aria-current="page"] {
-        background-color: #d0d0d0 !important;
+      /* Nav links - selected state */
+      header nav a[aria-current="page"],
+      nav[aria-label="Main navigation"] a[aria-current="page"],
+      header nav a.bg-blue-50,
+      nav a.bg-blue-50 {
+        background-color: black !important;
+        color: white !important;
         font-weight: bold !important;
       }
       
-      nav svg, header svg {
+      /* Override any text color classes in nav */
+      header .text-gray-600,
+      nav .text-gray-600,
+      header .text-blue-600,
+      nav .text-blue-600 {
+        color: black !important;
+      }
+      
+      /* Icons in nav */
+      header svg, nav svg {
         filter: brightness(0) !important;
+      }
+      
+      /* Icons in selected nav items */
+      header nav a[aria-current="page"] svg,
+      nav a[aria-current="page"] svg,
+      header nav a.bg-blue-50 svg,
+      nav a.bg-blue-50 svg {
+        filter: brightness(0) invert(1) !important;
       }
       
       input, select, textarea {
