@@ -9,10 +9,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { latitude, longitude } = await req.json();
+    let latitude, longitude;
+    try {
+      const body = await req.json();
+      latitude = body.latitude;
+      longitude = body.longitude;
+    } catch (e) {
+      // No body provided, proceed without coords
+    }
     
     const feltToken = Deno.env.get("base_recommendedRallyPoints");
     const feltMapId = Deno.env.get("FELT_MAP");
+    
+    console.log("Felt Map ID:", feltMapId);
+    console.log("Has Token:", !!feltToken);
     
     if (!feltToken || !feltMapId) {
       return Response.json({ error: 'Felt configuration missing' }, { status: 500 });
@@ -30,10 +40,13 @@ Deno.serve(async (req) => {
     );
 
     if (!layersResponse.ok) {
-      return Response.json({ error: 'Failed to fetch layers' }, { status: layersResponse.status });
+      const errorText = await layersResponse.text();
+      console.error("Felt API Error:", errorText);
+      return Response.json({ error: 'Failed to fetch layers', details: errorText }, { status: layersResponse.status });
     }
 
     const layers = await layersResponse.json();
+    console.log("Layers found:", layers.data?.length || 0);
     
     // Find rally points layer
     const rallyPointsLayer = layers.data?.find(layer => 
@@ -41,8 +54,11 @@ Deno.serve(async (req) => {
       layer.name?.toLowerCase().includes('meet')
     );
 
+    console.log("Rally points layer:", rallyPointsLayer?.name || "not found");
+
     if (!rallyPointsLayer) {
-      return Response.json({ rallyPoints: [] });
+      // Still return mapId even if no layer found
+      return Response.json({ rallyPoints: [], mapId: feltMapId });
     }
 
     // Fetch features from the layer
