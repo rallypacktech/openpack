@@ -20,6 +20,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [feltRallyPoints, setFeltRallyPoints] = useState([]);
+  const [feltMapId, setFeltMapId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -43,8 +45,9 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         });
       }
       
-      // Load recommendations
+      // Load recommendations and Felt rally points
       loadRecommendations();
+      loadFeltRallyPoints();
     };
     loadUser();
   }, [spots]);
@@ -61,6 +64,37 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     } finally {
       setLoadingRecs(false);
     }
+  };
+
+  const loadFeltRallyPoints = async () => {
+    try {
+      const profiles = await base44.entities.UserProfile.list();
+      const coords = profiles.length > 0 && profiles[0].latitude && profiles[0].longitude
+        ? { latitude: profiles[0].latitude, longitude: profiles[0].longitude }
+        : {};
+      
+      const response = await base44.functions.invoke('getFeltRallyPoints', coords);
+      if (response.data.rallyPoints) {
+        setFeltRallyPoints(response.data.rallyPoints);
+      }
+      if (response.data.mapId) {
+        setFeltMapId(response.data.mapId);
+      }
+    } catch (error) {
+      console.error('Error loading Felt rally points:', error);
+    }
+  };
+
+  const handleAddFromFelt = async (rallyPoint) => {
+    const data = {
+      name: rallyPoint.name,
+      address: rallyPoint.address,
+      latitude: rallyPoint.latitude,
+      longitude: rallyPoint.longitude,
+      description: rallyPoint.description || "Recommended rally point from FEMA",
+      is_primary: false
+    };
+    await onAdd(data);
   };
 
   const resetForm = () => {
@@ -295,6 +329,62 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Felt Map Embed */}
+        {feltMapId && userHomeCoords && (
+          <div className="mb-6 mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Recommended Rally Points Map</h3>
+            <div className="rounded-lg overflow-hidden border shadow-sm" style={{ height: '400px' }}>
+              <iframe
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                title="Rally Points Map"
+                src={`https://felt.com/embed/map/${feltMapId}?loc=${userHomeCoords.lat},${userHomeCoords.lon},12z`}
+                style={{ border: 0 }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Felt Rally Points Recommendations */}
+        {feltRallyPoints.length > 0 && (
+          <div className="space-y-4 mb-6 mt-6">
+            <h3 className="text-lg font-semibold text-gray-900">FEMA-Recommended Rally Points Near You</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {feltRallyPoints.map((point, idx) => (
+                <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <p className="font-medium text-blue-900 mb-1">{point.name}</p>
+                      {point.address && (
+                        <p className="text-sm text-blue-700 mb-1">{point.address}</p>
+                      )}
+                      {point.distance && (
+                        <p className="text-xs text-blue-600">
+                          {point.distance.toFixed(1)} miles away
+                          {userHomeCoords && point.latitude && (
+                            <> • {getDirection(point.latitude, point.longitude)}</>
+                          )}
+                        </p>
+                      )}
+                      {point.description && (
+                        <p className="text-xs text-blue-600 mt-1">{point.description}</p>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddFromFelt(point)}
+                      className="bg-blue-600 hover:bg-blue-700 text-xs px-3 py-1 h-auto"
+                    >
+                      Add
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Personalized Recommendations */}
         {recommendations.length > 0 && (
