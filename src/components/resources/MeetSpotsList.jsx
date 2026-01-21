@@ -36,8 +36,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       const user = await base44.auth.me();
       setCurrentUserEmail(user.email);
       
-      // Get user's home coordinates
-      const profiles = await base44.entities.UserProfile.list();
+      // Get current user's home coordinates only
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       if (profiles.length > 0 && profiles[0].latitude && profiles[0].longitude) {
         setUserHomeCoords({
           lat: profiles[0].latitude,
@@ -68,7 +68,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
 
   const loadFeltRallyPoints = async () => {
     try {
-      const profiles = await base44.entities.UserProfile.list();
+      const user = await base44.auth.me();
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       const coords = profiles.length > 0 && profiles[0].latitude && profiles[0].longitude
         ? { latitude: profiles[0].latitude, longitude: profiles[0].longitude }
         : {};
