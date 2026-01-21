@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Building2, ExternalLink, AlertTriangle, Users, PawPrint, Globe, Heart } from "lucide-react";
+import FamilyMessaging from "../components/messaging/FamilyMessaging";
+import FamilyStatuses from "../components/messaging/FamilyStatuses";
 
 export default function Emergency() {
   const [profile, setProfile] = useState(null);
@@ -181,6 +183,7 @@ export default function Emergency() {
           <TabsList className="mb-6">
             <TabsTrigger value="resources">Disaster Resources</TabsTrigger>
             <TabsTrigger value="shelters">Shelters</TabsTrigger>
+            <TabsTrigger value="messaging">Family Messaging</TabsTrigger>
             <TabsTrigger value="lost-persons">Lost Persons</TabsTrigger>
             <TabsTrigger value="lost-pets">Lost Pets</TabsTrigger>
           </TabsList>
@@ -365,6 +368,13 @@ export default function Emergency() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="messaging">
+            <div className="grid gap-6 md:grid-cols-2">
+              <FamilyMessaging />
+              <FamilyStatuses />
+            </div>
           </TabsContent>
 
           <TabsContent value="lost-persons">
