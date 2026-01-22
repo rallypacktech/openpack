@@ -30,6 +30,58 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     description: "",
     is_primary: false
   });
+
+  useEffect(() => {
+    // Listen for messages from Felt iframe
+    const handleMessage = (event) => {
+      // Verify origin is from Felt
+      if (event.origin !== 'https://felt.com') return;
+      
+      try {
+        const data = event.data;
+        
+        // Handle feature click events
+        if (data.type === 'feature_click' && data.feature) {
+          const feature = data.feature;
+          
+          // Extract coordinates from geometry
+          let lat, lon, name, address;
+          
+          if (feature.geometry?.type === 'Point') {
+            [lon, lat] = feature.geometry.coordinates;
+          }
+          
+          // Try to get name from properties
+          name = feature.properties?.name || 
+                 feature.properties?.title || 
+                 feature.properties?.label ||
+                 `Rally Point`;
+          
+          address = feature.properties?.address || 
+                   feature.properties?.location ||
+                   (lat && lon ? `${lat.toFixed(4)}, ${lon.toFixed(4)}` : '');
+          
+          // Pre-fill form with clicked point data
+          if (lat && lon) {
+            setFormData({
+              name,
+              address,
+              latitude: lat.toString(),
+              longitude: lon.toString(),
+              description: "Rally point from Felt map",
+              is_primary: false
+            });
+            setDialogOpen(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error handling Felt message:', error);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
   
   useEffect(() => {
     const loadUser = async () => {
@@ -335,6 +387,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         {feltMapId && userHomeCoords && (
           <div className="mb-6 mt-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Recommended Rally Points Map</h3>
+            <p className="text-sm text-gray-600 mb-3">Click on any rally point on the map to add it to your meeting spots</p>
             <div className="rounded-lg overflow-hidden border shadow-sm" style={{ height: '400px' }}>
               <iframe
                 width="100%"
@@ -343,6 +396,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                 title="Rally Points Map"
                 src={`https://felt.com/embed/map/${feltMapId}?loc=${userHomeCoords.lat},${userHomeCoords.lon},12z`}
                 style={{ border: 0 }}
+                allow="geolocation"
               />
             </div>
           </div>

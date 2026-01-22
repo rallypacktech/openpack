@@ -9,116 +9,116 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let latitude, longitude;
-    try {
-      const body = await req.json();
-      latitude = body.latitude;
-      longitude = body.longitude;
-    } catch (e) {
-      // No body provided, proceed without coords
-    }
-    
-    const feltToken = Deno.env.get("base_recommendedRallyPoints");
-    const feltMapId = Deno.env.get("FELT_MAP");
-    
-    console.log("Felt Map ID:", feltMapId);
-    console.log("Has Token:", !!feltToken);
-    
-    if (!feltToken || !feltMapId) {
-      return Response.json({ error: 'Felt configuration missing' }, { status: 500 });
+    const { latitude, longitude } = await req.json();
+
+    const FELT_API_KEY = Deno.env.get('FELT_API_KEY');
+    const FELT_MAP_ID = Deno.env.get('FELT_MAP');
+
+    if (!FELT_API_KEY || !FELT_MAP_ID) {
+      return Response.json({ 
+        error: 'Felt API not configured',
+        rallyPoints: [],
+        mapId: FELT_MAP_ID || null
+      }, { status: 200 });
     }
 
-    // Fetch map layers
+    // Get map layers
     const layersResponse = await fetch(
-      `https://felt.com/api/v2/maps/${feltMapId}/layers`,
+      `https://felt.com/api/v2/maps/${FELT_MAP_ID}/layers`,
       {
         headers: {
-          'Authorization': `Bearer ${feltToken}`,
+          'Authorization': `Bearer ${FELT_API_KEY}`,
           'Content-Type': 'application/json'
         }
       }
     );
 
     if (!layersResponse.ok) {
-      const errorText = await layersResponse.text();
-      console.error("Felt API Error:", errorText);
-      return Response.json({ error: 'Failed to fetch layers', details: errorText }, { status: layersResponse.status });
+      console.error('Failed to fetch Felt layers');
+      return Response.json({ 
+        rallyPoints: [],
+        mapId: FELT_MAP_ID
+      });
     }
 
-    const layers = await layersResponse.json();
-    console.log("Layers found:", layers.data?.length || 0);
+    const layersData = await layersResponse.json();
     
     // Find rally points layer
-    const rallyPointsLayer = layers.data?.find(layer => 
-      layer.name?.toLowerCase().includes('rally') || 
+    const rallyLayer = layersData.data?.find(layer => 
+      layer.name?.toLowerCase().includes('rally') ||
       layer.name?.toLowerCase().includes('meet')
     );
 
-    console.log("Rally points layer:", rallyPointsLayer?.name || "not found");
-
-    if (!rallyPointsLayer) {
-      // Still return mapId even if no layer found
-      return Response.json({ rallyPoints: [], mapId: feltMapId });
+    if (!rallyLayer) {
+      return Response.json({ 
+        rallyPoints: [],
+        mapId: FELT_MAP_ID
+      });
     }
 
-    // Fetch features from the layer
+    // Get features from the layer
     const featuresResponse = await fetch(
-      `https://felt.com/api/v2/maps/${feltMapId}/layers/${rallyPointsLayer.id}/features`,
+      `https://felt.com/api/v2/maps/${FELT_MAP_ID}/layers/${rallyLayer.id}/features`,
       {
         headers: {
-          'Authorization': `Bearer ${feltToken}`,
+          'Authorization': `Bearer ${FELT_API_KEY}`,
           'Content-Type': 'application/json'
         }
       }
     );
 
     if (!featuresResponse.ok) {
-      return Response.json({ error: 'Failed to fetch features' }, { status: featuresResponse.status });
+      console.error('Failed to fetch Felt features');
+      return Response.json({ 
+        rallyPoints: [],
+        mapId: FELT_MAP_ID
+      });
     }
 
-    const features = await featuresResponse.json();
-    
-    // Parse rally points and calculate distance if user location provided
-    const rallyPoints = (features.data || []).map(feature => {
-      const coords = feature.geometry?.coordinates;
-      const props = feature.properties || {};
-      
-      let distance = null;
-      if (latitude && longitude && coords) {
-        const [lng, lat] = coords;
-        // Haversine formula for distance
-        const R = 3959; // Earth radius in miles
-        const dLat = (lat - latitude) * Math.PI / 180;
-        const dLon = (lng - longitude) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(latitude * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
-          Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        distance = R * c;
-      }
+    const featuresData = await featuresResponse.json();
+
+    // Extract rally points
+    const rallyPoints = featuresData.features?.map(feature => {
+      const coords = feature.geometry?.type === 'Point' 
+        ? feature.geometry.coordinates 
+        : null;
       
       return {
-        name: props.name || props.title || 'Unnamed Location',
-        address: props.address || props.description || '',
-        latitude: coords?.[1],
-        longitude: coords?.[0],
-        description: props.description || props.notes || '',
-        distance: distance
+        name: feature.properties?.name || feature.properties?.title || 'Rally Point',
+        address: feature.properties?.address || feature.properties?.location || '',
+        latitude: coords ? coords[1] : null,
+        longitude: coords ? coords[0] : null,
+        description: feature.properties?.description || ''
       };
-    });
+    }).filter(point => point.latitude && point.longitude) || [];
 
-    // Sort by distance if available
+    // Calculate distances if user location provided
     if (latitude && longitude) {
-      rallyPoints.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+      rallyPoints.forEach(point => {
+        const R = 3958.8; // Earth radius in miles
+        const lat1 = latitude * Math.PI / 180;
+        const lat2 = point.latitude * Math.PI / 180;
+        const deltaLat = (point.latitude - latitude) * Math.PI / 180;
+        const deltaLon = (point.longitude - longitude) * Math.PI / 180;
+
+        const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                  Math.cos(lat1) * Math.cos(lat2) *
+                  Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        point.distance = R * c;
+      });
+
+      // Sort by distance and limit to 10 closest
+      rallyPoints.sort((a, b) => a.distance - b.distance);
+      rallyPoints.splice(10);
     }
 
     return Response.json({ 
-      rallyPoints: rallyPoints.slice(0, 10), // Top 10 closest
-      mapId: feltMapId 
+      rallyPoints,
+      mapId: FELT_MAP_ID
     });
-
   } catch (error) {
-    console.error("Error fetching Felt rally points:", error);
+    console.error('Error in getFeltRallyPoints:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
