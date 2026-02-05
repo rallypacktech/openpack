@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Save, X } from "lucide-react";
-import AddressAutocomplete from "./AddressAutocomplete";
+import StructuredAddressInput from "./StructuredAddressInput";
 
 export default function ProfileForm({ user, profile, onSave }) {
   const [editing, setEditing] = useState(false);
@@ -23,6 +22,13 @@ export default function ProfileForm({ user, profile, onSave }) {
     setFormData({
       ...formData,
       ...addressData
+    });
+  };
+
+  const handleFieldChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value
     });
   };
 
@@ -69,65 +75,13 @@ export default function ProfileForm({ user, profile, onSave }) {
           </div>
           
           {editing ? (
-            <>
-              <div className="md:col-span-2">
-                <AddressAutocomplete 
-                  onAddressSelect={handleAddressSelect}
-                  initialValue={formData.display_name || [
-                    formData.street_address,
-                    formData.city,
-                    formData.state_province,
-                    formData.postal_code,
-                    formData.country
-                  ].filter(Boolean).join(', ')}
-                />
-              </div>
-              <div>
-                <Label htmlFor="street_address" className="text-gray-500 text-sm">Street Address</Label>
-                <Input
-                  id="street_address"
-                  value={formData.street_address}
-                  onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="city" className="text-gray-500 text-sm">City</Label>
-                <Input
-                  id="city"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="state_province" className="text-gray-500 text-sm">Province/State</Label>
-                <Input
-                  id="state_province"
-                  value={formData.state_province}
-                  onChange={(e) => setFormData({ ...formData, state_province: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="postal_code" className="text-gray-500 text-sm">Postal Code</Label>
-                <Input
-                  id="postal_code"
-                  value={formData.postal_code}
-                  onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="country" className="text-gray-500 text-sm">Country</Label>
-                <Input
-                  id="country"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-            </>
+            <div className="md:col-span-2">
+              <StructuredAddressInput
+                formData={formData}
+                onFieldChange={handleFieldChange}
+                onAddressSelect={handleAddressSelect}
+              />
+            </div>
           ) : (
             <>
               <div>

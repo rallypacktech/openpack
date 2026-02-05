@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Pencil, Trash2, MapPin, Navigation, Star, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { base44 } from "@/api/base44Client";
-import AddressAutocomplete from "../settings/AddressAutocomplete";
+import StructuredAddressInput from "../settings/StructuredAddressInput";
 
 export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
@@ -196,6 +196,27 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     resetForm();
   };
 
+  const handleMeetSpotFieldChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value
+    });
+  };
+
+  const handleMeetSpotAddressSelect = (addressData) => {
+    setFormData({
+      ...formData,
+      address: addressData.display_name || [
+        addressData.street_address,
+        addressData.city,
+        addressData.state_province,
+        addressData.postal_code
+      ].filter(Boolean).join(', '),
+      latitude: addressData.latitude?.toString() || "",
+      longitude: addressData.longitude?.toString() || ""
+    });
+  };
+
   // Calculate cardinal direction from home to a spot
   const getDirection = (spotLat, spotLon) => {
     if (!userHomeCoords || !spotLat || !spotLon) return null;
@@ -321,44 +342,43 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                   placeholder="e.g., Community Center"
                 />
               </div>
-              <div>
-                <AddressAutocomplete
-                  key={editingSpot?.id || 'new'}
-                  initialValue={formData.address}
-                  onAddressSelect={(addressData) => {
-                    setFormData({
-                      ...formData,
-                      address: addressData.display_name,
-                      latitude: addressData.latitude.toString(),
-                      longitude: addressData.longitude.toString()
-                    });
+              
+              <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                <StructuredAddressInput
+                  formData={{
+                    street_address: formData.address?.split(',')[0] || "",
+                    city: "",
+                    state_province: "",
+                    postal_code: "",
+                    country: ""
                   }}
+                  onFieldChange={(field, value) => {
+                    if (field === 'street_address') {
+                      handleMeetSpotFieldChange('address', value);
+                    }
+                  }}
+                  onAddressSelect={handleMeetSpotAddressSelect}
                 />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Latitude</Label>
-                  <Input
-                    type="number"
-                    step="any"
-                    value={formData.latitude}
-                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                    placeholder="40.7128"
-                    disabled
-                    className="bg-gray-50"
-                  />
-                </div>
-                <div>
-                  <Label>Longitude</Label>
-                  <Input
-                    type="number"
-                    step="any"
-                    value={formData.longitude}
-                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                    placeholder="-74.0060"
-                    disabled
-                    className="bg-gray-50"
-                  />
+                
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                  <div>
+                    <Label className="text-xs text-gray-500">Latitude</Label>
+                    <Input
+                      type="text"
+                      value={formData.latitude}
+                      disabled
+                      className="bg-gray-100 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500">Longitude</Label>
+                    <Input
+                      type="text"
+                      value={formData.longitude}
+                      disabled
+                      className="bg-gray-100 text-sm"
+                    />
+                  </div>
                 </div>
               </div>
               <div>
