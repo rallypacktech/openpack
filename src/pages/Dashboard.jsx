@@ -3,11 +3,13 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { Package, MapPin, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import WeatherCard from "../components/dashboard/WeatherCard";
 import StatsCard from "../components/dashboard/StatsCard";
 import NotificationsList from "../components/dashboard/NotificationsList";
 import QuickActions from "../components/dashboard/QuickActions";
 import PreparednessTips from "../components/dashboard/PreparednessTips";
+import StructuredAddressInput from "../components/settings/StructuredAddressInput";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -22,6 +24,39 @@ export default function Dashboard() {
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [userEmail, setUserEmail] = useState("");
+  const [locationForm, setLocationForm] = useState({
+    street_address: "",
+    city: "",
+    state_province: "",
+    postal_code: "",
+    country: "",
+    latitude: null,
+    longitude: null
+  });
+
+  const handleLocationFieldChange = (field, value) => {
+    setLocationForm({
+      ...locationForm,
+      [field]: value
+    });
+  };
+
+  const handleSaveAddress = async () => {
+    try {
+      // Determine FEMA region
+      if (locationForm.state_province) {
+        const regionResponse = await base44.functions.invoke('determineFemaRegion', {
+          state: locationForm.state_province
+        });
+        locationForm.fema_region = regionResponse.data.fema_region;
+      }
+      
+      await base44.entities.UserProfile.create(locationForm);
+      loadData(); // Reload to update state
+    } catch (error) {
+      console.error("Error saving address:", error);
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -430,11 +465,11 @@ export default function Dashboard() {
                   <span className="text-3xl">📍</span>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 1: Add Your Home Address</h2>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mb-6">
                   Your address enables localized weather alerts, tailored disaster recommendations, and nearby emergency resources.
                 </p>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
@@ -443,12 +478,22 @@ export default function Dashboard() {
                     <li>• Find nearby shelters and emergency resources</li>
                   </ul>
                 </div>
-                <button
-                  onClick={() => navigate(createPageUrl("Settings"))}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                
+                <div className="p-6 bg-gray-50 rounded-lg">
+                  <StructuredAddressInput
+                    formData={locationForm}
+                    onFieldChange={handleLocationFieldChange}
+                    onAddressSelect={(data) => setLocationForm({ ...locationForm, ...data })}
+                  />
+                </div>
+
+                <Button
+                  onClick={handleSaveAddress}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 text-lg font-bold"
+                  disabled={!locationForm.street_address || !locationForm.city || !locationForm.state_province}
                 >
-                  Add Your Address Now
-                </button>
+                  Save Address & Continue
+                </Button>
                 <p className="text-sm text-gray-500 text-center">
                   💡 Update your address anytime in <strong>Settings</strong>
                 </p>
