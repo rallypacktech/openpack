@@ -52,6 +52,11 @@ export default function Dashboard() {
         locationForm.fema_region = regionResponse.data.fema_region;
       }
       
+      // Add household info
+      locationForm.has_children = familyMembers.length > 0;
+      locationForm.has_pets = pets.length > 0;
+      locationForm.household_size = 1 + familyMembers.length;
+      
       await base44.entities.UserProfile.create(locationForm);
       loadData(); // Reload to update state
     } catch (error) {
