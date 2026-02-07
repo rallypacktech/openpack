@@ -258,7 +258,15 @@ export default function Shopping() {
 
                 {rec.affiliate_link ? (
                   <Button
-                    onClick={() => window.open(rec.affiliate_link, '_blank')}
+                    onClick={async () => {
+                      // Track the click
+                      await base44.functions.invoke('trackAffiliateClick', {
+                        recommendationId: rec.id,
+                        productName: rec.item_name,
+                        affiliateLink: rec.affiliate_link
+                      });
+                      window.open(rec.affiliate_link, '_blank');
+                    }}
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
