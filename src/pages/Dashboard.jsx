@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
+  const [pets, setPets] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [locationForm, setLocationForm] = useState({
     street_address: "",
@@ -73,7 +74,7 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       
       // Use secure backend functions for data access
-      const [profileData, cachesResponse, spotsResponse, firstAidData, notifData, allRecs, pets, familyData] = await Promise.all([
+      const [profileData, cachesResponse, spotsResponse, firstAidData, notifData, allRecs, petsData, familyData] = await Promise.all([
         base44.entities.UserProfile.filter({ created_by: user.email }),
         base44.functions.invoke('getCaches'),
         base44.functions.invoke('getMeetSpots'),
@@ -99,12 +100,13 @@ export default function Dashboard() {
       setMeetSpots(filteredSpots);
       setFirstAidItems(firstAidData);
       setFamilyMembers(familyData);
+      setPets(petsData);
       setUserEmail(user.email);
 
       // If no notifications, add top recommendations
       if (notifData.length === 0) {
         const familyTypes = ['person'];
-        pets.forEach(pet => {
+        petsData.forEach(pet => {
           const petType = pet.species?.toLowerCase();
           if (petType && !familyTypes.includes(petType)) {
             familyTypes.push(petType);
