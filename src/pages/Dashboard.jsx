@@ -74,14 +74,14 @@ export default function Dashboard() {
       
       // Use secure backend functions for data access
       const [profileData, cachesResponse, spotsResponse, firstAidData, notifData, allRecs, pets, familyData] = await Promise.all([
-        base44.entities.UserProfile.list(),
+        base44.entities.UserProfile.filter({ created_by: user.email }),
         base44.functions.invoke('getCaches'),
         base44.functions.invoke('getMeetSpots'),
-        base44.entities.FirstAidItem.list(),
-        base44.entities.Notification.list("-created_date", 10),
+        base44.entities.FirstAidItem.filter({ created_by: user.email }),
+        base44.entities.Notification.filter({ created_by: user.email }, "-created_date", 10),
         base44.entities.ProductRecommendation.filter({ active: true }, "-priority", 3),
-        base44.entities.Pet.list(),
-        base44.entities.FamilyMember.list()
+        base44.entities.Pet.filter({ created_by: user.email }),
+        base44.entities.FamilyMember.filter({ created_by: user.email })
       ]);
 
       const cachesData = cachesResponse.data.caches;
