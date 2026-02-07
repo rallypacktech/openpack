@@ -10,6 +10,7 @@ import NotificationsList from "../components/dashboard/NotificationsList";
 import QuickActions from "../components/dashboard/QuickActions";
 import PreparednessTips from "../components/dashboard/PreparednessTips";
 import StructuredAddressInput from "../components/settings/StructuredAddressInput";
+import ReadinessScore from "../components/dashboard/ReadinessScore";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -674,6 +675,9 @@ export default function Dashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Readiness Score */}
+            <ReadinessScore />
+            
             {/* Notifications */}
             <NotificationsList 
               notifications={notifications} 

@@ -4,6 +4,7 @@ import ProfileForm from "../components/settings/ProfileForm";
 import FamilyMembersList from "../components/settings/FamilyMembersList";
 import PetsList from "../components/settings/PetsList";
 import AccessibilitySettings from "../components/settings/AccessibilitySettings";
+import NotificationPreferences from "../components/settings/NotificationPreferences";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -170,6 +171,9 @@ export default function Settings() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Accessibility Settings */}
         <AccessibilitySettings />
+
+        {/* Notification Preferences */}
+        <NotificationPreferences profile={profile} onSave={handleProfileSave} />
 
         {/* Profile Section */}
         <ProfileForm user={user} profile={profile} onSave={handleProfileSave} />
