@@ -6,6 +6,25 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Card className="mb-6 border-yellow-200 bg-yellow-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-6 h-6 text-yellow-700 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-semibold text-yellow-900 mb-2">BETA TEST IN PROGRESS</h3>
+                <p className="text-sm text-yellow-800 mb-2">
+                  <strong>What is a Beta?</strong> RallyPack is currently in beta testing. This means the app is still under development, 
+                  features may change, and some functionality may be incomplete or experimental. Your participation helps us improve the platform.
+                </p>
+                <p className="text-sm text-yellow-800">
+                  <strong>Send Feedback:</strong> Have suggestions or found a bug? Email us at{" "}
+                  <a href="mailto:beta@rallypack.org" className="underline font-semibold">beta@rallypack.org</a>
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-10 h-10 text-blue-600" />
