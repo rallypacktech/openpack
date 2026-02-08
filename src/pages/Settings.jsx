@@ -34,6 +34,17 @@ export default function Settings() {
 
   useEffect(() => {
     loadData();
+    
+    // Scroll to anchor if present in URL
+    const hash = window.location.hash;
+    if (hash) {
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
   }, []);
 
   const loadData = async () => {
