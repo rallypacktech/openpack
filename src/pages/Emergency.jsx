@@ -31,7 +31,8 @@ export default function Emergency() {
 
   const loadProfile = async () => {
     try {
-      const profileData = await base44.entities.UserProfile.list();
+      const userData = await base44.auth.me();
+      const profileData = await base44.entities.UserProfile.filter({ created_by: userData.email });
       if (profileData.length > 0) {
         setProfile(profileData[0]);
         setLocationForm({

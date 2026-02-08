@@ -34,18 +34,22 @@ export default function Settings() {
 
   useEffect(() => {
     loadData();
-    
-    // Scroll to anchor if present in URL
-    const hash = window.location.hash;
-    if (hash) {
-      setTimeout(() => {
-        const element = document.querySelector(hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100);
-    }
   }, []);
+
+  useEffect(() => {
+    // Scroll to anchor if present in URL, wait for data to load
+    if (!loading) {
+      const hash = window.location.hash;
+      if (hash) {
+        setTimeout(() => {
+          const element = document.querySelector(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
+      }
+    }
+  }, [loading]);
 
   const loadData = async () => {
     try {
