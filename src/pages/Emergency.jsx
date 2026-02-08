@@ -9,13 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Building2, ExternalLink, AlertTriangle, Users, PawPrint, Globe, Heart } from "lucide-react";
 import FamilyMessaging from "../components/messaging/FamilyMessaging";
 import FamilyStatuses from "../components/messaging/FamilyStatuses";
+import EmergencyShelterMap from "../components/maps/EmergencyShelterMap";
 
 export default function Emergency() {
   const [profile, setProfile] = useState(null);
   const [disasterResources, setDisasterResources] = useState([]);
   const [shelters, setShelters] = useState([]);
+  const [rallyPoints, setRallyPoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sheltersLoading, setSheltersLoading] = useState(false);
+  const [rallyPointsLoading, setRallyPointsLoading] = useState(false);
   const [locationForm, setLocationForm] = useState({
     street_address: "",
     city: "",
@@ -28,6 +31,12 @@ export default function Emergency() {
     loadDisasterResources();
     loadShelters();
   }, []);
+
+  useEffect(() => {
+    if (profile?.latitude && profile?.longitude) {
+      loadRallyPoints();
+    }
+  }, [profile]);
 
   const loadProfile = async () => {
     try {
@@ -67,6 +76,22 @@ export default function Emergency() {
       console.error("Error loading shelters:", error);
     } finally {
       setSheltersLoading(false);
+    }
+  };
+
+  const loadRallyPoints = async () => {
+    setRallyPointsLoading(true);
+    try {
+      const response = await base44.functions.invoke('getCommunityRallyPoints', {
+        latitude: profile.latitude,
+        longitude: profile.longitude,
+        radius: 25
+      });
+      setRallyPoints(response.data.rallyPoints || []);
+    } catch (error) {
+      console.error("Error loading rally points:", error);
+    } finally {
+      setRallyPointsLoading(false);
     }
   };
 
@@ -265,14 +290,31 @@ export default function Emergency() {
           <TabsContent value="shelters">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-xl font-semibold">Emergency Shelters</h2>
+                <h2 className="text-xl font-semibold">Emergency Shelters & Rally Points</h2>
                 <p className="text-gray-500 mt-1">
                   {profile?.fema_region 
-                    ? `Shelters in your FEMA region (${profile.fema_region}) and nearby areas` 
-                    : "Emergency shelters in your area"}
+                    ? `Shelters, parks, and community centers near you (${profile.fema_region})` 
+                    : "Emergency locations and rally points in your area"}
                 </p>
               </div>
             </div>
+
+            {/* Map View */}
+            <div className="mb-6">
+              <EmergencyShelterMap
+                shelters={shelters}
+                rallyPoints={rallyPoints}
+                userLocation={profile ? {
+                  latitude: profile.latitude,
+                  longitude: profile.longitude,
+                  address: [profile.street_address, profile.city, profile.state_province].filter(Boolean).join(', ')
+                } : null}
+                showRadius={true}
+                radiusMiles={25}
+              />
+            </div>
+
+            <h3 className="text-lg font-semibold mb-3 mt-6">Emergency Shelters List</h3>
 
             {sheltersLoading ? (
               <div className="flex items-center justify-center py-12">
