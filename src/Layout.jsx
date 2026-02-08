@@ -193,9 +193,13 @@ export default function Layout({ children, currentPageName }) {
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-gray-500">
-                <p>© 2026 RallyPack. All rights reserved. | Ages 13+</p>
-                <p className="mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
+              <div className="border-t border-gray-200 mt-8 pt-6 text-center">
+                <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg mb-4">
+                  <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+                  <span className="font-semibold">BETA TEST IN PROGRESS</span>
+                </div>
+                <p className="text-sm text-gray-500">© 2026 RallyPack. All rights reserved. | Ages 13+</p>
+                <p className="text-sm text-gray-500 mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
               </div>
             </div>
           </footer>
