@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { Package, MapPin, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -530,12 +530,12 @@ export default function Dashboard() {
                     <li>• Centralizes emergency contacts for quick access</li>
                   </ul>
                 </div>
-                <button
-                  onClick={() => navigate(createPageUrl("Settings") + "#family-section")}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                <Link
+                  to={createPageUrl("Settings") + "#family-section"}
+                  className="block w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors text-center"
                 >
                   Add Family Members Now
-                </button>
+                </Link>
                 <p className="text-sm text-gray-500 text-center">
                   💡 Update family members anytime in <strong>Settings</strong>
                 </p>
