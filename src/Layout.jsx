@@ -198,6 +198,13 @@ export default function Layout({ children, currentPageName }) {
                   <AlertTriangle className="w-4 h-4" aria-hidden="true" />
                   <span className="font-semibold">BETA TEST IN PROGRESS</span>
                 </div>
+                <p className="text-sm text-gray-600 max-w-2xl mx-auto mb-2">
+                  <strong>What is a Beta?</strong> This app is in testing. Features may change, and some functionality is still under development. 
+                  Your feedback helps us improve!
+                </p>
+                <p className="text-sm text-gray-600 mb-4">
+                  <strong>Send Feedback:</strong> <a href="mailto:beta@rallypack.org" className="text-blue-600 hover:underline">beta@rallypack.org</a>
+                </p>
                 <p className="text-sm text-gray-500">© 2026 RallyPack. All rights reserved. | Ages 13+</p>
                 <p className="text-sm text-gray-500 mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
               </div>
