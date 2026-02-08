@@ -65,7 +65,12 @@ export default function FamilyMembersList({ members, onAdd, onUpdate, onDelete }
     <Card>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-semibold">Family Members</CardTitle>
+          <div>
+            <CardTitle className="text-xl font-semibold">Family Members</CardTitle>
+            <p className="text-sm text-gray-500 mt-1">
+              Add emergency contacts with their email to invite them. They'll see your meet spots & caches.
+            </p>
+          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700">
@@ -122,12 +127,15 @@ export default function FamilyMembersList({ members, onAdd, onUpdate, onDelete }
                   />
                 </div>
                 <div>
-                  <Label>Emergency Contact</Label>
+                  <Label>Emergency Contact (Email)</Label>
                   <Input
                     value={formData.emergency_contact}
                     onChange={(e) => setFormData({ ...formData, emergency_contact: e.target.value })}
-                    placeholder="Email or phone"
+                    placeholder="their@email.com (they'll get access to your resources)"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    💡 If they use this email to sign up, they'll automatically see your meet spots and caches
+                  </p>
                 </div>
                 <Button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700">
                   {editingMember ? "Update" : "Add"} Member
@@ -167,7 +175,14 @@ export default function FamilyMembersList({ members, onAdd, onUpdate, onDelete }
                   </div>
                   <div>
                     <p className="text-gray-500">Emergency Contact</p>
-                    <p className="font-medium text-blue-600">{member.emergency_contact || "N/A"}</p>
+                    <p className="font-medium text-blue-600 flex items-center gap-1">
+                      {member.emergency_contact ? (
+                        <>
+                          <Phone className="w-3 h-3" />
+                          {member.emergency_contact}
+                        </>
+                      ) : "N/A"}
+                    </p>
                   </div>
                 </div>
               </div>

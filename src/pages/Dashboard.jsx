@@ -531,7 +531,7 @@ export default function Dashboard() {
                   </ul>
                 </div>
                 <button
-                  onClick={() => navigate(createPageUrl("Settings"))}
+                  onClick={() => navigate(createPageUrl("Settings") + "#family-section")}
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
                 >
                   Add Family Members Now

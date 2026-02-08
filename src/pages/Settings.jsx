@@ -179,7 +179,8 @@ export default function Settings() {
         <ProfileForm user={user} profile={profile} onSave={handleProfileSave} />
 
         {/* Family Members Section */}
-        <FamilyMembersList
+        <div id="family-section">
+          <FamilyMembersList
           members={familyMembers}
           onAdd={handleAddFamilyMember}
           onUpdate={handleUpdateFamilyMember}
@@ -187,12 +188,13 @@ export default function Settings() {
         />
 
         {/* Pets Section */}
-        <PetsList
-          pets={pets}
-          onAdd={handleAddPet}
-          onUpdate={handleUpdatePet}
-          onDelete={handleDeletePet}
-        />
+          <PetsList
+            pets={pets}
+            onAdd={handleAddPet}
+            onUpdate={handleUpdatePet}
+            onDelete={handleDeletePet}
+          />
+        </div>
 
         {/* Security Settings */}
         <Card>
