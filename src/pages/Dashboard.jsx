@@ -530,12 +530,17 @@ export default function Dashboard() {
                     <li>• Centralizes emergency contacts for quick access</li>
                   </ul>
                 </div>
-                <Link
-                  to={createPageUrl("Settings") + "#family-section"}
-                  className="block w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors text-center"
+                <button
+                  onClick={() => {
+                    navigate(createPageUrl("Settings"));
+                    setTimeout(() => {
+                      window.location.hash = "family-section";
+                    }, 100);
+                  }}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
                 >
                   Add Family Members Now
-                </Link>
+                </button>
                 <p className="text-sm text-gray-500 text-center">
                   💡 Update family members anytime in <strong>Settings</strong>
                 </p>

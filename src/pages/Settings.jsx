@@ -192,20 +192,20 @@ export default function Settings() {
         {/* Family Members Section */}
         <div id="family-section">
           <FamilyMembersList
-          members={familyMembers}
-          onAdd={handleAddFamilyMember}
-          onUpdate={handleUpdateFamilyMember}
-          onDelete={handleDeleteFamilyMember}
-        />
-
-        {/* Pets Section */}
-          <PetsList
-            pets={pets}
-            onAdd={handleAddPet}
-            onUpdate={handleUpdatePet}
-            onDelete={handleDeletePet}
+            members={familyMembers}
+            onAdd={handleAddFamilyMember}
+            onUpdate={handleUpdateFamilyMember}
+            onDelete={handleDeleteFamilyMember}
           />
         </div>
+
+        {/* Pets Section */}
+        <PetsList
+          pets={pets}
+          onAdd={handleAddPet}
+          onUpdate={handleUpdatePet}
+          onDelete={handleDeletePet}
+        />
 
         {/* Security Settings */}
         <Card>
