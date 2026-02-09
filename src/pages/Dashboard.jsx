@@ -11,6 +11,7 @@ import QuickActions from "../components/dashboard/QuickActions";
 import PreparednessTips from "../components/dashboard/PreparednessTips";
 import StructuredAddressInput from "../components/settings/StructuredAddressInput";
 import ReadinessScore from "../components/dashboard/ReadinessScore";
+import FamilyMemberForm from "../components/onboarding/FamilyMemberForm";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -518,29 +519,35 @@ export default function Dashboard() {
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 2: Add Your Family Members</h2>
                 <p className="text-gray-600">
-                  Including household members and pets helps us tailor emergency plans and recommendations to your family's unique needs.
+                  Build your household roster so everyone stays connected during emergencies and gets the right supplies.
                 </p>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="bg-purple-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Ensures supply recommendations fit your entire household</li>
-                    <li>• Keeps track of everyone's medical needs</li>
-                    <li>• Centralizes emergency contacts for quick access</li>
+                    <li>• <strong>Share emergency plans:</strong> Family members with emails can access your caches and meet spots</li>
+                    <li>• <strong>Get personalized recommendations:</strong> Supplies tailored to your household's needs</li>
+                    <li>• <strong>Track medical requirements:</strong> Keep everyone's health info organized</li>
                   </ul>
                 </div>
-                <button
-                  onClick={() => {
-                    navigate(createPageUrl("Settings"));
-                    setTimeout(() => {
-                      window.location.hash = "family-section";
-                    }, 100);
+                
+                <FamilyMemberForm
+                  onComplete={async (members) => {
+                    try {
+                      for (const member of members) {
+                        await base44.entities.FamilyMember.create(member);
+                      }
+                      loadData(); // Refresh to move to next step
+                    } catch (error) {
+                      console.error("Error saving family members:", error);
+                    }
                   }}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
-                >
-                  Add Family Members Now
-                </button>
+                  onSkip={() => {
+                    loadData(); // Skip to next step
+                  }}
+                />
+
                 <p className="text-sm text-gray-500 text-center">
                   💡 Update family members anytime in <strong>Settings</strong>
                 </p>
