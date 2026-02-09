@@ -533,14 +533,17 @@ export default function Dashboard() {
                 </div>
                 
                 <FamilyMemberForm
-                  onComplete={async (members) => {
+                  onComplete={async (data) => {
                     try {
-                      for (const member of members) {
+                      for (const member of data.members) {
                         await base44.entities.FamilyMember.create(member);
+                      }
+                      for (const pet of data.pets) {
+                        await base44.entities.Pet.create(pet);
                       }
                       loadData(); // Refresh to move to next step
                     } catch (error) {
-                      console.error("Error saving family members:", error);
+                      console.error("Error saving family members and pets:", error);
                     }
                   }}
                   onSkip={() => {

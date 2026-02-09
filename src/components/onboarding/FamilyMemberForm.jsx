@@ -5,10 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { X, Plus, Users, Info } from "lucide-react";
+import { X, Plus, Users, Info, PawPrint } from "lucide-react";
 
 export default function FamilyMemberForm({ onComplete, onSkip }) {
   const [members, setMembers] = useState([]);
+  const [pets, setPets] = useState([]);
   const [currentMember, setCurrentMember] = useState({
     name: "",
     relationship: "spouse",
@@ -16,7 +17,16 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
     medical_conditions: "",
     emergency_contact: ""
   });
+  const [currentPet, setCurrentPet] = useState({
+    name: "",
+    species: "dog",
+    breed: "",
+    age: "",
+    medical_conditions: "",
+    microchip_number: ""
+  });
   const [showForm, setShowForm] = useState(false);
+  const [formType, setFormType] = useState(""); // "member" or "pet"
 
   const handleAddMember = () => {
     if (currentMember.name) {
@@ -36,8 +46,28 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
     setMembers(members.filter((_, i) => i !== index));
   };
 
+  const handleAddPet = () => {
+    if (currentPet.name) {
+      setPets([...pets, currentPet]);
+      setCurrentPet({
+        name: "",
+        species: "dog",
+        breed: "",
+        age: "",
+        medical_conditions: "",
+        microchip_number: ""
+      });
+      setShowForm(false);
+      setFormType("");
+    }
+  };
+
+  const handleRemovePet = (index) => {
+    setPets(pets.filter((_, i) => i !== index));
+  };
+
   const handleComplete = () => {
-    onComplete(members);
+    onComplete({ members, pets });
   };
 
   return (
@@ -96,17 +126,75 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
         </div>
       )}
 
-      {/* Add Member Button / Form */}
+      {/* Added Pets List */}
+      {pets.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="font-semibold text-gray-900">Added Pets ({pets.length})</h3>
+          {pets.map((pet, index) => (
+            <Card key={index} className="border-2 border-blue-200 bg-blue-50">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <PawPrint className="w-4 h-4 text-blue-700" />
+                      <span className="font-semibold text-gray-900">{pet.name}</span>
+                      <span className="text-sm text-gray-600">({pet.species})</span>
+                    </div>
+                    {pet.breed && (
+                      <p className="text-sm text-gray-600 mt-1">Breed: {pet.breed}</p>
+                    )}
+                    {pet.age && (
+                      <p className="text-sm text-gray-600">Age: {pet.age}</p>
+                    )}
+                    {pet.microchip_number && (
+                      <p className="text-sm text-gray-600">Microchip: {pet.microchip_number}</p>
+                    )}
+                    {pet.medical_conditions && (
+                      <p className="text-sm text-gray-600">Medical: {pet.medical_conditions}</p>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemovePet(index)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Add Member/Pet Buttons / Form */}
       {!showForm ? (
-        <Button
-          onClick={() => setShowForm(true)}
-          variant="outline"
-          className="w-full border-2 border-dashed border-gray-300 hover:border-purple-500 py-8"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Add Family Member
-        </Button>
-      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            onClick={() => {
+              setShowForm(true);
+              setFormType("member");
+            }}
+            variant="outline"
+            className="border-2 border-dashed border-gray-300 hover:border-purple-500 py-8"
+          >
+            <Users className="w-5 h-5 mr-2" />
+            Add Family Member
+          </Button>
+          <Button
+            onClick={() => {
+              setShowForm(true);
+              setFormType("pet");
+            }}
+            variant="outline"
+            className="border-2 border-dashed border-gray-300 hover:border-blue-500 py-8"
+          >
+            <PawPrint className="w-5 h-5 mr-2" />
+            Add Pet
+          </Button>
+        </div>
+      ) : formType === "member" ? (
         <Card className="border-2 border-purple-500">
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center justify-between">
@@ -195,11 +283,112 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <Card className="border-2 border-blue-500">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">Add Pet</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setShowForm(false);
+                  setFormType("");
+                }}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="pet-name">Pet Name *</Label>
+                <Input
+                  id="pet-name"
+                  value={currentPet.name}
+                  onChange={(e) => setCurrentPet({ ...currentPet, name: e.target.value })}
+                  placeholder="e.g., Max"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="species">Species *</Label>
+                <Select
+                  value={currentPet.species}
+                  onValueChange={(value) => setCurrentPet({ ...currentPet, species: value })}
+                >
+                  <SelectTrigger id="species">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dog">Dog</SelectItem>
+                    <SelectItem value="cat">Cat</SelectItem>
+                    <SelectItem value="bird">Bird</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="breed">Breed (optional)</Label>
+                <Input
+                  id="breed"
+                  value={currentPet.breed}
+                  onChange={(e) => setCurrentPet({ ...currentPet, breed: e.target.value })}
+                  placeholder="e.g., Golden Retriever"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="pet-age">Age (optional)</Label>
+                <Input
+                  id="pet-age"
+                  type="number"
+                  value={currentPet.age}
+                  onChange={(e) => setCurrentPet({ ...currentPet, age: e.target.value })}
+                  placeholder="e.g., 5"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="microchip">Microchip Number (optional)</Label>
+                <Input
+                  id="microchip"
+                  value={currentPet.microchip_number}
+                  onChange={(e) => setCurrentPet({ ...currentPet, microchip_number: e.target.value })}
+                  placeholder="e.g., 982000123456789"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Critical for reuniting with your pet if separated during emergencies
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="pet-medical">Medical Conditions (optional)</Label>
+                <Textarea
+                  id="pet-medical"
+                  value={currentPet.medical_conditions}
+                  onChange={(e) => setCurrentPet({ ...currentPet, medical_conditions: e.target.value })}
+                  placeholder="e.g., Requires heart medication daily"
+                  rows={2}
+                />
+              </div>
+
+              <Button
+                onClick={handleAddPet}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                disabled={!currentPet.name}
+              >
+                Add This Pet
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        {members.length > 0 ? (
+        {members.length > 0 || pets.length > 0 ? (
           <>
             <Button
               variant="outline"
@@ -212,7 +401,7 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
               onClick={handleComplete}
               className="flex-1 bg-purple-600 hover:bg-purple-700"
             >
-              Continue with {members.length} Member{members.length !== 1 ? 's' : ''}
+              Continue with {members.length + pets.length} {members.length + pets.length === 1 ? 'Member' : 'Members'}
             </Button>
           </>
         ) : (
