@@ -359,6 +359,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
               <EmergencyShelterMap
                 rallyPoints={rallyPoints}
                 userLocation={userHomeCoords ? { lat: userHomeCoords.lat, lng: userHomeCoords.lon } : null}
+                showUserRadius={true}
               />
             </div>
           </div>
