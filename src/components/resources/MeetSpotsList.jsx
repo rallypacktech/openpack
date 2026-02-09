@@ -11,6 +11,7 @@ import { Plus, Pencil, Trash2, MapPin, Navigation, Star, Info } from "lucide-rea
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { base44 } from "@/api/base44Client";
 import StructuredAddressInput from "../settings/StructuredAddressInput";
+import EmergencyShelterMap from "../maps/EmergencyShelterMap";
 
 export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
@@ -20,8 +21,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
-  const [feltRallyPoints, setFeltRallyPoints] = useState([]);
-  const [feltMapId, setFeltMapId] = useState(null);
+  const [rallyPoints, setRallyPoints] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -31,57 +31,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     is_primary: false
   });
 
-  useEffect(() => {
-    // Listen for messages from Felt iframe
-    const handleMessage = (event) => {
-      // Verify origin is from Felt
-      if (event.origin !== 'https://felt.com') return;
-      
-      try {
-        const data = event.data;
-        
-        // Handle feature click events
-        if (data.type === 'feature_click' && data.feature) {
-          const feature = data.feature;
-          
-          // Extract coordinates from geometry
-          let lat, lon, name, address;
-          
-          if (feature.geometry?.type === 'Point') {
-            [lon, lat] = feature.geometry.coordinates;
-          }
-          
-          // Try to get name from properties
-          name = feature.properties?.name || 
-                 feature.properties?.title || 
-                 feature.properties?.label ||
-                 `Rally Point`;
-          
-          address = feature.properties?.address || 
-                   feature.properties?.location ||
-                   (lat && lon ? `${lat.toFixed(4)}, ${lon.toFixed(4)}` : '');
-          
-          // Pre-fill form with clicked point data
-          if (lat && lon) {
-            setFormData({
-              name,
-              address,
-              latitude: lat.toString(),
-              longitude: lon.toString(),
-              description: "Rally point from Felt map",
-              is_primary: false
-            });
-            setDialogOpen(true);
-          }
-        }
-      } catch (error) {
-        console.error('Error handling Felt message:', error);
-      }
-    };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
   
   useEffect(() => {
     const loadUser = async () => {
@@ -97,9 +47,9 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         });
       }
       
-      // Load recommendations and Felt rally points
+      // Load recommendations and rally points
       loadRecommendations();
-      loadFeltRallyPoints();
+      loadRallyPoints();
     };
     loadUser();
   }, [spots]);
@@ -118,7 +68,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     }
   };
 
-  const loadFeltRallyPoints = async () => {
+  const loadRallyPoints = async () => {
     try {
       const user = await base44.auth.me();
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
@@ -126,19 +76,16 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         ? { latitude: profiles[0].latitude, longitude: profiles[0].longitude }
         : {};
       
-      const response = await base44.functions.invoke('getFeltRallyPoints', coords);
+      const response = await base44.functions.invoke('getCommunityRallyPoints', coords);
       if (response.data.rallyPoints) {
-        setFeltRallyPoints(response.data.rallyPoints);
-      }
-      if (response.data.mapId) {
-        setFeltMapId(response.data.mapId);
+        setRallyPoints(response.data.rallyPoints);
       }
     } catch (error) {
-      console.error('Error loading Felt rally points:', error);
+      console.error('Error loading rally points:', error);
     }
   };
 
-  const handleAddFromFelt = async (rallyPoint) => {
+  const handleAddFromRallyPoints = async (rallyPoint) => {
     const data = {
       name: rallyPoint.name,
       address: rallyPoint.address,
@@ -403,31 +350,26 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           </DialogContent>
         </Dialog>
 
-        {/* Felt Map Embed */}
-        {feltMapId && userHomeCoords && (
+        {/* Rally Points Map */}
+        {userHomeCoords && (
           <div className="mb-6 mt-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Recommended Rally Points Map</h3>
-            <p className="text-sm text-gray-600 mb-3">Click on any rally point on the map to add it to your meeting spots</p>
+            <p className="text-sm text-gray-600 mb-3">View community parks and centers near you that make ideal meeting spots</p>
             <div className="rounded-lg overflow-hidden border shadow-sm" style={{ height: '400px' }}>
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                title="Rally Points Map"
-                src={`https://felt.com/embed/map/${feltMapId}?loc=${userHomeCoords.lat},${userHomeCoords.lon},12z`}
-                style={{ border: 0 }}
-                allow="geolocation"
+              <EmergencyShelterMap
+                rallyPoints={rallyPoints}
+                userLocation={userHomeCoords ? { lat: userHomeCoords.lat, lng: userHomeCoords.lon } : null}
               />
             </div>
           </div>
         )}
 
-        {/* Felt Rally Points Recommendations */}
-        {feltRallyPoints.length > 0 && (
+        {/* Rally Points Recommendations */}
+        {rallyPoints.length > 0 && (
           <div className="space-y-4 mb-6 mt-6">
-            <h3 className="text-lg font-semibold text-gray-900">FEMA-Recommended Rally Points Near You</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Community Rally Points Near You</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {feltRallyPoints.map((point, idx) => (
+              {rallyPoints.map((point, idx) => (
                 <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
@@ -449,7 +391,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                     </div>
                     <Button
                       size="sm"
-                      onClick={() => handleAddFromFelt(point)}
+                      onClick={() => handleAddFromRallyPoints(point)}
                       className="bg-blue-600 hover:bg-blue-700 text-xs px-3 py-1 h-auto"
                     >
                       Add
