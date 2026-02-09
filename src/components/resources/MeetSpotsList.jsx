@@ -11,7 +11,6 @@ import { Plus, Pencil, Trash2, MapPin, Navigation, Star, Info } from "lucide-rea
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { base44 } from "@/api/base44Client";
 import StructuredAddressInput from "../settings/StructuredAddressInput";
-import EmergencyShelterMap from "../maps/EmergencyShelterMap";
 
 export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
@@ -349,21 +348,6 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Rally Points Map */}
-        {userHomeCoords && (
-          <div className="mb-6 mt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Recommended Rally Points Map</h3>
-            <p className="text-sm text-gray-600 mb-3">View community parks and centers near you that make ideal meeting spots</p>
-            <div className="rounded-lg overflow-hidden border shadow-sm" style={{ height: '400px' }}>
-              <EmergencyShelterMap
-                rallyPoints={rallyPoints}
-                userLocation={userHomeCoords ? { lat: userHomeCoords.lat, lng: userHomeCoords.lon } : null}
-                showUserRadius={true}
-              />
-            </div>
-          </div>
-        )}
 
         {/* Rally Points Recommendations */}
         {rallyPoints.length > 0 && (
