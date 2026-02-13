@@ -51,23 +51,47 @@ export default function Dashboard() {
 
   const handleSaveAddress = async () => {
     try {
+      console.log("Saving address:", locationForm);
+      
+      // Validate required fields
+      if (!locationForm.street_address || !locationForm.city || !locationForm.state_province || !locationForm.postal_code || !locationForm.country) {
+        alert("Please fill in all required address fields");
+        return;
+      }
+      
       // Determine FEMA region
+      let femaRegion = null;
       if (locationForm.state_province) {
         const regionResponse = await base44.functions.invoke('determineFemaRegion', {
           state: locationForm.state_province
         });
-        locationForm.fema_region = regionResponse.data.fema_region;
+        femaRegion = regionResponse.data.fema_region;
       }
       
-      // Add household info
-      locationForm.has_children = familyMembers.length > 0;
-      locationForm.has_pets = pets.length > 0;
-      locationForm.household_size = 1 + familyMembers.length;
+      // Clean and prepare data
+      const cleanedData = {
+        display_name: locationForm.display_name,
+        street_address: locationForm.street_address,
+        city: locationForm.city,
+        state_province: locationForm.state_province,
+        postal_code: locationForm.postal_code,
+        country: locationForm.country,
+        latitude: locationForm.latitude ? Number(locationForm.latitude) : undefined,
+        longitude: locationForm.longitude ? Number(locationForm.longitude) : undefined,
+        fema_region: femaRegion,
+        has_children: familyMembers.length > 0,
+        has_pets: pets.length > 0,
+        household_size: 1 + familyMembers.length
+      };
       
-      await base44.entities.UserProfile.create(locationForm);
-      loadData(); // Reload to update state
+      await base44.entities.UserProfile.create(cleanedData);
+      console.log("Address saved successfully");
+      
+      // Reload data to update state
+      await loadData();
     } catch (error) {
       console.error("Error saving address:", error);
+      alert("Failed to save address. Please try again.");
     }
   };
 
