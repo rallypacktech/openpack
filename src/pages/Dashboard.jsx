@@ -4,6 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { Package, MapPin, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import WeatherCard from "../components/dashboard/WeatherCard";
 import StatsCard from "../components/dashboard/StatsCard";
 import NotificationsList from "../components/dashboard/NotificationsList";
