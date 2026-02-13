@@ -16,7 +16,8 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
     relationship: "spouse",
     age: "",
     medical_conditions: "",
-    emergency_contact: ""
+    emergency_contact: "",
+    link_status: "none"
   });
   const [currentPet, setCurrentPet] = useState({
     name: "",
@@ -37,7 +38,8 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
         relationship: "spouse",
         age: "",
         medical_conditions: "",
-        emergency_contact: ""
+        emergency_contact: "",
+        link_status: "none"
       });
       setShowForm(false);
     }
