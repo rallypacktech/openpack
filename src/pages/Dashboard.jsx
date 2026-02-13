@@ -22,7 +22,7 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState([]);
   const [weather, setWeather] = useState(null);
   const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
@@ -73,10 +73,20 @@ export default function Dashboard() {
   const loadData = async () => {
     try {
       const user = await base44.auth.me();
+      setUserEmail(user.email);
       
-      // Use secure backend functions for data access
-      const [profileData, cachesResponse, spotsResponse, firstAidData, notifData, allRecs, petsData, familyData] = await Promise.all([
-        base44.entities.UserProfile.filter({ created_by: user.email }),
+      // Load profile first (critical for onboarding)
+      const profileData = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profileData.length > 0) {
+        setUserProfile(profileData[0]);
+        // Fetch weather in background
+        if (profileData[0].latitude && profileData[0].longitude) {
+          fetchWeather(profileData[0].latitude, profileData[0].longitude, profileData[0].country);
+        }
+      }
+      
+      // Load everything else in parallel (non-blocking)
+      Promise.all([
         base44.functions.invoke('getCaches'),
         base44.functions.invoke('getMeetSpots'),
         base44.entities.FirstAidItem.filter({ created_by: user.email }),
@@ -84,70 +94,59 @@ export default function Dashboard() {
         base44.entities.ProductRecommendation.filter({ active: true }, "-priority", 3),
         base44.entities.Pet.filter({ created_by: user.email }),
         base44.entities.FamilyMember.filter({ created_by: user.email })
-      ]);
+      ]).then(([cachesResponse, spotsResponse, firstAidData, notifData, allRecs, petsData, familyData]) => {
+        const cachesData = cachesResponse.data.caches;
+        const filteredSpots = spotsResponse.data.spots;
 
-      const cachesData = cachesResponse.data.caches;
-      const filteredSpots = spotsResponse.data.spots;
+        setCaches(cachesData);
+        setMeetSpots(filteredSpots);
+        setFirstAidItems(firstAidData);
+        setFamilyMembers(familyData);
+        setPets(petsData);
 
-      if (profileData.length > 0) {
-        setUserProfile(profileData[0]);
-        // Fetch weather if location is set
-        if (profileData[0].latitude && profileData[0].longitude) {
-          fetchWeather(profileData[0].latitude, profileData[0].longitude, profileData[0].country);
-        }
-      }
-      
-      setCaches(cachesData);
-      setMeetSpots(filteredSpots);
-      setFirstAidItems(firstAidData);
-      setFamilyMembers(familyData);
-      setPets(petsData);
-      setUserEmail(user.email);
+        // If no notifications, add top recommendations
+        if (notifData.length === 0) {
+          const familyTypes = ['person'];
+          petsData.forEach(pet => {
+            const petType = pet.species?.toLowerCase();
+            if (petType && !familyTypes.includes(petType)) {
+              familyTypes.push(petType);
+            }
+          });
 
-      // If no notifications, add top recommendations
-      if (notifData.length === 0) {
-        const familyTypes = ['person'];
-        petsData.forEach(pet => {
-          const petType = pet.species?.toLowerCase();
-          if (petType && !familyTypes.includes(petType)) {
-            familyTypes.push(petType);
+          const relevantRecs = allRecs.filter(rec => {
+            if (rec.family_member_types && rec.family_member_types.length > 0) {
+              return rec.family_member_types.some(type => familyTypes.includes(type?.toLowerCase()));
+            }
+            return true;
+          }).slice(0, 3);
+
+          const recNotifications = relevantRecs.map(rec => ({
+            id: `rec_${rec.id}`,
+            title: `Recommended: ${rec.item_name}`,
+            message: rec.description || `Consider adding this to your emergency cache`,
+            type: "info",
+            read: false,
+            recommendation: rec
+          }));
+
+          setNotifications(recNotifications);
+        } else {
+          setNotifications(notifData);
+          
+          // Check for evacuation notices in notifications
+          const hasEvacuationNotice = notifData.some(notif => 
+            notif.title.toLowerCase().includes('evacuation') || 
+            notif.message.toLowerCase().includes('evacuation') ||
+            notif.type === 'alert'
+          );
+          if (hasEvacuationNotice) {
+            setEmergencyMode(true);
           }
-        });
-
-        const relevantRecs = allRecs.filter(rec => {
-          if (rec.family_member_types && rec.family_member_types.length > 0) {
-            return rec.family_member_types.some(type => familyTypes.includes(type?.toLowerCase()));
-          }
-          return true;
-        }).slice(0, 3);
-
-        const recNotifications = relevantRecs.map(rec => ({
-          id: `rec_${rec.id}`,
-          title: `Recommended: ${rec.item_name}`,
-          message: rec.description || `Consider adding this to your emergency cache`,
-          type: "info",
-          read: false,
-          recommendation: rec
-        }));
-
-        setNotifications(recNotifications);
-      } else {
-        setNotifications(notifData);
-        
-        // Check for evacuation notices in notifications
-        const hasEvacuationNotice = notifData.some(notif => 
-          notif.title.toLowerCase().includes('evacuation') || 
-          notif.message.toLowerCase().includes('evacuation') ||
-          notif.type === 'alert'
-        );
-        if (hasEvacuationNotice) {
-          setEmergencyMode(true);
         }
-      }
+      });
     } catch (error) {
       console.error("Error loading data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -266,14 +265,6 @@ export default function Dashboard() {
   });
 
   const primaryMeetSpot = meetSpots.find(spot => spot.is_primary);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading dashboard"></div>
-      </div>
-    );
-  }
 
   // Emergency View - Simplified for crisis situations
   if (emergencyMode) {
