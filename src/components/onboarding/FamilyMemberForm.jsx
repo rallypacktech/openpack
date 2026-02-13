@@ -81,7 +81,7 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
   const handleSkip = async () => {
     setSaving(true);
     try {
-      await onSkip();
+      await onSkip({ members, pets });
     } finally {
       setSaving(false);
     }

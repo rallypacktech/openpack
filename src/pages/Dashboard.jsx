@@ -556,29 +556,49 @@ export default function Dashboard() {
                 <FamilyMemberForm
                   onComplete={async (data) => {
                     try {
-                      const savedMembers = [];
-                      const savedPets = [];
+                      console.log("Saving family data:", data);
                       
+                      // Save to database
                       for (const member of data.members) {
-                        const saved = await base44.entities.FamilyMember.create(member);
-                        savedMembers.push(saved);
+                        await base44.entities.FamilyMember.create(member);
                       }
                       for (const pet of data.pets) {
-                        const saved = await base44.entities.Pet.create(pet);
-                        savedPets.push(saved);
+                        await base44.entities.Pet.create(pet);
                       }
                       
-                      // Update state and mark step as complete
-                      setFamilyMembers(prev => [...prev, ...savedMembers]);
-                      setPets(prev => [...prev, ...savedPets]);
+                      console.log("Family data saved successfully");
+                      
+                      // Mark step as complete and reload data
                       setFamilyStepCompleted(true);
+                      await loadData();
                     } catch (error) {
                       console.error("Error saving family members and pets:", error);
+                      alert("Failed to save family information. Please try again.");
                     }
                   }}
-                  onSkip={async () => {
-                    // Mark step as complete without adding members
-                    setFamilyStepCompleted(true);
+                  onSkip={async (data) => {
+                    try {
+                      // If there's data, save it before skipping
+                      if (data && (data.members.length > 0 || data.pets.length > 0)) {
+                        console.log("Saving family data before skip:", data);
+                        
+                        for (const member of data.members) {
+                          await base44.entities.FamilyMember.create(member);
+                        }
+                        for (const pet of data.pets) {
+                          await base44.entities.Pet.create(pet);
+                        }
+                        
+                        console.log("Family data saved successfully");
+                      }
+                      
+                      // Mark step as complete and reload
+                      setFamilyStepCompleted(true);
+                      await loadData();
+                    } catch (error) {
+                      console.error("Error during skip:", error);
+                      alert("Failed to save family information. Please try again.");
+                    }
                   }}
                 />
 
