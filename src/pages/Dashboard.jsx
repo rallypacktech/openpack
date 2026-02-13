@@ -22,7 +22,8 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState([]);
   const [weather, setWeather] = useState(null);
   const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
@@ -75,8 +76,13 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       setUserEmail(user.email);
       
-      // Load profile first (critical for onboarding)
-      const profileData = await base44.entities.UserProfile.filter({ created_by: user.email });
+      // Load critical data for onboarding check
+      const [profileData, petsData, familyData] = await Promise.all([
+        base44.entities.UserProfile.filter({ created_by: user.email }),
+        base44.entities.Pet.filter({ created_by: user.email }),
+        base44.entities.FamilyMember.filter({ created_by: user.email })
+      ]);
+
       if (profileData.length > 0) {
         setUserProfile(profileData[0]);
         // Fetch weather in background
@@ -85,24 +91,25 @@ export default function Dashboard() {
         }
       }
       
-      // Load everything else in parallel (non-blocking)
+      setFamilyMembers(familyData);
+      setPets(petsData);
+      setDataLoaded(true);
+      setLoading(false);
+      
+      // Load everything else in background
       Promise.all([
         base44.functions.invoke('getCaches'),
         base44.functions.invoke('getMeetSpots'),
         base44.entities.FirstAidItem.filter({ created_by: user.email }),
         base44.entities.Notification.filter({ created_by: user.email }, "-created_date", 10),
-        base44.entities.ProductRecommendation.filter({ active: true }, "-priority", 3),
-        base44.entities.Pet.filter({ created_by: user.email }),
-        base44.entities.FamilyMember.filter({ created_by: user.email })
-      ]).then(([cachesResponse, spotsResponse, firstAidData, notifData, allRecs, petsData, familyData]) => {
+        base44.entities.ProductRecommendation.filter({ active: true }, "-priority", 3)
+      ]).then(([cachesResponse, spotsResponse, firstAidData, notifData, allRecs]) => {
         const cachesData = cachesResponse.data.caches;
         const filteredSpots = spotsResponse.data.spots;
 
         setCaches(cachesData);
         setMeetSpots(filteredSpots);
         setFirstAidItems(firstAidData);
-        setFamilyMembers(familyData);
-        setPets(petsData);
 
         // If no notifications, add top recommendations
         if (notifData.length === 0) {
@@ -147,6 +154,7 @@ export default function Dashboard() {
       });
     } catch (error) {
       console.error("Error loading data:", error);
+      setLoading(false);
     }
   };
 
@@ -265,6 +273,14 @@ export default function Dashboard() {
   });
 
   const primaryMeetSpot = meetSpots.find(spot => spot.is_primary);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading dashboard"></div>
+      </div>
+    );
+  }
 
   // Emergency View - Simplified for crisis situations
   if (emergencyMode) {
