@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
   const [userEmail, setUserEmail] = useState("");
+  const [familyStepCompleted, setFamilyStepCompleted] = useState(false);
   const [locationForm, setLocationForm] = useState({
     display_name: "",
     street_address: "",
@@ -416,7 +417,7 @@ export default function Dashboard() {
 
   // Onboarding Flow - Guide new users through setup
   const needsAddress = !userProfile || !userProfile.street_address;
-  const needsFamilySetup = !needsAddress && dataLoaded && familyMembers.length === 0 && pets.length === 0;
+  const needsFamilySetup = !needsAddress && dataLoaded && !familyStepCompleted && familyMembers.length === 0 && pets.length === 0;
   const needsMeetSpots = !needsAddress && !needsFamilySetup && dataLoaded && meetSpots.length === 0;
   
   // Check if user has any caches they actually own (not samples)
@@ -567,17 +568,17 @@ export default function Dashboard() {
                         savedPets.push(saved);
                       }
                       
-                      // Optimistically update state to move to next step
+                      // Update state and mark step as complete
                       setFamilyMembers(prev => [...prev, ...savedMembers]);
                       setPets(prev => [...prev, ...savedPets]);
+                      setFamilyStepCompleted(true);
                     } catch (error) {
                       console.error("Error saving family members and pets:", error);
                     }
                   }}
                   onSkip={async () => {
-                    // Just trigger re-render to move to next step
-                    setFamilyMembers([]);
-                    setPets([]);
+                    // Mark step as complete without adding members
+                    setFamilyStepCompleted(true);
                   }}
                 />
 
