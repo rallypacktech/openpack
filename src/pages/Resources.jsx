@@ -43,18 +43,19 @@ export default function Resources() {
       setCaches(cachesResponse.data.caches);
       setMeetSpots(spotsResponse.data.spots);
       setFirstAidItems(firstAidData);
+      setLoading(false);
 
-      // Create sample caches if user has none of their own
+      // Create sample caches in background if user has none (don't block rendering)
       const ownCaches = cachesResponse.data.caches.filter(c => c.created_by === user.email);
       if (!samplesCreated && ownCaches.length === 0) {
-        await base44.functions.invoke('generateSampleCaches');
         setSamplesCreated(true);
-        // Reload data to show samples
-        await loadData();
+        base44.functions.invoke('generateSampleCaches').then(() => {
+          // Silently reload data to show samples
+          loadData();
+        });
       }
     } catch (error) {
       console.error("Error loading data:", error);
-    } finally {
       setLoading(false);
     }
   };

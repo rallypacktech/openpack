@@ -47,6 +47,7 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AdminMonitor from './pages/AdminMonitor';
 import AdminProductSuggestions from './pages/AdminProductSuggestions';
 import AdminProducts from './pages/AdminProducts';
 import AdminRecommendations from './pages/AdminRecommendations';
@@ -63,11 +64,11 @@ import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import Shopping from './pages/Shopping';
 import TermsAndConditions from './pages/TermsAndConditions';
-import AdminMonitor from './pages/AdminMonitor';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AdminMonitor": AdminMonitor,
     "AdminProductSuggestions": AdminProductSuggestions,
     "AdminProducts": AdminProducts,
     "AdminRecommendations": AdminRecommendations,
@@ -84,7 +85,6 @@ export const PAGES = {
     "Settings": Settings,
     "Shopping": Shopping,
     "TermsAndConditions": TermsAndConditions,
-    "AdminMonitor": AdminMonitor,
 }
 
 export const pagesConfig = {
