@@ -66,8 +66,8 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
     setPets(pets.filter((_, i) => i !== index));
   };
 
-  const handleComplete = () => {
-    onComplete({ members, pets });
+  const handleComplete = async () => {
+    await onComplete({ members, pets });
   };
 
   return (
@@ -393,13 +393,13 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
             <>
               <Button
                 variant="outline"
-                onClick={onSkip}
+                onClick={() => onSkip()}
                 className="flex-1"
               >
                 Add More Later
               </Button>
               <Button
-                onClick={handleComplete}
+                onClick={() => handleComplete()}
                 className="flex-1 bg-purple-600 hover:bg-purple-700"
               >
                 Continue with {members.length + pets.length} {members.length + pets.length === 1 ? 'Member' : 'Members'}
@@ -408,7 +408,7 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
           ) : (
             <Button
               variant="outline"
-              onClick={onSkip}
+              onClick={() => onSkip()}
               className="w-full"
             >
               Skip for Now (Add Later in Settings)

@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [pets, setPets] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [locationForm, setLocationForm] = useState({
+    display_name: "",
     street_address: "",
     city: "",
     state_province: "",
@@ -495,7 +496,17 @@ export default function Dashboard() {
                   </ul>
                 </div>
                 
-                <div className="p-6 bg-gray-50 rounded-lg">
+                <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+                  <div>
+                    <Label>Your Name</Label>
+                    <Input
+                      value={locationForm.display_name}
+                      onChange={(e) => setLocationForm({ ...locationForm, display_name: e.target.value })}
+                      placeholder="e.g., John Smith"
+                      className="bg-white"
+                    />
+                  </div>
+                  
                   <StructuredAddressInput
                     formData={locationForm}
                     onFieldChange={handleLocationFieldChange}
@@ -506,7 +517,7 @@ export default function Dashboard() {
                 <Button
                   onClick={handleSaveAddress}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 text-lg font-bold"
-                  disabled={!locationForm.street_address || !locationForm.city || !locationForm.state_province}
+                  disabled={!locationForm.display_name || !locationForm.street_address || !locationForm.city || !locationForm.state_province}
                 >
                   Save Address & Continue
                 </Button>
