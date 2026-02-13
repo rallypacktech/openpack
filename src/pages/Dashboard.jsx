@@ -406,7 +406,7 @@ export default function Dashboard() {
 
   // Onboarding Flow - Guide new users through setup
   const needsAddress = !userProfile || !userProfile.street_address;
-  const needsFamilySetup = !needsAddress && familyMembers.length === 0;
+  const needsFamilySetup = !needsAddress && familyMembers.length === 0 && pets.length === 0;
   const needsMeetSpots = !needsAddress && !needsFamilySetup && meetSpots.length === 0;
   
   // Check if user has any caches they actually own (not samples)

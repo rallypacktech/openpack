@@ -43,12 +43,15 @@ export default function EmergencyShelterMap({
   useEffect(() => {
     if (userLocation && userLocation.latitude && userLocation.longitude) {
       setCenter([userLocation.latitude, userLocation.longitude]);
-      setZoom(10);
+      setZoom(12);
+    } else if (rallyPoints.length > 0 && rallyPoints[0].latitude) {
+      setCenter([rallyPoints[0].latitude, rallyPoints[0].longitude]);
+      setZoom(12);
     } else if (shelters.length > 0 && shelters[0].latitude) {
       setCenter([shelters[0].latitude, shelters[0].longitude]);
-      setZoom(9);
+      setZoom(11);
     }
-  }, [userLocation, shelters]);
+  }, [userLocation, shelters, rallyPoints]);
 
   return (
     <Card>

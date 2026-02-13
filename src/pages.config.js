@@ -63,6 +63,7 @@ import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import Shopping from './pages/Shopping';
 import TermsAndConditions from './pages/TermsAndConditions';
+import AdminMonitor from './pages/AdminMonitor';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +84,7 @@ export const PAGES = {
     "Settings": Settings,
     "Shopping": Shopping,
     "TermsAndConditions": TermsAndConditions,
+    "AdminMonitor": AdminMonitor,
 }
 
 export const pagesConfig = {
