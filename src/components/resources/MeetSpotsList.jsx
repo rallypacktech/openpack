@@ -70,13 +70,17 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     try {
       const user = await base44.auth.me();
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      const coords = profiles.length > 0 && profiles[0].latitude && profiles[0].longitude
-        ? { latitude: profiles[0].latitude, longitude: profiles[0].longitude }
-        : {};
       
-      const response = await base44.functions.invoke('getCommunityRallyPoints', coords);
-      if (response.data.rallyPoints) {
-        setRallyPoints(response.data.rallyPoints);
+      if (profiles.length > 0 && profiles[0].latitude && profiles[0].longitude) {
+        const response = await base44.functions.invoke('getCommunityRallyPoints', {
+          latitude: profiles[0].latitude,
+          longitude: profiles[0].longitude,
+          radius: 25
+        });
+        
+        if (response.data.rallyPoints) {
+          setRallyPoints(response.data.rallyPoints);
+        }
       }
     } catch (error) {
       console.error('Error loading rally points:', error);
