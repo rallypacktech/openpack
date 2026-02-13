@@ -52,7 +52,7 @@ export default function StructuredAddressInput({ formData, onFieldChange, onAddr
 
     debounceTimer.current = setTimeout(() => {
       searchAddress(value);
-    }, 500);
+    }, 300);
   };
 
   const handleSelectAddress = (suggestion) => {
