@@ -46,8 +46,9 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         });
       }
       
-      // Load recommendations and rally points in parallel
-      Promise.all([loadRecommendations(), loadRallyPoints()]);
+      // Load recommendations and rally points in background (don't block rendering)
+      loadRecommendations();
+      loadRallyPoints();
     };
     loadUser();
   }, [spots]);
