@@ -559,13 +559,13 @@ export default function Dashboard() {
                       for (const pet of data.pets) {
                         await base44.entities.Pet.create(pet);
                       }
-                      loadData(); // Refresh to move to next step
+                      await loadData(); // Refresh to move to next step
                     } catch (error) {
                       console.error("Error saving family members and pets:", error);
                     }
                   }}
-                  onSkip={() => {
-                    loadData(); // Skip to next step
+                  onSkip={async () => {
+                    await loadData(); // Skip to next step
                   }}
                 />
 

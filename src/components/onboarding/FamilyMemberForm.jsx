@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { X, Plus, Users, Info, PawPrint } from "lucide-react";
 
 export default function FamilyMemberForm({ onComplete, onSkip }) {
+  const [saving, setSaving] = useState(false);
   const [members, setMembers] = useState([]);
   const [pets, setPets] = useState([]);
   const [currentMember, setCurrentMember] = useState({
@@ -67,7 +68,21 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
   };
 
   const handleComplete = async () => {
-    await onComplete({ members, pets });
+    setSaving(true);
+    try {
+      await onComplete({ members, pets });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    setSaving(true);
+    try {
+      await onSkip();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -393,25 +408,28 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
             <>
               <Button
                 variant="outline"
-                onClick={() => onSkip()}
+                onClick={handleSkip}
+                disabled={saving}
                 className="flex-1"
               >
-                Add More Later
+                {saving ? "Saving..." : "Add More Later"}
               </Button>
               <Button
-                onClick={() => handleComplete()}
+                onClick={handleComplete}
+                disabled={saving}
                 className="flex-1 bg-purple-600 hover:bg-purple-700"
               >
-                Continue with {members.length + pets.length} {members.length + pets.length === 1 ? 'Member' : 'Members'}
+                {saving ? "Saving..." : `Continue with ${members.length + pets.length} ${members.length + pets.length === 1 ? 'Member' : 'Members'}`}
               </Button>
             </>
           ) : (
             <Button
               variant="outline"
-              onClick={() => onSkip()}
+              onClick={handleSkip}
+              disabled={saving}
               className="w-full"
             >
-              Skip for Now (Add Later in Settings)
+              {saving ? "Loading..." : "Skip for Now (Add Later in Settings)"}
             </Button>
           )}
         </div>
