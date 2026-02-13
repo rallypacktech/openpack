@@ -46,15 +46,13 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         });
       }
       
-      // Load recommendations and rally points
-      loadRecommendations();
-      loadRallyPoints();
+      // Load recommendations and rally points in parallel
+      Promise.all([loadRecommendations(), loadRallyPoints()]);
     };
     loadUser();
   }, [spots]);
 
   const loadRecommendations = async () => {
-    setLoadingRecs(true);
     try {
       const response = await base44.functions.invoke('recommendMeetSpots');
       if (response.data.recommendations) {
@@ -350,7 +348,14 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         </Dialog>
 
         {/* Rally Points Recommendations */}
-        {rallyPoints.length > 0 && (
+        {loadingRecs && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-600">Loading recommendations...</span>
+          </div>
+        )}
+        
+        {!loadingRecs && rallyPoints.length > 0 && (
           <div className="space-y-4 mb-6 mt-6">
             <h3 className="text-lg font-semibold text-gray-900">Community Rally Points Near You</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -389,7 +394,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         )}
 
         {/* Personalized Recommendations */}
-        {recommendations.length > 0 && (
+        {!loadingRecs && recommendations.length > 0 && (
           <div className="space-y-4 mb-6 mt-6">
             <h3 className="text-lg font-semibold text-gray-900">Recommendations for You</h3>
             {recommendations.map((rec, idx) => (

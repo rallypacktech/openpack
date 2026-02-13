@@ -386,34 +386,36 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
         </Card>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex gap-3">
-        {members.length > 0 || pets.length > 0 ? (
-          <>
+      {/* Action Buttons - Always visible */}
+      {!showForm && (
+        <div className="flex gap-3 pt-4 border-t">
+          {members.length > 0 || pets.length > 0 ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={onSkip}
+                className="flex-1"
+              >
+                Add More Later
+              </Button>
+              <Button
+                onClick={handleComplete}
+                className="flex-1 bg-purple-600 hover:bg-purple-700"
+              >
+                Continue with {members.length + pets.length} {members.length + pets.length === 1 ? 'Member' : 'Members'}
+              </Button>
+            </>
+          ) : (
             <Button
               variant="outline"
               onClick={onSkip}
-              className="flex-1"
+              className="w-full"
             >
-              Add More Later
+              Skip for Now (Add Later in Settings)
             </Button>
-            <Button
-              onClick={handleComplete}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
-            >
-              Continue with {members.length + pets.length} {members.length + pets.length === 1 ? 'Member' : 'Members'}
-            </Button>
-          </>
-        ) : (
-          <Button
-            variant="outline"
-            onClick={onSkip}
-            className="w-full"
-          >
-            Skip for Now (Add Later in Settings)
-          </Button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
