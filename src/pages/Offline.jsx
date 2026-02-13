@@ -86,11 +86,11 @@ export default function Offline() {
         🚧 Work in Progress - This page is currently under development
       </div>
 
-      {/* Grey Overlay */}
-      <div className="absolute inset-0 bg-gray-500 bg-opacity-50 z-40 pointer-events-none"></div>
+      {/* Grey Overlay with Blur */}
+      <div className="absolute inset-0 bg-gray-600 bg-opacity-60 backdrop-blur-md z-40 pointer-events-none"></div>
 
-      {/* Content (greyed out) */}
-      <div className="relative z-30 opacity-40">
+      {/* Content (blurred and greyed out) */}
+      <div className="relative z-30 opacity-30 blur-sm">
         {/* Header */}
         <div className="bg-blue-100 py-12 text-center">
         <WifiOff className="w-12 h-12 mx-auto mb-4 text-blue-600" />
