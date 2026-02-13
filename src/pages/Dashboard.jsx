@@ -555,19 +555,29 @@ export default function Dashboard() {
                 <FamilyMemberForm
                   onComplete={async (data) => {
                     try {
+                      const savedMembers = [];
+                      const savedPets = [];
+                      
                       for (const member of data.members) {
-                        await base44.entities.FamilyMember.create(member);
+                        const saved = await base44.entities.FamilyMember.create(member);
+                        savedMembers.push(saved);
                       }
                       for (const pet of data.pets) {
-                        await base44.entities.Pet.create(pet);
+                        const saved = await base44.entities.Pet.create(pet);
+                        savedPets.push(saved);
                       }
-                      await loadData(); // Refresh to move to next step
+                      
+                      // Optimistically update state to move to next step
+                      setFamilyMembers(prev => [...prev, ...savedMembers]);
+                      setPets(prev => [...prev, ...savedPets]);
                     } catch (error) {
                       console.error("Error saving family members and pets:", error);
                     }
                   }}
                   onSkip={async () => {
-                    await loadData(); // Skip to next step
+                    // Just trigger re-render to move to next step
+                    setFamilyMembers([]);
+                    setPets([]);
                   }}
                 />
 
