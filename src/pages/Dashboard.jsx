@@ -558,12 +558,28 @@ export default function Dashboard() {
                     try {
                       console.log("Saving family data:", data);
                       
-                      // Save to database
+                      // Save to database with cleaned data
                       for (const member of data.members) {
-                        await base44.entities.FamilyMember.create(member);
+                        const cleanMember = {
+                          name: member.name,
+                          relationship: member.relationship,
+                          age: member.age ? Number(member.age) : undefined,
+                          medical_conditions: member.medical_conditions || undefined,
+                          emergency_contact: member.emergency_contact || undefined,
+                          link_status: member.link_status || "none"
+                        };
+                        await base44.entities.FamilyMember.create(cleanMember);
                       }
                       for (const pet of data.pets) {
-                        await base44.entities.Pet.create(pet);
+                        const cleanPet = {
+                          name: pet.name,
+                          species: pet.species,
+                          breed: pet.breed || undefined,
+                          age: pet.age ? Number(pet.age) : undefined,
+                          medical_conditions: pet.medical_conditions || undefined,
+                          microchip_number: pet.microchip_number || undefined
+                        };
+                        await base44.entities.Pet.create(cleanPet);
                       }
                       
                       console.log("Family data saved successfully");
@@ -583,10 +599,26 @@ export default function Dashboard() {
                         console.log("Saving family data before skip:", data);
                         
                         for (const member of data.members) {
-                          await base44.entities.FamilyMember.create(member);
+                          const cleanMember = {
+                            name: member.name,
+                            relationship: member.relationship,
+                            age: member.age ? Number(member.age) : undefined,
+                            medical_conditions: member.medical_conditions || undefined,
+                            emergency_contact: member.emergency_contact || undefined,
+                            link_status: member.link_status || "none"
+                          };
+                          await base44.entities.FamilyMember.create(cleanMember);
                         }
                         for (const pet of data.pets) {
-                          await base44.entities.Pet.create(pet);
+                          const cleanPet = {
+                            name: pet.name,
+                            species: pet.species,
+                            breed: pet.breed || undefined,
+                            age: pet.age ? Number(pet.age) : undefined,
+                            medical_conditions: pet.medical_conditions || undefined,
+                            microchip_number: pet.microchip_number || undefined
+                          };
+                          await base44.entities.Pet.create(cleanPet);
                         }
                         
                         console.log("Family data saved successfully");
