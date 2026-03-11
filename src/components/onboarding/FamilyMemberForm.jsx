@@ -22,6 +22,7 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
   const [currentPet, setCurrentPet] = useState({
     name: "",
     species: "dog",
+    size: "medium",
     breed: "",
     age: "",
     medical_conditions: "",
@@ -55,6 +56,7 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
       setCurrentPet({
         name: "",
         species: "dog",
+        size: "medium",
         breed: "",
         age: "",
         medical_conditions: "",
