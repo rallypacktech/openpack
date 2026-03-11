@@ -14,6 +14,7 @@ import PreparednessTips from "../components/dashboard/PreparednessTips";
 import StructuredAddressInput from "../components/settings/StructuredAddressInput";
 import ReadinessScore from "../components/dashboard/ReadinessScore";
 import FamilyMemberForm from "../components/onboarding/FamilyMemberForm";
+import TermsAgreement from "../components/onboarding/TermsAgreement";
 
 export default function Dashboard() {
   const navigate = useNavigate();
