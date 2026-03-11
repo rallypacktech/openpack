@@ -82,6 +82,14 @@ Deno.serve(async (req) => {
         }
       }
 
+      // If rec specifies pet sizes, user must have a pet of that size
+      if (rec.pet_sizes && rec.pet_sizes.length > 0) {
+        const hasSizeMatch = rec.pet_sizes.some(size => petSizes.has(size));
+        if (!hasSizeMatch) {
+          return false;
+        }
+      }
+
       return true;
     });
 
