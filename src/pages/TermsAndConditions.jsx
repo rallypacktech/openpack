@@ -31,7 +31,7 @@ export default function TermsAndConditions() {
             <h1 className="text-3xl font-bold text-gray-900">Terms and Conditions</h1>
           </div>
           <p className="text-gray-500">Effective Date: December 27, 2025</p>
-          <p className="text-gray-500">Last Updated: December 27, 2025</p>
+          <p className="text-gray-500">Last Updated: March 11, 2026</p>
         </div>
 
         <div className="space-y-6">

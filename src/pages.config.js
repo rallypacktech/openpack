@@ -64,6 +64,8 @@ import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import Shopping from './pages/Shopping';
 import TermsAndConditions from './pages/TermsAndConditions';
+import EULA from './pages/EULA';
+import ConfidentialityAgreement from './pages/ConfidentialityAgreement';
 import __Layout from './Layout.jsx';
 
 
@@ -85,6 +87,8 @@ export const PAGES = {
     "Settings": Settings,
     "Shopping": Shopping,
     "TermsAndConditions": TermsAndConditions,
+    "EULA": EULA,
+    "ConfidentialityAgreement": ConfidentialityAgreement,
 }
 
 export const pagesConfig = {

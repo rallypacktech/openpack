@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Database, Lock, Eye, FileText } from "lucide-react";
+import { Shield, Database, Lock, Eye, FileText, AlertTriangle } from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
@@ -31,7 +31,7 @@ export default function PrivacyPolicy() {
             <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
           </div>
           <p className="text-gray-500">Effective Date: December 27, 2025</p>
-          <p className="text-gray-500">Last Updated: December 27, 2025</p>
+          <p className="text-gray-500">Last Updated: March 11, 2026</p>
         </div>
 
         <div className="space-y-6">
