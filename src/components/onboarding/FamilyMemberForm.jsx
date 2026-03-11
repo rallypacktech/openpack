@@ -349,6 +349,24 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
               </div>
 
               <div>
+                <Label htmlFor="size">Size *</Label>
+                <Select
+                  value={currentPet.size}
+                  onValueChange={(value) => setCurrentPet({ ...currentPet, size: value })}
+                >
+                  <SelectTrigger id="size">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="small">Small (&lt;20 lbs)</SelectItem>
+                    <SelectItem value="medium">Medium (20–50 lbs)</SelectItem>
+                    <SelectItem value="large">Large (50–100 lbs)</SelectItem>
+                    <SelectItem value="x-large">X-Large (100+ lbs / Horses / Livestock)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label htmlFor="breed">Breed (optional)</Label>
                 <Input
                   id="breed"
