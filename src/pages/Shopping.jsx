@@ -34,11 +34,13 @@ export default function Shopping() {
 
       const userProfile = profiles[0];
       const familyTypes = ['person'];
+      const petSizes = new Set();
       pets.forEach(pet => {
         const petType = pet.species.toLowerCase();
         if (!familyTypes.includes(petType)) {
           familyTypes.push(petType);
         }
+        if (pet.size) petSizes.add(pet.size);
       });
 
       // Filter recommendations based on user's family composition
@@ -51,6 +53,10 @@ export default function Shopping() {
         if (rec.family_member_types && rec.family_member_types.length > 0) {
           const hasMatch = rec.family_member_types.some(type => familyTypes.includes(type.toLowerCase()));
           if (!hasMatch) return false;
+        }
+        if (rec.pet_sizes && rec.pet_sizes.length > 0) {
+          const hasSizeMatch = rec.pet_sizes.some(size => petSizes.has(size));
+          if (!hasSizeMatch) return false;
         }
         return true;
       });
