@@ -101,13 +101,14 @@ export default function Home() {
             >
               Start Your Family's Plan
             </Button>
-            <Link to={createPageUrl("LearnMore")}>
+            <Link to={createPageUrl("ReadinessQuiz")}>
               <Button 
                 variant="outline" 
                 size="lg"
-                className="text-lg px-8 py-6"
+                className="text-lg px-8 py-6 border-blue-300 text-blue-700 hover:bg-blue-50"
               >
-                Learn More
+                <ClipboardList className="w-5 h-5 mr-2" />
+                Take the Readiness Quiz
               </Button>
             </Link>
           </div>
