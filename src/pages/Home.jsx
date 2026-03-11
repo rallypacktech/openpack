@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
@@ -63,13 +63,11 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            When Disaster Strikes,<br />
-            <span className="text-blue-600">Will Your Family Know What to Do?</span>
+            If You're the One Who Keeps<br />
+            <span className="text-blue-600">Everyone Else Ready—This Is for You.</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            I've seen families arrive at shelters without medications, at the wrong location, 
-            or separated from loved ones with no plan. In hurricanes, fires, floods, or even 
-            when cell service fails—<strong>having a plan saves lives</strong>.
+            A storm shifts its track. School closes early. Power drops. In those moments, <strong>calm beats chaos</strong>—and a simple plan beats a perfect plan. RallyPack is built for the family operations lead: the person everyone depends on when things get real.
           </p>
           
           {/* Problem Boxes */}
