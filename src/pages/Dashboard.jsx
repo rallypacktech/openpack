@@ -449,7 +449,33 @@ export default function Dashboard() {
   // Check if user has any caches they actually own (not samples)
   const userOwnedCaches = caches.filter(cache => !cache.is_sample);
   const needsCaches = !needsAddress && !needsFamilySetup && !needsMeetSpots && userOwnedCaches.length === 0;
-  const isOnboarding = needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
+  const isOnboarding = needsTermsAgreement || needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
+
+  // Terms Agreement - must come before all other onboarding
+  if (needsTermsAgreement) {
+    return (
+      <TermsAgreement
+        onAgree={async (version, date) => {
+          try {
+            if (userProfile) {
+              await base44.entities.UserProfile.update(userProfile.id, {
+                terms_agreed_version: version,
+                terms_agreed_date: date
+              });
+            } else {
+              await base44.entities.UserProfile.create({
+                terms_agreed_version: version,
+                terms_agreed_date: date
+              });
+            }
+            await loadData();
+          } catch (error) {
+            console.error("Error recording terms agreement:", error);
+          }
+        }}
+      />
+    );
+  }
 
   if (isOnboarding) {
     const currentStep = needsAddress ? 1 : needsFamilySetup ? 2 : needsMeetSpots ? 3 : 4;
