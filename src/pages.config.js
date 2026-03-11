@@ -54,7 +54,9 @@ import AdminRecommendations from './pages/AdminRecommendations';
 import CacheDetail from './pages/CacheDetail';
 import CheckoutCancel from './pages/CheckoutCancel';
 import CheckoutSuccess from './pages/CheckoutSuccess';
+import ConfidentialityAgreement from './pages/ConfidentialityAgreement';
 import Dashboard from './pages/Dashboard';
+import EULA from './pages/EULA';
 import Emergency from './pages/Emergency';
 import Home from './pages/Home';
 import LearnMore from './pages/LearnMore';
@@ -64,8 +66,7 @@ import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import Shopping from './pages/Shopping';
 import TermsAndConditions from './pages/TermsAndConditions';
-import EULA from './pages/EULA';
-import ConfidentialityAgreement from './pages/ConfidentialityAgreement';
+import ReadinessQuiz from './pages/ReadinessQuiz';
 import __Layout from './Layout.jsx';
 
 
@@ -77,7 +78,9 @@ export const PAGES = {
     "CacheDetail": CacheDetail,
     "CheckoutCancel": CheckoutCancel,
     "CheckoutSuccess": CheckoutSuccess,
+    "ConfidentialityAgreement": ConfidentialityAgreement,
     "Dashboard": Dashboard,
+    "EULA": EULA,
     "Emergency": Emergency,
     "Home": Home,
     "LearnMore": LearnMore,
@@ -87,8 +90,7 @@ export const PAGES = {
     "Settings": Settings,
     "Shopping": Shopping,
     "TermsAndConditions": TermsAndConditions,
-    "EULA": EULA,
-    "ConfidentialityAgreement": ConfidentialityAgreement,
+    "ReadinessQuiz": ReadinessQuiz,
 }
 
 export const pagesConfig = {

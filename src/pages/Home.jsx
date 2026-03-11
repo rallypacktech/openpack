@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
-import { Shield, Users, Package, AlertTriangle, Cloud, Heart, MapPin, CheckCircle } from "lucide-react";
+import { Shield, Users, Package, AlertTriangle, Cloud, Heart, MapPin, CheckCircle, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
