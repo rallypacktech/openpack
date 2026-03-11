@@ -125,7 +125,7 @@ export default function Home() {
             Everything You Need to Stay Prepared
           </h2>
           <p className="text-lg text-gray-600">
-            Built for adventurers, travelers, and families who value safety
+          Built for families who want to be ready—not just hopeful.
           </p>
         </div>
 
@@ -271,7 +271,7 @@ export default function Home() {
             Ready to Get Started?
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join adventurers and families who are taking control of their emergency preparedness.
+            The families who come through emergencies calmly are the ones who had a simple plan ready. Set yours up in under 5 minutes.
           </p>
           <Button 
             onClick={handleGetStarted}
@@ -297,7 +297,7 @@ export default function Home() {
               <span className="text-lg font-bold text-blue-600">RallyPack</span>
             </div>
             <p className="text-sm text-gray-500">
-              © 2025 RallyPack. Your emergency preparedness companion.
+              © 2026 RallyPack. Your emergency preparedness companion.
             </p>
           </div>
         </div>
