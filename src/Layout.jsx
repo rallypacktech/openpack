@@ -192,6 +192,12 @@ export default function Layout({ children, currentPageName }) {
                     <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-gray-600 hover:text-blue-600">
                       Terms & Conditions
                     </Link>
+                    <Link to={createPageUrl("EULA")} className="block text-sm text-gray-600 hover:text-blue-600">
+                      End User License Agreement
+                    </Link>
+                    <Link to={createPageUrl("ConfidentialityAgreement")} className="block text-sm text-gray-600 hover:text-blue-600">
+                      Confidentiality Agreement
+                    </Link>
                   </nav>
                 </div>
               </div>
