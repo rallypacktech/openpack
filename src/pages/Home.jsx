@@ -251,14 +251,13 @@ export default function Home() {
         <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
           <CardContent className="p-8 text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              🚀 We're Growing With You
+              We're Looking for Real Families to Test This
             </h3>
             <p className="text-gray-700 max-w-2xl mx-auto mb-4">
-              RallyPack is in early beta, which means we're actively building new features 
-              and listening to our community. Your feedback helps shape the future of emergency preparedness!
+              RallyPack is in early beta. We're looking for families willing to test it in real life—not in theory—and share honest feedback on what's clear, what's confusing, and what's missing. Your input shapes the platform before official launch.
             </p>
             <p className="text-sm text-gray-600">
-              Join now to get lifetime early-adopter benefits and help us build something amazing together.
+              If you're the one your family looks to when things get real, <strong>we built this for you</strong>.
             </p>
           </CardContent>
         </Card>
