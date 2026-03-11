@@ -441,7 +441,8 @@ export default function Dashboard() {
   }
 
   // Onboarding Flow - Guide new users through setup
-  const needsAddress = !userProfile || !userProfile.street_address;
+  const needsTermsAgreement = dataLoaded && (!userProfile || !userProfile.terms_agreed_version);
+  const needsAddress = !needsTermsAgreement && (!userProfile || !userProfile.street_address);
   const needsFamilySetup = !needsAddress && dataLoaded && !familyStepCompleted && familyMembers.length === 0 && pets.length === 0;
   const needsMeetSpots = !needsAddress && !needsFamilySetup && dataLoaded && meetSpots.length === 0;
   
