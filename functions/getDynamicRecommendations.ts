@@ -40,11 +40,13 @@ Deno.serve(async (req) => {
     ]);
 
     const familyTypes = ['person']; // Always include person
+    const petSizes = new Set();
     pets.forEach(pet => {
       const petType = pet.species.toLowerCase();
       if (!familyTypes.includes(petType)) {
         familyTypes.push(petType);
       }
+      if (pet.size) petSizes.add(pet.size);
     });
 
     // Get all recommendations

@@ -5,7 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, PawPrint } from "lucide-react";
+
+const SIZE_LABELS = {
+  small: "Small (<20 lbs)",
+  medium: "Medium (20–50 lbs)",
+  large: "Large (50–100 lbs)",
+  "x-large": "X-Large (100+ lbs / Livestock)"
+};
 
 export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -13,6 +21,7 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
   const [formData, setFormData] = useState({
     name: "",
     species: "dog",
+    size: "medium",
     breed: "",
     age: "",
     microchip_number: "",
@@ -23,6 +32,7 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
     setFormData({
       name: "",
       species: "dog",
+      size: "medium",
       breed: "",
       age: "",
       microchip_number: "",
@@ -41,6 +51,7 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
     setFormData({
       name: pet.name || "",
       species: pet.species || "dog",
+      size: pet.size || "medium",
       breed: pet.breed || "",
       age: pet.age?.toString() || "",
       microchip_number: pet.microchip_number || "",
@@ -54,7 +65,6 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
       ...formData,
       age: formData.age ? parseInt(formData.age) : null
     };
-    
     if (editingPet) {
       await onUpdate(editingPet.id, data);
     } else {
@@ -103,6 +113,23 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
                       <SelectItem value="cat">Cat</SelectItem>
                       <SelectItem value="bird">Bird</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Size</Label>
+                  <Select
+                    value={formData.size}
+                    onValueChange={(value) => setFormData({ ...formData, size: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="small">Small (&lt;20 lbs)</SelectItem>
+                      <SelectItem value="medium">Medium (20–50 lbs)</SelectItem>
+                      <SelectItem value="large">Large (50–100 lbs)</SelectItem>
+                      <SelectItem value="x-large">X-Large (100+ lbs / Horses / Livestock)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -160,6 +187,9 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
                       <div>
                         <h3 className="font-semibold text-gray-900">{pet.name}</h3>
                         <p className="text-sm text-gray-500 capitalize">{pet.species} - {pet.breed || "Unknown breed"}</p>
+                        {pet.size && (
+                          <Badge variant="outline" className="mt-1 text-xs capitalize">{SIZE_LABELS[pet.size] || pet.size}</Badge>
+                        )}
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => openEditDialog(pet)}>
@@ -180,7 +210,7 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
                         <span className="font-mono text-xs">{pet.microchip_number || "N/A"}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Medical Conditions</span>
+                        <span className="text-gray-500">Medical</span>
                         <span>{pet.medical_conditions || "None"}</span>
                       </div>
                     </div>
