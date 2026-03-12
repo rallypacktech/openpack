@@ -62,11 +62,11 @@ import Home from './pages/Home';
 import LearnMore from './pages/LearnMore';
 import Offline from './pages/Offline';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import ReadinessQuiz from './pages/ReadinessQuiz';
 import Resources from './pages/Resources';
 import Settings from './pages/Settings';
 import Shopping from './pages/Shopping';
 import TermsAndConditions from './pages/TermsAndConditions';
-import ReadinessQuiz from './pages/ReadinessQuiz';
 import __Layout from './Layout.jsx';
 
 
@@ -86,11 +86,11 @@ export const PAGES = {
     "LearnMore": LearnMore,
     "Offline": Offline,
     "PrivacyPolicy": PrivacyPolicy,
+    "ReadinessQuiz": ReadinessQuiz,
     "Resources": Resources,
     "Settings": Settings,
     "Shopping": Shopping,
     "TermsAndConditions": TermsAndConditions,
-    "ReadinessQuiz": ReadinessQuiz,
 }
 
 export const pagesConfig = {
