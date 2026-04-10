@@ -9,8 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart, Droplet, UtensilsCrossed, Info, User, Users } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Html5Qrcode } from "html5-qrcode";
+import BarcodeScanner from "../components/BarcodeScanner";
 
 export default function CacheDetail() {
   const navigate = useNavigate();
@@ -29,6 +28,7 @@ export default function CacheDetail() {
   const [isFirstAidKitLocation, setIsFirstAidKitLocation] = useState(false);
   const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
   const [scanning, setScanning] = useState(false);
+  const [showCameraScanner, setShowCameraScanner] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
   const [showDescriptions, setShowDescriptions] = useState({});
@@ -208,86 +208,12 @@ export default function CacheDetail() {
     }
   };
 
-  const startScanner = async () => {
-    setScanning(true);
-    
-    // Check if browser supports camera
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert("Camera not supported on this browser");
-      setScanning(false);
-      return;
-    }
-
-    let permissionStream = null;
-    try {
-      // Request camera permission first
-      permissionStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-      
-      // Stop the permission check stream before starting html5-qrcode
-      if (permissionStream) {
-        permissionStream.getTracks().forEach(track => track.stop());
-      }
-      
-      const html5QrCode = new Html5Qrcode("qr-reader");
-      scannerRef.current = html5QrCode;
-      
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 }
-        },
-        (decodedText) => {
-          setBarcode(decodedText);
-          stopScanner();
-        },
-        () => {
-          // Error callback - ignore continuous scanning errors
-        }
-      );
-    } catch (err) {
-      console.error("Camera error:", err);
-      
-      // Clean up permission stream if it exists
-      if (permissionStream) {
-        permissionStream.getTracks().forEach(track => track.stop());
-      }
-      
-      const errorMsg = err?.message || err?.toString() || "Unknown error";
-      
-      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-        alert("Camera permission denied. Please allow camera access in your browser settings.");
-      } else if (err.name === "NotFoundError") {
-        alert("No camera found on your device.");
-      } else {
-        alert("Unable to start camera. Try entering the barcode manually.");
-        console.error("Full error:", errorMsg);
-      }
-      setScanning(false);
-    }
-  };
-
   const stopScanner = () => {
-    if (scannerRef.current) {
-      scannerRef.current.stop().then(() => {
-        scannerRef.current.clear();
-        scannerRef.current = null;
-        setScanning(false);
-      }).catch(err => {
-        console.error("Error stopping scanner:", err);
-        setScanning(false);
-      });
-    }
+    setShowCameraScanner(false);
+    setScanning(false);
   };
 
-  useEffect(() => {
-    return () => {
-      // Cleanup on unmount
-      if (scannerRef.current) {
-        stopScanner();
-      }
-    };
-  }, []);
+
 
   const handleBarcodeSubmit = async () => {
     if (!barcode.trim()) return;
@@ -742,10 +668,10 @@ export default function CacheDetail() {
                 />
               </div>
 
-              {!scanning && !barcode && (
-                <Button 
-                  onClick={startScanner} 
-                  variant="outline" 
+              {!showCameraScanner && !barcode && (
+                <Button
+                  onClick={() => setShowCameraScanner(true)}
+                  variant="outline"
                   className="w-full"
                 >
                   <Camera className="w-4 h-4 mr-2" />
@@ -753,17 +679,14 @@ export default function CacheDetail() {
                 </Button>
               )}
 
-              {scanning && (
-                <div className="space-y-2">
-                  <div id="qr-reader" className="w-full rounded-lg overflow-hidden"></div>
-                  <Button 
-                    onClick={stopScanner} 
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    Stop Scanner
-                  </Button>
-                </div>
+              {showCameraScanner && (
+                <BarcodeScanner
+                  onDetected={(code) => {
+                    setBarcode(code);
+                    setShowCameraScanner(false);
+                  }}
+                  onClose={() => setShowCameraScanner(false)}
+                />
               )}
 
               {barcode && (
