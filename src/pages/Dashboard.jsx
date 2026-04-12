@@ -443,6 +443,12 @@ export default function Dashboard() {
   // Onboarding Flow
   const needsTermsAgreement = dataLoaded && (!userProfile || !userProfile.terms_agreed_version);
 
+  const needsAddress = dataLoaded && userProfile && !userProfile.street_address;
+  const needsFamilySetup = dataLoaded && !familyStepCompleted && familyMembers.length === 0;
+  const needsMeetSpots = dataLoaded && meetSpots.length === 0;
+  const needsCaches = dataLoaded && caches.length === 0;
+  const isOnboarding = !needsTermsAgreement && (needsAddress || needsFamilySetup || needsMeetSpots || needsCaches);
+
   if (needsTermsAgreement) {
     return (
       <TermsAgreement
@@ -484,6 +490,31 @@ export default function Dashboard() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-5">
           {/* Progress Bar */}
           <section className="bg-white border border-border rounded p-5" aria-labelledby="onboarding-progress">
+            <h2 id="onboarding-progress" className="sr-only">Onboarding Progress</h2>
+            <div className="flex items-center justify-between mb-4" role="list">
+              {["Address","Family","Meet Spots","Caches"].map((label, i) => {
+                const stepNum = i + 1;
+                const done = currentStep > stepNum;
+                const active = currentStep === stepNum;
+                return (
+                  <div key={label} className={`flex items-center gap-1.5 text-xs font-sans ${active ? 'text-foreground font-semibold' : done ? 'text-primary' : 'text-muted-foreground'}`} role="listitem">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${active ? 'bg-foreground text-background' : done ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'}`}>
+                      {done ? '✓' : stepNum}
+                    </div>
+                    <span className="hidden sm:inline">{label}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="w-full bg-secondary rounded-full h-1" role="progressbar" aria-valuenow={progressPercent} aria-valuemin="0" aria-valuemax="100" aria-label={`Onboarding ${progressPercent}% complete`}>
+              <div
+                className="bg-foreground h-1 rounded-full transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="sr-only">You are on step {currentStep} of 4</p>
+          </section>
+
           {needsAddress && (
             <article className="bg-white border border-border rounded p-7">
               <div className="text-center mb-6">
