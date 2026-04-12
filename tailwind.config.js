@@ -4,6 +4,17 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+  		fontFamily: {
+  			serif: ['Playfair Display', 'Georgia', 'serif'],
+  			sans: ['Inter', 'DM Sans', 'system-ui', 'sans-serif'],
+  		},
+  		colors: {
+  			crimson: 'hsl(var(--crimson))',
+  			navy: 'hsl(var(--navy))',
+  			cream: 'hsl(var(--cream))',
+  			gold: 'hsl(var(--gold))',
+  			sage: 'hsl(var(--sage))',
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

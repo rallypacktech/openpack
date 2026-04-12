@@ -1,28 +1,40 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
-import { ChevronRight, ChevronLeft, AlertTriangle, CheckCircle, Users, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { ChevronRight, ChevronLeft, AlertTriangle, CheckCircle, ExternalLink } from "lucide-react";
+import LoginWall from "../components/LoginWall";
+import AdSlot from "../components/AdSlot";
+import ResourcesSection from "../components/ResourcesSection";
 
 const questions = [
   {
     id: "region",
     question: "Where do you live?",
-    subtext: "This helps us understand the risks most relevant to your area.",
+    subtext: "Your region shapes which disasters you're most at risk for, and which FEMA resources apply to you.",
     options: [
       { label: "Coastal / Hurricane Zone", value: "coastal" },
       { label: "Wildfire-Prone Region", value: "wildfire" },
       { label: "Tornado / Severe Storm Corridor", value: "tornado" },
       { label: "Earthquake Zone", value: "earthquake" },
+      { label: "Flood Plain", value: "flood" },
       { label: "Mixed / Not Sure", value: "general" },
     ],
   },
   {
+    id: "county_plan",
+    question: "Do you know your county's emergency plan?",
+    subtext: "Most counties have a published evacuation plan, shelter locations, and emergency management contact. Do you know yours?",
+    options: [
+      { label: "Yes — I know the shelter locations and evacuation routes", value: "yes" },
+      { label: "I know one exists but haven't looked at it", value: "vague" },
+      { label: "I didn't know counties had these", value: "no" },
+    ],
+  },
+  {
     id: "experienced_disaster",
-    question: "Have you ever been through a natural disaster or major emergency?",
-    subtext: "A hurricane evacuation, wildfire, flood, ice storm, prolonged power outage—anything that disrupted your normal life.",
+    question: "Have you ever been through a major emergency?",
+    subtext: "A hurricane evacuation, wildfire, flood, ice storm, extended power outage — anything that disrupted normal life for days.",
     options: [
       { label: "Yes — more than once", value: "multiple" },
       { label: "Yes — once", value: "once" },
@@ -32,29 +44,29 @@ const questions = [
   },
   {
     id: "felt_prepared",
-    question: "In that situation, how prepared did your household feel?",
-    subtext: "Be honest — there's no wrong answer here.",
+    question: "In that situation, how prepared was your household?",
+    subtext: "Be honest — this is for your benefit, not a grade.",
     options: [
       { label: "Fully prepared — we had a plan and followed it", value: "prepared" },
       { label: "Somewhat — we managed but there were real gaps", value: "partial" },
-      { label: "Not prepared at all — we were figuring it out as we went", value: "unprepared" },
+      { label: "Not prepared — we figured it out as we went", value: "unprepared" },
       { label: "I haven't been in one yet", value: "na" },
     ],
   },
   {
     id: "meeting_spot",
-    question: "Does your household have a clear meeting spot if you can't reach each other?",
-    subtext: "Somewhere everyone knows to go if phones are down or roads are blocked.",
+    question: "Does your household have a clear meeting spot?",
+    subtext: "Somewhere everyone knows to go if phones are down, roads are blocked, or you can't reach each other.",
     options: [
       { label: "Yes — everyone knows exactly where to go", value: "yes" },
-      { label: "We've talked about it, but it's not clearly defined", value: "vague" },
+      { label: "We've talked about it but it's not clearly defined", value: "vague" },
       { label: "No", value: "no" },
     ],
   },
   {
     id: "supplies",
-    question: "How would you rate your household's emergency supplies right now?",
-    subtext: "Think: water, food, medications, flashlights, documents.",
+    question: "How are your household's emergency supplies right now?",
+    subtext: "FEMA recommends 72 hours minimum: water (1 gal/person/day), food, medications, flashlights, documents, cash.",
     options: [
       { label: "Well stocked — 72+ hours covered", value: "good" },
       { label: "Partial — some things, but real gaps", value: "partial" },
@@ -63,93 +75,268 @@ const questions = [
   },
   {
     id: "plan_documented",
-    question: "Could your household follow an emergency plan without you leading it?",
-    subtext: "If you were traveling and something happened at home, would they know what to do?",
+    question: "Could your family execute the plan without you leading it?",
+    subtext: "If you were traveling and something happened at home — would they know what to do, where to go, who to call?",
     options: [
-      { label: "Yes — it's written down or saved somewhere accessible", value: "yes" },
-      { label: "Mostly in my head — I'm the one who knows it", value: "in_my_head" },
+      { label: "Yes — it's written down and accessible to everyone", value: "yes" },
+      { label: "It's mostly in my head — I'm the one who knows it", value: "in_my_head" },
       { label: "We don't have a real plan", value: "no" },
+    ],
+  },
+  {
+    id: "insurance",
+    question: "Is your home or renter's insurance current and do you know what it covers?",
+    subtext: "After a disaster, insurance is often the fastest path to recovery — but many people discover gaps too late.",
+    options: [
+      { label: "Yes — covered and I know exactly what's included", value: "yes" },
+      { label: "I have insurance but I'm not sure what it covers", value: "unsure" },
+      { label: "No insurance or it's lapsed", value: "no" },
     ],
   },
 ];
 
 function calculateScore(answers) {
   let score = 0;
-  const max = 18;
+  const max = 26;
 
-  // Region doesn't affect score (just context)
-  
-  // Experienced disaster
-  if (answers.experienced_disaster === "multiple") score += 1;
-  else if (answers.experienced_disaster === "once") score += 1;
+  if (answers.county_plan === "yes") score += 3;
+  else if (answers.county_plan === "vague") score += 1;
+
+  if (answers.experienced_disaster === "multiple" || answers.experienced_disaster === "once") score += 1;
   else if (answers.experienced_disaster === "at_risk") score += 1;
-  
-  // Felt prepared
+
   if (answers.felt_prepared === "prepared") score += 4;
   else if (answers.felt_prepared === "partial") score += 2;
-  else if (answers.felt_prepared === "na") score += 2; // neutral, no experience
+  else if (answers.felt_prepared === "na") score += 2;
 
-  // Meeting spot
   if (answers.meeting_spot === "yes") score += 4;
   else if (answers.meeting_spot === "vague") score += 2;
 
-  // Supplies
-  if (answers.supplies === "good") score += 4;
+  if (answers.supplies === "good") score += 5;
   else if (answers.supplies === "partial") score += 2;
 
-  // Plan documented
-  if (answers.plan_documented === "yes") score += 5;
+  if (answers.plan_documented === "yes") score += 6;
   else if (answers.plan_documented === "in_my_head") score += 2;
 
-  const pct = Math.round((score / max) * 100);
-  return pct;
+  if (answers.insurance === "yes") score += 3;
+  else if (answers.insurance === "unsure") score += 1;
+
+  return Math.round((score / max) * 100);
 }
 
 function getResult(score, answers) {
   const hadDisaster = answers.experienced_disaster === "multiple" || answers.experienced_disaster === "once";
-  const feltUnprepared = answers.felt_prepared === "unprepared" || answers.felt_prepared === "partial";
 
-  if (score >= 70) {
-    return {
-      level: "A Good Start",
-      color: "blue",
-      headline: "You've laid some groundwork—but gaps still put your family at risk.",
-      body: hadDisaster && feltUnprepared
-        ? "You've been through it before and know the gaps firsthand. The next emergency won't announce itself. Now's the time to turn what's in your head into a plan your whole household can follow."
-        : "You're ahead of most people. But emergency plans that live only in one person's head—or aren't tested—fail at exactly the wrong moment. A few focused steps now will make the difference.",
-      urgency: "medium",
-    };
-  } else if (score >= 40) {
-    return {
-      level: "Some Gaps to Address",
-      color: "orange",
-      headline: "Your household has real vulnerabilities right now.",
-      body: hadDisaster && feltUnprepared
-        ? "You know from experience what it feels like to be underprepared. The first 72 hours after a disaster are the most chaotic—before outside help fully ramps up. That window is entirely on you and your family."
-        : "The families who struggle most during emergencies aren't unlucky—they just didn't have a plan before things got real. Supplies, a meeting spot, and a documented plan aren't complicated. They just need to happen.",
-      urgency: "high",
-    };
-  } else {
-    return {
-      level: "Not Ready",
-      color: "red",
-      headline: "If something happened today, your family would be improvising.",
-      body: hadDisaster && feltUnprepared
-        ? "You've felt this before—the chaos, the uncertainty, the wishing you'd done more. The first 72 hours after a disaster are the most critical window your household has. Don't face the next one the same way."
-        : "That's not a criticism—it's where most families are. But disasters don't wait for the right time. A storm shifts track. Power drops. School closes early. The families who come through it calmly are the ones who had a simple plan ready.",
-      urgency: "critical",
-    };
-  }
+  if (score >= 70) return {
+    level: "A Solid Foundation",
+    badge: "bg-blue-100 text-blue-800",
+    headline: "You've built some groundwork. Now close the gaps before they matter.",
+    body: hadDisaster
+      ? "You've been through it before — you know firsthand how fast things change. The families who come through emergencies calmly aren't lucky; they closed their gaps before it got real."
+      : "You're ahead of most families. But a plan that lives in one person's head — or that isn't documented — fails at exactly the wrong moment. A few focused steps change that.",
+    urgency: "medium",
+  };
+  if (score >= 40) return {
+    level: "Gaps That Put You at Risk",
+    badge: "bg-amber-100 text-amber-800",
+    headline: "Your household has real vulnerabilities. Now is the time.",
+    body: "The first 72 hours after a disaster — before outside help fully ramps up, before FEMA arrives, before the Red Cross sets up shelters — that window is entirely yours. Right now, your family isn't ready for it.",
+    urgency: "high",
+  };
+  return {
+    level: "Not Ready",
+    badge: "bg-red-100 text-red-800",
+    headline: "If something happened today, your family would be improvising.",
+    body: hadDisaster
+      ? "You've felt this before — the chaos, the uncertainty, the wishing you'd done more. Don't face the next one the same way. The steps aren't complicated. They just need to happen."
+      : "That's where most American families are. But disasters don't wait. A storm shifts track. Power drops. School closes early. The families who come through it are the ones who had a simple plan ready.",
+    urgency: "critical",
+  };
 }
 
-const urgencyColors = {
-  medium: { bg: "bg-blue-50", border: "border-blue-200", badge: "bg-blue-100 text-blue-800", icon: "text-blue-600" },
-  high: { bg: "bg-orange-50", border: "border-orange-200", badge: "bg-orange-100 text-orange-800", icon: "text-orange-600" },
-  critical: { bg: "bg-red-50", border: "border-red-200", badge: "bg-red-100 text-red-800", icon: "text-red-600" },
+const REGION_RESOURCES = {
+  coastal: { name: "Hurricane preparedness", url: "https://www.ready.gov/hurricanes", fema: "https://www.fema.gov/emergency-managers/risk-management/hurricanes" },
+  wildfire: { name: "Wildfire preparedness", url: "https://www.ready.gov/wildfires", fema: "https://www.fema.gov/emergency-managers/risk-management/wildfires" },
+  tornado: { name: "Tornado preparedness", url: "https://www.ready.gov/tornadoes", fema: "https://www.fema.gov/emergency-managers/risk-management/tornadoes" },
+  earthquake: { name: "Earthquake preparedness", url: "https://www.ready.gov/earthquakes", fema: "https://www.fema.gov/emergency-managers/risk-management/earthquakes" },
+  flood: { name: "Flood preparedness", url: "https://www.ready.gov/floods", fema: "https://www.fema.gov/flood-insurance" },
+  general: { name: "General preparedness", url: "https://www.ready.gov/be-informed", fema: "https://www.fema.gov/emergency-managers/individuals-communities" },
 };
 
+function QuizResults({ score, answers }) {
+  const result = getResult(score, answers);
+  const regionRes = REGION_RESOURCES[answers.region] || REGION_RESOURCES.general;
+
+  const urgencyBorder = {
+    medium: "border-blue-200",
+    high: "border-amber-200",
+    critical: "border-red-200",
+  }[result.urgency];
+
+  const urgencyBg = {
+    medium: "bg-blue-50",
+    high: "bg-amber-50",
+    critical: "bg-red-50",
+  }[result.urgency];
+
+  return (
+    <div className="min-h-screen bg-cream font-sans">
+      {/* Header */}
+      <header className="bg-cream/95 border-b border-border py-4 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto flex justify-between items-center">
+          <Link to="/" className="font-serif text-xl font-bold text-foreground">RallyPack</Link>
+          <p className="text-xs font-sans text-muted-foreground uppercase tracking-widest">Readiness Results</p>
+        </div>
+      </header>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+        {/* Score Banner */}
+        <div className={`border ${urgencyBorder} ${urgencyBg} rounded p-8 mb-8`}>
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+              <span className="font-serif text-2xl font-bold text-foreground">{score}%</span>
+            </div>
+            <div>
+              <span className={`text-xs font-sans font-semibold uppercase tracking-widest px-2 py-1 rounded-full ${result.badge}`}>
+                {result.level}
+              </span>
+              <h1 className="font-serif text-2xl md:text-3xl font-semibold text-foreground mt-3 mb-3">{result.headline}</h1>
+              <p className="font-sans text-sm text-muted-foreground leading-relaxed">{result.body}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Ad between score and recommendations */}
+        <div className="mb-6 flex justify-center">
+          <AdSlot size="banner" />
+        </div>
+
+        {/* Public: What to focus on - always visible */}
+        <div className="bg-card border border-border rounded p-6 mb-6">
+          <h2 className="font-serif text-xl font-semibold text-foreground mb-4">Based on your answers, focus here first:</h2>
+          <div className="space-y-3">
+            {answers.county_plan !== "yes" && (
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                <p className="text-sm font-sans text-muted-foreground">
+                  <strong className="text-foreground">Learn your county's emergency plan.</strong> Your county has published evacuation routes, shelter locations, and emergency contacts. Most families never look at it until it's too late.{" "}
+                  <a href="https://www.ready.gov/plan" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:opacity-80 inline-flex items-center gap-0.5">
+                    Find it on ready.gov <ExternalLink className="w-3 h-3" />
+                  </a>
+                </p>
+              </div>
+            )}
+            {answers.meeting_spot !== "yes" && (
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                <p className="text-sm font-sans text-muted-foreground">
+                  <strong className="text-foreground">No meeting spot.</strong> When phones fail, a pre-agreed location is the only way families reunite. Define two: one near home, one outside your neighborhood.
+                </p>
+              </div>
+            )}
+            {(answers.supplies === "partial" || answers.supplies === "none") && (
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                <p className="text-sm font-sans text-muted-foreground">
+                  <strong className="text-foreground">Supply gaps.</strong> FEMA recommends at least 72 hours of water (1 gallon per person/day), food, medications, and cash. Most families have less than 24 hours.{" "}
+                  <a href="https://www.ready.gov/kit" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:opacity-80 inline-flex items-center gap-0.5">
+                    FEMA kit guide <ExternalLink className="w-3 h-3" />
+                  </a>
+                </p>
+              </div>
+            )}
+            {(answers.plan_documented === "in_my_head" || answers.plan_documented === "no") && (
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                <p className="text-sm font-sans text-muted-foreground">
+                  <strong className="text-foreground">Plan exists only in your head.</strong> You're the operations lead — but what if you're not there? A written, shared plan means your family can act without you.
+                </p>
+              </div>
+            )}
+            {answers.insurance === "no" && (
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                <p className="text-sm font-sans text-muted-foreground">
+                  <strong className="text-foreground">No insurance coverage.</strong> Operation HOPE's disaster recovery programs can help with financial recovery — but insurance is the fastest path.{" "}
+                  <a href="https://operationhope.org" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:opacity-80 inline-flex items-center gap-0.5">
+                    Operation HOPE <ExternalLink className="w-3 h-3" />
+                  </a>
+                </p>
+              </div>
+            )}
+            {answers.meeting_spot === "yes" && answers.supplies === "good" && answers.plan_documented === "yes" && (
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <p className="text-sm font-sans text-muted-foreground">
+                  You've covered the core basics. Keep your supplies current, review your plan annually, and make sure everyone in your household has practiced it.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Region-specific resource */}
+          {answers.region && (
+            <div className="mt-5 pt-5 border-t border-border">
+              <p className="text-xs font-sans font-semibold uppercase tracking-widest text-muted-foreground mb-2">Region-specific resource</p>
+              <a
+                href={regionRes.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-sans text-primary hover:opacity-80 transition-opacity"
+              >
+                🏛️ FEMA {regionRes.name} guide <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* LOGIN WALL — personalized recommendations & kit builder */}
+        <div className="mb-8">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-widest text-primary font-sans font-semibold mb-1">Save your results & get your kit</p>
+            <h2 className="font-serif text-2xl font-semibold text-foreground">Your personalized action plan is ready.</h2>
+          </div>
+          <LoginWall context="kit checklist & personalized recommendations" redirectTo="/Dashboard" />
+        </div>
+
+        {/* Public FEMA Resources teaser */}
+        <div className="bg-navy/5 border border-border rounded p-6 mb-8">
+          <p className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Free federal resources — no account needed</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              { label: "FEMA Disaster Assistance", url: "https://www.disasterassistance.gov", icon: "🏛️" },
+              { label: "Red Cross Shelter Finder", url: "https://www.redcross.org/get-help/disaster-relief-and-recovery-services/find-an-open-shelter.html", icon: "🔴" },
+              { label: "211 — Local Resources", url: "https://www.211.org", icon: "📞" },
+              { label: "NOAA Weather Alerts", url: "https://www.weather.gov/alerts", icon: "⛈️" },
+            ].map((r) => (
+              <a
+                key={r.label}
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm font-sans text-muted-foreground hover:text-foreground transition-colors py-1.5"
+              >
+                <span>{r.icon}</span>
+                <span>{r.label}</span>
+                <ExternalLink className="w-3 h-3 ml-auto flex-shrink-0" />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center">
+          <Link to="/" className="text-sm font-sans text-muted-foreground hover:text-foreground underline transition-colors">
+            ← Back to RallyPack
+          </Link>
+        </div>
+      </div>
+
+      <ResourcesSection regionFilter={answers.region} />
+    </div>
+  );
+}
+
 export default function ReadinessQuiz() {
-  const navigate = useNavigate();
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -158,12 +345,12 @@ export default function ReadinessQuiz() {
     const newAnswers = { ...answers, [questions[currentQ].id]: value };
     setAnswers(newAnswers);
 
-    // Skip "felt_prepared" if no disaster experience
     if (
       questions[currentQ].id === "experienced_disaster" &&
       (value === "at_risk" || value === "low_risk")
     ) {
-      setAnswers({ ...newAnswers, felt_prepared: "na" });
+      const updated = { ...newAnswers, felt_prepared: "na" };
+      setAnswers(updated);
       if (currentQ + 2 < questions.length) {
         setCurrentQ(currentQ + 2);
       } else {
@@ -181,7 +368,6 @@ export default function ReadinessQuiz() {
 
   const handleBack = () => {
     if (currentQ > 0) {
-      // If we skipped felt_prepared, go back two
       const prevQ = currentQ - 1;
       if (questions[prevQ]?.id === "felt_prepared" && answers.felt_prepared === "na") {
         setCurrentQ(prevQ - 1);
@@ -191,184 +377,77 @@ export default function ReadinessQuiz() {
     }
   };
 
-  const handleSignUp = () => {
-    base44.auth.redirectToLogin(createPageUrl("Dashboard"));
-  };
-
   if (showResults) {
     const score = calculateScore(answers);
-    const result = getResult(score, answers);
-    const colors = urgencyColors[result.urgency];
-    const regionLabels = {
-      coastal: "Coastal / Hurricane Zone",
-      wildfire: "Wildfire-Prone Region",
-      tornado: "Tornado / Severe Storm Corridor",
-      earthquake: "Earthquake Zone",
-      general: "Mixed / General Region",
-    };
-
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-2xl">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-blue-600">RallyPack</span>
-            </div>
-          </div>
-
-          {/* Score Card */}
-          <Card className={`${colors.border} ${colors.bg} mb-6`}>
-            <CardContent className="p-8">
-              <div className="flex items-start gap-4">
-                <AlertTriangle className={`w-8 h-8 mt-1 flex-shrink-0 ${colors.icon}`} />
-                <div>
-                  <span className={`text-xs font-semibold uppercase tracking-wider px-2 py-1 rounded-full ${colors.badge}`}>
-                    {result.level}
-                  </span>
-                  <h2 className="text-2xl font-bold text-gray-900 mt-3 mb-3">{result.headline}</h2>
-                  <p className="text-gray-700 leading-relaxed">{result.body}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Gap Summary */}
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Based on your answers, here's what to focus on:</h3>
-              <div className="space-y-3">
-                {answers.meeting_spot !== "yes" && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">
-                      <strong>No clear meeting spot.</strong> When phones go down, a pre-agreed location is the only way families reunite. RallyPack helps you set and share it with everyone.
-                    </p>
-                  </div>
-                )}
-                {(answers.supplies === "partial" || answers.supplies === "none") && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">
-                      <strong>Incomplete supplies.</strong> The first 72 hours after a disaster are before outside help fully ramps up. RallyPack tracks what you have, what's expiring, and what's missing.
-                    </p>
-                  </div>
-                )}
-                {(answers.plan_documented === "in_my_head" || answers.plan_documented === "no") && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">
-                      <strong>Plan only lives in your head.</strong> You're the family operations lead—but what happens when you're not there? RallyPack makes your plan accessible to everyone, even offline.
-                    </p>
-                  </div>
-                )}
-                {answers.meeting_spot === "yes" && answers.supplies === "good" && answers.plan_documented === "yes" && (
-                  <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">
-                      You've covered the basics. RallyPack helps you keep everything current, get real-time alerts, and ensure your household is aligned—especially during fast-moving situations.
-                    </p>
-                  </div>
-                )}
-              </div>
-              {answers.region && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-500">
-                    Region: <span className="font-medium text-gray-700">{regionLabels[answers.region]}</span> — RallyPack tailors alerts and recommendations to your local disaster risks.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* CTA */}
-          <div className="text-center">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Build your plan before you need it.</h3>
-            <p className="text-gray-600 mb-6">
-              RallyPack is free to join. Set up your family's plan in under 5 minutes—supplies, meeting spots, alerts, and more.
-            </p>
-            <Button
-              onClick={handleSignUp}
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-lg px-10 py-6 w-full sm:w-auto"
-            >
-              Create Your Free Account
-            </Button>
-            <p className="text-sm text-gray-500 mt-3">✓ Free  ✓ No credit card  ✓ Your data stays private</p>
-            <button
-              onClick={() => navigate(createPageUrl("Home"))}
-              className="mt-4 text-sm text-gray-400 hover:text-gray-600 underline block mx-auto"
-            >
-              Back to home
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <QuizResults score={score} answers={answers} />;
   }
 
   const q = questions[currentQ];
-  const totalVisible = questions.filter(q => !(q.id === "felt_prepared" && answers.felt_prepared === "na")).length;
-  const progress = Math.round(((currentQ) / questions.length) * 100);
+  const progress = Math.round((currentQ / questions.length) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-xl">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-              <Users className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-cream font-sans flex flex-col">
+      {/* Header */}
+      <header className="bg-cream/95 border-b border-border py-4 px-4 sm:px-6">
+        <div className="max-w-2xl mx-auto flex justify-between items-center">
+          <Link to="/" className="font-serif text-xl font-bold text-foreground">RallyPack</Link>
+          <p className="text-xs font-sans text-muted-foreground uppercase tracking-widest">Family Readiness Quiz</p>
+        </div>
+      </header>
+
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-xl">
+
+          {/* Progress */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-xs font-sans font-semibold text-muted-foreground uppercase tracking-widest">
+                Question {currentQ + 1} of {questions.length}
+              </p>
+              <p className="text-xs font-sans text-muted-foreground">{progress}% complete</p>
             </div>
-            <span className="text-xl font-bold text-blue-600">RallyPack</span>
+            <div className="w-full bg-secondary rounded-full h-1">
+              <div
+                className="bg-primary h-1 rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </div>
-          <p className="text-sm text-gray-500">Family Readiness Quiz</p>
-        </div>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-1.5 mb-8">
-          <div
-            className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        {/* Question Card */}
-        <Card className="border-gray-200 shadow-sm">
-          <CardContent className="p-8">
-            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-3">
-              Question {currentQ + 1} of {questions.length}
-            </p>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{q.question}</h2>
-            {q.subtext && <p className="text-sm text-gray-500 mb-6">{q.subtext}</p>}
+          {/* Question Card */}
+          <div className="bg-card border border-border rounded p-8 shadow-sm">
+            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground mb-2">{q.question}</h2>
+            {q.subtext && (
+              <p className="text-sm font-sans text-muted-foreground mb-7 leading-relaxed">{q.subtext}</p>
+            )}
             <div className="space-y-3">
               {q.options.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => handleAnswer(opt.value)}
-                  className="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all duration-150 text-gray-800 font-medium flex items-center justify-between group"
+                  className="w-full text-left px-5 py-4 rounded border border-border hover:border-primary hover:bg-primary/5 transition-all duration-150 text-foreground font-sans font-medium text-sm flex items-center justify-between group"
                 >
                   <span>{opt.label}</span>
-                  <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 transition-colors" />
                 </button>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Back button */}
-        {currentQ > 0 && (
-          <button
-            onClick={handleBack}
-            className="mt-4 flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mx-auto"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </button>
-        )}
+          {/* Back */}
+          {currentQ > 0 && (
+            <button
+              onClick={handleBack}
+              className="mt-5 flex items-center gap-1 text-sm font-sans text-muted-foreground hover:text-foreground mx-auto transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" /> Back
+            </button>
+          )}
+
+          <p className="text-center text-xs font-sans text-muted-foreground mt-6">
+            No account required · Free · Open source
+          </p>
+        </div>
       </div>
     </div>
   );
