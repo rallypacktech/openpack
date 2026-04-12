@@ -48,8 +48,8 @@ export default function Layout({ children, currentPageName }) {
   // Show loading while checking auth on protected pages
   if (!authChecked && !isPublicPage) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading"></div>
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" role="status" aria-label="Loading"></div>
       </div>
     );
   }
@@ -81,14 +81,14 @@ export default function Layout({ children, currentPageName }) {
           key={item.page}
           to={createPageUrl(item.page)}
           onClick={onClick}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors font-sans ${
             currentPageName === item.page
-              ? "bg-blue-50 text-blue-600 font-medium"
-              : "text-gray-600 hover:bg-gray-100"
+              ? "bg-foreground/5 text-foreground font-medium"
+              : "text-muted-foreground hover:text-foreground"
           }`}
           aria-current={currentPageName === item.page ? "page" : undefined}
         >
-          <item.icon className="w-5 h-5" aria-hidden="true" />
+          <item.icon className="w-4 h-4" aria-hidden="true" />
           <span>{item.name}</span>
         </Link>
       ))}
@@ -97,26 +97,22 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <AccessibilityProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Skip to content link for keyboard users */}
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[99999] focus:px-4 focus:py-3 focus:bg-blue-600 focus:text-white focus:rounded-md focus:font-semibold focus:shadow-lg">
+      <div className="min-h-screen bg-cream font-sans">
+        {/* Skip to content */}
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[99999] focus:px-4 focus:py-2 focus:bg-foreground focus:text-background focus:rounded focus:text-sm focus:font-semibold">
           Skip to main content
         </a>
 
-        {/* Header - only show nav for authenticated users */}
+        {/* Header */}
         {user && (
-          <header className="bg-white border-b border-gray-200 sticky top-0 z-50" role="banner">
+          <header className="bg-white border-b border-border sticky top-0 z-50" role="banner">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
+              <div className="flex justify-between items-center h-14">
                 {/* Logo */}
                 <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2" aria-label="RallyPack Home">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center" aria-hidden="true">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-xl font-bold text-blue-600">RallyPack</span>
+                  <span className="font-serif text-xl font-bold text-foreground tracking-tight">RallyPack</span>
                 </Link>
 
-                {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
                   <NavLinks />
                 </nav>
@@ -124,14 +120,14 @@ export default function Layout({ children, currentPageName }) {
                 {/* Right Section */}
                 <div className="flex items-center gap-4">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={handleLogout}
-                    className="hidden md:flex items-center gap-2"
+                    className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
                     aria-label="Log out of your account"
                   >
-                    <LogOut className="w-4 h-4" aria-hidden="true" />
-                    Log Out
+                    <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+                    Log out
                   </Button>
 
                   {/* Mobile Menu */}
@@ -166,56 +162,38 @@ export default function Layout({ children, currentPageName }) {
         {/* Main Content */}
         <main id="main-content" role="main">{children}</main>
 
-        {/* Footer - only show for authenticated users */}
+        {/* Footer */}
         {user && (
-          <footer className="bg-white border-t border-gray-200 mt-auto" role="contentinfo">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <footer className="bg-white border-t border-border mt-auto" role="contentinfo">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center" aria-hidden="true">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-lg font-bold text-blue-600">RallyPack</span>
-                  </div>
-                  <p className="text-gray-600 text-sm">
-                    Your comprehensive emergency preparedness platform. Stay ready, stay connected.
+                  <span className="font-serif text-lg font-bold text-foreground block mb-2">RallyPack</span>
+                  <p className="text-muted-foreground text-sm font-sans">
+                    Free, open-source emergency preparedness.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
+                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Legal</h3>
                   <nav className="space-y-2" aria-label="Legal navigation">
-                    <Link to={createPageUrl("PrivacyPolicy")} className="block text-sm text-gray-600 hover:text-blue-600">
-                      Privacy Policy
-                    </Link>
-                    <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-gray-600 hover:text-blue-600">
-                      Terms & Conditions
-                    </Link>
-                    <Link to={createPageUrl("EULA")} className="block text-sm text-gray-600 hover:text-blue-600">
-                      End User License Agreement
-                    </Link>
-                    <Link to={createPageUrl("ConfidentialityAgreement")} className="block text-sm text-gray-600 hover:text-blue-600">
-                      Confidentiality Agreement
-                    </Link>
+                    <Link to={createPageUrl("PrivacyPolicy")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Privacy Policy</Link>
+                    <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Terms & Conditions</Link>
+                    <Link to={createPageUrl("EULA")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">End User License Agreement</Link>
+                    <Link to={createPageUrl("ConfidentialityAgreement")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Confidentiality Agreement</Link>
                   </nav>
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 mt-8 pt-6 text-center">
-                <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg mb-4">
-                  <AlertTriangle className="w-4 h-4" aria-hidden="true" />
-                  <span className="font-semibold">BETA TEST IN PROGRESS</span>
+              <div className="border-t border-border mt-8 pt-6 text-center">
+                <div className="inline-flex items-center gap-2 bg-secondary text-foreground px-3 py-1.5 rounded text-xs font-sans font-medium mb-4">
+                  <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
+                  BETA — Features may change
                 </div>
-                <p className="text-sm text-gray-600 max-w-2xl mx-auto mb-2">
-                  <strong>What is a Beta?</strong> This app is in testing. Features may change, and some functionality is still under development. 
-                  Your feedback helps us improve!
+                <p className="text-xs text-muted-foreground font-sans mb-1">
+                  Feedback: <a href="mailto:beta@rallypack.org" className="text-foreground hover:underline">beta@rallypack.org</a>
                 </p>
-                <p className="text-sm text-gray-600 mb-4">
-                  <strong>Send Feedback:</strong> <a href="mailto:beta@rallypack.org" className="text-blue-600 hover:underline">beta@rallypack.org</a>
-                </p>
-                <p className="text-sm text-gray-500">© 2026 RallyPack. All rights reserved. | Ages 13+</p>
-                <p className="text-sm text-gray-500 mt-1">GDPR & CCPA Compliant | SOC 2 Type I | AES-256 Encrypted</p>
+                <p className="text-xs text-muted-foreground font-sans">© 2026 RallyPack · MIT License · GDPR & CCPA Compliant</p>
               </div>
             </div>
           </footer>

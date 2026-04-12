@@ -305,8 +305,8 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading dashboard"></div>
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" role="status" aria-label="Loading dashboard"></div>
       </div>
     );
   }
@@ -440,18 +440,9 @@ export default function Dashboard() {
     );
   }
 
-  // Onboarding Flow - Guide new users through setup
+  // Onboarding Flow
   const needsTermsAgreement = dataLoaded && (!userProfile || !userProfile.terms_agreed_version);
-  const needsAddress = !needsTermsAgreement && (!userProfile || !userProfile.street_address);
-  const needsFamilySetup = !needsAddress && dataLoaded && !familyStepCompleted && familyMembers.length === 0 && pets.length === 0;
-  const needsMeetSpots = !needsAddress && !needsFamilySetup && dataLoaded && meetSpots.length === 0;
-  
-  // Check if user has any caches they actually own (not samples)
-  const userOwnedCaches = caches.filter(cache => !cache.is_sample);
-  const needsCaches = !needsAddress && !needsFamilySetup && !needsMeetSpots && userOwnedCaches.length === 0;
-  const isOnboarding = needsTermsAgreement || needsAddress || needsFamilySetup || needsMeetSpots || needsCaches;
 
-  // Terms Agreement - must come before all other onboarding
   if (needsTermsAgreement) {
     return (
       <TermsAgreement
@@ -482,68 +473,31 @@ export default function Dashboard() {
     const progressPercent = (currentStep / 4) * 100;
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
-        <div className="bg-white border-b">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <h1 className="text-2xl font-bold text-gray-900">Welcome to RallyPack</h1>
-            <p className="text-gray-500 mt-1">Get prepared in 4 simple steps</p>
+      <div className="min-h-screen bg-cream font-sans">
+        <div className="bg-white border-b border-border">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5">
+            <span className="font-serif text-xl font-bold text-foreground">RallyPack</span>
+            <p className="text-muted-foreground text-sm font-sans mt-0.5">Get prepared in 4 steps</p>
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-5">
           {/* Progress Bar */}
-          <section className="bg-white rounded-lg shadow-sm p-6 mb-6" aria-labelledby="onboarding-progress">
-            <h2 id="onboarding-progress" className="sr-only">Onboarding Progress</h2>
-            <div className="flex items-center justify-between mb-4" role="list">
-              <div className={`flex items-center ${needsAddress ? 'text-blue-600' : 'text-green-600'}`} role="listitem">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsAddress ? 'bg-blue-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
-                  {needsAddress ? '1' : '✓'}
-                </div>
-                <span className="font-medium text-sm">Address</span>
-              </div>
-              <div className={`flex items-center ${needsFamilySetup ? 'text-blue-600' : needsAddress ? 'text-gray-400' : 'text-green-600'}`} role="listitem">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsFamilySetup ? 'bg-blue-100' : needsAddress ? 'bg-gray-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
-                  {needsAddress ? '2' : needsFamilySetup ? '2' : '✓'}
-                </div>
-                <span className="font-medium text-sm">Family</span>
-              </div>
-              <div className={`flex items-center ${needsMeetSpots ? 'text-blue-600' : (needsAddress || needsFamilySetup) ? 'text-gray-400' : 'text-green-600'}`} role="listitem">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsMeetSpots ? 'bg-blue-100' : (needsAddress || needsFamilySetup) ? 'bg-gray-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
-                  {(needsAddress || needsFamilySetup) ? '3' : needsMeetSpots ? '3' : '✓'}
-                </div>
-                <span className="font-medium text-sm">Meet Spots</span>
-              </div>
-              <div className={`flex items-center ${needsCaches ? 'text-blue-600' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'text-gray-400' : 'text-green-600'}`} role="listitem">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${needsCaches ? 'bg-blue-100' : (needsAddress || needsFamilySetup || needsMeetSpots) ? 'bg-gray-100' : 'bg-green-100'} mr-2`} aria-hidden="true">
-                  {(needsAddress || needsFamilySetup || needsMeetSpots) ? '4' : needsCaches ? '4' : '✓'}
-                </div>
-                <span className="font-medium text-sm">Caches</span>
-              </div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuenow={progressPercent} aria-valuemin="0" aria-valuemax="100" aria-label={`Onboarding ${progressPercent}% complete`}>
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <p className="sr-only">You are on step {currentStep} of 4</p>
-          </section>
-
-          {/* Step 1: Add Address */}
+          <section className="bg-white border border-border rounded p-5" aria-labelledby="onboarding-progress">
           {needsAddress && (
-            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-blue-500">
+            <article className="bg-white border border-border rounded p-7">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <span className="text-3xl">📍</span>
+                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3" aria-hidden="true">
+                  <span className="text-2xl">📍</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 1: Add Your Home Address</h2>
-                <p className="text-gray-600 mb-6">
+                <h2 className="font-serif text-2xl font-semibold text-foreground mb-2">Step 1: Add Your Home Address</h2>
+                <p className="text-muted-foreground font-sans text-sm max-w-md mx-auto">
                   Your address enables localized weather alerts, tailored disaster recommendations, and nearby emergency resources.
                 </p>
               </div>
-              <div className="space-y-6">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
+              <div className="space-y-5">
+                <div className="bg-secondary/50 p-4 rounded">
+                  <h3 className="font-sans font-semibold text-foreground text-sm mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>• Receive critical local weather and disaster alerts</li>
                     <li>• Get personalized recommendations for your region</li>
@@ -571,33 +525,29 @@ export default function Dashboard() {
 
                 <Button
                   onClick={handleSaveAddress}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 text-lg font-bold"
+                  className="w-full bg-foreground text-background hover:bg-foreground/90 font-sans font-semibold py-3"
                   disabled={!locationForm.display_name || !locationForm.street_address || !locationForm.city || !locationForm.state_province}
                 >
                   Save Address & Continue
                 </Button>
-                <p className="text-sm text-gray-500 text-center">
-                  💡 Update your address anytime in <strong>Settings</strong>
-                </p>
+                <p className="text-xs text-muted-foreground text-center font-sans">Update anytime in Settings</p>
               </div>
             </article>
           )}
 
-          {/* Step 2: Add Family Members */}
+          {/* Step 2 */}
           {needsFamilySetup && !needsAddress && (
-            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-purple-500">
+            <article className="bg-white border border-border rounded p-7">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <span className="text-3xl">👨‍👩‍👧‍👦</span>
+                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3" aria-hidden="true">
+                  <span className="text-2xl">👨‍👩‍👧‍👦</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 2: Add Your Family Members</h2>
-                <p className="text-gray-600">
-                  Build your household roster so everyone stays connected during emergencies and gets the right supplies.
-                </p>
+                <h2 className="font-serif text-2xl font-semibold text-foreground mb-2">Step 2: Add Your Family</h2>
+                <p className="text-muted-foreground font-sans text-sm max-w-md mx-auto">Build your household roster so everyone gets the right supplies and stays connected.</p>
               </div>
-              <div className="space-y-6">
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why this matters:</h3>
+              <div className="space-y-5">
+                <div className="bg-secondary/50 p-4 rounded">
+                  <h3 className="font-sans font-semibold text-foreground text-sm mb-2">Why this matters:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>• <strong>Share emergency plans:</strong> Family members with emails can access your caches and meet spots</li>
                     <li>• <strong>Get personalized recommendations:</strong> Supplies tailored to your household's needs</li>
@@ -686,28 +636,24 @@ export default function Dashboard() {
                   }}
                 />
 
-                <p className="text-sm text-gray-500 text-center">
-                  💡 Update family members anytime in <strong>Settings</strong>
-                </p>
+                <p className="text-xs text-muted-foreground text-center font-sans">Update family anytime in Settings</p>
               </div>
             </article>
           )}
 
-          {/* Step 3: Add Meet Spots */}
+          {/* Step 3 */}
           {needsMeetSpots && !needsAddress && !needsFamilySetup && (
-            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-green-500">
+            <article className="bg-white border border-border rounded p-7">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <span className="text-3xl">📍</span>
+                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3" aria-hidden="true">
+                  <span className="text-2xl">📍</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3: Define Your Meeting Spots</h2>
-                <p className="text-gray-600">
-                  When cell service fails during a terrorist incident, power outage, or natural disaster—where will your family meet?
-                </p>
+                <h2 className="font-serif text-2xl font-semibold text-foreground mb-2">Step 3: Define Meeting Spots</h2>
+                <p className="text-muted-foreground font-sans text-sm max-w-md mx-auto">When cell service fails, where will your family meet?</p>
               </div>
               <div className="space-y-4">
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
+                <div className="bg-secondary/50 p-4 rounded">
+                  <h3 className="font-sans font-semibold text-foreground text-sm mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>• <strong>Cell service goes down</strong> in emergencies—you can't rely on phones</li>
                     <li>• Family members may be separated at work, school, or on the road</li>
@@ -715,40 +661,35 @@ export default function Dashboard() {
                     <li>• FEMA recommends multiple meetup locations for different scenarios</li>
                   </ul>
                 </div>
-                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4">
-                  <p className="text-sm text-gray-800">
-                    <strong>Real scenario:</strong> During Hurricane Harvey, families couldn't contact each other for days. 
-                    Those with pre-planned meeting spots reunited faster.
+                <div className="bg-primary/5 border-l-2 border-primary p-4 rounded-r">
+                  <p className="text-sm font-sans text-foreground">
+                    <strong>Real scenario:</strong> During Hurricane Harvey, families couldn't contact each other for days. Those with pre-planned meeting spots reunited faster.
                   </p>
                 </div>
                 <button
                   onClick={() => navigate(createPageUrl("Resources") + "?tab=meetspots")}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                  className="w-full bg-foreground text-background hover:bg-foreground/90 py-3 rounded font-sans font-semibold transition-colors"
                 >
                   Set Up Meeting Spots Now
                 </button>
-                <p className="text-sm text-gray-500 text-center">
-                  💡 Manage meet spots anytime in <strong>Resources → Meet Spots</strong>
-                </p>
+                <p className="text-xs text-muted-foreground text-center font-sans">Manage in Resources → Meet Spots</p>
               </div>
             </article>
           )}
 
-          {/* Step 4: Build Caches */}
+          {/* Step 4 */}
           {needsCaches && !needsAddress && !needsFamilySetup && !needsMeetSpots && (
-            <article className="bg-white rounded-lg shadow-lg p-8 border-4 border-orange-500">
+            <article className="bg-white border border-border rounded p-7">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <span className="text-3xl">📦</span>
+                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3" aria-hidden="true">
+                  <span className="text-2xl">📦</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 4: Build Your Emergency Caches</h2>
-                <p className="text-gray-600">
-                  Don't arrive at a shelter only to be turned away. Be prepared with the supplies that matter.
-                </p>
+                <h2 className="font-serif text-2xl font-semibold text-foreground mb-2">Step 4: Build Emergency Caches</h2>
+                <p className="text-muted-foreground font-sans text-sm max-w-md mx-auto">Be prepared with the supplies that matter before you need them.</p>
               </div>
               <div className="space-y-4">
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Why it's essential:</h3>
+                <div className="bg-secondary/50 p-4 rounded">
+                  <h3 className="font-sans font-semibold text-foreground text-sm mb-2">Why it's essential:</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>• <strong>Many shelters require</strong> proof of medication and pet supplies</li>
                     <li>• Families without proper documentation get redirected or denied</li>
@@ -756,21 +697,18 @@ export default function Dashboard() {
                     <li>• Track expiration dates so supplies are always ready</li>
                   </ul>
                 </div>
-                <div className="bg-red-50 border-l-4 border-red-500 p-4">
-                  <p className="text-sm text-gray-800">
-                    <strong>Common mistakes:</strong> Arriving without pet supplies, forgetting prescriptions, 
-                    or not having identification documents. These cause families to be turned away during critical moments.
+                <div className="bg-primary/5 border-l-2 border-primary p-4 rounded-r">
+                  <p className="text-sm font-sans text-foreground">
+                    <strong>Common mistake:</strong> Arriving at shelters without pet supplies, prescriptions, or ID. These cause families to be turned away at critical moments.
                   </p>
                 </div>
                 <button
                   onClick={() => navigate(createPageUrl("Resources"))}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-lg text-lg font-bold shadow-lg transition-colors"
+                  className="w-full bg-foreground text-background hover:bg-foreground/90 py-3 rounded font-sans font-semibold transition-colors"
                 >
                   Create Your First Cache
                 </button>
-                <p className="text-sm text-gray-500 text-center">
-                  💡 Manage caches anytime in <strong>Resources → Caches</strong>
-                </p>
+                <p className="text-xs text-muted-foreground text-center font-sans">Manage in Resources → Caches</p>
               </div>
             </article>
           )}
@@ -781,16 +719,16 @@ export default function Dashboard() {
 
   // Normal Dashboard View
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream font-sans">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">Your Emergency Dashboard</h1>
-          <p className="text-gray-500 mt-1">Stay prepared and informed with your personalized emergency management hub</p>
+      <div className="bg-white border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
+          <p className="text-xs uppercase tracking-widest font-sans text-muted-foreground mb-0.5">Command Center</p>
+          <h1 className="font-serif text-2xl font-semibold text-foreground">Emergency Dashboard</h1>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">

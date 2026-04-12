@@ -141,25 +141,26 @@ export default function Resources() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream font-sans">
       {/* Header */}
-      <div className="bg-blue-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-2xl font-bold">Your Caches</h1>
-          <p className="text-blue-100 mt-1">
-            Manage your emergency caches, meet spots, and first aid supplies to keep your family prepared and safe.
+      <div className="bg-navy text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+          <p className="text-xs uppercase tracking-widest font-sans text-white/50 mb-1">Emergency Planning</p>
+          <h1 className="font-serif text-3xl font-semibold">Your Preparedness Hub</h1>
+          <p className="text-white/70 font-sans text-sm mt-1">
+            Caches, meeting spots, and first aid supplies — all in one place.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="caches">Caches</TabsTrigger>
