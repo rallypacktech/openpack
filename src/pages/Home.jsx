@@ -32,10 +32,10 @@ export default function Home() {
     <div className="min-h-screen bg-cream font-sans">
 
       {/* ── Top bar ── */}
-      <div className="bg-primary text-primary-foreground text-center py-2 px-4 text-xs font-sans tracking-wide">
-        Open source & free — no credit card, no paywall on tools.{" "}
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:opacity-80 transition-opacity inline-flex items-center gap-1">
-          View on GitHub <Github className="w-3 h-3" />
+      <div className="bg-secondary border-b border-border text-center py-2 px-4 text-xs font-sans tracking-wide text-muted-foreground">
+        Free, open source, and community maintained.{" "}
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground transition-colors inline-flex items-center gap-1">
+          Join us on GitHub <Github className="w-3 h-3" />
         </a>
       </div>
 
@@ -66,15 +66,15 @@ export default function Home() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80')" }}
         />
-        <div className="absolute inset-0 bg-navy/70" />
+        <div className="absolute inset-0 bg-navy/65" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-28 md:py-40 text-white">
-          <p className="text-xs uppercase tracking-widest font-sans text-primary/90 mb-4 font-semibold">Emergency Preparedness · Open Source</p>
+          <p className="text-xs uppercase tracking-widest font-sans text-white/60 mb-4">A community tool · Free forever · Open source</p>
           <h1 className="font-serif text-5xl md:text-7xl font-bold leading-tight mb-6 max-w-3xl">
-            The first 72 hours<br />
-            <em className="not-italic text-primary/90">are yours alone.</em>
+            Your neighbors<br />
+            <em className="not-italic text-primary/90">are counting on you.</em>
           </h1>
           <p className="font-sans text-lg md:text-xl text-white/80 max-w-xl mb-10 leading-relaxed">
-            Before federal aid arrives, before the Red Cross sets up, before your county opens a shelter — your family is on its own. RallyPack helps you be ready for that window.
+            RallyPack is a free, community-built tool that helps everyday families get prepared — not just for themselves, but so they can show up for their neighbors when it matters most.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to={createPageUrl("ReadinessQuiz")}>
@@ -91,7 +91,7 @@ export default function Home() {
             </button>
           </div>
           <p className="mt-5 text-xs font-sans text-white/50">
-            ✓ No account needed to take the quiz &nbsp;·&nbsp; ✓ Free forever &nbsp;·&nbsp; ✓ Open source on GitHub
+            ✓ No account needed to take the quiz &nbsp;·&nbsp; ✓ Free forever &nbsp;·&nbsp; ✓ Built by volunteers
           </p>
         </div>
       </section>
@@ -102,14 +102,14 @@ export default function Home() {
       </div>
 
       {/* ── Stats Strip ── */}
-      <section className="bg-navy text-white py-14">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:divide-x divide-white/10">
+      <section className="bg-secondary border-y border-border py-14">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:divide-x divide-border">
           {STATS.map((s) => (
             <div key={s.label} className="text-center md:px-8">
               <div className="font-serif text-5xl font-bold text-primary mb-1">
                 {s.number}<span className="text-2xl">{s.unit}</span>
               </div>
-              <p className="text-sm font-sans text-white/65 leading-snug">{s.label}</p>
+              <p className="text-sm font-sans text-muted-foreground leading-snug">{s.label}</p>
             </div>
           ))}
         </div>
@@ -118,9 +118,9 @@ export default function Home() {
       {/* ── Editorial Pull Quote ── */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 py-20 text-center">
         <blockquote className="font-serif text-3xl md:text-4xl text-foreground font-semibold leading-tight italic mb-6">
-          "A simple plan executed calmly beats a perfect plan that exists only in your head."
+          "The most resilient communities aren't the ones with the most resources — they're the ones where neighbors look out for each other."
         </blockquote>
-        <p className="text-sm font-sans text-muted-foreground">— Modeled on FEMA's Community Preparedness Doctrine and Red Cross Ready guidelines</p>
+        <p className="text-sm font-sans text-muted-foreground">— Community preparedness principle from FEMA's Whole Community approach</p>
       </section>
 
       {/* ── Scenarios ── */}
@@ -156,7 +156,7 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-12">
           <div className="flex-1">
             <p className="text-xs uppercase tracking-widest text-primary font-semibold font-sans mb-2">What RallyPack does</p>
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground font-semibold mb-8">Built for the person<br />everyone turns to.</h2>
+            <h2 className="font-serif text-3xl md:text-4xl text-foreground font-semibold mb-8">Simple tools for<br />everyday families.</h2>
             <div className="space-y-6">
               {[
                 { icon: Package, title: "Emergency Kit Tracker", desc: "Build and manage go-bags, car kits, and home supplies. Track expiration dates with smart reminders." },
@@ -221,13 +221,13 @@ export default function Home() {
 
       {/* ── CTA ── */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24 text-center">
-        <p className="text-xs uppercase tracking-widest text-primary font-sans font-semibold mb-4">The next emergency won't wait</p>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground font-sans mb-4">Start here, no account required</p>
         <h2 className="font-serif text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-          What would your family do<br />
-          <em className="text-primary">today?</em>
+          Where would you meet<br />
+          <em className="text-primary">if phones went down?</em>
         </h2>
         <p className="text-lg font-sans text-muted-foreground max-w-xl mx-auto mb-10">
-          Take the free readiness quiz in under 3 minutes. No account needed. Get personalized gaps and a starting kit list — save your plan by creating a free account.
+          Take the free readiness quiz in 3 minutes. No account needed. You'll get a plain-English look at where your household stands — and what to do first.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link to={createPageUrl("ReadinessQuiz")}>
