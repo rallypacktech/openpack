@@ -1,212 +1,224 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
-import { Shield, Package, AlertTriangle, Heart, MapPin, CheckCircle, ClipboardList, ArrowRight, Github, ExternalLink, Wind, Flame, Droplets, Zap } from "lucide-react";
+import { Package, MapPin, Heart, Shield, CheckCircle, ClipboardList, ArrowRight, Github, Wind, Flame, Droplets, Zap, AlertTriangle } from "lucide-react";
 import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
 
-const STATS = [
-  { number: "72", unit: "hours", label: "Before federal aid typically reaches communities after a major disaster" },
-  { number: "60%", unit: "", label: "of Americans lack emergency supplies for even 3 days" },
-  { number: "$1B+", unit: "", label: "in unclaimed FEMA disaster assistance goes unused each year" },
+const FEATURES = [
+  { icon: Package, title: "Kit Tracker", desc: "Go-bags, car kits, home caches. Track what you have and when it expires." },
+  { icon: MapPin, title: "Meeting Points", desc: "Pre-plan where your family rallies when phones go down." },
+  { icon: Heart, title: "Pet & Medical", desc: "Microchip numbers, medications, allergies — one place, always accessible." },
+  { icon: Shield, title: "Works Offline", desc: "Your plan survives when the grid doesn't." },
+  { icon: CheckCircle, title: "FEMA-Aligned", desc: "Checklists built around 72-hour preparedness guidelines, adapted for your region." },
 ];
 
 const SCENARIOS = [
-  { icon: Wind, label: "Hurricane", color: "text-blue-600", bg: "bg-blue-50" },
-  { icon: Flame, label: "Wildfire", color: "text-orange-600", bg: "bg-orange-50" },
-  { icon: Droplets, label: "Flood", color: "text-cyan-600", bg: "bg-cyan-50" },
-  { icon: Zap, label: "Power Outage", color: "text-yellow-600", bg: "bg-yellow-50" },
-  { icon: AlertTriangle, label: "Earthquake", color: "text-red-600", bg: "bg-red-50" },
-  { icon: Shield, label: "Civil Emergency", color: "text-purple-600", bg: "bg-purple-50" },
+  { icon: Wind, label: "Hurricane" },
+  { icon: Flame, label: "Wildfire" },
+  { icon: Droplets, label: "Flood" },
+  { icon: Zap, label: "Power Outage" },
+  { icon: AlertTriangle, label: "Earthquake" },
+  { icon: Shield, label: "Civil Emergency" },
 ];
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-
   const handleSignUp = () => {
     base44.auth.redirectToLogin("/Dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-cream font-sans">
+    <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
-      {/* ── Top bar ── */}
-      <div className="bg-secondary border-b border-border text-center py-2 px-4 text-xs font-sans tracking-wide text-muted-foreground">
-        Free, open source, and community maintained.{" "}
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground transition-colors inline-flex items-center gap-1">
-          Join us on GitHub <Github className="w-3 h-3" />
-        </a>
-      </div>
-
-      {/* ── Header ── */}
-      <header className="bg-cream/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <div>
-            <span className="font-serif text-2xl font-bold text-foreground tracking-tight">RallyPack</span>
-            <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground font-sans border border-border rounded px-1.5 py-0.5">Open Source</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-sans text-muted-foreground">
-            <Link to={createPageUrl("ReadinessQuiz")} className="hover:text-foreground transition-colors">Readiness Quiz</Link>
-            <Link to={createPageUrl("Resources")} className="hover:text-foreground transition-colors">Resources</Link>
-            <Link to={createPageUrl("LearnMore")} className="hover:text-foreground transition-colors">Learn More</Link>
+      {/* ── Nav ── */}
+      <header className="fixed top-0 left-0 right-0 z-50 mix-blend-normal">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+          <span className="font-serif text-xl font-bold text-white drop-shadow-md tracking-tight">RallyPack</span>
+          <nav className="hidden md:flex items-center gap-8 text-sm font-sans text-white/85 drop-shadow">
+            <Link to={createPageUrl("ReadinessQuiz")} className="hover:text-white transition-colors tracking-wide">Quiz</Link>
+            <Link to={createPageUrl("Resources")} className="hover:text-white transition-colors tracking-wide">Resources</Link>
+            <Link to={createPageUrl("LearnMore")} className="hover:text-white transition-colors tracking-wide">About</Link>
           </nav>
-          <div className="flex items-center gap-3">
-            <button onClick={handleSignUp} className="text-sm font-sans text-muted-foreground hover:text-foreground transition-colors hidden sm:block">Sign in</button>
-            <button onClick={handleSignUp} className="bg-primary text-primary-foreground text-sm font-sans px-5 py-2 rounded hover:bg-primary/90 transition-colors">
+          <div className="flex items-center gap-4">
+            <button onClick={handleSignUp} className="text-sm text-white/80 hover:text-white transition-colors hidden sm:block tracking-wide drop-shadow">Sign in</button>
+            <button
+              onClick={handleSignUp}
+              className="bg-white text-[#1C1C1A] text-sm font-semibold px-5 py-2.5 rounded-none hover:bg-[#F5F0E8] transition-colors tracking-wide"
+            >
               Get started
             </button>
           </div>
         </div>
       </header>
 
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden">
+      {/* ── Hero — full bleed ── */}
+      <section className="relative h-screen min-h-[640px] flex items-end">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80')" }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=1800&q=85')" }}
         />
-        <div className="absolute inset-0 bg-navy/65" />
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-28 md:py-40 text-white">
-          <p className="text-xs uppercase tracking-widest font-sans text-white/60 mb-4">A community tool · Free forever · Open source</p>
-          <h1 className="font-serif text-5xl md:text-7xl font-bold leading-tight mb-6 max-w-3xl">
-            Your neighbors<br />
-            <em className="not-italic text-primary/90">are counting on you.</em>
+        {/* gradient: dark at bottom, semi-dark at top for nav legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/75" />
+
+        <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
+          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Emergency Preparedness · Free · Open Source</p>
+          <h1 className="font-serif text-6xl md:text-8xl lg:text-[96px] font-bold leading-none text-white mb-6 max-w-4xl">
+            Ready<br />before it<br />matters.
           </h1>
-          <p className="font-sans text-lg md:text-xl text-white/80 max-w-xl mb-10 leading-relaxed">
-            RallyPack is a free, community-built tool that helps everyday families get prepared — not just for themselves, but so they can show up for their neighbors when it matters most.
+          <p className="font-sans text-base md:text-lg text-white/75 max-w-md mb-10 leading-relaxed">
+            The 72 hours after a major disaster, you're on your own. RallyPack helps everyday families prepare — so when it counts, you're not scrambling.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to={createPageUrl("ReadinessQuiz")}>
-              <button className="inline-flex items-center gap-2 bg-primary text-white font-sans font-medium px-8 py-4 rounded hover:bg-primary/90 transition-colors text-base">
+              <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-[#be3f25] transition-colors text-sm tracking-widest uppercase">
                 <ClipboardList className="w-4 h-4" />
-                Take the free readiness quiz
+                Free readiness quiz
               </button>
             </Link>
             <button
               onClick={handleSignUp}
-              className="inline-flex items-center gap-2 border border-white/40 text-white font-sans font-medium px-8 py-4 rounded hover:bg-white/10 transition-colors text-base"
+              className="inline-flex items-center gap-3 border border-white/50 text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-white/10 transition-colors text-sm tracking-widest uppercase"
             >
-              Build your family plan <ArrowRight className="w-4 h-4" />
+              Build your plan <ArrowRight className="w-4 h-4" />
             </button>
           </div>
-          <p className="mt-5 text-xs font-sans text-white/50">
-            ✓ No account needed to take the quiz &nbsp;·&nbsp; ✓ Free forever &nbsp;·&nbsp; ✓ Built by volunteers
+          <p className="mt-6 text-xs font-sans text-white/40 tracking-wide">
+            No account required for the quiz &nbsp;·&nbsp; Always free
           </p>
         </div>
       </section>
 
-      {/* ── Leaderboard Ad ── */}
-      <div className="bg-secondary/40 border-y border-border py-4 flex justify-center">
+      {/* ── Ad strip ── */}
+      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-4 flex justify-center">
         <AdSlot size="leaderboard" label={true} />
       </div>
 
-      {/* ── Stats Strip ── */}
-      <section className="bg-secondary border-y border-border py-14">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:divide-x divide-border">
-          {STATS.map((s) => (
-            <div key={s.label} className="text-center md:px-8">
-              <div className="font-serif text-5xl font-bold text-primary mb-1">
-                {s.number}<span className="text-2xl">{s.unit}</span>
+      {/* ── Stats — raw numbers, no fluff ── */}
+      <section className="bg-[#1C1C1A] text-white py-20">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10">
+          {[
+            { n: "72", unit: "hrs", label: "Before federal aid typically reaches a community after disaster" },
+            { n: "60%", unit: "", label: "Of Americans don't have emergency supplies for even 3 days" },
+            { n: "$1B+", unit: "", label: "In FEMA disaster assistance goes unclaimed every year" },
+          ].map((s) => (
+            <div key={s.label} className="py-10 md:py-0 md:px-14 first:pl-0 last:pr-0">
+              <div className="font-serif text-6xl md:text-7xl font-bold text-[#D64A2E] leading-none mb-3">
+                {s.n}<span className="text-3xl">{s.unit}</span>
               </div>
-              <p className="text-sm font-sans text-muted-foreground leading-snug">{s.label}</p>
+              <p className="text-sm font-sans text-white/50 leading-snug max-w-[220px]">{s.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Editorial Pull Quote ── */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 py-20 text-center">
-        <blockquote className="font-serif text-3xl md:text-4xl text-foreground font-semibold leading-tight italic mb-6">
-          "The most resilient communities aren't the ones with the most resources — they're the ones where neighbors look out for each other."
-        </blockquote>
-        <p className="text-sm font-sans text-muted-foreground">— Community preparedness principle from FEMA's Whole Community approach</p>
-      </section>
-
-      {/* ── Scenarios ── */}
-      <section className="bg-secondary/50 border-y border-border py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="mb-8">
-            <p className="text-xs uppercase tracking-widest text-primary font-semibold font-sans mb-2">Think through worst-case</p>
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground font-semibold">
-              Which of these keeps you up at night?
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {SCENARIOS.map(({ icon: Icon, label, color, bg }) => (
-              <Link key={label} to={createPageUrl("ReadinessQuiz")} className={`${bg} border border-border rounded p-5 flex items-center gap-3 hover:shadow-sm hover:border-primary/30 transition-all group`}>
-                <Icon className={`w-5 h-5 ${color} flex-shrink-0`} />
-                <span className="font-sans font-medium text-sm text-foreground group-hover:text-primary transition-colors">{label}</span>
-                <ArrowRight className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors ml-auto" />
-              </Link>
-            ))}
-          </div>
-          <div className="mt-6 text-center">
-            <Link to={createPageUrl("ReadinessQuiz")}>
-              <button className="inline-flex items-center gap-2 border border-primary text-primary font-sans text-sm font-medium px-7 py-3 rounded hover:bg-primary hover:text-white transition-colors">
-                Take the readiness quiz to find your gaps <ArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
-          </div>
+      {/* ── Full-bleed editorial image with overlaid quote ── */}
+      <section className="relative h-[70vh] min-h-[420px] flex items-center justify-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1519750157634-b6d493a0f77c?w=1600&q=80')" }}
+        />
+        <div className="absolute inset-0 bg-[#1C1C1A]/60" />
+        <div className="relative max-w-3xl mx-auto px-6 text-center">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-6 font-sans">FEMA Whole Community Approach</p>
+          <blockquote className="font-serif text-3xl md:text-5xl text-white font-bold leading-tight">
+            "The most resilient communities aren't the ones with the most resources — they're the ones where neighbors look out for each other."
+          </blockquote>
         </div>
       </section>
 
-      {/* ── Features + Side Ad ── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-        <div className="flex flex-col lg:flex-row gap-12">
-          <div className="flex-1">
-            <p className="text-xs uppercase tracking-widest text-primary font-semibold font-sans mb-2">What RallyPack does</p>
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground font-semibold mb-8">Simple tools for<br />everyday families.</h2>
-            <div className="space-y-6">
-              {[
-                { icon: Package, title: "Emergency Kit Tracker", desc: "Build and manage go-bags, car kits, and home supplies. Track expiration dates with smart reminders." },
-                { icon: MapPin, title: "Meet-Up Planning", desc: "Define meeting spots for your household. Document them so anyone can follow the plan — even without you." },
-                { icon: Heart, title: "Pet & Medical Records", desc: "Store microchip numbers, vet contacts, medication needs, and allergy info in one accessible place." },
-                { icon: Shield, title: "Offline Access", desc: "Your plan, supplies, and emergency contacts work without internet. Critical when power and cell service go down." },
-                { icon: CheckCircle, title: "FEMA-Aligned Checklists", desc: "Checklists built around FEMA's 72-hour preparedness guidelines, adapted for your region's specific risks." },
-              ].map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
+      {/* ── Disaster scenarios — clean grid, no color noise ── */}
+      <section className="py-20 max-w-6xl mx-auto px-6">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">What are you preparing for?</p>
+        <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-12 leading-tight">
+          Pick your scenario.
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-[#D8D2C6]">
+          {SCENARIOS.map(({ icon: Icon, label }) => (
+            <Link
+              key={label}
+              to={createPageUrl("ReadinessQuiz")}
+              className="bg-[#F5F0E8] hover:bg-[#1C1C1A] group p-8 flex flex-col gap-4 transition-colors duration-200"
+            >
+              <Icon className="w-6 h-6 text-[#D64A2E] group-hover:text-[#D64A2E]" />
+              <span className="font-sans font-semibold text-sm tracking-widest uppercase text-[#1C1C1A] group-hover:text-white transition-colors">
+                {label}
+              </span>
+              <ArrowRight className="w-4 h-4 text-[#D8D2C6] group-hover:text-white/50 transition-colors mt-auto" />
+            </Link>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link to={createPageUrl("ReadinessQuiz")}>
+            <button className="inline-flex items-center gap-2 border border-[#1C1C1A] text-[#1C1C1A] font-sans text-xs font-semibold tracking-widest uppercase px-8 py-3.5 hover:bg-[#1C1C1A] hover:text-white transition-colors">
+              Take the readiness quiz <ArrowRight className="w-4 h-4" />
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Features — two-column, editorial layout ── */}
+      <section className="bg-[#1C1C1A] text-white py-24">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-4">What RallyPack gives you</p>
+              <h2 className="font-serif text-5xl md:text-6xl font-bold leading-none mb-8">
+                Built for<br />the person<br />everyone<br />turns to.
+              </h2>
+              <Link to={createPageUrl("ReadinessQuiz")}>
+                <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-7 py-3.5 rounded-none hover:bg-[#be3f25] transition-colors text-xs tracking-widest uppercase">
+                  Start the quiz <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
+            </div>
+            <div className="space-y-0 divide-y divide-white/10">
+              {FEATURES.map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="py-6 flex items-start gap-5">
+                  <Icon className="w-5 h-5 text-[#D64A2E] mt-0.5 flex-shrink-0" />
                   <div>
-                    <h3 className="font-sans font-semibold text-foreground mb-1">{title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                    <h3 className="font-sans font-semibold text-white text-sm tracking-wide mb-1">{title}</h3>
+                    <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="lg:w-72 flex flex-col gap-6 items-center">
-            <AdSlot size="rectangle" />
-            <div className="border border-border rounded p-6 bg-card text-center w-full">
-              <p className="text-xs uppercase tracking-widest text-primary font-sans font-semibold mb-3">Open Source</p>
-              <p className="font-serif text-xl font-semibold text-foreground mb-3">Transparent by design.</p>
-              <p className="text-xs text-muted-foreground font-sans mb-4 leading-relaxed">RallyPack's full codebase is available on GitHub. Audit it, fork it, contribute. Your family's safety tool should be trustworthy.</p>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xs font-sans text-primary hover:underline">
-                <Github className="w-3.5 h-3.5" /> View repository <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
+        </div>
+      </section>
+
+      {/* ── Third full-bleed image — action shot ── */}
+      <section className="relative h-[55vh] min-h-[380px] overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-[center_30%]"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1591451204579-d1b6e3a72e7d?w=1600&q=80')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/80 to-transparent" />
+        <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
+          <div className="max-w-sm">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-sans mb-4">Privacy first</p>
+            <p className="font-serif text-3xl md:text-4xl text-white font-bold leading-tight mb-4">
+              Your data is never sold. Ever.
+            </p>
+            <p className="text-sm text-white/60 font-sans leading-relaxed">
+              AES-256 encrypted. GDPR & CCPA aligned. You own your data — and you can delete it anytime.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ── Trust Strip ── */}
-      <section className="bg-navy/5 border-y border-border py-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-center gap-8 text-center sm:text-left">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-sans font-semibold mb-1">Guidelines from</p>
-            <div className="flex flex-wrap items-center gap-4 text-sm font-sans text-foreground font-medium">
-              <span>🏛️ FEMA Ready.gov</span>
-              <span>🔴 American Red Cross</span>
-              <span>🤝 Operation HOPE</span>
-              <span>🏥 CDC Emergency</span>
-            </div>
-          </div>
-          <div className="hidden sm:block w-px h-12 bg-border" />
-          <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-sans font-semibold mb-1">Privacy</p>
-            <p className="text-sm font-sans text-foreground">Your data is never sold. AES-256 encrypted. GDPR & CCPA aligned.</p>
+      {/* ── Guidelines / Trust ── */}
+      <section className="py-16 border-b border-[#D8D2C6]">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#8A8577] font-sans flex-shrink-0">Built on guidance from</p>
+          <div className="flex flex-wrap items-center gap-6 text-sm font-sans font-semibold text-[#1C1C1A]">
+            <span>FEMA Ready.gov</span>
+            <span className="text-[#D8D2C6]">·</span>
+            <span>American Red Cross</span>
+            <span className="text-[#D8D2C6]">·</span>
+            <span>Operation HOPE</span>
+            <span className="text-[#D8D2C6]">·</span>
+            <span>CDC Emergency</span>
           </div>
         </div>
       </section>
@@ -215,64 +227,91 @@ export default function Home() {
       <ResourcesSection />
 
       {/* ── Mid-page Ad ── */}
-      <div className="bg-secondary/30 border-y border-border py-6 flex justify-center">
+      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-6 flex justify-center">
         <AdSlot size="leaderboard" />
       </div>
 
-      {/* ── CTA ── */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24 text-center">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground font-sans mb-4">Start here, no account required</p>
-        <h2 className="font-serif text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-          Where would you meet<br />
-          <em className="text-primary">if phones went down?</em>
-        </h2>
-        <p className="text-lg font-sans text-muted-foreground max-w-xl mx-auto mb-10">
-          Take the free readiness quiz in 3 minutes. No account needed. You'll get a plain-English look at where your household stands — and what to do first.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to={createPageUrl("ReadinessQuiz")}>
-            <button className="inline-flex items-center gap-2 bg-primary text-white font-sans font-medium px-10 py-4 rounded hover:bg-primary/90 transition-colors text-base w-full sm:w-auto justify-center">
-              <ClipboardList className="w-4 h-4" /> Take the quiz free
+      {/* ── Final CTA ── */}
+      <section className="relative overflow-hidden bg-[#1C1C1A]">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80')" }}
+        />
+        <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">The next emergency won't wait</p>
+          <h2 className="font-serif text-5xl md:text-7xl font-bold text-white leading-none mb-8">
+            Where would your<br />family meet<br />
+            <em className="not-italic text-[#D64A2E]">if phones went down?</em>
+          </h2>
+          <p className="text-base font-sans text-white/55 max-w-md mx-auto mb-12 leading-relaxed">
+            Take the free readiness quiz in under 3 minutes. No account needed. Get a plain-English picture of where your household stands.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to={createPageUrl("ReadinessQuiz")}>
+              <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-10 py-4 rounded-none hover:bg-[#be3f25] transition-colors text-xs tracking-widest uppercase w-full sm:w-auto justify-center">
+                <ClipboardList className="w-4 h-4" /> Take the quiz free
+              </button>
+            </Link>
+            <button
+              onClick={handleSignUp}
+              className="inline-flex items-center gap-3 border border-white/30 text-white font-sans font-semibold px-10 py-4 rounded-none hover:bg-white/5 transition-colors text-xs tracking-widest uppercase"
+            >
+              Create a free account <ArrowRight className="w-4 h-4" />
             </button>
-          </Link>
-          <button onClick={handleSignUp} className="inline-flex items-center gap-2 border border-foreground/20 text-foreground font-sans font-medium px-10 py-4 rounded hover:bg-foreground/5 transition-colors text-base">
-            Create a free account <ArrowRight className="w-4 h-4" />
-          </button>
+          </div>
+          <p className="mt-8 text-xs font-sans text-white/30 tracking-wide">✓ Free forever &nbsp;·&nbsp; ✓ No credit card &nbsp;·&nbsp; ✓ Open source on GitHub</p>
         </div>
-        <p className="mt-5 text-xs font-sans text-muted-foreground">✓ Free forever &nbsp;·&nbsp; ✓ Open source &nbsp;·&nbsp; ✓ No credit card</p>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-border bg-navy text-white/70">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+      <footer className="bg-[#141412] text-white/50">
+        <div className="max-w-6xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-14">
             <div className="md:col-span-2">
-              <span className="font-serif text-2xl font-bold text-white block mb-2">RallyPack</span>
-              <p className="text-sm font-sans leading-relaxed text-white/60 max-w-xs">
-                Free, open-source family emergency preparedness. Built around FEMA guidelines and inspired by the Red Cross and Operation HOPE.
+              <span className="font-serif text-2xl font-bold text-white block mb-3">RallyPack</span>
+              <p className="text-sm font-sans leading-relaxed text-white/40 max-w-xs">
+                Free, open-source emergency preparedness for everyday families. Built around FEMA guidelines and the Red Cross.
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest font-sans font-semibold text-white/40 mb-3">Tools</p>
-              <div className="flex flex-col gap-2 text-sm font-sans">
+              <p className="text-[10px] uppercase tracking-[0.25em] font-sans font-semibold text-white/25 mb-4">Tools</p>
+              <div className="flex flex-col gap-3 text-sm font-sans">
                 <Link to={createPageUrl("ReadinessQuiz")} className="hover:text-white transition-colors">Readiness Quiz</Link>
                 <Link to={createPageUrl("Resources")} className="hover:text-white transition-colors">Resources</Link>
                 <Link to={createPageUrl("Dashboard")} className="hover:text-white transition-colors">My Plan</Link>
               </div>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest font-sans font-semibold text-white/40 mb-3">Legal</p>
-              <div className="flex flex-col gap-2 text-sm font-sans">
+              <p className="text-[10px] uppercase tracking-[0.25em] font-sans font-semibold text-white/25 mb-4">Legal</p>
+              <div className="flex flex-col gap-3 text-sm font-sans">
                 <Link to={createPageUrl("PrivacyPolicy")} className="hover:text-white transition-colors">Privacy Policy</Link>
                 <Link to={createPageUrl("TermsAndConditions")} className="hover:text-white transition-colors">Terms</Link>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors inline-flex items-center gap-1">
-                  GitHub <Github className="w-3 h-3" />
-                </a>
               </div>
             </div>
           </div>
-          <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/40">
-            <span>© 2026 RallyPack. Open source under MIT License.</span>
+
+          {/* Open Source section — moved here as requested */}
+          <div className="border-t border-white/10 pt-10 mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.25em] font-sans text-white/25 mb-2">Open Source</p>
+                <p className="text-sm font-sans text-white/50 leading-relaxed">
+                  RallyPack's full codebase is available on GitHub. Audit it, fork it, contribute. Your family's safety tool should be transparent.
+                </p>
+              </div>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 inline-flex items-center gap-2 border border-white/20 text-white/60 hover:text-white hover:border-white/50 transition-colors text-xs font-sans font-semibold tracking-widest uppercase px-5 py-3"
+              >
+                <Github className="w-4 h-4" /> View on GitHub
+              </a>
+            </div>
+          </div>
+
+          <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">
+            <span>© 2026 RallyPack · MIT License · GDPR & CCPA Compliant</span>
             <span>In emergencies, always call 911 first.</span>
           </div>
         </div>
