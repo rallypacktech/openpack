@@ -441,7 +441,9 @@ export default function Dashboard() {
   }
 
   // Onboarding Flow
-  const needsTermsAgreement = dataLoaded && (!userProfile || !userProfile.terms_agreed_version);
+  const sessionTermsKey = "rallypack_terms_ack_session";
+  const sessionTermsAcked = typeof sessionStorage !== "undefined" && sessionStorage.getItem(sessionTermsKey) === "true";
+  const needsTermsAgreement = dataLoaded && (!sessionTermsAcked);
 
   const needsAddress = dataLoaded && userProfile && !userProfile.street_address;
   const needsFamilySetup = dataLoaded && !familyStepCompleted && familyMembers.length === 0;
@@ -454,6 +456,9 @@ export default function Dashboard() {
       <TermsAgreement
         onAgree={async (version, date) => {
           try {
+            if (typeof sessionStorage !== "undefined") {
+              sessionStorage.setItem("rallypack_terms_ack_session", "true");
+            }
             if (userProfile) {
               await base44.entities.UserProfile.update(userProfile.id, {
                 terms_agreed_version: version,
