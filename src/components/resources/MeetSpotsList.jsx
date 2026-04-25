@@ -19,7 +19,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [editingSpot, setEditingSpot] = useState(null);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
-  const [loadingRecs, setLoadingRecs] = useState(false);
+  const [loadingRecs, setLoadingRecs] = useState(true);
   const [rallyPoints, setRallyPoints] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -65,6 +65,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       setLoadingRecs(false);
     }
   };
+
+  
 
   const loadRallyPoints = async () => {
     try {
@@ -204,7 +206,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     <div>
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <h2 className="text-xl font-semibold">Meeting Spots</h2>
+          <h2 className="text-xl font-semibold text-foreground">Meeting Spots</h2>
           <TooltipProvider>
             <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
               <TooltipTrigger asChild>
@@ -443,7 +445,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           </div>
         )}
 
-        {(spots.length < 4 || missingDirections.length > 0) && recommendations.length === 0 && (
+        {(spots.length < 4 || missingDirections.length > 0) && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 mt-6">
             <div className="flex items-start gap-3">
               <Navigation className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />

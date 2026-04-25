@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
     // Add regional recommendations
     recommendations.push({
       type: 'regional',
-      title: `${profile.fema_region} Recommendations`,
+      title: `${profile.fema_region ? profile.fema_region + ' ' : 'Regional '}Recommendations`,
       description: 'Based on common disasters in your region, consider these types of locations:',
       suggestions: regionalRecs
     });
