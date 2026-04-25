@@ -15,6 +15,7 @@ import StructuredAddressInput from "../components/settings/StructuredAddressInpu
 import ReadinessScore from "../components/dashboard/ReadinessScore";
 import FamilyMemberForm from "../components/onboarding/FamilyMemberForm";
 import TermsAgreement from "../components/onboarding/TermsAgreement";
+import { safeSessionGet, safeSessionSet } from "../lib/utils";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -442,7 +443,7 @@ export default function Dashboard() {
 
   // Onboarding Flow
   const sessionTermsKey = "rallypack_terms_ack_session";
-  const sessionTermsAcked = typeof sessionStorage !== "undefined" && sessionStorage.getItem(sessionTermsKey) === "true";
+  const sessionTermsAcked = safeSessionGet(sessionTermsKey) === "true";
   const needsTermsAgreement = dataLoaded && (!sessionTermsAcked);
 
   const needsAddress = dataLoaded && userProfile && !userProfile.street_address;
@@ -456,9 +457,7 @@ export default function Dashboard() {
       <TermsAgreement
         onAgree={async (version, date) => {
           try {
-            if (typeof sessionStorage !== "undefined") {
-              sessionStorage.setItem("rallypack_terms_ack_session", "true");
-            }
+            safeSessionSet("rallypack_terms_ack_session", "true");
             if (userProfile) {
               await base44.entities.UserProfile.update(userProfile.id, {
                 terms_agreed_version: version,
