@@ -153,11 +153,11 @@ export default function Resources() {
   return (
     <div className="min-h-screen bg-cream font-sans">
       {/* Header */}
-      <div className="bg-navy text-white">
+      <div style={{ backgroundColor: "hsl(220, 40%, 18%)" }} className="text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
           <p className="text-xs uppercase tracking-widest font-sans text-white/50 mb-1">Emergency Planning</p>
-          <h1 className="font-serif text-3xl font-semibold">Your Preparedness Hub</h1>
-          <p className="text-white/70 font-sans text-sm mt-1">
+          <h1 className="font-serif text-3xl font-semibold text-white">Your Preparedness Hub</h1>
+          <p className="font-sans text-sm mt-1" style={{ color: "rgba(255,255,255,0.7)" }}>
             Caches, meeting spots, first aid, training, and volunteering — all in one place.
           </p>
         </div>
