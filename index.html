@@ -12,6 +12,27 @@
     <title>RallyPack — Family Emergency Preparedness</title>
   </head>
   <body>
+    <script>
+      // Must run before any bundle — patches localStorage/sessionStorage for Safari Private Browsing
+      (function() {
+        var mem = {};
+        var safe = {
+          getItem: function(k) { return k in mem ? mem[k] : null; },
+          setItem: function(k, v) { mem[k] = String(v); },
+          removeItem: function(k) { delete mem[k]; },
+          clear: function() { mem = {}; },
+          key: function(i) { return Object.keys(mem)[i] || null; },
+          get length() { return Object.keys(mem).length; }
+        };
+        ['localStorage', 'sessionStorage'].forEach(function(name) {
+          try { window[name].getItem('__t__'); }
+          catch(e) {
+            try { Object.defineProperty(window, name, { value: safe, configurable: true }); }
+            catch(e2) {}
+          }
+        });
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
