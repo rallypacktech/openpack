@@ -6,6 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CachesList from "../components/resources/CachesList";
 import MeetSpotsList from "../components/resources/MeetSpotsList";
 import FirstAidTracker from "../components/resources/FirstAidTracker";
+import TrainingClasses from "../components/resources/TrainingClasses";
+import VolunteerOpportunities from "../components/resources/VolunteerOpportunities";
+import SharePlan from "../components/resources/SharePlan";
 
 export default function Resources() {
   const navigate = useNavigate();
@@ -20,7 +23,7 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    if (tab && ["caches", "meetspots", "firstaid"].includes(tab)) {
+    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share"].includes(tab)) {
       setActiveTab(tab);
     }
   }, []);
@@ -155,17 +158,20 @@ export default function Resources() {
           <p className="text-xs uppercase tracking-widest font-sans text-white/50 mb-1">Emergency Planning</p>
           <h1 className="font-serif text-3xl font-semibold">Your Preparedness Hub</h1>
           <p className="text-white/70 font-sans text-sm mt-1">
-            Caches, meeting spots, and first aid supplies — all in one place.
+            Caches, meeting spots, first aid, training, and volunteering — all in one place.
           </p>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 flex-wrap h-auto gap-1">
             <TabsTrigger value="caches">Caches</TabsTrigger>
             <TabsTrigger value="meetspots">Meet Spots</TabsTrigger>
-            <TabsTrigger value="firstaid">First Aid Tracker</TabsTrigger>
+            <TabsTrigger value="firstaid">First Aid</TabsTrigger>
+            <TabsTrigger value="training">Training</TabsTrigger>
+            <TabsTrigger value="volunteer">Volunteer</TabsTrigger>
+            <TabsTrigger value="share">Share Plan</TabsTrigger>
           </TabsList>
 
           <TabsContent value="caches">
@@ -196,6 +202,18 @@ export default function Resources() {
               onDelete={handleDeleteFirstAid}
               onGenerateSamples={handleGenerateSampleFirstAid}
             />
+          </TabsContent>
+
+          <TabsContent value="training">
+            <TrainingClasses />
+          </TabsContent>
+
+          <TabsContent value="volunteer">
+            <VolunteerOpportunities />
+          </TabsContent>
+
+          <TabsContent value="share">
+            <SharePlan />
           </TabsContent>
         </Tabs>
       </div>
