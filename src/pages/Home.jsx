@@ -32,19 +32,18 @@ export default function Home() {
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       {/* ── Nav ── */}
-      <header className="fixed top-0 left-0 right-0 z-50 mix-blend-normal">
+      <header className="fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <span className="font-serif text-xl font-bold text-white drop-shadow-md tracking-tight">RallyPack</span>
           <nav className="hidden md:flex items-center gap-8 text-sm font-sans text-white/85 drop-shadow">
             <Link to={createPageUrl("ReadinessQuiz")} className="hover:text-white transition-colors tracking-wide">Quiz</Link>
             <Link to={createPageUrl("Resources")} className="hover:text-white transition-colors tracking-wide">Resources</Link>
             <Link to={createPageUrl("LearnMore")} className="hover:text-white transition-colors tracking-wide">About</Link>
           </nav>
-          <div className="flex items-center gap-4">
-            <button onClick={handleSignUp} className="text-sm text-white/80 hover:text-white transition-colors hidden sm:block tracking-wide drop-shadow">Sign in</button>
+          <div className="flex items-center gap-4 ml-auto">
+            <button onClick={handleSignUp} className="text-sm text-white font-semibold hidden sm:block tracking-wide drop-shadow hover:text-white/80 transition-colors">Sign in</button>
             <button
               onClick={handleSignUp}
-              className="bg-white text-[#1C1C1A] text-sm font-semibold px-5 py-2.5 rounded-none hover:bg-[#F5F0E8] transition-colors tracking-wide"
+              className="bg-white text-[#1C1C1A] text-sm font-semibold px-5 py-2.5 hover:bg-[#F5F0E8] transition-colors tracking-wide"
             >
               Get started
             </button>
