@@ -25,6 +25,7 @@ const SCENARIOS = [
 
 export default function Home() {
   const [scrolled, setScrolled] = React.useState(false);
+  const [user, setUser] = React.useState(null);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -32,8 +33,16 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  React.useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => setUser(null));
+  }, []);
+
   const handleSignUp = () => {
     base44.auth.redirectToLogin("/Dashboard");
+  };
+
+  const handleLogout = () => {
+    base44.auth.logout("/");
   };
 
   return (
@@ -48,13 +57,19 @@ export default function Home() {
             <Link to={createPageUrl("LearnMore")} className={`transition-colors tracking-wide ${scrolled ? "hover:text-[#1C1C1A]" : "hover:text-white"}`}>About</Link>
           </nav>
           <div className="flex items-center gap-4 ml-auto">
-            <button onClick={handleSignUp} className={`text-sm font-semibold hidden sm:block tracking-wide drop-shadow transition-colors ${scrolled ? "text-[#1C1C1A] hover:text-[#1C1C1A]/70" : "text-white hover:text-white/80"}`}>Sign in</button>
-            <button
-              onClick={handleSignUp}
-              className={`text-sm font-semibold px-5 py-2.5 transition-colors tracking-wide ${scrolled ? "bg-[#D64A2E] text-white hover:bg-[#be3f25]" : "bg-white text-[#1C1C1A] hover:bg-[#F5F0E8]"}`}
-            >
-              Get started
-            </button>
+            {user ? (
+              <button onClick={handleLogout} className={`text-sm font-semibold tracking-wide drop-shadow transition-colors ${scrolled ? "text-[#1C1C1A] hover:text-[#1C1C1A]/70" : "text-white hover:text-white/80"}`}>Log out</button>
+            ) : (
+              <>
+                <button onClick={handleSignUp} className={`text-sm font-semibold hidden sm:block tracking-wide drop-shadow transition-colors ${scrolled ? "text-[#1C1C1A] hover:text-[#1C1C1A]/70" : "text-white hover:text-white/80"}`}>Sign in</button>
+                <button
+                  onClick={handleSignUp}
+                  className={`text-sm font-semibold px-5 py-2.5 transition-colors tracking-wide ${scrolled ? "bg-[#D64A2E] text-white hover:bg-[#be3f25]" : "bg-white text-[#1C1C1A] hover:bg-[#F5F0E8]"}`}
+                >
+                  Get started
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -83,12 +98,14 @@ export default function Home() {
                 Free readiness quiz
               </button>
             </Link>
-            <button
-              onClick={handleSignUp}
-              className="inline-flex items-center gap-3 border border-white/50 text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-white/10 transition-colors text-sm tracking-widest uppercase"
-            >
-              Build your plan <ArrowRight className="w-4 h-4" />
-            </button>
+            {!user && (
+              <button
+                onClick={handleSignUp}
+                className="inline-flex items-center gap-3 border border-white/50 text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-white/10 transition-colors text-sm tracking-widest uppercase"
+              >
+                Build your plan <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
           <p className="mt-6 text-xs font-sans text-white/40 tracking-wide">
             No account required for the quiz &nbsp;·&nbsp; Always free
@@ -265,12 +282,14 @@ export default function Home() {
                 <ClipboardList className="w-4 h-4" /> Take the quiz free
               </button>
             </Link>
-            <button
-              onClick={handleSignUp}
-              className="inline-flex items-center gap-3 border border-white/30 text-white font-sans font-semibold px-10 py-4 rounded-none hover:bg-white/5 transition-colors text-xs tracking-widest uppercase"
-            >
-              Create a free account <ArrowRight className="w-4 h-4" />
-            </button>
+            {!user && (
+              <button
+                onClick={handleSignUp}
+                className="inline-flex items-center gap-3 border border-white/30 text-white font-sans font-semibold px-10 py-4 rounded-none hover:bg-white/5 transition-colors text-xs tracking-widest uppercase"
+              >
+                Create a free account <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
           <p className="mt-8 text-xs font-sans text-white/30 tracking-wide">✓ Free forever &nbsp;·&nbsp; ✓ No credit card &nbsp;·&nbsp; ✓ Open source on GitHub</p>
         </div>
