@@ -313,7 +313,7 @@ export default function Home() {
                 </p>
               </div>
               <a
-                href="https://github.com"
+                href="https://github.com/rallypacktech/openpack"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-shrink-0 inline-flex items-center gap-2 border border-white/20 text-white/60 hover:text-white hover:border-white/50 transition-colors text-xs font-sans font-semibold tracking-widest uppercase px-5 py-3"
