@@ -257,7 +257,7 @@ export default function Home() {
             <em className="not-italic text-[#D64A2E]">if phones went down?</em>
           </h2>
           <p className="text-base font-sans text-white/55 max-w-md mx-auto mb-12 leading-relaxed">
-            Take the free readiness quiz in under 3 minutes. No account needed. Get a plain-English picture of where your household stands.
+            Take the free readiness quiz in under 3 minutes. No account needed. Get a clear picture of where your household stands.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to={createPageUrl("ReadinessQuiz")}>
