@@ -228,6 +228,8 @@ export default function Home() {
             <span>CDC Emergency</span>
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://bestfriends.org/network/issues/emergency-response" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Best Friends Animal Society</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://dartcc.org/" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">DART Command Center</a>
           </div>
         </div>
       </section>
