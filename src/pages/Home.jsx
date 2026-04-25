@@ -230,6 +230,8 @@ export default function Home() {
             <a href="https://bestfriends.org/network/issues/emergency-response" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Best Friends Animal Society</a>
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://dartcc.org/" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">DART Command Center</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://code3associates.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Code 3 Associates</a>
           </div>
         </div>
       </section>
