@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import OfflineMap from "@/components/offline/OfflineMap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -344,6 +345,19 @@ export default function Offline() {
                 ))}
               </CardContent>
             </Card>
+
+            {/* Map of meet spots & caches */}
+            {(meetSpots.length > 0 || caches.length > 0) && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-sans font-semibold">Your Locations</CardTitle>
+                  <p className="text-xs text-muted-foreground font-sans">Meet spots and supply caches — tap a marker for details</p>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <OfflineMap meetSpots={meetSpots} caches={caches} isOnline={isOnline} />
+                </CardContent>
+              </Card>
+            )}
 
             {!isOnline && (
               <Card className="bg-muted border-border">

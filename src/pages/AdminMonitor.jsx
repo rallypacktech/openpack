@@ -3,8 +3,9 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList } from "lucide-react";
+import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map } from "lucide-react";
 import QuizResultsTable from "../components/admin/QuizResultsTable";
+import IncidentMap from "../components/admin/IncidentMap";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -90,10 +91,17 @@ export default function AdminMonitor() {
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" /> User Monitor
             </TabsTrigger>
+            <TabsTrigger value="incidents" className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" /> Incident Map
+            </TabsTrigger>
             <TabsTrigger value="quiz" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" /> Quiz Results
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="incidents">
+            <IncidentMap />
+          </TabsContent>
 
           <TabsContent value="quiz">
             <QuizResultsTable />
