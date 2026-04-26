@@ -189,7 +189,7 @@ export default function Layout({ children, currentPageName }) {
                   <nav className="space-y-2" aria-label="Contact navigation">
                     <Link to="/Feedback" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Send Feedback</Link>
                     <Link to="/AffiliatePartnerPolicy" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Affiliate & Partner Policy</Link>
-                    <a href="mailto:beta@rallypack.tech" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">beta@rallypack.tech</a>
+
                   </nav>
                 </div>
               </div>

@@ -83,7 +83,7 @@ export default function Feedback() {
           <p className="text-[10px] uppercase tracking-[0.25em] text-[#D64A2E] font-sans mb-2">Your Voice</p>
           <h2 className="font-serif text-2xl font-bold mb-2">Submit Feedback</h2>
           <p className="text-sm text-white/50 font-sans mb-8">
-            All feedback goes directly to <span className="text-white/80">beta@rallypack.tech</span>. We respond to most messages within 1–3 business days.
+            We respond to most messages within 1–3 business days.
           </p>
 
           {submitted ? (
@@ -166,9 +166,7 @@ export default function Feedback() {
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground font-sans text-center mt-8">
-          Prefer email? Write to <a href="mailto:beta@rallypack.tech" className="underline hover:text-foreground">beta@rallypack.tech</a>
-        </p>
+
       </div>
     </div>
   );

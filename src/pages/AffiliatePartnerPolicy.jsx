@@ -222,9 +222,7 @@ export default function AffiliatePartnerPolicy() {
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground font-sans text-center mt-8">
-          Questions? Email <a href="mailto:partners@rallypack.tech" className="underline hover:text-foreground">partners@rallypack.tech</a>
-        </p>
+
       </div>
     </div>
   );
