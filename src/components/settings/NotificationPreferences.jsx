@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Bell, Save } from "lucide-react";
+import { Bell, Save, Mail } from "lucide-react";
 
 export default function NotificationPreferences({ profile, onSave }) {
   const [settings, setSettings] = useState({
@@ -20,17 +20,21 @@ export default function NotificationPreferences({ profile, onSave }) {
     earthquake: false,
     alert_frequency: 'immediate'
   });
+  const [notificationMethod, setNotificationMethod] = useState("both");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (profile?.alert_settings) {
       setSettings({ ...settings, ...profile.alert_settings });
     }
+    if (profile?.notification_method) {
+      setNotificationMethod(profile.notification_method);
+    }
   }, [profile]);
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave({ alert_settings: settings });
+    await onSave({ alert_settings: settings, notification_method: notificationMethod });
     setSaving(false);
   };
 
@@ -57,6 +61,34 @@ export default function NotificationPreferences({ profile, onSave }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Email Notifications */}
+        <div className="pb-4 border-b">
+          <Label className="text-base font-semibold mb-3 flex items-center gap-2">
+            <Mail className="w-4 h-4 text-blue-600" />
+            Email Notifications
+          </Label>
+          <p className="text-sm text-gray-500 mb-3">In-app notifications are always on. Choose whether to also receive emails.</p>
+          <div className="space-y-2">
+            {[
+              { value: "in_app", label: "In-app only", desc: "Notifications inside RallyPack only" },
+              { value: "email", label: "Email only", desc: "Receive alerts by email (no in-app badge)" },
+              { value: "both", label: "Both (recommended)", desc: "In-app + email for critical alerts" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setNotificationMethod(opt.value)}
+                className={`w-full flex items-start gap-3 p-3 rounded-lg border text-left transition-colors ${notificationMethod === opt.value ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+              >
+                <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 ${notificationMethod === opt.value ? "border-blue-500 bg-blue-500" : "border-gray-300"}`} />
+                <div>
+                  <p className="font-medium text-sm text-gray-900">{opt.label}</p>
+                  <p className="text-xs text-gray-500">{opt.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Alert Frequency */}
         <div className="pb-4 border-b">
           <Label htmlFor="alert-frequency" className="text-base font-semibold mb-3 block">

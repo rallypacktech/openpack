@@ -13,6 +13,7 @@ import QuickActions from "../components/dashboard/QuickActions";
 import PreparednessTips from "../components/dashboard/PreparednessTips";
 import StructuredAddressInput from "../components/settings/StructuredAddressInput";
 import ReadinessScore from "../components/dashboard/ReadinessScore";
+import SafetyBeacon from "../components/dashboard/SafetyBeacon";
 import FamilyMemberForm from "../components/onboarding/FamilyMemberForm";
 import TermsAgreement from "../components/onboarding/TermsAgreement";
 import { safeSessionGet, safeSessionSet } from "../lib/utils";
@@ -805,6 +806,9 @@ export default function Dashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Safety Beacon */}
+            <SafetyBeacon />
+
             {/* Readiness Score */}
             <ReadinessScore />
             
