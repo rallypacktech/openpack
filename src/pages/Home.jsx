@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { Package, MapPin, Heart, Shield, CheckCircle, ClipboardList, ArrowRight, Github, Wind, Flame, Droplets, Zap, AlertTriangle } from "lucide-react";
 import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
+import FooterContactForm from "../components/FooterContactForm";
 
 const FEATURES = [
   { icon: Package, title: "Kit Tracker", desc: "Go-bags, car kits, home caches. Track what you have and when it expires." },
@@ -314,8 +315,16 @@ export default function Home() {
               <div className="flex flex-col gap-3 text-sm font-sans">
                 <Link to={createPageUrl("PrivacyPolicy")} className="hover:text-white transition-colors">Privacy Policy</Link>
                 <Link to={createPageUrl("TermsAndConditions")} className="hover:text-white transition-colors">Terms</Link>
+                <Link to={createPageUrl("AffiliatePartnerPolicy")} className="hover:text-white transition-colors">Affiliate Policy</Link>
               </div>
             </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="border-t border-white/10 pt-10 mb-8">
+            <p className="text-[10px] uppercase tracking-[0.25em] font-sans text-white/25 mb-2">Contact Us</p>
+            <p className="text-sm font-sans text-white/40 mb-5">Questions, feedback, or partnership inquiries? We read everything.</p>
+            <FooterContactForm />
           </div>
 
           {/* Open Source section — moved here as requested */}

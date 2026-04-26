@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Calendar, MapPin, AlertCircle, Check, FileDown, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { base44 } from "@/api/base44Client";
+import AiRecommendationsPanel from "../cache/AiRecommendationsPanel";
 
 export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete, onGenerateSamples }) {
   const [firstAidKitLocation, setFirstAidKitLocation] = useState(null);
@@ -282,6 +283,25 @@ export default function FirstAidTracker({ items, onAdd, onUpdate, onDelete, onGe
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* AI First Aid Recommendations */}
+      <div className="mb-6">
+        <AiRecommendationsPanel
+          mode="firstaid"
+          onAddItem={(rec) => {
+            setFormData({
+              name: rec.item_name,
+              category: rec.for_whom?.toLowerCase().includes("pet") ? "pets" : rec.for_whom?.toLowerCase().includes("child") ? "youth" : "adults",
+              quantity: rec.quantity || 1,
+              location: "",
+              expiration_date: "",
+              owned: false,
+              notes: rec.why || "",
+            });
+            setDialogOpen(true);
+          }}
+        />
+      </div>
 
       {/* Action Buttons */}
       <div className="flex gap-4">

@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Plus, Pencil, Trash2, Package, MapPin, ShoppingCart, ExternalLink, X, Camera, Barcode, Heart, Droplet, UtensilsCrossed, Info, User, Users } from "lucide-react";
 import BarcodeScanner from "../components/BarcodeScanner";
+import AiRecommendationsPanel from "../components/cache/AiRecommendationsPanel";
 
 export default function CacheDetail() {
   const navigate = useNavigate();
@@ -835,6 +836,27 @@ export default function CacheDetail() {
               <p className="text-gray-500">No items yet. Add your first item to this cache!</p>
             </CardContent>
           </Card>
+        )}
+
+        {/* AI Recommendations Panel */}
+        {cache.isOwner && (
+          <div className="mt-8">
+            <AiRecommendationsPanel
+              cacheId={cache.id}
+              mode="cache"
+              onAddItem={(rec) => {
+                setFormData({
+                  item_name: rec.item_name,
+                  quantity: rec.quantity || 1,
+                  category: rec.category || "other",
+                  expiration_date: "",
+                  notes: rec.why || "",
+                });
+                setEditingItem(null);
+                setDialogOpen(true);
+              }}
+            />
+          </div>
         )}
 
         {/* Recommendations Section */}

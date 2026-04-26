@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, MapPin, Navigation, Star, Info } from "lucide-react";
+import AiMeetSpotSuggestions from "./AiMeetSpotSuggestions";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { base44 } from "@/api/base44Client";
 import StructuredAddressInput from "../settings/StructuredAddressInput";
@@ -444,6 +445,23 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
             ))}
           </div>
         )}
+
+        {/* AI Meet Spot Suggestions */}
+        <AiMeetSpotSuggestions
+          missingDirections={missingDirections}
+          onAddSpot={(suggestion) => {
+            setFormData({
+              name: suggestion.place_type || suggestion.name || "",
+              address: "",
+              latitude: "",
+              longitude: "",
+              description: `${suggestion.direction_hint ? suggestion.direction_hint + " — " : ""}${suggestion.description || suggestion.why || ""}`,
+              is_primary: false,
+            });
+            setEditingSpot(null);
+            setDialogOpen(true);
+          }}
+        />
 
         {(spots.length < 4 || missingDirections.length > 0) && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 mt-6">
