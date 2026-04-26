@@ -26,6 +26,92 @@ import { format } from "date-fns";
 const CACHE_KEY = "rallypack_offline_data";
 const CACHE_VERSION_KEY = "rallypack_offline_version";
 
+// Emergency numbers by country code (ISO 3166-1 alpha-2)
+const EMERGENCY_NUMBERS = {
+  US: [
+    { label: "Emergency Services", number: "911" },
+    { label: "FEMA Helpline", number: "1-800-621-3362" },
+    { label: "Red Cross", number: "1-800-733-2767" },
+    { label: "Poison Control", number: "1-800-222-1222" },
+    { label: "Crisis Hotline", number: "988" },
+  ],
+  CA: [
+    { label: "Emergency Services", number: "911" },
+    { label: "Red Cross Canada", number: "1-800-418-1111" },
+    { label: "Poison Control", number: "1-800-268-9017" },
+    { label: "Crisis Hotline", number: "1-833-456-4566" },
+  ],
+  GB: [
+    { label: "Emergency Services", number: "999" },
+    { label: "Non-Emergency Police", number: "101" },
+    { label: "NHS Direct", number: "111" },
+    { label: "Samaritans", number: "116 123" },
+  ],
+  AU: [
+    { label: "Emergency Services", number: "000" },
+    { label: "Police Non-Emergency", number: "131 444" },
+    { label: "Poison Information", number: "13 11 26" },
+    { label: "Lifeline", number: "13 11 14" },
+  ],
+  NZ: [
+    { label: "Emergency Services", number: "111" },
+    { label: "Police Non-Emergency", number: "105" },
+    { label: "Poisons Centre", number: "0800 764 766" },
+    { label: "Crisis Line", number: "1737" },
+  ],
+  DE: [
+    { label: "Emergency Services", number: "112" },
+    { label: "Police", number: "110" },
+    { label: "Poison Control", number: "030 19240" },
+    { label: "Crisis Hotline", number: "0800 111 0 111" },
+  ],
+  FR: [
+    { label: "Emergency Services", number: "112" },
+    { label: "Police", number: "17" },
+    { label: "Fire (SAMU)", number: "15" },
+    { label: "Crisis Hotline", number: "3114" },
+  ],
+  MX: [
+    { label: "Emergency Services", number: "911" },
+    { label: "Red Cross Mexico", number: "065" },
+    { label: "Civil Protection", number: "800 001 9700" },
+    { label: "Crisis Hotline", number: "800 290 0024" },
+  ],
+  IN: [
+    { label: "Emergency Services", number: "112" },
+    { label: "Police", number: "100" },
+    { label: "Ambulance", number: "102" },
+    { label: "Disaster Management", number: "1078" },
+  ],
+  JP: [
+    { label: "Police", number: "110" },
+    { label: "Fire / Ambulance", number: "119" },
+    { label: "Disaster Hotline", number: "171" },
+    { label: "Crisis Hotline", number: "0120-279-338" },
+  ],
+  // Default fallback — international emergency
+  DEFAULT: [
+    { label: "Emergency Services", number: "112" },
+    { label: "Local Emergency", number: "See local listings" },
+    { label: "International Red Cross", number: "+41 22 730 3600" },
+  ],
+};
+
+function getEmergencyNumbers(country) {
+  if (!country) return EMERGENCY_NUMBERS.US;
+  const code = country.trim().toUpperCase();
+  // Try exact match, then try matching a country name to a code
+  if (EMERGENCY_NUMBERS[code]) return EMERGENCY_NUMBERS[code];
+  // Common full-name fallbacks
+  const nameMap = {
+    "UNITED STATES": "US", "UNITED KINGDOM": "GB", "CANADA": "CA",
+    "AUSTRALIA": "AU", "NEW ZEALAND": "NZ", "GERMANY": "DE",
+    "FRANCE": "FR", "MEXICO": "MX", "INDIA": "IN", "JAPAN": "JP",
+  };
+  const mapped = nameMap[code];
+  return mapped ? EMERGENCY_NUMBERS[mapped] : EMERGENCY_NUMBERS.DEFAULT;
+}
+
 function saveToLocalCache(data) {
   localStorage.setItem(CACHE_KEY, JSON.stringify(data));
   localStorage.setItem(CACHE_VERSION_KEY, new Date().toISOString());
@@ -88,16 +174,18 @@ export default function Offline() {
     if (showLoading) setLoading(true);
     setSyncing(true);
     try {
-      const [familyMembers, meetSpots, caches, firstAidItems, pets, cacheItems] = await Promise.all([
+      const [familyMembers, meetSpots, caches, firstAidItems, pets, cacheItems, profiles] = await Promise.all([
         base44.entities.FamilyMember.list(),
         base44.entities.MeetSpot.list(),
         base44.entities.EmergencyCache.list(),
         base44.entities.FirstAidItem.list(),
         base44.entities.Pet.list(),
-        base44.entities.CacheItem.list()
+        base44.entities.CacheItem.list(),
+        base44.entities.UserProfile.list(),
       ]);
 
-      const fresh = { familyMembers, meetSpots, caches, firstAidItems, pets, cacheItems };
+      const userProfile = profiles?.[0] || null;
+      const fresh = { familyMembers, meetSpots, caches, firstAidItems, pets, cacheItems, userProfile };
       saveToLocalCache(fresh);
       setData(fresh);
       setLastSync(getLastSyncTime());
@@ -120,7 +208,8 @@ export default function Offline() {
     );
   }
 
-  const { familyMembers = [], meetSpots = [], caches = [], firstAidItems = [], pets = [], cacheItems = [] } = data || {};
+  const { familyMembers = [], meetSpots = [], caches = [], firstAidItems = [], pets = [], cacheItems = [], userProfile = null } = data || {};
+  const emergencyNumbers = getEmergencyNumbers(userProfile?.country);
 
   const ownedFirstAid = firstAidItems.filter(i => i.owned);
   const expiredFirstAid = firstAidItems.filter(i => i.expiration_date && new Date(i.expiration_date) < new Date());
@@ -228,7 +317,7 @@ export default function Offline() {
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 mb-1 font-sans">Primary Rally Point</p>
                       <p className="font-serif text-lg font-bold text-emerald-900">{primarySpot.name}</p>
-                      {primarySpot.address && <p className="text-sm text-emerald-800 font-sans mt-1">{primarySpot.address}</p>}
+                      {primarySpot.address && <p className="text-sm text-emerald-800 font-sans mt-1 whitespace-pre-line">{primarySpot.address}</p>}
                       {primarySpot.description && <p className="text-sm text-emerald-700 mt-1 font-sans">{primarySpot.description}</p>}
                     </div>
                   </div>
@@ -239,16 +328,15 @@ export default function Offline() {
             {/* Emergency numbers */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base font-sans font-semibold">Emergency Numbers</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-sans font-semibold">Emergency Numbers</CardTitle>
+                  {userProfile?.country && (
+                    <span className="text-xs text-muted-foreground font-sans">{userProfile.country}</span>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="pt-0 space-y-3">
-                {[
-                  { label: "Emergency Services", number: "911" },
-                  { label: "FEMA Helpline", number: "1-800-621-3362" },
-                  { label: "Red Cross", number: "1-800-733-2767" },
-                  { label: "Poison Control", number: "1-800-222-1222" },
-                  { label: "Crisis Hotline", number: "988" },
-                ].map(({ label, number }) => (
+                {emergencyNumbers.map(({ label, number }) => (
                   <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                     <span className="text-sm font-sans text-foreground">{label}</span>
                     <a href={`tel:${number}`} className="font-mono text-sm font-semibold text-primary hover:underline">{number}</a>
@@ -320,7 +408,7 @@ export default function Offline() {
                     {spot.address && (
                       <div className="flex items-start gap-2 text-sm text-muted-foreground font-sans mb-2">
                         <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
-                        <span>{spot.address}</span>
+                        <span className="whitespace-pre-line">{spot.address}</span>
                       </div>
                     )}
                     {spot.latitude && spot.longitude && (
