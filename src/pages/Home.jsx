@@ -236,13 +236,13 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#8A8577] font-sans flex-shrink-0">Built on guidance from</p>
           <div className="flex flex-wrap items-center gap-6 text-sm font-sans font-semibold text-[#1C1C1A]">
-            <span>FEMA Ready.gov</span>
+            <a href="https://www.ready.gov" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">FEMA Ready.gov</a>
             <span className="text-[#D8D2C6]">·</span>
-            <span>American Red Cross</span>
+            <a href="https://www.redcross.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">American Red Cross</a>
             <span className="text-[#D8D2C6]">·</span>
-            <span>Operation HOPE</span>
+            <a href="https://operationhope.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Operation HOPE</a>
             <span className="text-[#D8D2C6]">·</span>
-            <span>CDC Emergency</span>
+            <a href="https://emergency.cdc.gov" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">CDC Emergency</a>
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://bestfriends.org/network/issues/emergency-response" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Best Friends Animal Society</a>
             <span className="text-[#D8D2C6]">·</span>
