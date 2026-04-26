@@ -1,0 +1,81 @@
+{
+  "name": "QuizResult",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Anonymous session ID to track pre-login quiz takers"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email if user was logged in or later signed up"
+    },
+    "score": {
+      "type": "number",
+      "description": "Calculated readiness score 0-100"
+    },
+    "score_level": {
+      "type": "string",
+      "enum": [
+        "Not Ready",
+        "Gaps That Put You at Risk",
+        "A Solid Foundation"
+      ],
+      "description": "Human-readable result level"
+    },
+    "region": {
+      "type": "string",
+      "description": "Region/disaster type the user selected"
+    },
+    "county_plan": {
+      "type": "string",
+      "description": "Awareness of county emergency plan"
+    },
+    "experienced_disaster": {
+      "type": "string",
+      "description": "Prior disaster experience"
+    },
+    "felt_prepared": {
+      "type": "string",
+      "description": "How prepared they felt during a past disaster"
+    },
+    "meeting_spot": {
+      "type": "string",
+      "description": "Whether a meeting spot is defined"
+    },
+    "supplies": {
+      "type": "string",
+      "description": "Current supply level"
+    },
+    "plan_documented": {
+      "type": "string",
+      "description": "Whether the plan is documented/shared"
+    },
+    "insurance": {
+      "type": "string",
+      "description": "Insurance coverage status"
+    },
+    "is_registered_user": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the quiz taker has a RallyPack account"
+    }
+  },
+  "required": [
+    "score"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

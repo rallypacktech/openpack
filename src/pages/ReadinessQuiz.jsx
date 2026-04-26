@@ -163,9 +163,58 @@ const REGION_RESOURCES = {
   general: { name: "General preparedness", url: "https://www.ready.gov/be-informed", fema: "https://www.fema.gov/emergency-managers/individuals-communities" },
 };
 
+function getSessionId() {
+  let sid = localStorage.getItem("rp_quiz_session");
+  if (!sid) {
+    sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem("rp_quiz_session", sid);
+  }
+  return sid;
+}
+
 function QuizResults({ score, answers }) {
   const result = getResult(score, answers);
   const regionRes = REGION_RESOURCES[answers.region] || REGION_RESOURCES.general;
+
+  // Save result on mount (once)
+  React.useEffect(() => {
+    const save = async () => {
+      const sessionId = getSessionId();
+      let userEmail = null;
+      let isRegistered = false;
+      try {
+        const user = await base44.auth.me();
+        userEmail = user?.email || null;
+        isRegistered = !!user;
+      } catch (_) {}
+
+      // Check if we already saved for this session to avoid duplicates on re-render
+      const savedKey = `rp_quiz_saved_${sessionId}`;
+      if (sessionStorage.getItem(savedKey)) return;
+
+      try {
+        await base44.entities.QuizResult.create({
+          session_id: sessionId,
+          user_email: userEmail,
+          score,
+          score_level: result.level,
+          region: answers.region,
+          county_plan: answers.county_plan,
+          experienced_disaster: answers.experienced_disaster,
+          felt_prepared: answers.felt_prepared,
+          meeting_spot: answers.meeting_spot,
+          supplies: answers.supplies,
+          plan_documented: answers.plan_documented,
+          insurance: answers.insurance,
+          is_registered_user: isRegistered,
+        });
+        sessionStorage.setItem(savedKey, "1");
+      } catch (e) {
+        console.error("Failed to save quiz result:", e);
+      }
+    };
+    save();
+  }, []);
 
   const urgencyBorder = {
     medium: "border-blue-200",

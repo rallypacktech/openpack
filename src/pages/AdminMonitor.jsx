@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Users, Circle, Clock, User, Mail } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList } from "lucide-react";
+import QuizResultsTable from "../components/admin/QuizResultsTable";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -83,6 +85,21 @@ export default function AdminMonitor() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs defaultValue="users">
+          <TabsList className="mb-6">
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="w-4 h-4" /> User Monitor
+            </TabsTrigger>
+            <TabsTrigger value="quiz" className="flex items-center gap-2">
+              <ClipboardList className="w-4 h-4" /> Quiz Results
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="quiz">
+            <QuizResultsTable />
+          </TabsContent>
+
+          <TabsContent value="users">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
@@ -256,6 +273,8 @@ export default function AdminMonitor() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
