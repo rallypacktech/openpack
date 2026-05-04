@@ -90,7 +90,7 @@ export default function AiMeetSpotSuggestions({ missingDirections, onAddSpot }) 
                 size="sm"
                 variant="outline"
                 className="text-xs h-7 px-2 w-full"
-                onClick={() => onAddSpot({ name: s.place_type, description: s.why, direction_hint: s.direction })}
+                onClick={() => onAddSpot({ name: s.place_type, description: s.why, direction_hint: s.direction, search_tip: s.search_tip, address: s.address || "" })}
               >
                 + Add as Meet Spot
               </Button>

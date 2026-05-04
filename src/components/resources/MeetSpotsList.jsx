@@ -452,9 +452,9 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           onAddSpot={(suggestion) => {
             setFormData({
               name: suggestion.place_type || suggestion.name || "",
-              address: "",
-              latitude: "",
-              longitude: "",
+              address: suggestion.search_tip || suggestion.address || "",
+              latitude: suggestion.latitude?.toString() || "",
+              longitude: suggestion.longitude?.toString() || "",
               description: `${suggestion.direction_hint ? suggestion.direction_hint + " — " : ""}${suggestion.description || suggestion.why || ""}`,
               is_primary: false,
             });
