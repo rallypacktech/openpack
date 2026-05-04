@@ -9,6 +9,7 @@ import FirstAidTracker from "../components/resources/FirstAidTracker";
 import TrainingClasses from "../components/resources/TrainingClasses";
 import VolunteerOpportunities from "../components/resources/VolunteerOpportunities";
 import SharePlan from "../components/resources/SharePlan";
+import ExternalResourcesTab from "../components/resources/ExternalResourcesTab";
 
 export default function Resources() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share"].includes(tab)) {
+    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share", "resources"].includes(tab)) {
       setActiveTab(tab);
     }
   }, []);
@@ -172,6 +173,7 @@ export default function Resources() {
             <TabsTrigger value="training">Training</TabsTrigger>
             <TabsTrigger value="volunteer">Volunteer</TabsTrigger>
             <TabsTrigger value="share">Share Plan</TabsTrigger>
+            <TabsTrigger value="resources">Ext. Resources</TabsTrigger>
           </TabsList>
 
           <TabsContent value="caches">
@@ -214,6 +216,10 @@ export default function Resources() {
 
           <TabsContent value="share">
             <SharePlan />
+          </TabsContent>
+
+          <TabsContent value="resources">
+            <ExternalResourcesTab />
           </TabsContent>
         </Tabs>
       </div>

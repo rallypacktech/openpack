@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
@@ -9,55 +9,63 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get family members where user is the creator
-    const myFamilyMembers = await base44.entities.FamilyMember.filter({ created_by: user.email });
-    
-    // Get family members where user is linked as emergency contact
-    const linkedFamilyMembers = await base44.asServiceRole.entities.FamilyMember.filter({ 
-      linked_user_id: user.id 
-    });
-
     const statuses = [];
 
-    // Get statuses of my family members who have accounts
+    // Branch 1: Family members I created who have linked accounts
+    // Use user-scoped query — only returns records created_by this user (RLS)
+    const myFamilyMembers = await base44.entities.FamilyMember.filter({ created_by: user.email });
+
     for (const fm of myFamilyMembers) {
-      if (fm.linked_user_id) {
-        const linkedUser = await base44.asServiceRole.entities.User.filter({ id: fm.linked_user_id });
-        if (linkedUser.length > 0) {
-          const profile = await base44.asServiceRole.entities.UserProfile.filter({ 
-            created_by: linkedUser[0].email 
-          });
-          if (profile.length > 0) {
-            statuses.push({
-              name: fm.name,
-              relationship: fm.relationship,
-              status: profile[0].current_status || 'unknown',
-              status_updated_at: profile[0].status_updated_at
-            });
-          }
-        }
+      if (!fm.linked_user_id) continue;
+
+      // Use service role ONLY to check if the linked user exists and get their status.
+      // We never return raw email/contact info — only name, relationship, and status.
+      const linkedUsers = await base44.asServiceRole.entities.User.filter({ id: fm.linked_user_id });
+      if (linkedUsers.length === 0) continue;
+
+      const linkedUser = linkedUsers[0];
+      const profiles = await base44.asServiceRole.entities.UserProfile.filter({
+        created_by: linkedUser.email
+      });
+
+      if (profiles.length > 0) {
+        statuses.push({
+          name: fm.name,           // User-supplied name, not the linked user's PII
+          relationship: fm.relationship,
+          status: profiles[0].current_status || 'unknown',
+          status_updated_at: profiles[0].status_updated_at,
+          // Never expose: email, phone, address, coordinates of linked user
+        });
       }
     }
 
-    // Get statuses of users who have me as emergency contact
-    for (const fm of linkedFamilyMembers) {
-      const creatorUser = await base44.asServiceRole.entities.User.filter({ email: fm.created_by });
-      if (creatorUser.length > 0) {
-        const profile = await base44.asServiceRole.entities.UserProfile.filter({ 
-          created_by: fm.created_by 
+    // Branch 2: Users who have listed ME as their emergency contact
+    // Use service role to look up reverse relationships, but filter output strictly
+    const reverseLinks = await base44.asServiceRole.entities.FamilyMember.filter({
+      emergency_contact: user.email
+    });
+
+    for (const fm of reverseLinks) {
+      // Verify this person explicitly opted in to share their status (linked_user_id set)
+      if (!fm.linked_user_id) continue;
+
+      const profiles = await base44.asServiceRole.entities.UserProfile.filter({
+        created_by: fm.created_by
+      });
+
+      if (profiles.length > 0) {
+        statuses.push({
+          name: fm.name,
+          relationship: 'emergency contact for',
+          status: profiles[0].current_status || 'unknown',
+          status_updated_at: profiles[0].status_updated_at,
+          // Never expose raw email, location, or contact details
         });
-        if (profile.length > 0) {
-          statuses.push({
-            name: creatorUser[0].full_name,
-            relationship: 'emergency contact for',
-            status: profile[0].current_status || 'unknown',
-            status_updated_at: profile[0].status_updated_at
-          });
-        }
       }
     }
 
     return Response.json({ statuses });
+
   } catch (error) {
     console.error('Error fetching family statuses:', error);
     return Response.json({ error: error.message }, { status: 500 });
