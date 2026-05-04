@@ -10,6 +10,7 @@ import { MapPin, Phone, Building2, ExternalLink, AlertTriangle, Users, PawPrint,
 import FamilyMessaging from "../components/messaging/FamilyMessaging";
 import FamilyStatuses from "../components/messaging/FamilyStatuses";
 import EmergencyShelterMap from "../components/maps/EmergencyShelterMap";
+import ActiveIncidents from "../components/emergency/ActiveIncidents";
 
 export default function Emergency() {
   const [profile, setProfile] = useState(null);
@@ -205,14 +206,19 @@ export default function Emergency() {
         </Card>
 
         {/* Tabs */}
-        <Tabs defaultValue="resources">
-          <TabsList className="mb-6">
+        <Tabs defaultValue="incidents">
+          <TabsList className="mb-6 flex-wrap h-auto gap-1">
+            <TabsTrigger value="incidents">🔴 Active Incidents</TabsTrigger>
             <TabsTrigger value="resources">Disaster Resources</TabsTrigger>
             <TabsTrigger value="shelters">Shelters</TabsTrigger>
             <TabsTrigger value="messaging">Family Messaging</TabsTrigger>
             <TabsTrigger value="lost-persons">Lost Persons</TabsTrigger>
             <TabsTrigger value="lost-pets">Lost Pets</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="incidents">
+            <ActiveIncidents />
+          </TabsContent>
 
           <TabsContent value="resources">
             <div className="flex items-center justify-between mb-4">

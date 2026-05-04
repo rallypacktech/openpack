@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Phone, Globe, MapPin, Heart, Home, Brain, Shield, Plane, TrendingUp } from "lucide-react";
-import GeorgiaWildfireAlert from "@/components/GeorgiaWildfireAlert";
 
 const RESOURCE_CATEGORIES = [
   {
@@ -166,9 +165,6 @@ export default function ExternalResourcesTab() {
 
   return (
     <div className="space-y-4">
-      {/* Georgia Wildfire Active Alert */}
-      <GeorgiaWildfireAlert />
-
       {/* Category Accordions */}
       {RESOURCE_CATEGORIES.map(cat => {
         const Icon = cat.icon;
