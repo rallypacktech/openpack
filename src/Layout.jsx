@@ -194,11 +194,29 @@ export default function Layout({ children, currentPageName }) {
 
                 <div>
                   <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Follow Us</h3>
-                  <nav className="space-y-2" aria-label="Social media links">
-                    <a href="https://instagram.com/rallypackgear" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Instagram · @rallypackgear</a>
-                    <a href="https://facebook.com/rallypack" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Facebook · rallypack</a>
-                    <a href="https://pixelfed.social/rallypack" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Pixelfed · rallypack</a>
-                  </nav>
+                  <div className="flex items-center gap-4 mt-1">
+                    <a href="https://instagram.com/rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Instagram @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
+                      {/* Instagram icon */}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <circle cx="12" cy="12" r="4"/>
+                        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61583589766031" target="_blank" rel="noopener noreferrer" aria-label="Facebook rallypack" className="text-muted-foreground hover:text-foreground transition-colors">
+                      {/* Facebook icon */}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                      </svg>
+                    </a>
+                    <a href="https://pixelfed.social/rallypack" target="_blank" rel="noopener noreferrer" aria-label="Pixelfed rallypack" className="text-muted-foreground hover:text-foreground transition-colors">
+                      {/* Camera/Pixelfed icon */}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               </div>
 
