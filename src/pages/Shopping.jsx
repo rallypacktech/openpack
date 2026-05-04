@@ -262,27 +262,29 @@ export default function Shopping() {
                   )}
                 </div>
 
-                {rec.affiliate_link ? (
-                  <Button
-                    onClick={async () => {
-                      // Track the click
-                      await base44.functions.invoke('trackAffiliateClick', {
-                        recommendationId: rec.id,
-                        productName: rec.item_name,
-                        affiliateLink: rec.affiliate_link
-                      });
-                      window.open(rec.affiliate_link, '_blank');
-                    }}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View on {getStoreName(rec.affiliate_link)}
-                  </Button>
-                ) : cart[rec.id] ? (
-                  <div className="space-y-2">
-                    <Select value={cart[rec.id].cacheId} onValueChange={(val) => addToCart(rec, val)}>
+                <div className="space-y-2">
+                  {cart[rec.id] ? (
+                    <div className="space-y-2">
+                      <Select value={cart[rec.id].cacheId} onValueChange={(val) => addToCart(rec, val)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select cache" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {caches.map(cache => (
+                            <SelectItem key={cache.id} value={cache.id}>
+                              {cache.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button onClick={() => removeFromCart(rec.id)} variant="outline" className="w-full">
+                        Remove from Cache
+                      </Button>
+                    </div>
+                  ) : (
+                    <Select onValueChange={(cacheId) => addToCart(rec, cacheId)}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select cache" />
+                        <SelectValue placeholder="Add to cache..." />
                       </SelectTrigger>
                       <SelectContent>
                         {caches.map(cache => (
@@ -292,28 +294,24 @@ export default function Shopping() {
                         ))}
                       </SelectContent>
                     </Select>
+                  )}
+                  {rec.affiliate_link && (
                     <Button
-                      onClick={() => removeFromCart(rec.id)}
-                      variant="outline"
-                      className="w-full"
+                      onClick={async () => {
+                        await base44.functions.invoke('trackAffiliateClick', {
+                          recommendationId: rec.id,
+                          productName: rec.item_name,
+                          affiliateLink: rec.affiliate_link
+                        });
+                        window.open(rec.affiliate_link, '_blank');
+                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
                     >
-                      Remove from Cart
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      View on {getStoreName(rec.affiliate_link)}
                     </Button>
-                  </div>
-                ) : (
-                  <Select onValueChange={(cacheId) => addToCart(rec, cacheId)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Add to cache..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {caches.map(cache => (
-                        <SelectItem key={cache.id} value={cache.id}>
-                          {cache.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
