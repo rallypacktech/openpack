@@ -11,16 +11,6 @@ Deno.serve(async (req) => {
 
     const { recommendationId, productName, affiliateLink } = await req.json();
 
-    // Track the click
-    await base44.analytics.track({
-      eventName: 'affiliate_link_clicked',
-      properties: {
-        recommendation_id: recommendationId,
-        product_name: productName,
-        user_email: user.email
-      }
-    });
-
     // Return the affiliate link for redirect
     return Response.json({ 
       success: true,
