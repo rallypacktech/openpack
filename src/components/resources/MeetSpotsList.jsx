@@ -25,6 +25,11 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [formData, setFormData] = useState({
     name: "",
     address: "",
+    street_address: "",
+    city: "",
+    state_province: "",
+    postal_code: "",
+    country: "",
     latitude: "",
     longitude: "",
     description: "",
@@ -106,6 +111,11 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     setFormData({
       name: "",
       address: "",
+      street_address: "",
+      city: "",
+      state_province: "",
+      postal_code: "",
+      country: "",
       latitude: "",
       longitude: "",
       description: "",
@@ -124,6 +134,11 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     setFormData({
       name: spot.name || "",
       address: spot.address || "",
+      street_address: spot.address?.split(',')[0]?.trim() || "",
+      city: "",
+      state_province: "",
+      postal_code: "",
+      country: "",
       latitude: spot.latitude?.toString() || "",
       longitude: spot.longitude?.toString() || "",
       description: spot.description || "",
@@ -156,17 +171,24 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   };
 
   const handleMeetSpotAddressSelect = (addressData) => {
-    setFormData({
-      ...formData,
-      address: addressData.display_name || [
-        addressData.street_address,
-        addressData.city,
-        addressData.state_province,
-        addressData.postal_code
-      ].filter(Boolean).join(', '),
+    const fullAddress = [
+      addressData.street_address,
+      addressData.city,
+      addressData.state_province,
+      addressData.postal_code,
+      addressData.country
+    ].filter(Boolean).join(', ');
+    setFormData(prev => ({
+      ...prev,
+      address: fullAddress,
+      street_address: addressData.street_address || "",
+      city: addressData.city || "",
+      state_province: addressData.state_province || "",
+      postal_code: addressData.postal_code || "",
+      country: addressData.country || "",
       latitude: addressData.latitude?.toString() || "",
       longitude: addressData.longitude?.toString() || ""
-    });
+    }));
   };
 
   // Calculate cardinal direction from home to a spot
@@ -298,16 +320,23 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
                 <StructuredAddressInput
                   formData={{
-                    street_address: formData.address?.split(',')[0] || "",
-                    city: "",
-                    state_province: "",
-                    postal_code: "",
-                    country: ""
+                    street_address: formData.street_address || "",
+                    city: formData.city || "",
+                    state_province: formData.state_province || "",
+                    postal_code: formData.postal_code || "",
+                    country: formData.country || ""
                   }}
                   onFieldChange={(field, value) => {
-                    if (field === 'street_address') {
-                      handleMeetSpotFieldChange('address', value);
-                    }
+                    setFormData(prev => ({
+                      ...prev,
+                      [field]: value,
+                      address: [
+                        field === 'street_address' ? value : prev.street_address,
+                        field === 'city' ? value : prev.city,
+                        field === 'state_province' ? value : prev.state_province,
+                        field === 'postal_code' ? value : prev.postal_code,
+                      ].filter(Boolean).join(', ')
+                    }));
                   }}
                   onAddressSelect={handleMeetSpotAddressSelect}
                 />
@@ -452,7 +481,12 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           onAddSpot={(suggestion) => {
             setFormData({
               name: suggestion.place_type || suggestion.name || "",
-              address: suggestion.search_tip || suggestion.address || "",
+              address: suggestion.address || "",
+              street_address: suggestion.address || "",
+              city: "",
+              state_province: "",
+              postal_code: "",
+              country: "",
               latitude: suggestion.latitude?.toString() || "",
               longitude: suggestion.longitude?.toString() || "",
               description: `${suggestion.direction_hint ? suggestion.direction_hint + " — " : ""}${suggestion.description || suggestion.why || ""}`,
