@@ -23,26 +23,33 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Suggestion not found' }, { status: 404 });
         }
 
-        // If original_recommendation_id exists, update it. Otherwise create new.
+        // If original_recommendation_id exists, try to update it. If not found, fall through to create.
+        let updated = false;
         if (suggestion.original_recommendation_id) {
-            await base44.asServiceRole.entities.ProductRecommendation.update(
-                suggestion.original_recommendation_id,
-                {
-                    item_name: suggestion.suggested_item_name,
-                    category: suggestion.suggested_category,
-                    cache_type: suggestion.suggested_cache_type,
-                    image_url: suggestion.suggested_image_url,
-                    price_cents: suggestion.suggested_price_cents,
-                    description: suggestion.suggested_description,
-                    quantity: suggestion.suggested_quantity,
-                    fema_regions: suggestion.suggested_fema_regions,
-                    disaster_types: suggestion.suggested_disaster_types,
-                    family_member_types: suggestion.suggested_family_member_types,
-                    affiliate_link: suggestion.suggested_affiliate_link,
-                    active: true
-                }
-            );
-        } else {
+            try {
+                await base44.asServiceRole.entities.ProductRecommendation.update(
+                    suggestion.original_recommendation_id,
+                    {
+                        item_name: suggestion.suggested_item_name,
+                        category: suggestion.suggested_category,
+                        cache_type: suggestion.suggested_cache_type,
+                        image_url: suggestion.suggested_image_url,
+                        price_cents: suggestion.suggested_price_cents,
+                        description: suggestion.suggested_description,
+                        quantity: suggestion.suggested_quantity,
+                        fema_regions: suggestion.suggested_fema_regions,
+                        disaster_types: suggestion.suggested_disaster_types,
+                        family_member_types: suggestion.suggested_family_member_types,
+                        affiliate_link: suggestion.suggested_affiliate_link,
+                        active: true
+                    }
+                );
+                updated = true;
+            } catch (e) {
+                // Original recommendation was deleted — fall through to create a new one
+            }
+        }
+        if (!updated) {
             await base44.asServiceRole.entities.ProductRecommendation.create({
                 item_name: suggestion.suggested_item_name,
                 category: suggestion.suggested_category,
