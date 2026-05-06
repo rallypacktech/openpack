@@ -450,7 +450,7 @@ export default function Dashboard() {
   // An "established" user has already added family members or has a complete address — don't force them through onboarding steps they haven't done
   const isEstablishedUser = familyMembers.length > 0;
   const needsAddress = dataLoaded && userProfile && !userProfile.street_address && !isEstablishedUser;
-  const needsFamilySetup = dataLoaded && !familyStepCompleted && familyMembers.length === 0 && !isEstablishedUser;
+  const needsFamilySetup = dataLoaded && !familyStepCompleted && familyMembers.length === 0 && pets.length === 0 && !isEstablishedUser;
   const needsMeetSpots = dataLoaded && meetSpots.length === 0 && !needsAddress && !needsFamilySetup && !isEstablishedUser;
   const needsCaches = dataLoaded && caches.length === 0 && !needsAddress && !needsFamilySetup && !needsMeetSpots && !isEstablishedUser;
   const isOnboarding = !needsTermsAgreement && (needsAddress || needsFamilySetup || needsMeetSpots || needsCaches);

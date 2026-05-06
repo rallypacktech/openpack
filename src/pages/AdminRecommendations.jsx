@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, ShoppingCart, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 
 export default function AdminRecommendations() {
@@ -25,7 +26,10 @@ export default function AdminRecommendations() {
     affiliate_link: "",
     image_url: "",
     priority: 0,
-    active: true
+    active: true,
+    fema_regions: [],
+    disaster_types: [],
+    family_member_types: []
   });
 
   useEffect(() => {
@@ -62,9 +66,12 @@ export default function AdminRecommendations() {
       affiliate_link: "",
       image_url: "",
       priority: 0,
-      active: true
-    });
-    setEditing(null);
+      active: true,
+      fema_regions: [],
+      disaster_types: [],
+      family_member_types: []
+      });
+      setEditing(null);
   };
 
   const openAddDialog = () => {
@@ -85,7 +92,10 @@ export default function AdminRecommendations() {
       affiliate_link: rec.affiliate_link || "",
       image_url: rec.image_url || "",
       priority: rec.priority || 0,
-      active: rec.active !== false
+      active: rec.active !== false,
+      fema_regions: rec.fema_regions || [],
+      disaster_types: rec.disaster_types || [],
+      family_member_types: rec.family_member_types || []
     });
     setDialogOpen(true);
   };
@@ -106,6 +116,14 @@ export default function AdminRecommendations() {
       await base44.entities.ProductRecommendation.delete(id);
       loadData();
     }
+  };
+
+  const toggleTag = (field, value) => {
+    const current = formData[field] || [];
+    setFormData({
+      ...formData,
+      [field]: current.includes(value) ? current.filter(v => v !== value) : [...current, value]
+    });
   };
 
   const toggleActive = async (rec) => {
@@ -239,6 +257,71 @@ export default function AdminRecommendations() {
                   />
                 </div>
                 <div>
+                  <Label>Recommended For</Label>
+                  <div className="border rounded-md p-3 flex flex-wrap gap-2">
+                    {[
+                      { value: 'person', label: '👤 Person' },
+                      { value: 'dog', label: '🐕 Dog' },
+                      { value: 'cat', label: '🐈 Cat' },
+                      { value: 'bird', label: '🐦 Bird' },
+                      { value: 'other', label: '🐾 Other Pet' }
+                    ].map(({ value, label }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => toggleTag('family_member_types', value)}
+                        className={`px-3 py-1 rounded border text-sm transition-all ${
+                          formData.family_member_types?.includes(value)
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Leave empty to show to all users</p>
+                </div>
+                <div>
+                  <Label>Disaster Types</Label>
+                  <div className="border rounded-md p-3 flex flex-wrap gap-2">
+                    {['wildfire', 'hurricane', 'flood', 'tornado', 'earthquake', 'winter_storm', 'general'].map(type => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => toggleTag('disaster_types', type)}
+                        className={`px-3 py-1 rounded border text-sm transition-all capitalize ${
+                          formData.disaster_types?.includes(type)
+                            ? 'bg-orange-500 text-white border-orange-500'
+                            : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {type.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label>FEMA Regions</Label>
+                  <div className="border rounded-md p-3 flex flex-wrap gap-2">
+                    {['1','2','3','4','5','6','7','8','9','10'].map(region => (
+                      <button
+                        key={region}
+                        type="button"
+                        onClick={() => toggleTag('fema_regions', region)}
+                        className={`px-3 py-1 rounded border text-sm transition-all ${
+                          formData.fema_regions?.includes(region)
+                            ? 'bg-green-600 text-white border-green-600'
+                            : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        Region {region}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Leave empty to show in all regions</p>
+                </div>
+                <div>
                   <Label>Priority (higher = shown first)</Label>
                   <Input
                     type="number"
@@ -295,6 +378,24 @@ export default function AdminRecommendations() {
                 </div>
                 {rec.description && (
                   <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
+                )}
+                {rec.family_member_types?.length > 0 && (
+                  <div className="flex gap-1 flex-wrap mb-2">
+                    {rec.family_member_types.map(type => (
+                      <Badge key={type} className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                        {type === 'person' ? '👤' : type === 'dog' ? '🐕' : type === 'cat' ? '🐈' : type === 'bird' ? '🐦' : '🐾'} {type}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                {rec.disaster_types?.length > 0 && (
+                  <div className="flex gap-1 flex-wrap mb-2">
+                    {rec.disaster_types.map(type => (
+                      <Badge key={type} className="text-xs bg-orange-50 text-orange-700 border-orange-200 capitalize">
+                        {type.replace('_', ' ')}
+                      </Badge>
+                    ))}
+                  </div>
                 )}
                 <div className="flex items-center gap-2 text-xs">
                   {rec.stripe_product_id && (
