@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
         }
 
         const recommendations = await base44.asServiceRole.entities.ProductRecommendation.filter({ active: true });
-        const withLinks = recommendations.filter(rec => rec.affiliate_link && rec.price_cents);
+        const withLinks = recommendations.filter(rec => rec.affiliate_link);
 
         const updated = [];
         const errors = [];
