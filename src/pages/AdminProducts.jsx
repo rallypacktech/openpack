@@ -317,7 +317,9 @@ export default function AdminProducts() {
       <Card className={missing.length > 0 ? "border-orange-300" : ""}>
         <CardContent className="p-4">
           {item.suggested_image_url && (
-            <img src={item.suggested_image_url} alt={item.suggested_item_name} className="w-full h-32 object-cover rounded mb-3" />
+            <div className="aspect-square w-full mb-3 overflow-hidden rounded">
+              <img src={item.suggested_image_url} alt={item.suggested_item_name} className="w-full h-full object-cover" />
+            </div>
           )}
           <h3 className="font-semibold text-gray-900 mb-2">{item.suggested_item_name}</h3>
           <div className="flex gap-1 mb-2 flex-wrap">
@@ -383,7 +385,11 @@ export default function AdminProducts() {
   const ProductCard = ({ item }) => (
     <Card className={(!item.affiliate_link || !item.price_cents || item.price_cents === 0) ? "border-orange-300" : ""}>
       <CardContent className="p-4">
-        {item.image_url && <img src={item.image_url} alt={item.item_name} className="w-full h-32 object-cover rounded mb-3" />}
+        {item.image_url && (
+        <div className="aspect-square w-full mb-3 overflow-hidden rounded">
+          <img src={item.image_url} alt={item.item_name} className="w-full h-full object-cover" />
+        </div>
+      )}
         <h3 className="font-semibold text-gray-900 mb-2">{item.item_name}</h3>
         <div className="flex gap-1 mb-2 flex-wrap">
           <Badge className={CATEGORY_COLORS[item.category]}>{item.category}</Badge>

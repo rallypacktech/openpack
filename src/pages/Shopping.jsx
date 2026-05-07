@@ -221,11 +221,13 @@ export default function Shopping() {
             <Card key={rec.id} className="hover:shadow-lg transition-shadow">
               <CardContent className="p-4">
                 {rec.image_url && (
-                  <img 
-                    src={rec.image_url} 
-                    alt={rec.item_name}
-                    className="w-full h-56 object-cover rounded-lg mb-4"
-                  />
+                  <div className="aspect-square w-full mb-4 overflow-hidden rounded-lg">
+                    <img 
+                      src={rec.image_url} 
+                      alt={rec.item_name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 )}
                 
                 <div className="flex items-start justify-between mb-2">
