@@ -49,7 +49,6 @@
  */
 import AdminMonitor from './pages/AdminMonitor';
 import AdminProducts from './pages/AdminProducts';
-import AdminRecommendations from './pages/AdminRecommendations';
 import CacheDetail from './pages/CacheDetail';
 import CheckoutCancel from './pages/CheckoutCancel';
 import CheckoutSuccess from './pages/CheckoutSuccess';
@@ -72,7 +71,6 @@ import __Layout from './Layout.jsx';
 export const PAGES = {
     "AdminMonitor": AdminMonitor,
     "AdminProducts": AdminProducts,
-    "AdminRecommendations": AdminRecommendations,
     "CacheDetail": CacheDetail,
     "CheckoutCancel": CheckoutCancel,
     "CheckoutSuccess": CheckoutSuccess,
