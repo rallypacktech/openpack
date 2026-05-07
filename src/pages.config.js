@@ -48,7 +48,6 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import AdminMonitor from './pages/AdminMonitor';
-import AdminProductSuggestions from './pages/AdminProductSuggestions';
 import AdminProducts from './pages/AdminProducts';
 import AdminRecommendations from './pages/AdminRecommendations';
 import CacheDetail from './pages/CacheDetail';
@@ -72,7 +71,6 @@ import __Layout from './Layout.jsx';
 
 export const PAGES = {
     "AdminMonitor": AdminMonitor,
-    "AdminProductSuggestions": AdminProductSuggestions,
     "AdminProducts": AdminProducts,
     "AdminRecommendations": AdminRecommendations,
     "CacheDetail": CacheDetail,
