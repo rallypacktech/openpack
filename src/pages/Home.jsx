@@ -235,7 +235,11 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-6 text-sm font-sans font-semibold text-[#1C1C1A]">
             <a href="https://www.ready.gov" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">FEMA Ready.gov</a>
             <span className="text-[#D8D2C6]">·</span>
-            <a href="https://www.redcross.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">American Red Cross</a>
+            <a href="https://www.ifrc.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">IFRC</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://www.weather.gov" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">NOAA / NWS</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://www.publicsafety.gc.ca/cnt/mrgnc-mngmnt/index-en.aspx" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Public Safety Canada</a>
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://operationhope.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Operation HOPE</a>
             <span className="text-[#D8D2C6]">·</span>
@@ -299,7 +303,7 @@ export default function Home() {
             <div className="md:col-span-2">
               <span className="font-serif text-2xl font-bold text-white block mb-3">RallyPack</span>
               <p className="text-sm font-sans leading-relaxed text-white/40 max-w-xs">
-                Free, open-source emergency preparedness for everyday families. Built around FEMA guidelines and the Red Cross.
+                Free, open-source emergency preparedness for everyday families. Built around FEMA guidelines and the IFRC.
               </p>
             </div>
             <div>
