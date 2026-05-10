@@ -252,6 +252,8 @@ export default function Home() {
             <a href="https://code3associates.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Code 3 Associates</a>
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://www.rei.com/learn/expert-advice/emergency-preparedness.html" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">REI Co-op</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://www.oregonhumane.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Oregon Humane Society</a>
           </div>
         </div>
       </section>
