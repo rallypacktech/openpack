@@ -9,11 +9,13 @@ import {
   WifiOff, 
   Settings, 
   LogOut,
+  LogIn,
   Menu,
   X,
   Users,
   Radio,
-  Building2
+  Building2,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -56,21 +58,21 @@ export default function Layout({ children, currentPageName }) {
     );
   }
 
-  const navItems = [
-    { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
-    { name: "Resources", page: "Resources", icon: Package },
-    { name: "Shopping", page: "Shopping", icon: Package },
-    { name: "Emergency", page: "Emergency", icon: AlertTriangle },
-    { name: "Offline", page: "Offline", icon: WifiOff },
-    { name: "Settings", page: "Settings", icon: Settings },
-    { name: "Tracking", page: "TrackedItems", icon: Radio },
-    { name: "Business", page: "BusinessDashboard", icon: Building2 },
+  const allNavItems = [
+    { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard, requiresAuth: true },
+    { name: "Resources", page: "Resources", icon: Package, requiresAuth: true },
+    { name: "Shopping", page: "Shopping", icon: Package, requiresAuth: false },
+    { name: "Emergency", page: "Emergency", icon: AlertTriangle, requiresAuth: true },
+    { name: "Offline", page: "Offline", icon: WifiOff, requiresAuth: true },
+    { name: "Settings", page: "Settings", icon: Settings, requiresAuth: true },
+    { name: "Tracking", page: "TrackedItems", icon: Radio, requiresAuth: true },
+    { name: "Business", page: "BusinessDashboard", icon: Building2, requiresAuth: true },
   ];
 
   if (isAdmin) {
-    navItems.push(
-      { name: "Products", page: "AdminProducts", icon: Package },
-      { name: "Monitor", page: "AdminMonitor", icon: Users }
+    allNavItems.push(
+      { name: "Products", page: "AdminProducts", icon: Package, requiresAuth: true },
+      { name: "Monitor", page: "AdminMonitor", icon: Users, requiresAuth: true }
     );
   }
 
@@ -80,22 +82,39 @@ export default function Layout({ children, currentPageName }) {
 
   const NavLinks = ({ onClick }) => (
     <>
-      {navItems.map((item) => (
-        <Link
-          key={item.page}
-          to={createPageUrl(item.page)}
-          onClick={onClick}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors font-sans ${
-            currentPageName === item.page
-              ? "bg-foreground/5 text-foreground font-medium"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          aria-current={currentPageName === item.page ? "page" : undefined}
-        >
-          <item.icon className="w-4 h-4" aria-hidden="true" />
-          <span>{item.name}</span>
-        </Link>
-      ))}
+      {allNavItems.map((item) => {
+        const isLocked = item.requiresAuth && !user;
+        if (isLocked) {
+          return (
+            <button
+              key={item.page}
+              onClick={() => { base44.auth.redirectToLogin(createPageUrl(item.page)); if (onClick) onClick(); }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded text-sm font-sans text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors"
+              title="Sign in to access this feature"
+            >
+              <item.icon className="w-4 h-4" aria-hidden="true" />
+              <span>{item.name}</span>
+              <Lock className="w-3 h-3 ml-0.5 opacity-60" aria-hidden="true" />
+            </button>
+          );
+        }
+        return (
+          <Link
+            key={item.page}
+            to={createPageUrl(item.page)}
+            onClick={onClick}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors font-sans ${
+              currentPageName === item.page
+                ? "bg-foreground/5 text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            aria-current={currentPageName === item.page ? "page" : undefined}
+          >
+            <item.icon className="w-4 h-4" aria-hidden="true" />
+            <span>{item.name}</span>
+          </Link>
+        );
+      })}
     </>
   );
 
@@ -107,13 +126,13 @@ export default function Layout({ children, currentPageName }) {
           Skip to main content
         </a>
 
-        {/* Header */}
-        {user && (
+        {/* Header — always visible */}
+        {authChecked && (
           <header className="bg-white border-b border-border sticky top-0 z-50" role="banner">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-14">
                 {/* Logo */}
-                <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2" aria-label="RallyPack Home">
+                <Link to={user ? createPageUrl("Dashboard") : createPageUrl("Home")} className="flex items-center gap-2" aria-label="RallyPack Home">
                   <span className="font-serif text-xl font-bold text-foreground tracking-tight">RallyPack</span>
                 </Link>
 
@@ -123,16 +142,29 @@ export default function Layout({ children, currentPageName }) {
 
                 {/* Right Section */}
                 <div className="flex items-center gap-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleLogout}
-                    className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
-                    aria-label="Log out of your account"
-                  >
-                    <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
-                    Log out
-                  </Button>
+                  {user ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogout}
+                      className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
+                      aria-label="Log out of your account"
+                    >
+                      <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+                      Log out
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => base44.auth.redirectToLogin()}
+                      className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
+                      aria-label="Log in to your account"
+                    >
+                      <LogIn className="w-3.5 h-3.5" aria-hidden="true" />
+                      Log in
+                    </Button>
+                  )}
 
                   {/* Mobile Menu */}
                   <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -145,15 +177,27 @@ export default function Layout({ children, currentPageName }) {
                       <nav className="flex flex-col gap-2 mt-8">
                         <NavLinks onClick={() => setMobileMenuOpen(false)} />
                         <hr className="my-4" />
-                        <Button
-                          variant="outline"
-                          onClick={handleLogout}
-                          className="flex items-center gap-2"
-                          aria-label="Log out of your account"
-                        >
-                          <LogOut className="w-4 h-4" aria-hidden="true" />
-                          Log Out
-                        </Button>
+                        {user ? (
+                          <Button
+                            variant="outline"
+                            onClick={handleLogout}
+                            className="flex items-center gap-2"
+                            aria-label="Log out of your account"
+                          >
+                            <LogOut className="w-4 h-4" aria-hidden="true" />
+                            Log Out
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            onClick={() => base44.auth.redirectToLogin()}
+                            className="flex items-center gap-2"
+                            aria-label="Log in to your account"
+                          >
+                            <LogIn className="w-4 h-4" aria-hidden="true" />
+                            Log In / Sign Up
+                          </Button>
+                        )}
                       </nav>
                     </SheetContent>
                   </Sheet>
@@ -167,7 +211,7 @@ export default function Layout({ children, currentPageName }) {
         <main id="main-content" role="main">{children}</main>
 
         {/* Footer */}
-        {user && (
+        {authChecked && (
           <footer className="bg-white border-t border-border mt-auto" role="contentinfo">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
