@@ -10,6 +10,7 @@ import TrainingClasses from "../components/resources/TrainingClasses";
 import VolunteerOpportunities from "../components/resources/VolunteerOpportunities";
 import SharePlan from "../components/resources/SharePlan";
 import ExternalResourcesTab from "../components/resources/ExternalResourcesTab";
+import { Link } from "react-router-dom";
 
 export default function Resources() {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share", "resources"].includes(tab)) {
+    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share", "resources", "tracking"].includes(tab)) {
       setActiveTab(tab);
     }
   }, []);
@@ -174,6 +175,7 @@ export default function Resources() {
             <TabsTrigger value="volunteer">Volunteer</TabsTrigger>
             <TabsTrigger value="share">Share Plan</TabsTrigger>
             <TabsTrigger value="resources">Ext. Resources</TabsTrigger>
+            <TabsTrigger value="tracking">Tracking</TabsTrigger>
           </TabsList>
 
           <TabsContent value="caches">
@@ -220,6 +222,18 @@ export default function Resources() {
 
           <TabsContent value="resources">
             <ExternalResourcesTab />
+          </TabsContent>
+
+          <TabsContent value="tracking">
+            <div className="text-center py-16">
+              <p className="text-muted-foreground text-sm mb-4">Manage your tracked items — pets, valuables, vehicles, and more.</p>
+              <Link
+                to="/TrackedItems"
+                className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-2.5 rounded text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                Go to Tracking
+              </Link>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

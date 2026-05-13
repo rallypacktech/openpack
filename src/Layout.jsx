@@ -13,7 +13,6 @@ import {
   Menu,
   X,
   Users,
-  Radio,
   Building2,
   Lock
 } from "lucide-react";
@@ -61,7 +60,6 @@ export default function Layout({ children, currentPageName }) {
   const allNavItems = [
     { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard, requiresAuth: true },
     { name: "Resources", page: "Resources", icon: Package, requiresAuth: true },
-    { name: "Tracking", page: "TrackedItems", icon: Radio, requiresAuth: true },
     { name: "Shopping", page: "Shopping", icon: Package, requiresAuth: false },
     { name: "Emergency", page: "Emergency", icon: AlertTriangle, requiresAuth: true },
     { name: "Offline", page: "Offline", icon: WifiOff, requiresAuth: true },
