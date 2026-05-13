@@ -1,0 +1,108 @@
+{
+  "name": "EvacuationPlan",
+  "type": "object",
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to BusinessSubscription"
+    },
+    "plan_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "assembly_point_name": {
+      "type": "string"
+    },
+    "assembly_point_address": {
+      "type": "string"
+    },
+    "assembly_point_latitude": {
+      "type": "number"
+    },
+    "assembly_point_longitude": {
+      "type": "number"
+    },
+    "secondary_assembly_point_name": {
+      "type": "string"
+    },
+    "secondary_assembly_point_address": {
+      "type": "string"
+    },
+    "evacuation_routes": {
+      "type": "string",
+      "description": "Text description of evacuation routes"
+    },
+    "trigger_conditions": {
+      "type": "string",
+      "description": "When to activate this plan (fire, earthquake, active shooter, etc.)"
+    },
+    "last_drill_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "next_drill_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "subscription_id",
+    "plan_name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

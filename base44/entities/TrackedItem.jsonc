@@ -1,0 +1,134 @@
+{
+  "name": "TrackedItem",
+  "type": "object",
+  "properties": {
+    "item_name": {
+      "type": "string",
+      "description": "Name of the tracked item"
+    },
+    "item_type": {
+      "type": "string",
+      "enum": [
+        "pet_collar",
+        "pet_microchip",
+        "valuable_asset",
+        "vehicle",
+        "equipment",
+        "luggage",
+        "other"
+      ],
+      "description": "Type of tracked item"
+    },
+    "description": {
+      "type": "string"
+    },
+    "tracking_id": {
+      "type": "string",
+      "description": "Unique AirTag or device tracking ID / microchip number"
+    },
+    "tracking_device": {
+      "type": "string",
+      "enum": [
+        "airtag",
+        "tile",
+        "microchip",
+        "gps_collar",
+        "other"
+      ],
+      "description": "Type of tracking device used"
+    },
+    "associated_entity_type": {
+      "type": "string",
+      "enum": [
+        "pet",
+        "person",
+        "none"
+      ],
+      "description": "What entity this item is linked to"
+    },
+    "associated_entity_id": {
+      "type": "string",
+      "description": "ID of the linked Pet or UserProfile"
+    },
+    "last_known_latitude": {
+      "type": "number"
+    },
+    "last_known_longitude": {
+      "type": "number"
+    },
+    "last_location_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_known_address": {
+      "type": "string",
+      "description": "Human-readable last known location"
+    },
+    "purchase_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "purchase_value": {
+      "type": "number",
+      "description": "Purchase value in dollars (for insurance claims)"
+    },
+    "insurance_policy_number": {
+      "type": "string"
+    },
+    "serial_number": {
+      "type": "string"
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "item_name",
+    "item_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

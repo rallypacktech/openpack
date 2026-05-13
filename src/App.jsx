@@ -10,6 +10,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import AffiliatePartnerPolicy from './pages/AffiliatePartnerPolicy';
 import Feedback from './pages/Feedback';
+import TrackedItems from './pages/TrackedItems';
+import BusinessDashboard from './pages/BusinessDashboard';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -63,6 +65,8 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="/AffiliatePartnerPolicy" element={<AffiliatePartnerPolicy />} />
       <Route path="/Feedback" element={<Feedback />} />
+      <Route path="/TrackedItems" element={<LayoutWrapper currentPageName="TrackedItems"><TrackedItems /></LayoutWrapper>} />
+      <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -1,0 +1,120 @@
+{
+  "name": "OrganizationMember",
+  "type": "object",
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to BusinessSubscription"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "owner",
+        "safety_officer",
+        "team_lead",
+        "member"
+      ],
+      "default": "member"
+    },
+    "department": {
+      "type": "string"
+    },
+    "chain_of_command_order": {
+      "type": "number",
+      "description": "Notification order \u2014 lower number = notified first"
+    },
+    "notify_on_evacuation": {
+      "type": "boolean",
+      "default": true
+    },
+    "notify_on_kit_expiry": {
+      "type": "boolean",
+      "default": false
+    },
+    "notification_method": {
+      "type": "string",
+      "enum": [
+        "email",
+        "in_app",
+        "both"
+      ],
+      "default": "email"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "pending_invite"
+      ],
+      "default": "pending_invite"
+    }
+  },
+  "required": [
+    "subscription_id",
+    "email",
+    "role"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

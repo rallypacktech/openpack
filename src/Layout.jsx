@@ -11,7 +11,9 @@ import {
   LogOut,
   Menu,
   X,
-  Users
+  Users,
+  Radio,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -61,6 +63,8 @@ export default function Layout({ children, currentPageName }) {
     { name: "Emergency", page: "Emergency", icon: AlertTriangle },
     { name: "Offline", page: "Offline", icon: WifiOff },
     { name: "Settings", page: "Settings", icon: Settings },
+    { name: "Tracking", page: "TrackedItems", icon: Radio },
+    { name: "Business", page: "BusinessDashboard", icon: Building2 },
   ];
 
   if (isAdmin) {
