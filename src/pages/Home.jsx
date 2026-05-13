@@ -25,14 +25,7 @@ const SCENARIOS = [
 ];
 
 export default function Home() {
-  const [scrolled, setScrolled] = React.useState(false);
   const [user, setUser] = React.useState(null);
-
-  React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   React.useEffect(() => {
     base44.auth.me().then(setUser).catch(() => setUser(null));
@@ -49,27 +42,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
-      {/* ── Nav ── (hidden when logged in — layout header handles it) */}
-      {!user && (
-        <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-sm" : ""}`}>
-          <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-            <nav className={`hidden md:flex items-center gap-8 text-sm font-sans drop-shadow transition-colors ${scrolled ? "text-[#1C1C1A]/70" : "text-white/85"}`}>
-              <Link to={createPageUrl("ReadinessQuiz")} className={`transition-colors tracking-wide ${scrolled ? "hover:text-[#1C1C1A]" : "hover:text-white"}`}>Quiz</Link>
-              <Link to={createPageUrl("Resources")} className={`transition-colors tracking-wide ${scrolled ? "hover:text-[#1C1C1A]" : "hover:text-white"}`}>Resources</Link>
-              <Link to={createPageUrl("LearnMore")} className={`transition-colors tracking-wide ${scrolled ? "hover:text-[#1C1C1A]" : "hover:text-white"}`}>About</Link>
-            </nav>
-            <div className="flex items-center gap-4 ml-auto">
-              <button onClick={handleSignUp} className={`text-sm font-semibold hidden sm:block tracking-wide drop-shadow transition-colors ${scrolled ? "text-[#1C1C1A] hover:text-[#1C1C1A]/70" : "text-white hover:text-white/80"}`}>Sign in</button>
-              <button
-                onClick={handleSignUp}
-                className={`text-sm font-semibold px-5 py-2.5 transition-colors tracking-wide ${scrolled ? "bg-[#D64A2E] text-white hover:bg-[#be3f25]" : "bg-white text-[#1C1C1A] hover:bg-[#F5F0E8]"}`}
-              >
-                Get started
-              </button>
-            </div>
-          </div>
-        </header>
-      )}
+
 
       {/* ── Hero — full bleed ── */}
       <section className="relative h-screen min-h-[640px] flex items-end">

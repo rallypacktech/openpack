@@ -61,11 +61,11 @@ export default function Layout({ children, currentPageName }) {
   const allNavItems = [
     { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard, requiresAuth: true },
     { name: "Resources", page: "Resources", icon: Package, requiresAuth: true },
+    { name: "Tracking", page: "TrackedItems", icon: Radio, requiresAuth: true },
     { name: "Shopping", page: "Shopping", icon: Package, requiresAuth: false },
     { name: "Emergency", page: "Emergency", icon: AlertTriangle, requiresAuth: true },
     { name: "Offline", page: "Offline", icon: WifiOff, requiresAuth: true },
     { name: "Settings", page: "Settings", icon: Settings, requiresAuth: true },
-    { name: "Tracking", page: "TrackedItems", icon: Radio, requiresAuth: true },
     { name: "Business", page: "BusinessDashboard", icon: Building2, requiresAuth: true },
   ];
 
