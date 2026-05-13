@@ -23,46 +23,50 @@ export default function Shopping() {
 
   const loadData = async () => {
     try {
-      const user = await base44.auth.me();
-      const [allRecs, cachesResponse, profiles, familyMembers, pets] = await Promise.all([
-        base44.entities.ProductRecommendation.filter({ active: true }, "-priority"),
-        base44.functions.invoke('getCaches'),
-        base44.entities.UserProfile.filter({ created_by: user.email }),
-        base44.entities.FamilyMember.filter({ created_by: user.email }),
-        base44.entities.Pet.filter({ created_by: user.email })
-      ]);
+      const isAuthed = await base44.auth.isAuthenticated();
 
-      const userProfile = profiles[0];
-      const familyTypes = ['person'];
-      const petSizes = new Set();
-      pets.forEach(pet => {
-        const petType = pet.species.toLowerCase();
-        if (!familyTypes.includes(petType)) {
-          familyTypes.push(petType);
-        }
-        if (pet.size) petSizes.add(pet.size);
-      });
+      // Always load all active recommendations (public)
+      const allRecs = await base44.entities.ProductRecommendation.filter({ active: true }, "-priority");
 
-      // Filter recommendations based on user's family composition
-      const filteredRecs = allRecs.filter(rec => {
-        if (rec.fema_regions && rec.fema_regions.length > 0) {
-          if (!userProfile || !userProfile.fema_region || !rec.fema_regions.includes(userProfile.fema_region)) {
-            return false;
+      if (isAuthed) {
+        const user = await base44.auth.me();
+        const [cachesResponse, profiles, pets] = await Promise.all([
+          base44.functions.invoke('getCaches'),
+          base44.entities.UserProfile.filter({ created_by: user.email }),
+          base44.entities.Pet.filter({ created_by: user.email })
+        ]);
+
+        const userProfile = profiles[0];
+        const familyTypes = ['person'];
+        const petSizes = new Set();
+        pets.forEach(pet => {
+          const petType = pet.species.toLowerCase();
+          if (!familyTypes.includes(petType)) familyTypes.push(petType);
+          if (pet.size) petSizes.add(pet.size);
+        });
+
+        const filteredRecs = allRecs.filter(rec => {
+          if (rec.fema_regions && rec.fema_regions.length > 0) {
+            if (!userProfile || !userProfile.fema_region || !rec.fema_regions.includes(userProfile.fema_region)) return false;
           }
-        }
-        if (rec.family_member_types && rec.family_member_types.length > 0) {
-          const hasMatch = rec.family_member_types.some(type => familyTypes.includes(type.toLowerCase()));
-          if (!hasMatch) return false;
-        }
-        if (rec.pet_sizes && rec.pet_sizes.length > 0) {
-          const hasSizeMatch = rec.pet_sizes.some(size => petSizes.has(size));
-          if (!hasSizeMatch) return false;
-        }
-        return true;
-      });
+          if (rec.family_member_types && rec.family_member_types.length > 0) {
+            const hasMatch = rec.family_member_types.some(type => familyTypes.includes(type.toLowerCase()));
+            if (!hasMatch) return false;
+          }
+          if (rec.pet_sizes && rec.pet_sizes.length > 0) {
+            const hasSizeMatch = rec.pet_sizes.some(size => petSizes.has(size));
+            if (!hasSizeMatch) return false;
+          }
+          return true;
+        });
 
-      setRecommendations(filteredRecs);
-      setCaches(cachesResponse.data.caches);
+        setRecommendations(filteredRecs);
+        setCaches(cachesResponse.data.caches);
+      } else {
+        // Show all recommendations to unauthenticated users
+        setRecommendations(allRecs);
+        setCaches([]);
+      }
     } catch (error) {
       console.error("Error loading shopping data:", error);
     } finally {
@@ -265,11 +269,29 @@ export default function Shopping() {
                 </div>
 
                 <div className="space-y-2">
-                  {cart[rec.id] ? (
-                    <div className="space-y-2">
-                      <Select value={cart[rec.id].cacheId} onValueChange={(val) => addToCart(rec, val)}>
+                  {caches.length > 0 && (
+                    cart[rec.id] ? (
+                      <div className="space-y-2">
+                        <Select value={cart[rec.id].cacheId} onValueChange={(val) => addToCart(rec, val)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select cache" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {caches.map(cache => (
+                              <SelectItem key={cache.id} value={cache.id}>
+                                {cache.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button onClick={() => removeFromCart(rec.id)} variant="outline" className="w-full">
+                          Remove from Cache
+                        </Button>
+                      </div>
+                    ) : (
+                      <Select onValueChange={(cacheId) => addToCart(rec, cacheId)}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select cache" />
+                          <SelectValue placeholder="Add to cache..." />
                         </SelectTrigger>
                         <SelectContent>
                           {caches.map(cache => (
@@ -279,32 +301,20 @@ export default function Shopping() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Button onClick={() => removeFromCart(rec.id)} variant="outline" className="w-full">
-                        Remove from Cache
-                      </Button>
-                    </div>
-                  ) : (
-                    <Select onValueChange={(cacheId) => addToCart(rec, cacheId)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Add to cache..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {caches.map(cache => (
-                          <SelectItem key={cache.id} value={cache.id}>
-                            {cache.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    )
                   )}
                   {rec.affiliate_link && (
                     <Button
                       onClick={async () => {
-                        await base44.functions.invoke('trackAffiliateClick', {
-                          recommendationId: rec.id,
-                          productName: rec.item_name,
-                          affiliateLink: rec.affiliate_link
-                        });
+                        try {
+                          await base44.functions.invoke('trackAffiliateClick', {
+                            recommendationId: rec.id,
+                            productName: rec.item_name,
+                            affiliateLink: rec.affiliate_link
+                          });
+                        } catch {
+                          // tracking is best-effort for unauthenticated users
+                        }
                         window.open(rec.affiliate_link, '_blank');
                       }}
                       className="w-full bg-blue-600 hover:bg-blue-700"
