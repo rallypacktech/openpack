@@ -14,6 +14,7 @@ export default function Shopping() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [cacheTypeFilter, setCacheTypeFilter] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState("all");
   const [cart, setCart] = useState({});
   const [showDescriptions, setShowDescriptions] = useState({});
 
@@ -106,12 +107,21 @@ export default function Shopping() {
     }
   };
 
+  const sourceOrgs = [...new Set(recommendations.map(r => r.source_organization).filter(Boolean))].sort();
+
+  const normalizeOrg = (val) => {
+    if (!val) return "";
+    if (val.toLowerCase().includes("red cross")) return "Red Cross";
+    return val;
+  };
+
   const filteredRecommendations = recommendations.filter(rec => {
     const matchesSearch = rec.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           rec.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || rec.category === categoryFilter;
     const matchesCacheType = cacheTypeFilter === "all" || rec.cache_type === cacheTypeFilter;
-    return matchesSearch && matchesCategory && matchesCacheType;
+    const matchesSource = sourceFilter === "all" || normalizeOrg(rec.source_organization) === sourceFilter;
+    return matchesSearch && matchesCategory && matchesCacheType && matchesSource;
   });
 
   const categoryColors = {
@@ -176,8 +186,8 @@ export default function Shopping() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="md:col-span-2 lg:col-span-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
@@ -216,6 +226,19 @@ export default function Shopping() {
                 <SelectItem value="general">General</SelectItem>
               </SelectContent>
             </Select>
+            {sourceOrgs.length > 0 && (
+              <Select value={sourceFilter} onValueChange={setSourceFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Source Org" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sources</SelectItem>
+                  {[...new Set(sourceOrgs.map(normalizeOrg))].map(org => (
+                    <SelectItem key={org} value={org}>{org}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
 

@@ -15,6 +15,25 @@ import {
 
 const CATEGORIES = ["water","food","medical","tools","clothing","documents","communication","hygiene","other"];
 const CACHE_TYPES = ["go_bag","automobile","general"];
+const SOURCE_ORGS = [
+  "",
+  "Red Cross",
+  "FEMA",
+  "American Heart Association",
+  "CDC",
+  "Ready.gov",
+  "NOAA",
+  "DHS",
+  "Local Emergency Management",
+  "Other"
+];
+
+const normalizeSourceOrg = (val) => {
+  if (!val) return "";
+  const lower = val.toLowerCase();
+  if (lower.includes("red cross")) return "Red Cross";
+  return val;
+};
 const FAMILY_TYPES = [
   { value: 'person', label: '👤 Person', color: 'bg-blue-50 border-blue-300 text-blue-700' },
   { value: 'dog',    label: '🐕 Dog',    color: 'bg-green-50 border-green-300 text-green-700' },
@@ -98,8 +117,8 @@ export default function AdminProducts() {
       disaster_types: product.disaster_types || [],
       priority: product.priority || 0,
       active: product.active ?? true,
-      source_organization: "",
-      admin_notes: "",
+      source_organization: normalizeSourceOrg(product.source_organization || ""),
+      admin_notes: product.admin_notes || "",
       stripe_product_id: product.stripe_product_id || "",
       pet_sizes: product.pet_sizes || []
     });
@@ -122,7 +141,7 @@ export default function AdminProducts() {
       disaster_types: suggestion.suggested_disaster_types || [],
       priority: 0,
       active: true,
-      source_organization: suggestion.source_organization || "",
+      source_organization: normalizeSourceOrg(suggestion.source_organization || ""),
       admin_notes: suggestion.admin_notes || "",
       stripe_product_id: "",
       pet_sizes: []
@@ -150,6 +169,7 @@ export default function AdminProducts() {
           disaster_types: editForm.disaster_types,
           priority: editForm.priority,
           active: editForm.active,
+          source_organization: editForm.source_organization,
           stripe_product_id: editForm.stripe_product_id,
           pet_sizes: editForm.pet_sizes
         });
@@ -187,6 +207,7 @@ export default function AdminProducts() {
           disaster_types: editForm.disaster_types,
           priority: editForm.priority,
           active: editForm.active,
+          source_organization: editForm.source_organization,
           stripe_product_id: editForm.stripe_product_id,
           pet_sizes: editForm.pet_sizes
         });
@@ -618,6 +639,18 @@ export default function AdminProducts() {
               </div>
               <p className="text-xs text-gray-500 mt-1">Pet products only show to users with those pets</p>
             </div>
+            <div>
+              <Label>Source Organization</Label>
+              <select className="w-full border rounded-md px-3 py-2" value={editForm.source_organization} onChange={e => setEditForm({...editForm, source_organization: e.target.value})}>
+                {SOURCE_ORGS.map(org => <option key={org} value={org}>{org || "— None —"}</option>)}
+              </select>
+            </div>
+            {editingItem?.isSuggestion && (
+              <div>
+                <Label>Admin Notes</Label>
+                <Input value={editForm.admin_notes} onChange={e => setEditForm({...editForm, admin_notes: e.target.value})} />
+              </div>
+            )}
             {!editingItem?.isSuggestion && (
               <>
                 <div>
@@ -627,18 +660,6 @@ export default function AdminProducts() {
                 <div className="flex items-center gap-2 pt-6">
                   <input type="checkbox" checked={editForm.active} onChange={e => setEditForm({...editForm, active: e.target.checked})} className="w-5 h-5" />
                   <Label>Active</Label>
-                </div>
-              </>
-            )}
-            {editingItem?.isSuggestion && (
-              <>
-                <div>
-                  <Label>Source Organization</Label>
-                  <Input value={editForm.source_organization} onChange={e => setEditForm({...editForm, source_organization: e.target.value})} placeholder="e.g., American Red Cross" />
-                </div>
-                <div>
-                  <Label>Admin Notes</Label>
-                  <Input value={editForm.admin_notes} onChange={e => setEditForm({...editForm, admin_notes: e.target.value})} />
                 </div>
               </>
             )}
