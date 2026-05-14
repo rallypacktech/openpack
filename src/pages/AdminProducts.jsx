@@ -281,6 +281,17 @@ export default function AdminProducts() {
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
+  const [priceUpdating, setPriceUpdating] = useState(false);
+  const handleUpdatePrices = async () => {
+    if (!confirm("Fetch current prices from all affiliate links? This may take a while.")) return;
+    setPriceUpdating(true);
+    try {
+      const res = await base44.functions.invoke('updateAffiliatePrices');
+      await loadData();
+      alert(`Price update complete: ${res.data?.updated ?? 0} products updated.`);
+    } catch (e) { console.error(e); alert("Error updating prices"); } finally { setPriceUpdating(false); }
+  };
+
   const toggleFamilyType = (type) => {
     const cur = editForm.family_member_types || [];
     setEditForm({
@@ -511,6 +522,9 @@ export default function AdminProducts() {
 
           {/* Action Buttons */}
           <div className="flex gap-2 mt-3 flex-wrap">
+            <Button onClick={handleUpdatePrices} disabled={priceUpdating} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
+              <DollarSign className="w-3 h-3 mr-1" /> {priceUpdating ? "Updating Prices…" : "Update Prices"}
+            </Button>
             <Button onClick={handleCheckLinks} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
               <RefreshCw className="w-3 h-3 mr-1" /> Check Links
             </Button>
