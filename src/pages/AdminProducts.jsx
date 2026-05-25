@@ -212,6 +212,7 @@ export default function AdminProducts() {
           disaster_types: editForm.disaster_types,
           priority: editForm.priority,
           active: editForm.active,
+          is_required: editForm.is_required,
           source_organizations: editForm.source_organizations,
           stripe_product_id: editForm.stripe_product_id,
           pet_sizes: editForm.pet_sizes
