@@ -194,6 +194,26 @@ export default function AdminProducts() {
           admin_notes: editForm.admin_notes
         });
         await base44.functions.invoke('approveSuggestion', { suggestionId: editingItem.record.id });
+      } else {
+        // Update existing product
+        await base44.entities.ProductRecommendation.update(editingItem.record.id, {
+          item_name: editForm.item_name,
+          category: editForm.category,
+          cache_type: editForm.cache_type,
+          description: editForm.description,
+          quantity: editForm.quantity,
+          price_cents: editForm.price_cents,
+          image_url: editForm.image_url,
+          affiliate_link: editForm.affiliate_link,
+          family_member_types: editForm.family_member_types,
+          fema_regions: editForm.fema_regions,
+          disaster_types: editForm.disaster_types,
+          priority: editForm.priority,
+          active: editForm.active,
+          source_organizations: editForm.source_organizations,
+          stripe_product_id: editForm.stripe_product_id,
+          pet_sizes: editForm.pet_sizes
+        });
       }
       setEditDialog(false);
       await loadData();
