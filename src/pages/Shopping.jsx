@@ -27,7 +27,8 @@ export default function Shopping() {
       const isAuthed = await base44.auth.isAuthenticated();
 
       // Always load all active recommendations (public)
-      const allRecs = await base44.entities.ProductRecommendation.filter({ active: true }, "-priority");
+      const allRecs = await base44.entities.ProductRecommendation.filter({ active: true });
+      allRecs.sort((a, b) => (b.click_count || 0) - (a.click_count || 0) || (b.view_count || 0) - (a.view_count || 0));
 
       if (isAuthed) {
         const user = await base44.auth.me();

@@ -24,6 +24,7 @@ const SOURCE_ORGS = [
   "Ready.gov",
   "NOAA",
   "DHS",
+  "Best Friends Animal Society",
   "Local Emergency Management",
   "Other"
 ];
@@ -292,6 +293,17 @@ export default function AdminProducts() {
     } catch (e) { console.error(e); alert("Error updating prices"); } finally { setPriceUpdating(false); }
   };
 
+  const [descGenerating, setDescGenerating] = useState(false);
+  const handleGenerateDescriptions = async () => {
+    if (!confirm("Generate AI descriptions for all products missing one?")) return;
+    setDescGenerating(true);
+    try {
+      const res = await base44.functions.invoke('generateDescriptions');
+      await loadData();
+      alert(`Done: ${res.data?.updated ?? 0} descriptions generated.`);
+    } catch (e) { console.error(e); alert("Error generating descriptions"); } finally { setDescGenerating(false); }
+  };
+
   const toggleFamilyType = (type) => {
     const cur = editForm.family_member_types || [];
     setEditForm({
@@ -533,6 +545,9 @@ export default function AdminProducts() {
             </Button>
             <Button onClick={handleGeneratePlaceholders} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
               Generate Placeholders
+            </Button>
+            <Button onClick={handleGenerateDescriptions} disabled={descGenerating} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
+              {descGenerating ? "Generating…" : "Generate Descriptions"}
             </Button>
           </div>
         </div>

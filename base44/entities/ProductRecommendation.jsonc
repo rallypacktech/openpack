@@ -1,0 +1,135 @@
+{
+  "name": "ProductRecommendation",
+  "type": "object",
+  "properties": {
+    "item_name": {
+      "type": "string",
+      "description": "Name of the recommended product"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "water",
+        "food",
+        "medical",
+        "tools",
+        "clothing",
+        "documents",
+        "communication",
+        "hygiene",
+        "other"
+      ]
+    },
+    "cache_type": {
+      "type": "string",
+      "enum": [
+        "go_bag",
+        "automobile",
+        "general"
+      ],
+      "description": "Which cache type this is recommended for"
+    },
+    "fema_regions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "FEMA regions this is relevant for (empty = all regions)"
+    },
+    "disaster_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Disaster types this addresses (wildfire, hurricane, flood, etc.)"
+    },
+    "family_member_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Family member types this is for (person, dog, cat, bird, other)"
+    },
+    "pet_sizes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "small",
+          "medium",
+          "large",
+          "x-large"
+        ]
+      },
+      "description": "Pet sizes this recommendation applies to (empty = all sizes)"
+    },
+    "description": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1
+    },
+    "price_cents": {
+      "type": "number",
+      "description": "Price in cents"
+    },
+    "stripe_product_id": {
+      "type": "string",
+      "description": "Stripe product ID for checkout"
+    },
+    "affiliate_link": {
+      "type": "string",
+      "description": "External affiliate link"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "number",
+      "default": 0,
+      "description": "Display priority (higher = shown first)"
+    },
+    "click_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of affiliate link clicks"
+    },
+    "view_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of times this item has been viewed in the shop"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "source_organization": {
+      "type": "string",
+      "description": "Organization recommending this item"
+    }
+  },
+  "required": [
+    "item_name",
+    "category",
+    "cache_type"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
