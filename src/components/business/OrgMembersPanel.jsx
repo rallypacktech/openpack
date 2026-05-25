@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Trash2, Edit, ArrowUp, ArrowDown, Send, Users } from "lucide-react";
+import { Plus, Trash2, Edit, Send, Users, AlertTriangle } from "lucide-react";
 
 const ROLES = [
   { value: "owner", label: "Owner" },
@@ -23,6 +23,9 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(BLANK);
   const [notifying, setNotifying] = useState(false);
+  const [alertDialog, setAlertDialog] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertPostalCode, setAlertPostalCode] = useState("");
 
   const sorted = [...members].sort((a, b) => (a.chain_of_command_order || 99) - (b.chain_of_command_order || 99));
 
@@ -44,18 +47,22 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
     onRefresh();
   };
 
-  const sendEvacuationAlert = async () => {
+  const sendIncidentAlert = async () => {
     setNotifying(true);
     const toNotify = sorted.filter(m => m.notify_on_evacuation && m.status !== "inactive");
+    const areaNote = alertPostalCode ? `This alert is targeted to the ${alertPostalCode} area and neighboring postal codes.` : "";
     for (const member of toNotify) {
       await base44.integrations.Core.SendEmail({
         to: member.email,
-        subject: "⚠️ EVACUATION ALERT — Please evacuate immediately",
-        body: `Dear ${member.full_name || member.email},\n\nThis is an official evacuation alert from ${subscription?.organization_name || "your organization"}.\n\nPlease follow your organization's evacuation plan and proceed to the designated assembly point immediately.\n\nDo not re-enter the building until you receive the all-clear.\n\n— Emergency Response System`,
+        subject: `⚠️ INCIDENT ALERT — ${subscription?.organization_name || "Your Organization"}`,
+        body: `Dear ${member.full_name || member.email},\n\nThis is an incident alert from ${subscription?.organization_name || "your organization"}.\n\n${alertMessage || "Please be aware of an active incident in your area. Follow all instructions from local emergency services."}\n\n${areaNote}\n\nStay safe and monitor official channels for updates.\n\n— ${subscription?.organization_name || "Emergency Response Team"}`,
       });
     }
     setNotifying(false);
-    alert(`Evacuation alert sent to ${toNotify.length} member(s).`);
+    setAlertDialog(false);
+    setAlertMessage("");
+    setAlertPostalCode("");
+    alert(`Incident alert sent to ${toNotify.length} member(s).`);
   };
 
   const roleColor = { owner: "bg-red-100 text-red-800", safety_officer: "bg-orange-100 text-orange-800", team_lead: "bg-blue-100 text-blue-800", member: "bg-gray-100 text-gray-700" };
@@ -63,10 +70,10 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-foreground">Chain of Command</h2>
+        <h2 className="font-semibold text-foreground">Team Members</h2>
         <div className="flex gap-2">
-          <Button variant="destructive" size="sm" onClick={sendEvacuationAlert} disabled={notifying} className="gap-2">
-            <Send className="w-3.5 h-3.5" /> {notifying ? "Sending..." : "Send Evacuation Alert"}
+          <Button variant="destructive" size="sm" onClick={() => setAlertDialog(true)} className="gap-2">
+            <AlertTriangle className="w-3.5 h-3.5" /> Send Incident Alert
           </Button>
           <Button size="sm" onClick={openCreate} className="gap-2"><Plus className="w-3.5 h-3.5" /> Add Member</Button>
         </div>
@@ -76,7 +83,7 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
         <Card className="text-center py-10">
           <CardContent>
             <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-muted-foreground text-sm">No members yet. Add your team to define the chain of command.</p>
+            <p className="text-muted-foreground text-sm">No members yet. Add team members to send incident alerts.</p>
           </CardContent>
         </Card>
       ) : (
@@ -97,7 +104,7 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
                   <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
                     <span>{m.email}</span>
                     {m.phone && <span>{m.phone}</span>}
-                    <span>Notified: {m.notify_on_evacuation ? "✓ Evacuation" : ""} {m.notify_on_kit_expiry ? "✓ Kit Expiry" : ""}</span>
+                    <span>Alerts: {m.notify_on_evacuation ? "✓ Incident" : "—"} {m.notify_on_kit_expiry ? "✓ Kit Expiry" : ""}</span>
                   </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
@@ -146,7 +153,7 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
             <div className="flex gap-4 text-sm">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={form.notify_on_evacuation} onChange={e => setForm(f => ({ ...f, notify_on_evacuation: e.target.checked }))} />
-                Notify on Evacuation
+                Notify on Incident Alerts
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={form.notify_on_kit_expiry} onChange={e => setForm(f => ({ ...f, notify_on_kit_expiry: e.target.checked }))} />
@@ -156,6 +163,40 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
             <div className="flex gap-3 pt-1">
               <Button onClick={handleSave} className="flex-1" disabled={!form.email}>{editing ? "Save" : "Add Member"}</Button>
               <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Send Incident Alert Dialog */}
+      <Dialog open={alertDialog} onOpenChange={setAlertDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-destructive" /> Send Incident Alert</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">This will email all active members opted in to incident alerts.</p>
+          <div className="space-y-3 py-2">
+            <div>
+              <Label>Postal Code (optional)</Label>
+              <Input
+                placeholder="e.g. 78701"
+                value={alertPostalCode}
+                onChange={e => setAlertPostalCode(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground mt-1">Alert will note it covers this ZIP and neighboring codes.</p>
+            </div>
+            <div>
+              <Label>Incident Message</Label>
+              <textarea
+                className="w-full border rounded-md px-3 py-2 text-sm mt-1 min-h-[100px] resize-none"
+                placeholder="Describe the incident or leave blank for a generic safety alert..."
+                value={alertMessage}
+                onChange={e => setAlertMessage(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-3 pt-1">
+              <Button variant="destructive" onClick={sendIncidentAlert} disabled={notifying} className="flex-1 gap-2">
+                <Send className="w-3.5 h-3.5" />{notifying ? "Sending..." : "Send Alert"}
+              </Button>
+              <Button variant="outline" onClick={() => setAlertDialog(false)}>Cancel</Button>
             </div>
           </div>
         </DialogContent>

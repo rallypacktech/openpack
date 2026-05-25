@@ -114,7 +114,7 @@ export default function BusinessDashboard() {
 
       <Tabs defaultValue="members">
         <TabsList className="mb-4">
-          <TabsTrigger value="members">Chain of Command</TabsTrigger>
+          <TabsTrigger value="members">Members & Alerts</TabsTrigger>
           <TabsTrigger value="kits">First Aid Kits</TabsTrigger>
           <TabsTrigger value="evacuation">Evacuation Plans</TabsTrigger>
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
