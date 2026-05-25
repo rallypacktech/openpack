@@ -25,9 +25,15 @@
       "enum": [
         "go_bag",
         "automobile",
-        "general"
+        "general",
+        "first_aid_kit"
       ],
       "description": "Which cache type this is recommended for"
+    },
+    "is_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Starred as a baseline requirement \u2014 users missing this item receive monthly email reminders"
     },
     "fema_regions": {
       "type": "array",

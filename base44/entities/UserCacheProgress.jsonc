@@ -1,0 +1,77 @@
+{
+  "name": "UserCacheProgress",
+  "type": "object",
+  "properties": {
+    "cache_id": {
+      "type": "string",
+      "description": "Reference to EmergencyCache (optional \u2014 null for checklist-mode items not tied to a specific cache)"
+    },
+    "recommendation_id": {
+      "type": "string",
+      "description": "Reference to ProductRecommendation"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "dismissed",
+        "purchased",
+        "manually_added"
+      ],
+      "default": "pending"
+    },
+    "expiration_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expiration date of the user's owned item (for perishable supplies)"
+    },
+    "purchased_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "recommendation_id"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 const CATEGORIES = ["water","food","medical","tools","clothing","documents","communication","hygiene","other"];
-const CACHE_TYPES = ["go_bag","automobile","general"];
+const CACHE_TYPES = ["go_bag","automobile","general","first_aid_kit"];
 const SOURCE_ORGS = [
   "",
   "Red Cross",
@@ -54,7 +54,7 @@ const BLANK_FORM = {
   item_name: "", category: "other", cache_type: "general", description: "",
   quantity: 1, price_cents: 0, image_url: "", affiliate_link: "",
   family_member_types: ["person"], fema_regions: [], disaster_types: [],
-  priority: 0, active: true, source_organizations: [], admin_notes: "",
+  priority: 0, active: true, is_required: false, source_organizations: [], admin_notes: "",
   stripe_product_id: "", pet_sizes: []
 };
 
@@ -122,6 +122,7 @@ export default function AdminProducts() {
       source_organizations: product.source_organizations?.length ? product.source_organizations : legacyOrg,
       admin_notes: product.admin_notes || "",
       stripe_product_id: product.stripe_product_id || "",
+      is_required: product.is_required ?? false,
       pet_sizes: product.pet_sizes || []
     });
     setEditDialog(true);
@@ -172,6 +173,7 @@ export default function AdminProducts() {
           disaster_types: editForm.disaster_types,
           priority: editForm.priority,
           active: editForm.active,
+          is_required: editForm.is_required,
           source_organizations: editForm.source_organizations,
           stripe_product_id: editForm.stripe_product_id,
           pet_sizes: editForm.pet_sizes
@@ -442,6 +444,7 @@ export default function AdminProducts() {
         <div className="flex gap-1 mb-2 flex-wrap">
           <Badge className={CATEGORY_COLORS[item.category]}>{item.category}</Badge>
           <Badge variant="outline">{item.cache_type}</Badge>
+          {item.is_required && <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">⭐ Required</Badge>}
           {(item.source_organizations?.length ? item.source_organizations : item.source_organization ? [item.source_organization] : []).map(org => (
             <span key={org} className="text-xs text-gray-400 italic">{org}</span>
           ))}
@@ -634,6 +637,7 @@ export default function AdminProducts() {
                 <option value="go_bag">Go Bag</option>
                 <option value="automobile">Automobile</option>
                 <option value="general">General</option>
+                <option value="first_aid_kit">First Aid Kit</option>
               </select>
             </div>
             <div>
@@ -710,6 +714,10 @@ export default function AdminProducts() {
                 <div className="flex items-center gap-2 pt-6">
                   <input type="checkbox" checked={editForm.active} onChange={e => setEditForm({...editForm, active: e.target.checked})} className="w-5 h-5" />
                   <Label>Active</Label>
+                </div>
+                <div className="flex items-center gap-2 pt-6">
+                  <input type="checkbox" checked={editForm.is_required} onChange={e => setEditForm({...editForm, is_required: e.target.checked})} className="w-5 h-5" />
+                  <Label>⭐ Required (monthly email reminder if missing)</Label>
                 </div>
               </>
             )}
