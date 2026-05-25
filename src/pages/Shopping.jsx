@@ -108,7 +108,7 @@ export default function Shopping() {
     }
   };
 
-  const sourceOrgs = [...new Set(recommendations.map(r => r.source_organization).filter(Boolean))].sort();
+  const sourceOrgs = [...new Set(recommendations.flatMap(r => r.source_organizations?.length ? r.source_organizations : r.source_organization ? [r.source_organization] : []))].sort();
 
   const normalizeOrg = (val) => {
     if (!val) return "";
@@ -121,7 +121,8 @@ export default function Shopping() {
                           rec.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || rec.category === categoryFilter;
     const matchesCacheType = cacheTypeFilter === "all" || rec.cache_type === cacheTypeFilter;
-    const matchesSource = sourceFilter === "all" || normalizeOrg(rec.source_organization) === sourceFilter;
+    const recOrgs = rec.source_organizations?.length ? rec.source_organizations : rec.source_organization ? [rec.source_organization] : [];
+    const matchesSource = sourceFilter === "all" || recOrgs.some(o => normalizeOrg(o) === sourceFilter);
     return matchesSearch && matchesCategory && matchesCacheType && matchesSource;
   });
 
@@ -276,12 +277,13 @@ export default function Shopping() {
                   <p className="text-sm text-gray-600 mb-3 p-2 bg-gray-50 rounded">{rec.description}</p>
                 )}
                 
-                <div className="flex gap-2 mb-4 flex-wrap">
+                <div className="flex gap-2 mb-3 flex-wrap">
                   <Badge className={categoryColors[rec.category]}>
                     {rec.category}
                   </Badge>
                   <Badge variant="outline">{rec.cache_type}</Badge>
                 </div>
+                {(() => { const orgs = rec.source_organizations?.length ? rec.source_organizations : rec.source_organization ? [rec.source_organization] : []; return orgs.length > 0 ? <p className="text-xs text-gray-400 mb-3">Recommended by: {orgs.join(', ')}</p> : null; })()}
 
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-2xl font-bold text-green-600">

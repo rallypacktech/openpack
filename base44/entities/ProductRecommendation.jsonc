@@ -106,7 +106,14 @@
     },
     "source_organization": {
       "type": "string",
-      "description": "Organization recommending this item"
+      "description": "Legacy single source organization (use source_organizations instead)"
+    },
+    "source_organizations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Organizations recommending this item"
     }
   },
   "required": [

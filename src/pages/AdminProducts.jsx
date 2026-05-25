@@ -54,7 +54,7 @@ const BLANK_FORM = {
   item_name: "", category: "other", cache_type: "general", description: "",
   quantity: 1, price_cents: 0, image_url: "", affiliate_link: "",
   family_member_types: ["person"], fema_regions: [], disaster_types: [],
-  priority: 0, active: true, source_organization: "", admin_notes: "",
+  priority: 0, active: true, source_organizations: [], admin_notes: "",
   stripe_product_id: "", pet_sizes: []
 };
 
@@ -104,6 +104,7 @@ export default function AdminProducts() {
 
   const openEditProduct = (product) => {
     setEditingItem({ record: product, isSuggestion: false });
+    const legacyOrg = product.source_organization ? [normalizeSourceOrg(product.source_organization)] : [];
     setEditForm({
       item_name: product.item_name || "",
       category: product.category || "other",
@@ -118,7 +119,7 @@ export default function AdminProducts() {
       disaster_types: product.disaster_types || [],
       priority: product.priority || 0,
       active: product.active ?? true,
-      source_organization: normalizeSourceOrg(product.source_organization || ""),
+      source_organizations: product.source_organizations?.length ? product.source_organizations : legacyOrg,
       admin_notes: product.admin_notes || "",
       stripe_product_id: product.stripe_product_id || "",
       pet_sizes: product.pet_sizes || []
@@ -128,6 +129,7 @@ export default function AdminProducts() {
 
   const openEditSuggestion = (suggestion) => {
     setEditingItem({ record: suggestion, isSuggestion: true });
+    const legacyOrg = suggestion.source_organization ? [normalizeSourceOrg(suggestion.source_organization)] : [];
     setEditForm({
       item_name: suggestion.suggested_item_name || "",
       category: suggestion.suggested_category || "other",
@@ -142,7 +144,7 @@ export default function AdminProducts() {
       disaster_types: suggestion.suggested_disaster_types || [],
       priority: 0,
       active: true,
-      source_organization: normalizeSourceOrg(suggestion.source_organization || ""),
+      source_organizations: suggestion.source_organizations?.length ? suggestion.source_organizations : legacyOrg,
       admin_notes: suggestion.admin_notes || "",
       stripe_product_id: "",
       pet_sizes: []
@@ -170,7 +172,7 @@ export default function AdminProducts() {
           disaster_types: editForm.disaster_types,
           priority: editForm.priority,
           active: editForm.active,
-          source_organization: editForm.source_organization,
+          source_organizations: editForm.source_organizations,
           stripe_product_id: editForm.stripe_product_id,
           pet_sizes: editForm.pet_sizes
         });
@@ -188,30 +190,10 @@ export default function AdminProducts() {
           suggested_family_member_types: editForm.family_member_types,
           suggested_fema_regions: editForm.fema_regions,
           suggested_disaster_types: editForm.disaster_types,
-          source_organization: editForm.source_organization,
+          source_organizations: editForm.source_organizations,
           admin_notes: editForm.admin_notes
         });
         await base44.functions.invoke('approveSuggestion', { suggestionId: editingItem.record.id });
-      } else {
-        // Update existing product
-        await base44.entities.ProductRecommendation.update(editingItem.record.id, {
-          item_name: editForm.item_name,
-          category: editForm.category,
-          cache_type: editForm.cache_type,
-          description: editForm.description,
-          quantity: editForm.quantity,
-          price_cents: editForm.price_cents,
-          image_url: editForm.image_url,
-          affiliate_link: editForm.affiliate_link,
-          family_member_types: editForm.family_member_types,
-          fema_regions: editForm.fema_regions,
-          disaster_types: editForm.disaster_types,
-          priority: editForm.priority,
-          active: editForm.active,
-          source_organization: editForm.source_organization,
-          stripe_product_id: editForm.stripe_product_id,
-          pet_sizes: editForm.pet_sizes
-        });
       }
       setEditDialog(false);
       await loadData();
@@ -369,7 +351,9 @@ export default function AdminProducts() {
           <div className="flex gap-1 mb-2 flex-wrap">
             <Badge className={CATEGORY_COLORS[item.suggested_category]}>{item.suggested_category}</Badge>
             <Badge variant="outline">{item.suggested_cache_type}</Badge>
-            {item.source_organization && <Badge variant="outline" className="bg-blue-50 text-blue-700">{item.source_organization}</Badge>}
+            {(item.source_organizations?.length ? item.source_organizations : item.source_organization ? [item.source_organization] : []).map(org => (
+              <span key={org} className="text-xs text-gray-400 italic">{org}</span>
+            ))}
           </div>
           {item.suggested_family_member_types?.length > 0 && (
             <div className="flex gap-1 mb-2 flex-wrap">
@@ -438,6 +422,9 @@ export default function AdminProducts() {
         <div className="flex gap-1 mb-2 flex-wrap">
           <Badge className={CATEGORY_COLORS[item.category]}>{item.category}</Badge>
           <Badge variant="outline">{item.cache_type}</Badge>
+          {(item.source_organizations?.length ? item.source_organizations : item.source_organization ? [item.source_organization] : []).map(org => (
+            <span key={org} className="text-xs text-gray-400 italic">{org}</span>
+          ))}
         </div>
         {item.family_member_types?.length > 0 && (
           <div className="flex gap-1 mb-2 flex-wrap">
@@ -668,11 +655,25 @@ export default function AdminProducts() {
               </div>
               <p className="text-xs text-gray-500 mt-1">Pet products only show to users with those pets</p>
             </div>
-            <div>
-              <Label>Source Organization</Label>
-              <select className="w-full border rounded-md px-3 py-2" value={editForm.source_organization} onChange={e => setEditForm({...editForm, source_organization: e.target.value})}>
-                {SOURCE_ORGS.map(org => <option key={org} value={org}>{org || "— None —"}</option>)}
-              </select>
+            <div className="col-span-2">
+              <Label>Recommended By (Source Organizations)</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {SOURCE_ORGS.filter(o => o).map(org => {
+                  const selected = editForm.source_organizations?.includes(org);
+                  return (
+                    <button key={org} type="button"
+                      onClick={() => {
+                        const cur = editForm.source_organizations || [];
+                        setEditForm({...editForm, source_organizations: selected ? cur.filter(o => o !== org) : [...cur, org]});
+                      }}
+                      className={`px-3 py-1 rounded-full border text-sm transition-all ${
+                        selected ? 'bg-blue-100 border-blue-400 text-blue-800 font-medium' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                      }`}>
+                      {org}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             {editingItem?.isSuggestion && (
               <div>
