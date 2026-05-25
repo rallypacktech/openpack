@@ -121,6 +121,10 @@ export default function Shopping() {
   };
 
   const selectAllMissing = () => {
+    if (!user) {
+      base44.auth.redirectToLogin(window.location.pathname);
+      return;
+    }
     const missing = requiredItems.filter(r => !isOwned(r.id)).map(r => r.id);
     setSelected(new Set(missing));
   };
