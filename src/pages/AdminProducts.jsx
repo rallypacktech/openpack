@@ -25,8 +25,7 @@ const SOURCE_ORGS = [
   "NOAA",
   "DHS",
   "Best Friends Animal Society",
-  "Local Emergency Management",
-  "Other"
+  "Local Emergency Management"
 ];
 
 const normalizeSourceOrg = (val) => {
