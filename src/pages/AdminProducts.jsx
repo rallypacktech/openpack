@@ -15,21 +15,26 @@ import {
 
 const CATEGORIES = ["water","food","medical","tools","clothing","documents","communication","hygiene","other"];
 const CACHE_TYPES = ["go_bag","automobile","general","first_aid_kit"];
+// Canonical display order for orgs — matches priority weights in reRankPriorities function
 const SOURCE_ORGS = [
-  "",
-  "Red Cross",
   "FEMA",
-  "American Heart Association",
+  "Red Cross",
   "CDC",
+  "American Heart Association",
   "Ready.gov",
-  "NOAA",
   "DHS",
+  "AAEP",
+  "USDA/APHIS",
+  "SART",
+  "NOAA",
   "Best Friends Animal Society",
   "Local Emergency Management",
-  "USDA/APHIS",
-  "AAEP",
-  "SART"
 ];
+
+const sortOrgs = (orgs) => {
+  if (!orgs?.length) return orgs || [];
+  return [...orgs].sort((a, b) => SOURCE_ORGS.indexOf(a) - SOURCE_ORGS.indexOf(b));
+};
 
 const normalizeSourceOrg = (val) => {
   if (!val) return "";
@@ -307,6 +312,17 @@ export default function AdminProducts() {
     } catch (e) { console.error(e); alert("Error updating prices"); } finally { setPriceUpdating(false); }
   };
 
+  const [reRanking, setReRanking] = useState(false);
+  const handleReRankPriorities = async () => {
+    if (!confirm("Re-rank all product priorities based on source org authority and required status?")) return;
+    setReRanking(true);
+    try {
+      const res = await base44.functions.invoke('reRankPriorities');
+      await loadData();
+      alert(`Done: ${res.data?.updated ?? 0} products re-ranked.`);
+    } catch (e) { console.error(e); alert("Error re-ranking"); } finally { setReRanking(false); }
+  };
+
   const [descGenerating, setDescGenerating] = useState(false);
   const handleGenerateDescriptions = async () => {
     if (!confirm("Generate AI descriptions for all products missing one?")) return;
@@ -343,10 +359,12 @@ export default function AdminProducts() {
       );
     });
 
+  const byPriority = (a, b) => (b.priority || 0) - (a.priority || 0);
+
   const pendingSuggestions  = applyFilters(suggestions.filter(s => s.status === "pending"),  true);
   const rejectedSuggestions = applyFilters(suggestions.filter(s => s.status === "rejected"), true);
-  const activeProducts      = applyFilters(products.filter(p => p.active));
-  const inactiveProducts    = applyFilters(products.filter(p => !p.active));
+  const activeProducts      = applyFilters(products.filter(p => p.active)).sort(byPriority);
+  const inactiveProducts    = applyFilters(products.filter(p => !p.active)).sort(byPriority);
 
   // ── Sub-components ──────────────────────────────────────────────────────────
 
@@ -383,7 +401,7 @@ export default function AdminProducts() {
           <div className="flex gap-1 mb-2 flex-wrap">
             <Badge className={CATEGORY_COLORS[item.suggested_category]}>{item.suggested_category}</Badge>
             <Badge variant="outline">{item.suggested_cache_type}</Badge>
-            {(item.source_organizations?.length ? item.source_organizations : item.source_organization ? [item.source_organization] : []).map(org => (
+            {sortOrgs(item.source_organizations?.length ? item.source_organizations : item.source_organization ? [item.source_organization] : []).map(org => (
               <span key={org} className="text-xs text-gray-400 italic">{org}</span>
             ))}
           </div>
@@ -455,7 +473,7 @@ export default function AdminProducts() {
           <Badge className={CATEGORY_COLORS[item.category]}>{item.category}</Badge>
           <Badge variant="outline">{item.cache_type}</Badge>
           {item.is_required && <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">⭐ Required</Badge>}
-          {(item.source_organizations?.length ? item.source_organizations : item.source_organization ? [item.source_organization] : []).map(org => (
+          {sortOrgs(item.source_organizations?.length ? item.source_organizations : item.source_organization ? [item.source_organization] : []).map(org => (
             <span key={org} className="text-xs text-gray-400 italic">{org}</span>
           ))}
         </div>
@@ -568,6 +586,9 @@ export default function AdminProducts() {
             </Button>
             <Button onClick={handleGenerateDescriptions} disabled={descGenerating} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
               {descGenerating ? "Generating…" : "Generate Descriptions"}
+            </Button>
+            <Button onClick={handleReRankPriorities} disabled={reRanking} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
+              {reRanking ? "Re-ranking…" : "Re-rank Priorities"}
             </Button>
           </div>
         </div>
@@ -692,7 +713,7 @@ export default function AdminProducts() {
             <div className="col-span-2">
               <Label>Recommended By (Source Organizations)</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {SOURCE_ORGS.filter(o => o).map(org => {
+                {SOURCE_ORGS.map(org => {
                   const selected = editForm.source_organizations?.includes(org);
                   return (
                     <button key={org} type="button"
