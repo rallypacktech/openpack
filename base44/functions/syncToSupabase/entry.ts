@@ -43,7 +43,7 @@ async function getEncryptionKey(password) {
         ['deriveKey']
     );
     
-    const salt = textEncoder.encode('RallyPackEncryptionSalt2024');
+    const salt = textEncoder.encode(Deno.env.get("PBKDF2_SALT") || password.slice(0, 16));
     return await crypto.subtle.deriveKey(
         {
             name: 'PBKDF2',
@@ -75,8 +75,11 @@ Deno.serve(async (req) => {
         }
 
         const supabase = createClient(supabaseUrl, supabaseKey);
-        const salt = Deno.env.get("DATA_HASH_SALT") || "default_salt_change_me";
-        const encryptionPassword = Deno.env.get("DATA_ENCRYPTION_KEY") || "default_encryption_key_change_me";
+        const salt = Deno.env.get("DATA_HASH_SALT");
+        const encryptionPassword = Deno.env.get("DATA_ENCRYPTION_KEY");
+        if (!salt || !encryptionPassword) {
+            return Response.json({ error: 'DATA_HASH_SALT and DATA_ENCRYPTION_KEY secrets must be configured before syncing.' }, { status: 500 });
+        }
         const encryptionKey = await getEncryptionKey(encryptionPassword);
 
         const hashedUserId = await hashData(user.email, salt);
