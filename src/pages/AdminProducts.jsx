@@ -25,7 +25,10 @@ const SOURCE_ORGS = [
   "NOAA",
   "DHS",
   "Best Friends Animal Society",
-  "Local Emergency Management"
+  "Local Emergency Management",
+  "USDA/APHIS",
+  "AAEP",
+  "SART"
 ];
 
 const normalizeSourceOrg = (val) => {
@@ -35,12 +38,19 @@ const normalizeSourceOrg = (val) => {
   return val;
 };
 const FAMILY_TYPES = [
-  { value: 'person', label: '👤 Person', color: 'bg-blue-50 border-blue-300 text-blue-700' },
-  { value: 'dog',    label: '🐕 Dog',    color: 'bg-green-50 border-green-300 text-green-700' },
-  { value: 'cat',    label: '🐈 Cat',    color: 'bg-green-50 border-green-300 text-green-700' },
-  { value: 'bird',   label: '🐦 Bird',   color: 'bg-green-50 border-green-300 text-green-700' },
-  { value: 'other',  label: '🐾 Other',  color: 'bg-green-50 border-green-300 text-green-700' },
+  { value: 'person',    label: '👤 Person',    color: 'bg-blue-50 border-blue-300 text-blue-700' },
+  { value: 'dog',       label: '🐕 Dog',       color: 'bg-green-50 border-green-300 text-green-700' },
+  { value: 'cat',       label: '🐈 Cat',       color: 'bg-green-50 border-green-300 text-green-700' },
+  { value: 'bird',      label: '🐦 Bird',      color: 'bg-green-50 border-green-300 text-green-700' },
+  { value: 'equine',    label: '🐴 Equine',    color: 'bg-amber-50 border-amber-300 text-amber-700' },
+  { value: 'livestock', label: '🐄 Livestock', color: 'bg-amber-50 border-amber-300 text-amber-700' },
+  { value: 'other',     label: '🐾 Other',     color: 'bg-green-50 border-green-300 text-green-700' },
 ];
+
+const TYPE_EMOJI = {
+  person: '👤', dog: '🐕', cat: '🐈', bird: '🐦',
+  equine: '🐴', livestock: '🐄', other: '🐾'
+};
 const CATEGORY_COLORS = {
   water: "bg-blue-100 text-blue-800", food: "bg-green-100 text-green-800",
   medical: "bg-red-100 text-red-800", tools: "bg-gray-100 text-gray-800",
@@ -381,7 +391,7 @@ export default function AdminProducts() {
             <div className="flex gap-1 mb-2 flex-wrap">
               {item.suggested_family_member_types.map(t => (
                 <Badge key={t} variant="outline" className="text-xs">
-                  {t === 'person' ? '👤' : t === 'dog' ? '🐕' : t === 'cat' ? '🐈' : t === 'bird' ? '🐦' : '🐾'} {t}
+                  {TYPE_EMOJI[t] || '🐾'} {t}
                 </Badge>
               ))}
             </div>
@@ -453,7 +463,7 @@ export default function AdminProducts() {
           <div className="flex gap-1 mb-2 flex-wrap">
             {item.family_member_types.map(t => (
               <Badge key={t} variant="outline" className="text-xs">
-                {t === 'person' ? '👤' : t === 'dog' ? '🐕' : t === 'cat' ? '🐈' : t === 'bird' ? '🐦' : '🐾'} {t}
+                {TYPE_EMOJI[t] || '🐾'} {t}
               </Badge>
             ))}
           </div>
@@ -668,7 +678,7 @@ export default function AdminProducts() {
             )}
             <div className="col-span-2">
               <Label>Recommended For *</Label>
-              <div className="grid grid-cols-5 gap-2 mt-2">
+              <div className="grid grid-cols-4 gap-2 mt-2">
                 {FAMILY_TYPES.map(({ value, label, color }) => (
                   <button key={value} type="button" onClick={() => toggleFamilyType(value)}
                     className={`px-3 py-2 rounded border-2 text-sm transition-all ${editForm.family_member_types?.includes(value) ? `${color} border-current font-medium` : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
