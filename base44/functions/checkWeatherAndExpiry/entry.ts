@@ -68,7 +68,8 @@ Deno.serve(async (req) => {
           await base44.asServiceRole.integrations.Core.SendEmail({
             to: userEmail,
             subject: "RallyPack: You have expired emergency supplies",
-            body: `Hi,\n\n${msg}\n\nLog in to RallyPack to update your cache.\n\nStay prepared,\nThe RallyPack Team`,
+            body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#9888; Expired Emergency Supplies</h2><p>${msg}</p><p><a href="https://rallypack.tech/Resources" style="color:#222;">Log in to RallyPack to update your cache.</a></p><p>Stay prepared,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
+            is_html: true,
           });
           emailsSent++;
         }
@@ -89,7 +90,8 @@ Deno.serve(async (req) => {
           await base44.asServiceRole.integrations.Core.SendEmail({
             to: userEmail,
             subject: "RallyPack: Some emergency supplies are expiring soon",
-            body: `Hi,\n\n${msg}\n\nLog in to RallyPack to review and restock.\n\nStay prepared,\nThe RallyPack Team`,
+            body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#128336; Supplies Expiring Soon</h2><p>${msg}</p><p><a href="https://rallypack.tech/Resources" style="color:#222;">Log in to RallyPack to review and restock.</a></p><p>Stay prepared,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
+            is_html: true,
           });
           emailsSent++;
         }
@@ -155,7 +157,8 @@ Deno.serve(async (req) => {
             await base44.asServiceRole.integrations.Core.SendEmail({
               to: userEmail,
               subject: `RallyPack Weather Alert: ${props.event}`,
-              body: `Weather Alert for your area:\n\n${headline}\n\n${desc}\n\nStay safe,\nThe RallyPack Team`,
+              body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#127785; Weather Alert for Your Area</h2><p><strong>${headline}</strong></p><p>${desc}</p><p>Stay safe,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
+              is_html: true,
             });
             emailsSent++;
           }

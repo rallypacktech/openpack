@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       }
 
       // Build email body (HTML)
-      let body = `<p>Hi ${user.full_name || "there"},</p><p>Here's your monthly emergency preparedness update from RallyPack:</p>`;
+      let body = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">Monthly Emergency Preparedness Update</h2><p>Hi ${user.full_name || "there"},</p>`;
 
       if (expired.length > 0) {
         body += `<p><strong>🚨 EXPIRED ITEMS — replace these now:</strong><br>`;
@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
         body += `</p>`;
       }
 
-      body += `<p><a href="https://rallypack.tech/Shopping">Shop now and mark items as owned</a></p><p>Stay safe,<br>The RallyPack Team</p><p style="font-size: 0.9em; color: #666;">You received this because you have a RallyPack account. To stop these reminders, update your notification settings.</p>`;
+      body += `<p><a href="https://rallypack.tech/Shopping" style="color:#222;">Shop now and mark items as owned</a></p><p>Stay safe,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. To stop these reminders, update your notification settings.</p></body></html>`;
 
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: user.email,
