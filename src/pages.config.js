@@ -47,26 +47,27 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import AdminMonitor from './pages/AdminMonitor';
-import AdminProducts from './pages/AdminProducts';
-import CacheDetail from './pages/CacheDetail';
-import CheckoutCancel from './pages/CheckoutCancel';
-import CheckoutSuccess from './pages/CheckoutSuccess';
-import ConfidentialityAgreement from './pages/ConfidentialityAgreement';
-import Dashboard from './pages/Dashboard';
-import EULA from './pages/EULA';
-import Emergency from './pages/Emergency';
-import Home from './pages/Home';
-import LearnMore from './pages/LearnMore';
-import Offline from './pages/Offline';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import ReadinessQuiz from './pages/ReadinessQuiz';
-import Resources from './pages/Resources';
-import Settings from './pages/Settings';
-import Shopping from './pages/Shopping';
-import TermsAndConditions from './pages/TermsAndConditions';
+import { lazy } from 'react';
 import __Layout from './Layout.jsx';
 
+const AdminMonitor = lazy(() => import('./pages/AdminMonitor'));
+const AdminProducts = lazy(() => import('./pages/AdminProducts'));
+const CacheDetail = lazy(() => import('./pages/CacheDetail'));
+const CheckoutCancel = lazy(() => import('./pages/CheckoutCancel'));
+const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'));
+const ConfidentialityAgreement = lazy(() => import('./pages/ConfidentialityAgreement'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const EULA = lazy(() => import('./pages/EULA'));
+const Emergency = lazy(() => import('./pages/Emergency'));
+const Home = lazy(() => import('./pages/Home'));
+const LearnMore = lazy(() => import('./pages/LearnMore'));
+const Offline = lazy(() => import('./pages/Offline'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const ReadinessQuiz = lazy(() => import('./pages/ReadinessQuiz'));
+const Resources = lazy(() => import('./pages/Resources'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Shopping = lazy(() => import('./pages/Shopping'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
 
 export const PAGES = {
     "AdminMonitor": AdminMonitor,

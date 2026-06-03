@@ -5,6 +5,7 @@ import VisualEditAgent from '@/lib/VisualEditAgent'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -12,11 +13,12 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import AffiliatePartnerPolicy from './pages/AffiliatePartnerPolicy';
-import Feedback from './pages/Feedback';
-import Donate from './pages/Donate';
-import TrackedItems from './pages/TrackedItems';
-import BusinessDashboard from './pages/BusinessDashboard';
+
+const AffiliatePartnerPolicy = lazy(() => import('./pages/AffiliatePartnerPolicy'));
+const Feedback = lazy(() => import('./pages/Feedback'));
+const Donate = lazy(() => import('./pages/Donate'));
+const TrackedItems = lazy(() => import('./pages/TrackedItems'));
+const BusinessDashboard = lazy(() => import('./pages/BusinessDashboard'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -30,8 +32,15 @@ const PUBLIC_PAGES = new Set([
   'EULA', 'LearnMore', 'ReadinessQuiz', 'Shopping'
 ]);
 
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-cream">
+    <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" role="status" aria-label="Loading page" />
+  </div>
+);
+
 const AuthenticatedApp = () => {
   return (
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       {/* Auth routes — always public */}
       <Route path="/login" element={<Login />} />
@@ -74,6 +83,7 @@ const AuthenticatedApp = () => {
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
   );
 };
 
