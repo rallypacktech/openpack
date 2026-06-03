@@ -65,8 +65,8 @@ export default function BusinessSubscriptionPanel({ subscription, onRefresh }) {
   };
 
   const handleSubscribe = async (tierId, priceId) => {
-    if (!priceId) {
-      window.open("mailto:business@rallypack.tech?subject=Enterprise Inquiry", "_blank");
+    if (tierId === "enterprise") {
+      window.open("mailto:enterprise@rallypack.tech?subject=Enterprise Inquiry", "_blank");
       return;
     }
     setLoading(true);
