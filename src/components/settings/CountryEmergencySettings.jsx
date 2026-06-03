@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Plus, X, Crown } from "lucide-react";
+import { Phone, Plus, X, Crown, Building2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -145,9 +146,17 @@ export default function CountryEmergencySettings({ profile, onSave, isPaidAccoun
         )}
 
         {selectedCountries.length >= maxCountries && !isPaidAccount && (
-          <p className="text-xs text-muted-foreground">
-            Upgrade to a paid plan to add up to 3 countries.
-          </p>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Upgrade to a paid plan to add up to 3 countries.
+            </p>
+            <Link to="/BusinessDashboard">
+              <Button variant="outline" size="sm" className="gap-2 w-full">
+                <Building2 className="w-4 h-4" />
+                View Business Plans
+              </Button>
+            </Link>
+          </div>
         )}
       </CardContent>
     </Card>
