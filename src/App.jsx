@@ -14,6 +14,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import AffiliatePartnerPolicy from './pages/AffiliatePartnerPolicy';
 import Feedback from './pages/Feedback';
+import Donate from './pages/Donate';
 import TrackedItems from './pages/TrackedItems';
 import BusinessDashboard from './pages/BusinessDashboard';
 
@@ -41,6 +42,7 @@ const AuthenticatedApp = () => {
       {/* Public misc pages */}
       <Route path="/AffiliatePartnerPolicy" element={<AffiliatePartnerPolicy />} />
       <Route path="/Feedback" element={<Feedback />} />
+      <Route path="/Donate" element={<LayoutWrapper currentPageName="Donate"><Donate /></LayoutWrapper>} />
 
       {/* Public pages from pagesConfig */}
       {Object.entries(Pages)

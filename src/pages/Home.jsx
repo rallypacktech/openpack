@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
-import { Package, MapPin, Heart, Shield, CheckCircle, ClipboardList, ArrowRight, Github, Wind, Flame, Droplets, Zap, AlertTriangle } from "lucide-react";
+import { Package, MapPin, Heart, Shield, CheckCircle, ClipboardList, ArrowRight, Github, Wind, Flame, Droplets, Zap, AlertTriangle, X } from "lucide-react";
 import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
 import FooterContactForm from "../components/FooterContactForm";
@@ -26,9 +26,11 @@ const SCENARIOS = [
 
 export default function Home() {
   const [user, setUser] = React.useState(null);
+  const [supportBannerDismissed, setSupportBannerDismissed] = React.useState(false);
 
   React.useEffect(() => {
     base44.auth.me().then(setUser).catch(() => setUser(null));
+    setSupportBannerDismissed(sessionStorage.getItem("supportBannerDismissed") === "true");
   }, []);
 
   const handleSignUp = () => {
@@ -39,10 +41,32 @@ export default function Home() {
     base44.auth.logout("/");
   };
 
+  const dismissBanner = () => {
+    sessionStorage.setItem("supportBannerDismissed", "true");
+    setSupportBannerDismissed(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
 
+
+      {/* ── Wikipedia-style support banner ── */}
+      {!supportBannerDismissed && (
+        <div className="bg-[#FFF8E7] border-b border-[#E8C84A]/40 px-4 py-3 flex items-center justify-between gap-4">
+          <p className="text-sm font-sans text-[#1C1C1A]/80 flex-1 text-center">
+            <Heart className="w-3.5 h-3.5 inline text-[#D64A2E] mr-1.5 -mt-0.5" />
+            RallyPack is free for everyone. If it's helped your family prepare, please consider{" "}
+            <Link to="/Donate" className="font-semibold text-[#D64A2E] underline underline-offset-2 hover:no-underline">
+              making a small donation
+            </Link>{" "}
+            to keep it that way.
+          </p>
+          <button onClick={dismissBanner} className="text-[#1C1C1A]/30 hover:text-[#1C1C1A] transition-colors flex-shrink-0" aria-label="Dismiss">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* ── Hero — full bleed ── */}
       <section className="relative h-screen min-h-[640px] flex items-end">
@@ -306,6 +330,25 @@ export default function Home() {
             <p className="text-[10px] uppercase tracking-[0.25em] font-sans text-white/25 mb-2">Contact Us</p>
             <p className="text-sm font-sans text-white/40 mb-5">Questions, feedback, or partnership inquiries? We read everything.</p>
             <FooterContactForm />
+          </div>
+
+          {/* Support section */}
+          <div className="border-t border-white/10 pt-10 mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.25em] font-sans text-white/25 mb-2">Support RallyPack</p>
+                <p className="text-sm font-sans text-white/50 leading-relaxed">
+                  No ads on your safety data. No investors. Just a tool built for families.{" "}
+                  <span className="text-white/70">Help us cover the cost of keeping it free.</span>
+                </p>
+              </div>
+              <Link
+                to="/Donate"
+                className="flex-shrink-0 inline-flex items-center gap-2 bg-[#D64A2E] text-white hover:bg-[#be3f25] transition-colors text-xs font-sans font-semibold tracking-widest uppercase px-5 py-3"
+              >
+                <Heart className="w-4 h-4" /> Donate
+              </Link>
+            </div>
           </div>
 
           {/* Open Source section — moved here as requested */}

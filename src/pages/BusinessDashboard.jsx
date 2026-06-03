@@ -50,6 +50,42 @@ export default function BusinessDashboard() {
     );
   }
 
+  // Lock business features for users without an active/trialing subscription
+  const isSubscribed = subscription && (subscription.status === "active" || subscription.status === "trialing");
+  if (!isSubscribed) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <Building2 className="w-12 h-12 text-primary/40 mx-auto mb-4" />
+        <h1 className="font-serif text-3xl font-bold text-foreground mb-3">Business Features</h1>
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed">
+          Team member tracking, first aid kit management, chain-of-command alerts, and evacuation planning are available on a Business subscription.
+        </p>
+        <div className="bg-card border rounded-lg p-6 max-w-md mx-auto text-left">
+          <p className="text-sm font-semibold text-foreground mb-4">What's included:</p>
+          <ul className="space-y-2 text-sm text-muted-foreground mb-6">
+            {["Track multiple first aid kits across locations", "Chain-of-command emergency alerts", "Member roster with notification settings", "Evacuation plan builder"].map(f => (
+              <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />{f}</li>
+            ))}
+          </ul>
+          <button
+            onClick={() => {
+              setSubscription({ id: null, organization_name: "", status: null, tier: "basic" });
+            }}
+            className="w-full bg-primary text-primary-foreground font-semibold py-2.5 rounded text-sm hover:bg-primary/90 transition-colors"
+          >
+            View Plans & Subscribe
+          </button>
+        </div>
+        {/* Show subscription panel below if they clicked "View Plans" */}
+        {subscription?.id === null && (
+          <div className="mt-10 text-left">
+            <BusinessSubscriptionPanel subscription={null} onRefresh={loadAll} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const tierColor = { active: "bg-green-100 text-green-800", trialing: "bg-blue-100 text-blue-800", past_due: "bg-yellow-100 text-yellow-800", cancelled: "bg-red-100 text-red-800" };
 
   return (
