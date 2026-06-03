@@ -1,0 +1,77 @@
+{
+  "name": "BarcodeCorrection",
+  "type": "object",
+  "properties": {
+    "barcode": {
+      "type": "string",
+      "description": "The UPC/barcode that was scanned"
+    },
+    "ai_suggested_name": {
+      "type": "string",
+      "description": "What the AI lookup suggested"
+    },
+    "ai_suggested_category": {
+      "type": "string"
+    },
+    "corrected_name": {
+      "type": "string",
+      "description": "What the user corrected it to"
+    },
+    "corrected_category": {
+      "type": "string"
+    },
+    "corrected_shelf_life_days": {
+      "type": "number"
+    },
+    "submitted_to_api": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "barcode",
+    "corrected_name",
+    "corrected_category"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -15,6 +15,10 @@ const SIZE_LABELS = {
   "x-large": "X-Large (100+ lbs / Livestock)"
 };
 
+const EQUINE_SPECIES = ["equine", "livestock"];
+
+const isEquine = (species) => EQUINE_SPECIES.includes(species);
+
 export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
@@ -25,7 +29,11 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
     breed: "",
     age: "",
     microchip_number: "",
-    medical_conditions: ""
+    medical_conditions: "",
+    coggins_test_date: "",
+    vaccination_notes: "",
+    feed_requirements: "",
+    loading_notes: ""
   });
 
   const resetForm = () => {
@@ -36,7 +44,11 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
       breed: "",
       age: "",
       microchip_number: "",
-      medical_conditions: ""
+      medical_conditions: "",
+      coggins_test_date: "",
+      vaccination_notes: "",
+      feed_requirements: "",
+      loading_notes: ""
     });
     setEditingPet(null);
   };
@@ -55,7 +67,11 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
       breed: pet.breed || "",
       age: pet.age?.toString() || "",
       microchip_number: pet.microchip_number || "",
-      medical_conditions: pet.medical_conditions || ""
+      medical_conditions: pet.medical_conditions || "",
+      coggins_test_date: pet.coggins_test_date || "",
+      vaccination_notes: pet.vaccination_notes || "",
+      feed_requirements: pet.feed_requirements || "",
+      loading_notes: pet.loading_notes || ""
     });
     setDialogOpen(true);
   };
@@ -63,7 +79,11 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
   const handleSave = async () => {
     const data = {
       ...formData,
-      age: formData.age ? parseInt(formData.age) : null
+      age: formData.age ? parseInt(formData.age) : null,
+      coggins_test_date: formData.coggins_test_date || null,
+      vaccination_notes: formData.vaccination_notes || null,
+      feed_requirements: formData.feed_requirements || null,
+      loading_notes: formData.loading_notes || null
     };
     if (editingPet) {
       await onUpdate(editingPet.id, data);
@@ -112,6 +132,8 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
                       <SelectItem value="dog">Dog</SelectItem>
                       <SelectItem value="cat">Cat</SelectItem>
                       <SelectItem value="bird">Bird</SelectItem>
+                      <SelectItem value="equine">Equine (Horse / Mule / Donkey)</SelectItem>
+                      <SelectItem value="livestock">Livestock (Cattle / Goat / Sheep / Pig)</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
@@ -165,6 +187,45 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
                     placeholder="Any health issues"
                   />
                 </div>
+
+                {isEquine(formData.species) && (
+                  <div className="space-y-4 pt-2 border-t">
+                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">🐴 Equine / Livestock Fields</p>
+                    <div>
+                      <Label>Coggins Test Date</Label>
+                      <Input
+                        type="date"
+                        value={formData.coggins_test_date}
+                        onChange={(e) => setFormData({ ...formData, coggins_test_date: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label>Vaccination Notes</Label>
+                      <Input
+                        value={formData.vaccination_notes}
+                        onChange={(e) => setFormData({ ...formData, vaccination_notes: e.target.value })}
+                        placeholder="e.g., EHV, WNV, Rabies — last updated Jan 2026"
+                      />
+                    </div>
+                    <div>
+                      <Label>Feed / Diet Requirements</Label>
+                      <Input
+                        value={formData.feed_requirements}
+                        onChange={(e) => setFormData({ ...formData, feed_requirements: e.target.value })}
+                        placeholder="e.g., Bermuda hay, 2 flakes/day, no grain"
+                      />
+                    </div>
+                    <div>
+                      <Label>Trailer Loading Notes</Label>
+                      <Input
+                        value={formData.loading_notes}
+                        onChange={(e) => setFormData({ ...formData, loading_notes: e.target.value })}
+                        placeholder="e.g., Difficult loader, needs blindfold, prefers left stall"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <Button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700">
                   {editingPet ? "Update" : "Add"} Pet
                 </Button>
@@ -213,6 +274,27 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
                         <span className="text-gray-500">Medical</span>
                         <span>{pet.medical_conditions || "None"}</span>
                       </div>
+                      {isEquine(pet.species) && (
+                        <>
+                          {pet.coggins_test_date && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Coggins</span>
+                              <span>{pet.coggins_test_date}</span>
+                            </div>
+                          )}
+                          {pet.feed_requirements && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Feed</span>
+                              <span className="text-right max-w-[60%]">{pet.feed_requirements}</span>
+                            </div>
+                          )}
+                          {pet.loading_notes && (
+                            <div className="pt-1 text-xs text-amber-700 bg-amber-50 rounded px-2 py-1">
+                              🚛 {pet.loading_notes}
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

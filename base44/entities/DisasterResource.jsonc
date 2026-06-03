@@ -1,0 +1,61 @@
+{
+  "name": "DisasterResource",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the organization"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "federal_agency",
+        "insurance",
+        "relief_organization",
+        "local_emergency",
+        "mental_health",
+        "financial_assistance"
+      ]
+    },
+    "phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "service_area": {
+      "type": "string",
+      "description": "National, Regional, or specific states"
+    },
+    "available_24_7": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "phone"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

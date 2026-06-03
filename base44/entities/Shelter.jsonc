@@ -1,0 +1,92 @@
+{
+  "name": "Shelter",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the shelter"
+    },
+    "address": {
+      "type": "string",
+      "description": "Full address of the shelter"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "zip_code": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "capacity": {
+      "type": "number",
+      "description": "Total capacity"
+    },
+    "current_occupancy": {
+      "type": "number",
+      "description": "Current number of people"
+    },
+    "is_open": {
+      "type": "boolean",
+      "default": true
+    },
+    "pets_allowed": {
+      "type": "boolean",
+      "default": false
+    },
+    "medical_services": {
+      "type": "boolean",
+      "default": false
+    },
+    "phone": {
+      "type": "string"
+    },
+    "disaster_type": {
+      "type": "string",
+      "description": "Type of disaster (hurricane, wildfire, flood, etc.)"
+    },
+    "opened_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "external_id": {
+      "type": "string",
+      "description": "ID from external API source"
+    },
+    "data_source": {
+      "type": "string",
+      "description": "Source of shelter data (FEMA, Red Cross, etc.)"
+    }
+  },
+  "required": [
+    "name",
+    "address",
+    "city",
+    "state"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

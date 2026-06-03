@@ -1,0 +1,185 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "display_name": {
+      "type": "string",
+      "description": "User's display name"
+    },
+    "street_address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state_province": {
+      "type": "string"
+    },
+    "postal_code": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "fema_region": {
+      "type": "string",
+      "description": "Determined FEMA region based on location"
+    },
+    "climate_zone": {
+      "type": "string",
+      "enum": [
+        "cold",
+        "warm",
+        "temperate"
+      ],
+      "description": "Climate zone for personalized recommendations"
+    },
+    "notification_method": {
+      "type": "string",
+      "enum": [
+        "email",
+        "in_app",
+        "both"
+      ],
+      "default": "both"
+    },
+    "alert_settings": {
+      "type": "object",
+      "properties": {
+        "wildfire": {
+          "type": "boolean",
+          "default": true
+        },
+        "wildfire_radius_miles": {
+          "type": "number",
+          "default": 50
+        },
+        "severe_weather": {
+          "type": "boolean",
+          "default": true
+        },
+        "temperature_thresholds": {
+          "type": "boolean",
+          "default": true
+        },
+        "precipitation": {
+          "type": "boolean",
+          "default": true
+        },
+        "hurricane": {
+          "type": "boolean",
+          "default": true
+        },
+        "tornado": {
+          "type": "boolean",
+          "default": true
+        },
+        "flood": {
+          "type": "boolean",
+          "default": true
+        },
+        "earthquake": {
+          "type": "boolean",
+          "default": false
+        },
+        "alert_frequency": {
+          "type": "string",
+          "enum": [
+            "immediate",
+            "daily_digest",
+            "weekly_digest"
+          ],
+          "default": "immediate"
+        }
+      }
+    },
+    "current_status": {
+      "type": "string",
+      "enum": [
+        "safe",
+        "needs_assistance",
+        "unknown"
+      ],
+      "default": "unknown",
+      "description": "Current emergency status"
+    },
+    "status_updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When status was last updated"
+    },
+    "household_size": {
+      "type": "number",
+      "description": "Number of people in household"
+    },
+    "has_children": {
+      "type": "boolean",
+      "default": false
+    },
+    "has_pets": {
+      "type": "boolean",
+      "default": false
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "terms_agreed_version": {
+      "type": "string",
+      "description": "Version of the terms the user agreed to (e.g. '1.0')"
+    },
+    "terms_agreed_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time the user agreed to the terms"
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

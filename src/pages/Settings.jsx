@@ -188,7 +188,11 @@ export default function Settings() {
         <AccessibilitySettings />
 
         {/* Notification Preferences */}
-        <NotificationPreferences profile={profile} onSave={handleProfileSave} />
+        <NotificationPreferences
+          profile={profile}
+          onSave={handleProfileSave}
+          hasLargeAnimals={pets.some(p => ['equine', 'livestock'].includes(p.species))}
+        />
 
         {/* Profile Section */}
         <ProfileForm user={user} profile={profile} onSave={handleProfileSave} />

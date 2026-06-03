@@ -1,0 +1,107 @@
+{
+  "name": "Pet",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "species": {
+      "type": "string",
+      "enum": [
+        "dog",
+        "cat",
+        "bird",
+        "equine",
+        "livestock",
+        "other"
+      ]
+    },
+    "size": {
+      "type": "string",
+      "enum": [
+        "small",
+        "medium",
+        "large",
+        "x-large"
+      ],
+      "description": "Size of the pet \u2014 small (<20 lbs), medium (20-50 lbs), large (50-100 lbs), x-large (100+ lbs / livestock / horses)"
+    },
+    "breed": {
+      "type": "string"
+    },
+    "age": {
+      "type": "number"
+    },
+    "microchip_number": {
+      "type": "string"
+    },
+    "medical_conditions": {
+      "type": "string"
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "coggins_test_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of most recent negative Coggins test (equine/livestock)"
+    },
+    "vaccination_notes": {
+      "type": "string",
+      "description": "Vaccination history notes (EHV, WNV, Rabies, etc.) for equine/livestock"
+    },
+    "feed_requirements": {
+      "type": "string",
+      "description": "Special diet or feed requirements \u2014 important for emergency evacuation planning"
+    },
+    "loading_notes": {
+      "type": "string",
+      "description": "Trailer loading behavior and notes (e.g., difficult loader, requires specific stall position)"
+    }
+  },
+  "required": [
+    "name",
+    "species"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -145,6 +145,7 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                   <option value="general">General / Home Cache</option>
                   <option value="go_bag">Go Bag / Bug Out Bag</option>
                   <option value="automobile">Automobile / Car Kit</option>
+                  <option value="barn">Barn / Equine & Livestock Kit</option>
                 </select>
               </div>
               <div>
@@ -177,7 +178,8 @@ export default function CachesList({ caches, onAdd, onUpdate, onDelete, onViewIt
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="outline">
                         {cache.cache_type === 'go_bag' ? 'Go Bag' : 
-                         cache.cache_type === 'automobile' ? 'Automobile' : 'General'}
+                         cache.cache_type === 'automobile' ? 'Automobile' :
+                         cache.cache_type === 'barn' ? '🐴 Barn / Livestock' : 'General'}
                       </Badge>
                       {!isOwner && (
                         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">

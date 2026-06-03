@@ -1,0 +1,77 @@
+{
+  "name": "EmergencyCache",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "description": "Where the cache is stored (e.g., Garage, Barn, Basement)"
+    },
+    "cache_type": {
+      "type": "string",
+      "enum": [
+        "go_bag",
+        "automobile",
+        "general",
+        "barn"
+      ],
+      "default": "general",
+      "description": "Type of emergency cache"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_sample": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this is a sample cache for demonstration"
+    }
+  },
+  "required": [
+    "name",
+    "location"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "name": "LivestockLogistics",
+  "type": "object",
+  "properties": {
+    "truck_make_model": {
+      "type": "string",
+      "description": "Towing vehicle make and model"
+    },
+    "truck_towing_capacity_lbs": {
+      "type": "number",
+      "description": "Maximum towing capacity of the tow vehicle in pounds"
+    },
+    "trailer_make_model": {
+      "type": "string",
+      "description": "Horse/livestock trailer make and model"
+    },
+    "trailer_stall_count": {
+      "type": "number",
+      "description": "Number of stalls/animal slots in the trailer"
+    },
+    "trailer_type": {
+      "type": "string",
+      "enum": [
+        "slant_load",
+        "straight_load",
+        "stock",
+        "bumper_pull",
+        "gooseneck",
+        "other"
+      ]
+    },
+    "has_trailer": {
+      "type": "boolean",
+      "default": false
+    },
+    "trailer_gvwr_lbs": {
+      "type": "number",
+      "description": "Trailer Gross Vehicle Weight Rating in pounds"
+    },
+    "emergency_haul_contact_name": {
+      "type": "string",
+      "description": "Name of neighbor or contact who can haul your animals if needed"
+    },
+    "emergency_haul_contact_phone": {
+      "type": "string",
+      "description": "Phone number of emergency haul contact"
+    },
+    "emergency_haul_contact_notes": {
+      "type": "string",
+      "description": "Notes about the emergency haul arrangement"
+    },
+    "animals_per_load": {
+      "type": "number",
+      "description": "How many animals you can move per trailer load"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

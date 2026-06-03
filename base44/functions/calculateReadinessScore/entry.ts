@@ -1,13 +1,15 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    
+
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const EQUINE_SPECIES = ['equine', 'livestock'];
 
     // Fetch all preparedness data
     const [profile, caches, meetSpots, familyMembers, pets, firstAidItems] = await Promise.all([
@@ -24,6 +26,8 @@ Deno.serve(async (req) => {
     const maxScore = 100;
     const breakdown = {};
 
+    const hasLargeAnimals = pets.some(p => EQUINE_SPECIES.includes(p.species));
+
     // Profile completeness (25 points)
     let profileScore = 0;
     if (userProfile?.street_address) profileScore += 8;
@@ -38,7 +42,6 @@ Deno.serve(async (req) => {
     let householdScore = 0;
     if (familyMembers.length > 0) householdScore += 10;
     if (pets.length > 0) householdScore += 5;
-    // Emergency contacts set
     const contactsSet = familyMembers.filter(m => m.emergency_contact).length;
     if (contactsSet > 0) householdScore += 5;
     breakdown.household = { score: householdScore, max: 20, label: 'Household Info' };
@@ -56,6 +59,13 @@ Deno.serve(async (req) => {
       totalCacheItems += items.length;
     }
     if (totalCacheItems >= 10) cachesScore += 5;
+
+    // Bonus: barn cache for large animals
+    if (hasLargeAnimals) {
+      const hasBarnCache = caches.some(c => c.cache_type === 'barn');
+      if (hasBarnCache) cachesScore = Math.min(cachesScore + 3, 25);
+    }
+
     breakdown.caches = { score: cachesScore, max: 25, label: 'Emergency Caches' };
     score += cachesScore;
 
@@ -72,7 +82,6 @@ Deno.serve(async (req) => {
     let medicalScore = 0;
     if (firstAidItems.length >= 5) medicalScore += 8;
     if (firstAidItems.length >= 10) medicalScore += 4;
-    // Check for non-expired items
     const currentDate = new Date();
     const validItems = firstAidItems.filter(item => {
       if (!item.expiration_date) return true;
@@ -82,14 +91,14 @@ Deno.serve(async (req) => {
     breakdown.medical = { score: medicalScore, max: 15, label: 'First Aid Supplies' };
     score += medicalScore;
 
-    // Calculate percentage
     const percentage = Math.round((score / maxScore) * 100);
 
     return Response.json({
       score: percentage,
       breakdown,
+      hasLargeAnimals,
       level: percentage >= 80 ? 'Excellent' : percentage >= 60 ? 'Good' : percentage >= 40 ? 'Fair' : 'Needs Improvement',
-      recommendations: generateRecommendations(breakdown, familyMembers.length, pets.length)
+      recommendations: generateRecommendations(breakdown, familyMembers.length, pets.length, hasLargeAnimals, userProfile)
     });
   } catch (error) {
     console.error('Error calculating readiness score:', error);
@@ -97,9 +106,9 @@ Deno.serve(async (req) => {
   }
 });
 
-function generateRecommendations(breakdown, familyCount, petCount) {
+function generateRecommendations(breakdown, familyCount, petCount, hasLargeAnimals, userProfile) {
   const recommendations = [];
-  
+
   if (breakdown.profile.score < breakdown.profile.max) {
     recommendations.push('Complete your profile with full address information');
   }
@@ -115,6 +124,23 @@ function generateRecommendations(breakdown, familyCount, petCount) {
   if (breakdown.medical.score < 10) {
     recommendations.push('Stock your first aid kit with essential supplies');
   }
-  
+
+  // Large animal specific recommendations
+  if (hasLargeAnimals) {
+    const alertSettings = userProfile?.alert_settings || {};
+    const wildfireRadius = alertSettings.wildfire_radius_miles ?? 50;
+    const severeWeatherRadius = alertSettings.severe_weather_radius_miles ?? 75;
+
+    if (wildfireRadius < 100) {
+      recommendations.push('🐴 You have equine or livestock — increase your wildfire alert radius to at least 100 miles. Large animals need more evacuation lead time and are highly sensitive to smoke.');
+    }
+    if (severeWeatherRadius < 100) {
+      recommendations.push('🐴 Increase your severe weather alert radius to 100+ miles for earlier warning when evacuating large animals.');
+    }
+    if (breakdown.caches.score < 25) {
+      recommendations.push('🐴 Create a Barn / Livestock cache stocked with emergency feed, spare halters, and equine medical supplies');
+    }
+  }
+
   return recommendations;
 }

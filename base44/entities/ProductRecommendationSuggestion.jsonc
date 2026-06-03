@@ -1,0 +1,145 @@
+{
+  "name": "ProductRecommendationSuggestion",
+  "type": "object",
+  "properties": {
+    "original_recommendation_id": {
+      "type": "string",
+      "description": "Reference to the ProductRecommendation being suggested for change (null for new suggestions)"
+    },
+    "suggested_item_name": {
+      "type": "string"
+    },
+    "suggested_category": {
+      "type": "string",
+      "enum": [
+        "water",
+        "food",
+        "medical",
+        "tools",
+        "clothing",
+        "documents",
+        "communication",
+        "hygiene",
+        "other"
+      ]
+    },
+    "suggested_cache_type": {
+      "type": "string",
+      "enum": [
+        "go_bag",
+        "automobile",
+        "general"
+      ]
+    },
+    "suggested_image_url": {
+      "type": "string"
+    },
+    "suggested_price_cents": {
+      "type": "number"
+    },
+    "suggested_description": {
+      "type": "string"
+    },
+    "suggested_quantity": {
+      "type": "number",
+      "default": 1
+    },
+    "suggested_fema_regions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "suggested_disaster_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "suggested_family_member_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Family member types (person, dog, cat, bird, other)"
+    },
+    "suggested_affiliate_link": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "suggested_by": {
+      "type": "string",
+      "default": "LLM Automation"
+    },
+    "source_organization": {
+      "type": "string",
+      "description": "Organization recommending this (American Red Cross, FEMA, etc.)"
+    },
+    "admin_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "suggested_item_name",
+    "suggested_category",
+    "suggested_cache_type"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -7,25 +7,44 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Bell, Save, Mail } from "lucide-react";
 
-export default function NotificationPreferences({ profile, onSave }) {
-  const [settings, setSettings] = useState({
-    wildfire: true,
-    wildfire_radius_miles: 50,
-    severe_weather: true,
-    temperature_thresholds: true,
-    precipitation: true,
-    hurricane: true,
-    tornado: true,
-    flood: true,
-    earthquake: false,
-    alert_frequency: 'immediate'
-  });
+// Alert types with optional radius support
+const alertTypes = [
+  { key: 'wildfire', label: 'Wildfire Alerts', description: 'Active wildfires within your radius', hasRadius: true, defaultRadius: 50 },
+  { key: 'severe_weather', label: 'Severe Weather', description: 'Thunderstorms, high winds, hail', hasRadius: true, defaultRadius: 75 },
+  { key: 'hurricane', label: 'Hurricane Warnings', description: 'Tropical storms and hurricanes', hasRadius: true, defaultRadius: 200 },
+  { key: 'tornado', label: 'Tornado Warnings', description: 'Tornado watches and warnings', hasRadius: true, defaultRadius: 50 },
+  { key: 'flood', label: 'Flood Alerts', description: 'Flash floods and flood warnings', hasRadius: true, defaultRadius: 25 },
+  { key: 'temperature_thresholds', label: 'Extreme Temperatures', description: 'Heat waves and cold snaps', hasRadius: false },
+  { key: 'precipitation', label: 'Heavy Precipitation', description: 'Significant rain or snow events', hasRadius: false },
+  { key: 'earthquake', label: 'Earthquake Alerts', description: 'Seismic activity notifications', hasRadius: true, defaultRadius: 100 },
+];
+
+const defaultSettings = {
+  wildfire: true,
+  wildfire_radius_miles: 50,
+  severe_weather: true,
+  severe_weather_radius_miles: 75,
+  hurricane: true,
+  hurricane_radius_miles: 200,
+  tornado: true,
+  tornado_radius_miles: 50,
+  flood: true,
+  flood_radius_miles: 25,
+  temperature_thresholds: true,
+  precipitation: true,
+  earthquake: false,
+  earthquake_radius_miles: 100,
+  alert_frequency: 'immediate'
+};
+
+export default function NotificationPreferences({ profile, onSave, hasLargeAnimals = false }) {
+  const [settings, setSettings] = useState(defaultSettings);
   const [notificationMethod, setNotificationMethod] = useState("both");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (profile?.alert_settings) {
-      setSettings({ ...settings, ...profile.alert_settings });
+      setSettings({ ...defaultSettings, ...profile.alert_settings });
     }
     if (profile?.notification_method) {
       setNotificationMethod(profile.notification_method);
@@ -38,16 +57,7 @@ export default function NotificationPreferences({ profile, onSave }) {
     setSaving(false);
   };
 
-  const alertTypes = [
-    { key: 'wildfire', label: 'Wildfire Alerts', description: 'Active wildfires within your radius' },
-    { key: 'severe_weather', label: 'Severe Weather', description: 'Thunderstorms, high winds, hail' },
-    { key: 'hurricane', label: 'Hurricane Warnings', description: 'Tropical storms and hurricanes' },
-    { key: 'tornado', label: 'Tornado Warnings', description: 'Tornado watches and warnings' },
-    { key: 'flood', label: 'Flood Alerts', description: 'Flash floods and flood warnings' },
-    { key: 'temperature_thresholds', label: 'Extreme Temperatures', description: 'Heat waves and cold snaps' },
-    { key: 'precipitation', label: 'Heavy Precipitation', description: 'Significant rain or snow events' },
-    { key: 'earthquake', label: 'Earthquake Alerts', description: 'Seismic activity notifications' }
-  ];
+  const updateSetting = (key, value) => setSettings(prev => ({ ...prev, [key]: value }));
 
   return (
     <Card>
@@ -57,10 +67,36 @@ export default function NotificationPreferences({ profile, onSave }) {
           <CardTitle>Notification Preferences</CardTitle>
         </div>
         <CardDescription>
-          Customize which alerts you receive and how often
+          Customize which alerts you receive and the radius for location-based alerts
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+
+        {/* Large animal advisory */}
+        {hasLargeAnimals && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
+            <span className="text-xl">🐴</span>
+            <div>
+              <p className="text-sm font-semibold text-amber-900">Large Animal Advisory</p>
+              <p className="text-sm text-amber-700 mt-0.5">
+                You have equine or livestock. FEMA and ASPCA recommend increasing wildfire and smoke alert radii to at least 100 miles for large animals — they're more sensitive to smoke and require more lead time to evacuate.
+              </p>
+              <button
+                className="mt-2 text-xs text-amber-800 underline font-medium"
+                onClick={() => {
+                  setSettings(prev => ({
+                    ...prev,
+                    wildfire_radius_miles: Math.max(prev.wildfire_radius_miles || 50, 100),
+                    severe_weather_radius_miles: Math.max(prev.severe_weather_radius_miles || 75, 100)
+                  }));
+                }}
+              >
+                Apply recommended large-animal radii →
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Email Notifications */}
         <div className="pb-4 border-b">
           <Label className="text-base font-semibold mb-3 flex items-center gap-2">
@@ -94,9 +130,9 @@ export default function NotificationPreferences({ profile, onSave }) {
           <Label htmlFor="alert-frequency" className="text-base font-semibold mb-3 block">
             Alert Frequency
           </Label>
-          <Select 
-            value={settings.alert_frequency} 
-            onValueChange={(value) => setSettings({ ...settings, alert_frequency: value })}
+          <Select
+            value={settings.alert_frequency}
+            onValueChange={(value) => updateSetting('alert_frequency', value)}
           >
             <SelectTrigger id="alert-frequency">
               <SelectValue />
@@ -109,51 +145,49 @@ export default function NotificationPreferences({ profile, onSave }) {
           </Select>
         </div>
 
-        {/* Wildfire Radius */}
-        {settings.wildfire && (
-          <div className="pb-4 border-b">
-            <Label htmlFor="wildfire-radius" className="text-base font-semibold mb-2 block">
-              Wildfire Alert Radius
-            </Label>
-            <div className="flex items-center gap-3">
-              <Input
-                id="wildfire-radius"
-                type="number"
-                min="10"
-                max="200"
-                value={settings.wildfire_radius_miles}
-                onChange={(e) => setSettings({ ...settings, wildfire_radius_miles: parseInt(e.target.value) })}
-                className="w-24"
-              />
-              <span className="text-sm text-gray-600">miles from your location</span>
-            </div>
-          </div>
-        )}
-
-        {/* Alert Types */}
+        {/* Alert Types with per-type radius */}
         <div>
-          <Label className="text-base font-semibold mb-3 block">Alert Types</Label>
-          <div className="space-y-4">
+          <Label className="text-base font-semibold mb-3 block">Alert Types & Radii</Label>
+          <div className="space-y-3">
             {alertTypes.map((alert) => (
-              <div key={alert.key} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex-1">
-                  <Label htmlFor={alert.key} className="font-medium cursor-pointer">
-                    {alert.label}
-                  </Label>
-                  <p className="text-sm text-gray-500 mt-0.5">{alert.description}</p>
+              <div key={alert.key} className="p-3 bg-gray-50 rounded-lg space-y-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <Label htmlFor={alert.key} className="font-medium cursor-pointer">
+                      {alert.label}
+                    </Label>
+                    <p className="text-sm text-gray-500 mt-0.5">{alert.description}</p>
+                  </div>
+                  <Switch
+                    id={alert.key}
+                    checked={!!settings[alert.key]}
+                    onCheckedChange={(checked) => updateSetting(alert.key, checked)}
+                  />
                 </div>
-                <Switch
-                  id={alert.key}
-                  checked={settings[alert.key]}
-                  onCheckedChange={(checked) => setSettings({ ...settings, [alert.key]: checked })}
-                />
+                {alert.hasRadius && settings[alert.key] && (
+                  <div className="flex items-center gap-3 pt-1">
+                    <span className="text-xs text-gray-500 w-14">Radius:</span>
+                    <Input
+                      type="number"
+                      min="5"
+                      max="500"
+                      value={settings[`${alert.key}_radius_miles`] ?? alert.defaultRadius}
+                      onChange={(e) => updateSetting(`${alert.key}_radius_miles`, parseInt(e.target.value))}
+                      className="w-20 h-7 text-sm"
+                    />
+                    <span className="text-xs text-gray-500">miles</span>
+                    {hasLargeAnimals && (alert.key === 'wildfire' || alert.key === 'severe_weather') && (
+                      <span className="text-xs text-amber-600 font-medium">🐴 100+ recommended</span>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        <Button 
-          onClick={handleSave} 
+        <Button
+          onClick={handleSave}
           disabled={saving}
           className="w-full bg-blue-600 hover:bg-blue-700"
         >

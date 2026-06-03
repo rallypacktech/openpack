@@ -1,0 +1,95 @@
+{
+  "name": "FamilyMember",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full name"
+    },
+    "relationship": {
+      "type": "string",
+      "enum": [
+        "spouse",
+        "child",
+        "parent",
+        "sibling",
+        "other"
+      ]
+    },
+    "age": {
+      "type": "number"
+    },
+    "medical_conditions": {
+      "type": "string"
+    },
+    "emergency_contact": {
+      "type": "string",
+      "description": "Email or phone"
+    },
+    "linked_user_id": {
+      "type": "string",
+      "description": "User ID if this family member has an account"
+    },
+    "link_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "none"
+      ],
+      "default": "none",
+      "description": "Status of account linking"
+    }
+  },
+  "required": [
+    "name",
+    "relationship"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.linked_user_id": "{{user.id}}"
+        },
+        {
+          "data.emergency_contact": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

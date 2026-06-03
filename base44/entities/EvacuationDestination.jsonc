@@ -1,0 +1,124 @@
+{
+  "name": "EvacuationDestination",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the evacuation destination (e.g., Williamson County Fairgrounds)"
+    },
+    "destination_type": {
+      "type": "string",
+      "enum": [
+        "fairgrounds",
+        "private_barn",
+        "veterinary_clinic",
+        "livestock_auction",
+        "other"
+      ],
+      "default": "fairgrounds"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "stall_capacity": {
+      "type": "number",
+      "description": "Number of stalls available for your animals"
+    },
+    "pre_authorized": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether you have pre-arranged access/authorization with this facility"
+    },
+    "authorization_notes": {
+      "type": "string",
+      "description": "Contact info, agreement details, or access codes for pre-authorized facilities"
+    },
+    "amenities": {
+      "type": "string",
+      "description": "Available amenities (water, electricity, RV hookups, feed storage, etc.)"
+    },
+    "distance_miles": {
+      "type": "number",
+      "description": "Approximate distance from home in miles"
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "north",
+        "south",
+        "east",
+        "west",
+        "northeast",
+        "northwest",
+        "southeast",
+        "southwest"
+      ],
+      "description": "General direction from home \u2014 use different directions for alternate routes"
+    },
+    "is_primary": {
+      "type": "boolean",
+      "default": false,
+      "description": "Primary evacuation destination"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "destination_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
