@@ -49,6 +49,13 @@
       ],
       "default": "both"
     },
+    "emergency_countries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "ISO country codes the user wants localized emergency info for (e.g. ['US', 'MX']). Free users: max 1. Paid users: max 3."
+    },
     "alert_settings": {
       "type": "object",
       "properties": {

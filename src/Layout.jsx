@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { base44 } from "@/api/base44Client";
+import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySettings";
 import { 
   LayoutDashboard, 
   Package, 
@@ -22,6 +23,7 @@ import AccessibilityProvider from "./components/AccessibilityProvider";
 
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -30,6 +32,9 @@ export default function Layout({ children, currentPageName }) {
       try {
         const userData = await base44.auth.me();
         setUser(userData);
+        // Load profile silently to get emergency_countries
+        const profiles = await base44.entities.UserProfile.filter({ created_by: userData.email });
+        if (profiles.length > 0) setProfile(profiles[0]);
         setAuthChecked(true);
       } catch (e) {
         // Not logged in - redirect to Home if on protected page
@@ -271,6 +276,36 @@ export default function Layout({ children, currentPageName }) {
                   <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
                   BETA — Features may change
                 </div>
+
+                {/* Emergency services notice */}
+                {(() => {
+                  const countries = profile?.emergency_countries || [];
+                  if (countries.length === 0) {
+                    return (
+                      <p className="text-xs text-muted-foreground font-sans mb-3">
+                        🚨 In an emergency, <strong>contact your local emergency services</strong> immediately.
+                      </p>
+                    );
+                  }
+                  return (
+                    <div className="mb-3 text-xs text-muted-foreground font-sans">
+                      <p className="font-semibold text-foreground mb-1">🚨 Emergency numbers for your selected countries:</p>
+                      {countries.map((code) => {
+                        const data = COUNTRY_EMERGENCY_DATA[code];
+                        if (!data) return null;
+                        return (
+                          <p key={code} className="mt-0.5">
+                            <strong>{data.name}:</strong> {data.combined}
+                            {data.police !== data.combined && ` (Police: ${data.police})`}
+                            {data.fire !== data.combined && ` (Fire: ${data.fire})`}
+                            {data.ambulance !== data.combined && ` (Ambulance: ${data.ambulance})`}
+                          </p>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+
                 <p className="text-xs text-muted-foreground font-sans mb-1">
                   Feedback: <a href="mailto:beta@rallypack.tech" className="text-foreground hover:underline">beta@rallypack.tech</a>
                 </p>

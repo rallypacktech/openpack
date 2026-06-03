@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Shield, Lock, AlertTriangle } from "lucide-react";
+import CountryEmergencySettings from "../components/settings/CountryEmergencySettings";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -213,6 +214,13 @@ export default function Settings() {
           onAdd={handleAddPet}
           onUpdate={handleUpdatePet}
           onDelete={handleDeletePet}
+        />
+
+        {/* Emergency Country Preferences */}
+        <CountryEmergencySettings
+          profile={profile}
+          onSave={handleProfileSave}
+          isPaidAccount={false}
         />
 
         {/* Security Settings */}
