@@ -51,37 +51,36 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Build email body
-      let body = `Hi ${user.full_name || "there"},\n\nHere's your monthly emergency preparedness update from RallyPack:\n\n`;
+      // Build email body (HTML)
+      let body = `<p>Hi ${user.full_name || "there"},</p><p>Here's your monthly emergency preparedness update from RallyPack:</p>`;
 
       if (expired.length > 0) {
-        body += `🚨 EXPIRED ITEMS — replace these now:\n`;
-        expired.forEach(i => { body += `  • ${i.name} (expired ${new Date(i.date).toLocaleDateString()})\n`; });
-        body += "\n";
+        body += `<p><strong>🚨 EXPIRED ITEMS — replace these now:</strong><br>`;
+        expired.forEach(i => { body += `• ${i.name} (expired ${new Date(i.date).toLocaleDateString()})<br>`; });
+        body += `</p>`;
       }
 
       if (expiringSoon.length > 0) {
-        body += `⚠️ EXPIRING SOON — replace within 30 days:\n`;
-        expiringSoon.forEach(i => { body += `  • ${i.name} (expires ${new Date(i.date).toLocaleDateString()})\n`; });
-        body += "\n";
+        body += `<p><strong>⚠️ EXPIRING SOON — replace within 30 days:</strong><br>`;
+        expiringSoon.forEach(i => { body += `• ${i.name} (expires ${new Date(i.date).toLocaleDateString()})<br>`; });
+        body += `</p>`;
       }
 
       if (missingItems.length > 0) {
-        body += `📦 MISSING ESSENTIALS — ${missingItems.length} recommended item${missingItems.length !== 1 ? "s" : ""} not yet in your inventory:\n`;
-        missingItems.slice(0, 10).forEach(i => { body += `  • ${i.item_name} (${i.category})\n`; });
-        if (missingItems.length > 10) body += `  … and ${missingItems.length - 10} more.\n`;
-        body += "\n";
+        body += `<p><strong>📦 MISSING ESSENTIALS — ${missingItems.length} recommended item${missingItems.length !== 1 ? "s" : ""} not yet in your inventory:</strong><br>`;
+        missingItems.slice(0, 10).forEach(i => { body += `• ${i.item_name} (${i.category})<br>`; });
+        if (missingItems.length > 10) body += `… and ${missingItems.length - 10} more.<br>`;
+        body += `</p>`;
       }
 
-      body += `Shop now and mark items as owned at:\nhttps://rallypack.tech/Shopping\n\n`;
-      body += `Stay safe,\nThe RallyPack Team\n\n`;
-      body += `You received this because you have a RallyPack account. To stop these reminders, update your notification settings.`;
+      body += `<p><a href="https://rallypack.tech/Shopping">Shop now and mark items as owned</a></p><p>Stay safe,<br>The RallyPack Team</p><p style="font-size: 0.9em; color: #666;">You received this because you have a RallyPack account. To stop these reminders, update your notification settings.</p>`;
 
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: user.email,
         from_name: "RallyPack",
         subject: `Your monthly emergency preparedness checklist update`,
-        body
+        body,
+        is_html: true
       });
 
       sent++;
