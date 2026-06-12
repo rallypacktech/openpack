@@ -172,9 +172,14 @@ function getSessionId() {
   return sid;
 }
 
-function QuizResults({ score, answers }) {
+function QuizResults({ score, answers, onRetake }) {
   const result = getResult(score, answers);
   const regionRes = REGION_RESOURCES[answers.region] || REGION_RESOURCES.general;
+  const [isAuthed, setIsAuthed] = React.useState(null);
+
+  React.useEffect(() => {
+    base44.auth.isAuthenticated().then(setIsAuthed).catch(() => setIsAuthed(false));
+  }, []);
 
   // Save result on mount (once)
   React.useEffect(() => {
@@ -339,13 +344,32 @@ function QuizResults({ score, answers }) {
           )}
         </div>
 
-        {/* LOGIN WALL — personalized recommendations & kit builder */}
+        {/* CTA — login wall for guests, dashboard link for authed users */}
         <div className="mb-8">
-          <div className="mb-4">
-            <p className="text-xs uppercase tracking-widest text-primary font-sans font-semibold mb-1">Save your results & get your kit</p>
-            <h2 className="font-serif text-2xl font-semibold text-foreground">Your personalized action plan is ready.</h2>
-          </div>
-          <LoginWall context="kit checklist & personalized recommendations" redirectTo="/Dashboard" />
+          {isAuthed ? (
+            <div className="bg-card border border-border rounded p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <p className="font-serif text-lg font-semibold text-foreground">Results saved to your account.</p>
+                <p className="text-sm text-muted-foreground font-sans mt-1">Head to your dashboard to build your kit or update your plan.</p>
+              </div>
+              <div className="flex gap-3 flex-shrink-0">
+                <button onClick={onRetake} className="text-sm font-sans text-muted-foreground hover:text-foreground underline transition-colors">
+                  Retake quiz
+                </button>
+                <Link to="/Dashboard" className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-medium px-6 py-2.5 rounded hover:bg-primary/90 transition-colors text-sm">
+                  Go to Dashboard <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="mb-4">
+                <p className="text-xs uppercase tracking-widest text-primary font-sans font-semibold mb-1">Save your results & get your kit</p>
+                <h2 className="font-serif text-2xl font-semibold text-foreground">Your personalized action plan is ready.</h2>
+              </div>
+              <LoginWall context="kit checklist & personalized recommendations" redirectTo="/Dashboard" />
+            </>
+          )}
         </div>
 
         {/* Public FEMA Resources teaser */}
@@ -428,7 +452,7 @@ export default function ReadinessQuiz() {
 
   if (showResults) {
     const score = calculateScore(answers);
-    return <QuizResults score={score} answers={answers} />;
+    return <QuizResults score={score} answers={answers} onRetake={() => { setShowResults(false); setAnswers({}); setCurrentQ(0); }} />;
   }
 
   const q = questions[currentQ];

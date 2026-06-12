@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+const getNextUrl = () => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("next") || "/";
+};
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,7 +48,7 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      window.location.href = "/";
+      window.location.href = getNextUrl();
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
@@ -127,7 +131,7 @@ export default function Register() {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="text-primary font-medium hover:underline">
+          <Link to={`/login${window.location.search}`} className="text-primary font-medium hover:underline">
             Log in
           </Link>
         </>

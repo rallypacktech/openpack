@@ -1,11 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Lock, ArrowRight, Star } from "lucide-react";
 
 export default function LoginWall({ context = "recommendations", redirectTo = "/Dashboard" }) {
-  const handleLogin = () => {
-    base44.auth.redirectToLogin(redirectTo);
-  };
+  const encodedNext = encodeURIComponent(redirectTo);
 
   return (
     <div className="relative rounded overflow-hidden border border-border">
@@ -24,19 +23,19 @@ export default function LoginWall({ context = "recommendations", redirectTo = "/
           Create a free account to unlock your tailored plan, save your results, and access county-level FEMA resources — no credit card required.
         </p>
 
-        <button
-          onClick={handleLogin}
+        <Link
+          to={`/register?next=${encodedNext}`}
           className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-medium px-8 py-3 rounded hover:bg-primary/90 transition-colors text-sm tracking-wide"
         >
           Sign up free <ArrowRight className="w-4 h-4" />
-        </button>
+        </Link>
 
-        <button
-          onClick={handleLogin}
+        <Link
+          to={`/login?next=${encodedNext}`}
           className="mt-3 text-xs text-muted-foreground hover:text-foreground underline font-sans transition-colors"
         >
           Already have an account? Sign in
-        </button>
+        </Link>
 
         <div className="mt-8 flex items-center gap-6 text-xs text-muted-foreground font-sans">
           <div className="flex items-center gap-1"><Star className="w-3 h-3 text-gold fill-gold" /> Free forever</div>
