@@ -120,7 +120,7 @@ export default function Avian() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://media.base44.com/images/public/69dc170f0871ac017d79debb/74c10a1f8_generated_image.png')" }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">Plan it before you need it</p>
           <h2 className="font-serif text-5xl md:text-6xl font-bold text-white leading-none mb-8">

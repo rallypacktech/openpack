@@ -107,7 +107,7 @@ export default function Infant() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560800452-f2d475982b96?w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://media.base44.com/images/public/69dc170f0871ac017d79debb/14d5a88ae_generated_image.png')" }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">The best time to plan is now</p>
           <h2 className="font-serif text-5xl md:text-6xl font-bold text-white leading-none mb-8">
