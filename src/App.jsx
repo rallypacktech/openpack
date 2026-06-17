@@ -15,6 +15,11 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
 const AffiliatePartnerPolicy = lazy(() => import('./pages/AffiliatePartnerPolicy'));
+const Equine = lazy(() => import('./pages/Equine'));
+const Canine = lazy(() => import('./pages/Canine'));
+const Feline = lazy(() => import('./pages/Feline'));
+const Infant = lazy(() => import('./pages/Infant'));
+const Avian = lazy(() => import('./pages/Avian'));
 const Feedback = lazy(() => import('./pages/Feedback'));
 const Donate = lazy(() => import('./pages/Donate'));
 const TrackedItems = lazy(() => import('./pages/TrackedItems'));
@@ -50,6 +55,11 @@ const AuthenticatedApp = () => {
 
       {/* Public misc pages */}
       <Route path="/AffiliatePartnerPolicy" element={<AffiliatePartnerPolicy />} />
+      <Route path="/equine" element={<LayoutWrapper currentPageName="Equine"><Equine /></LayoutWrapper>} />
+      <Route path="/canine" element={<LayoutWrapper currentPageName="Canine"><Canine /></LayoutWrapper>} />
+      <Route path="/feline" element={<LayoutWrapper currentPageName="Feline"><Feline /></LayoutWrapper>} />
+      <Route path="/infant" element={<LayoutWrapper currentPageName="Infant"><Infant /></LayoutWrapper>} />
+      <Route path="/avian" element={<LayoutWrapper currentPageName="Avian"><Avian /></LayoutWrapper>} />
       <Route path="/Feedback" element={<Feedback />} />
       <Route path="/Donate" element={<LayoutWrapper currentPageName="Donate"><Donate /></LayoutWrapper>} />
 
