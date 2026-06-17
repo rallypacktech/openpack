@@ -96,8 +96,8 @@ export default function AdminProducts() {
     setLoading(true);
     try {
       const [p, s] = await Promise.all([
-        base44.entities.ProductRecommendation.list(),
-        base44.entities.ProductRecommendationSuggestion.list()
+        base44.entities.ProductRecommendation.list('-priority', 500),
+        base44.entities.ProductRecommendationSuggestion.list('-created_date', 500)
       ]);
       setProducts(p);
       setSuggestions(s);
