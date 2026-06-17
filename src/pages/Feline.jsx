@@ -13,7 +13,14 @@ const CHECKLIST = [
 
 export default function Feline() {
   React.useEffect(() => {
-    document.title = "Feline Emergency Preparedness | RallyPack";
+    document.title = "Cat Emergency Preparedness — Evacuating with Cats | RallyPack";
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
+    meta.content = "Emergency preparedness guide for cat owners. Learn how to safely evacuate with your cat during a wildfire, hurricane, tornado, or flood — including carrier tips, hiding behavior, pet-friendly shelters, and a cat disaster kit checklist. Free tools from RallyPack.";
+    let keywords = document.querySelector('meta[name="keywords"]');
+    if (!keywords) { keywords = document.createElement('meta'); keywords.name = "keywords"; document.head.appendChild(keywords); }
+    keywords.content = "cat emergency preparedness, evacuating with cats, feline disaster plan, cat go bag, cat evacuation checklist, pet friendly shelter cats, cat wildfire evacuation, hurricane evacuation cats, cat disaster kit, cat microchip disaster, how to evacuate with a cat, indoor cat evacuation, cat emergency plan, disaster preparedness cats, feline emergency preparedness";
+    return () => {};
   }, []);
 
   return (
@@ -21,13 +28,10 @@ export default function Feline() {
 
       {/* Hero */}
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1800&q=85')" }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1800&q=85')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
-          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Feline Emergency Preparedness · RallyPack</p>
+          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Cat Emergency Preparedness · RallyPack</p>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-none text-white mb-6 max-w-3xl">
             Cats don't<br />evacuate<br />on your schedule.
           </h1>
@@ -37,8 +41,7 @@ export default function Feline() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/ReadinessQuiz">
               <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-[#be3f25] transition-colors text-sm tracking-widest uppercase">
-                <ClipboardList className="w-4 h-4" />
-                Take the readiness quiz
+                <ClipboardList className="w-4 h-4" /> Take the readiness quiz
               </button>
             </Link>
             <Link to="/register">
@@ -71,7 +74,7 @@ export default function Feline() {
 
       {/* Checklist */}
       <section className="py-24 max-w-6xl mx-auto px-6">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The feline preparedness essentials</p>
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The cat emergency preparedness essentials</p>
         <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-14 leading-tight max-w-xl">
           Six things every cat owner needs in place.
         </h2>
@@ -96,11 +99,35 @@ export default function Feline() {
           <div className="max-w-sm">
             <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-sans mb-4">RallyPack for cat owners</p>
             <p className="font-serif text-3xl text-white font-bold leading-tight mb-4">
-              Store your cat's microchip, vaccines, and meds. Access it offline when you need it most.
+              Microchip. Vaccines. Medications. Vet contacts. Offline when you need them.
             </p>
             <p className="text-sm text-white/60 font-sans leading-relaxed">
-              Your vet records, vaccination history, and medication schedules — organized once, available anywhere.
+              Your vet records, vaccination history, and medication schedules — organized once, available anywhere, even without internet.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SEO section */}
+      <section className="py-16 max-w-6xl mx-auto px-6 border-t border-[#D8D2C6]">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Common questions & scenarios</p>
+        <h2 className="font-serif text-3xl font-bold text-[#1C1C1A] mb-8">What cat owners search for in an emergency</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-sans text-[#8A8577] leading-relaxed">
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Catching a scared cat before an evacuation</h3>
+            <p>The most important preparation for cat owners: at the first sign of an emergency, confine your cat to a single room before you begin packing. Once boxes are moving and doors are opening, an indoor cat will disappear into walls, closets, or under furniture and may not come out for hours.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Cat evacuation kit checklist</h3>
+            <p>Your cat go-bag should include: carrier with familiar bedding, 3-day food supply, water, portable litter box and litter, scoop, poop bags, vaccination records, microchip ID, recent photo, any medications, and your vet's emergency number.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Finding cat-friendly shelters and hotels</h3>
+            <p>Public evacuation shelters almost never accept cats. Research pet-friendly hotels along your two planned evacuation routes before the emergency season. Search for "pet-friendly hotels [city]" and call ahead — policies vary and "pet-friendly" sometimes means dogs only.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">If you can't find your cat before evacuating</h3>
+            <p>Leave a carrier with familiar scent inside the house with the door open. Leave dry food and water. Tell a trusted neighbor. File a lost pet report online immediately. Post to Nextdoor and local Facebook groups with a clear recent photo. A microchip is the best tool for reunification.</p>
           </div>
         </div>
       </section>
@@ -125,7 +152,7 @@ export default function Feline() {
             </Link>
             <Link to="/register">
               <button className="inline-flex items-center gap-3 border border-white/30 text-white font-sans font-semibold px-10 py-4 rounded-none hover:bg-white/5 transition-colors text-xs tracking-widest uppercase w-full sm:w-auto justify-center">
-                Build your feline plan <ArrowRight className="w-4 h-4" />
+                Build your cat's plan <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
           </div>

@@ -13,7 +13,14 @@ const CHECKLIST = [
 
 export default function Avian() {
   React.useEffect(() => {
-    document.title = "Avian Emergency Preparedness | RallyPack";
+    document.title = "Bird Emergency Preparedness — Evacuating with Parrots, Cockatiels & Pet Birds | RallyPack";
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
+    meta.content = "Emergency preparedness guide for bird owners. Learn how to evacuate with your parrot, cockatiel, budgie, macaw, or other pet bird during a wildfire, hurricane, or air quality emergency. Free disaster planning tools from RallyPack.";
+    let keywords = document.querySelector('meta[name="keywords"]');
+    if (!keywords) { keywords = document.createElement('meta'); keywords.name = "keywords"; document.head.appendChild(keywords); }
+    keywords.content = "bird emergency preparedness, evacuating with birds, parrot evacuation plan, cockatiel disaster kit, budgie emergency plan, macaw evacuation, avian disaster preparedness, bird go bag, bird evacuation checklist, pet bird emergency plan, avian emergency preparedness, parrot wildfire evacuation, bird hurricane plan, air quality danger birds, PTFE toxicity birds, avian vet emergency, bird boarding emergency";
+    return () => {};
   }, []);
 
   return (
@@ -21,24 +28,20 @@ export default function Avian() {
 
       {/* Hero */}
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=1800&q=85')" }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=1800&q=85')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
-          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Avian Emergency Preparedness · RallyPack</p>
+          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Bird Emergency Preparedness · RallyPack</p>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-none text-white mb-6 max-w-3xl">
             Birds are the<br />first to sense<br />danger.
           </h1>
           <p className="font-sans text-base md:text-lg text-white/75 max-w-md mb-10 leading-relaxed">
-            Canaries warned miners of bad air for a reason — birds are extraordinarily sensitive to their environment. In a disaster, that sensitivity becomes a life-threatening vulnerability. RallyPack helps bird owners build a plan that protects them.
+            Canaries warned miners of bad air for a reason — birds are extraordinarily sensitive to their environment. Parrots, cockatiels, budgies, and macaws face life-threatening risks in evacuations that other pets survive easily. RallyPack helps bird owners build a plan that protects them.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/ReadinessQuiz">
               <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-[#be3f25] transition-colors text-sm tracking-widest uppercase">
-                <ClipboardList className="w-4 h-4" />
-                Take the readiness quiz
+                <ClipboardList className="w-4 h-4" /> Take the readiness quiz
               </button>
             </Link>
             <Link to="/register">
@@ -55,7 +58,7 @@ export default function Avian() {
       <section className="bg-[#1C1C1A] text-white py-20">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10">
           {[
-            { n: "20M+", unit: "", label: "Pet birds in the US — nearly none of their owners have a species-specific emergency plan" },
+            { n: "20M+", unit: "", label: "Pet birds in the US — including parrots, cockatiels, budgies, macaws, and finches" },
             { n: "Seconds", unit: "", label: "It can take for a bird to succumb to smoke, fumes, or rapid temperature change in an emergency" },
             { n: "99%", unit: "", label: "Of public emergency shelters cannot accommodate birds — leaving owners without options if unprepared" },
           ].map((s) => (
@@ -71,7 +74,7 @@ export default function Avian() {
 
       {/* Checklist */}
       <section className="py-24 max-w-6xl mx-auto px-6">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The avian preparedness essentials</p>
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The bird emergency preparedness essentials</p>
         <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-14 leading-tight max-w-xl">
           Six things every bird owner needs in place.
         </h2>
@@ -88,14 +91,14 @@ export default function Avian() {
         </div>
       </section>
 
-      {/* Key warning callout */}
+      {/* Warning callout */}
       <section className="bg-[#D64A2E] py-16">
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center gap-8">
           <Wind className="w-12 h-12 text-white flex-shrink-0" />
           <div>
             <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2">Air quality is your bird's primary threat.</h3>
             <p className="text-white/80 font-sans text-sm leading-relaxed max-w-2xl">
-              Birds have a unique respiratory system that processes air more efficiently than mammals — which means airborne toxins, smoke, and even non-stick cookware fumes at high heat can be fatal in minutes. In wildfire or chemical emergency scenarios, evacuate your bird before you pack anything else.
+              Birds have a unique respiratory system that processes air more efficiently than mammals — which means airborne toxins, smoke, and even non-stick PTFE cookware fumes at high heat can be fatal in minutes. In wildfire or chemical emergency scenarios, evacuate your parrot, cockatiel, or budgie before you pack anything else.
             </p>
           </div>
         </div>
@@ -112,8 +115,32 @@ export default function Avian() {
               Vet records. Species-specific needs. Emergency boarding contacts. Offline when you need them.
             </p>
             <p className="text-sm text-white/60 font-sans leading-relaxed">
-              Different species have very different needs. RallyPack lets you log what your bird eats, any medications, and your avian vet — so rescuers and caregivers have the right information fast.
+              Parrots, cockatiels, finches, and macaws all have different needs. RallyPack lets you log species-specific information so rescuers and emergency caregivers have the right information fast.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SEO section */}
+      <section className="py-16 max-w-6xl mx-auto px-6 border-t border-[#D8D2C6]">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Common questions & scenarios</p>
+        <h2 className="font-serif text-3xl font-bold text-[#1C1C1A] mb-8">What bird owners search for in an emergency</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-sans text-[#8A8577] leading-relaxed">
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Evacuating with parrots and large birds</h3>
+            <p>African Greys, Amazon parrots, cockatoos, and macaws require large, secure carriers — often airline-style crates. Stressed large parrots can bite, scream, and injure themselves. Cover the carrier with a light cloth to reduce stimulation during transport. Never use a carrier without ventilation.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Evacuating with cockatiels, budgies, and small birds</h3>
+            <p>Small birds like budgerigars (parakeets), cockatiels, lovebirds, and canaries are more vulnerable to temperature change than large parrots. A small hard-sided carrier with a travel perch and food is sufficient. Keep them away from direct AC or heating vents in the car.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Bird go-bag checklist</h3>
+            <p>Pack: secure travel cage, familiar perch, 3-day food supply (no new foods), water bottle, avian vet records, leg band or microchip info, current photo, any medications, hand warmers or cool packs depending on season, and your avian vet's emergency number.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Air quality threats to birds indoors</h3>
+            <p>Non-stick (PTFE/Teflon) cookware releases fumes lethal to birds at high temperatures — this is a risk inside your home, not just during wildfires. Scented candles, aerosol sprays, and cleaning products can also affect birds. Keep your bird away from fumes year-round, and prioritize their evacuation at the first smoke warning.</p>
           </div>
         </div>
       </section>

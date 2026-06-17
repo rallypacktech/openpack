@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets } from "lucide-react";
+import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, Flame, Wind, Droplets } from "lucide-react";
 
 const CHECKLIST = [
   { icon: FileText, title: "Coggins & Health Papers", desc: "Keep a current negative Coggins test and health certificate in a waterproof pouch in your trailer." },
@@ -11,15 +11,16 @@ const CHECKLIST = [
   { icon: AlertTriangle, title: "Difficult Loaders", desc: "Practice loading before a disaster. Note any horse that needs extra time — panic and rushing cause injuries." },
 ];
 
-const DISASTERS = [
-  { icon: Flame, label: "Wildfire" },
-  { icon: Wind, label: "Hurricane" },
-  { icon: Droplets, label: "Flood" },
-];
-
 export default function Equine() {
   React.useEffect(() => {
-    document.title = "Equine Emergency Preparedness | RallyPack";
+    document.title = "Equine Emergency Preparedness — Evacuating with Horses | RallyPack";
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
+    meta.content = "Complete guide to equine emergency preparedness. Learn how to evacuate horses during a wildfire, hurricane, or flood — including Coggins paperwork, trailer logistics, evacuation destinations, and 72-hour supply planning. Free tools from RallyPack.";
+    let keywords = document.querySelector('meta[name="keywords"]');
+    if (!keywords) { keywords = document.createElement('meta'); keywords.name = "keywords"; document.head.appendChild(keywords); }
+    keywords.content = "equine emergency preparedness, evacuating horses wildfire, horse evacuation plan, horse disaster kit, equine go bag, horse Coggins emergency, evacuating with horses hurricane, trailer evacuation horses, horse emergency checklist, large animal evacuation, livestock emergency plan, horse natural disaster, fairgrounds evacuation horses";
+    return () => {};
   }, []);
 
   return (
@@ -27,10 +28,7 @@ export default function Equine() {
 
       {/* Hero */}
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=1800&q=85')" }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=1800&q=85')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Equine Emergency Preparedness · RallyPack</p>
@@ -43,8 +41,7 @@ export default function Equine() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/ReadinessQuiz">
               <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-[#be3f25] transition-colors text-sm tracking-widest uppercase">
-                <ClipboardList className="w-4 h-4" />
-                Take the readiness quiz
+                <ClipboardList className="w-4 h-4" /> Take the readiness quiz
               </button>
             </Link>
             <Link to="/register">
@@ -57,7 +54,7 @@ export default function Equine() {
         </div>
       </section>
 
-      {/* The reality */}
+      {/* Stats */}
       <section className="bg-[#1C1C1A] text-white py-20">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10">
           {[
@@ -79,7 +76,7 @@ export default function Equine() {
       <section className="py-24 max-w-6xl mx-auto px-6">
         <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The six things that actually save horses</p>
         <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-14 leading-tight max-w-xl">
-          What your equine plan needs to cover.
+          What your equine evacuation plan needs to cover.
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[#D8D2C6]">
           {CHECKLIST.map(({ icon: Icon, title, desc }) => (
@@ -96,10 +93,7 @@ export default function Equine() {
 
       {/* Editorial image */}
       <section className="relative h-[55vh] min-h-[380px] overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534043464124-3be32fe000c9?w=1600&q=80')" }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534043464124-3be32fe000c9?w=1600&q=80')" }} />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/80 to-transparent" />
         <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
           <div className="max-w-sm">
@@ -114,15 +108,13 @@ export default function Equine() {
         </div>
       </section>
 
-      {/* What disasters apply */}
+      {/* Disasters */}
       <section className="py-20 max-w-6xl mx-auto px-6">
         <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Equine threats by disaster type</p>
-        <h2 className="font-serif text-4xl font-bold text-[#1C1C1A] mb-12 leading-tight">
-          Horses face unique risks in every scenario.
-        </h2>
+        <h2 className="font-serif text-4xl font-bold text-[#1C1C1A] mb-12 leading-tight">Horses face unique risks in every scenario.</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#D8D2C6]">
           {[
-            { icon: Flame, label: "Wildfire", desc: "Smoke inhalation, road closures, and terrified animals make fire the #1 cause of equine disaster deaths. Plan to leave early." },
+            { icon: Flame, label: "Wildfire", desc: "Smoke inhalation, road closures, and terrified animals make fire the #1 cause of equine disaster deaths. Plan to leave early — when there's a watch, not a warning." },
             { icon: Wind, label: "Hurricane", desc: "Pasture flooding and wind damage to structures. Know your storm surge zone and have a destination 100+ miles away." },
             { icon: Droplets, label: "Flood", desc: "Horses standing in floodwater develop hoof and leg conditions within hours. Elevated pasture or trailer evacuation is essential." },
           ].map(({ icon: Icon, label, desc }) => (
@@ -132,6 +124,30 @@ export default function Equine() {
               <p className="text-sm text-[#8A8577] leading-relaxed">{desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* SEO section */}
+      <section className="py-16 max-w-6xl mx-auto px-6 border-t border-[#D8D2C6]">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Common questions & scenarios</p>
+        <h2 className="font-serif text-3xl font-bold text-[#1C1C1A] mb-8">What horse owners search for in an emergency</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-sans text-[#8A8577] leading-relaxed">
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Evacuating horses during a wildfire</h3>
+            <p>The single most important rule: leave when a watch is issued, not when a warning is issued. Smoke reduces visibility, roads get jammed, and terrified horses become dangerous to load. Have your trailer hitched and your Coggins papers on hand before fire season begins.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Horse go-bag and trailer checklist</h3>
+            <p>Each horse needs: halter and lead rope, feed for 72 hours, water buckets, hay net, current Coggins test, health certificate, medications, and ID photos. The trailer needs: fuel, first aid kit, spare tire, and pre-loaded contact info for your evacuation destinations.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">Finding horse evacuation destinations</h3>
+            <p>Contact your county fairgrounds, local equestrian centers, and neighboring farms now — not during a crisis. Pre-authorize access and get a contact name and cell number. Identify destinations in at least two different directions from your property.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1C1C1A] mb-2">What to do if you can't evacuate your horses</h3>
+            <p>As a last resort: remove halters (loose horses can self-rescue more easily than haltered ones caught on fences), open pasture gates, write your contact info on hooves with livestock marker, and photograph each animal. Never lock horses in a barn during a fire.</p>
+          </div>
         </div>
       </section>
 
@@ -163,7 +179,6 @@ export default function Equine() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">
           <Link to="/" className="font-serif text-lg font-bold text-white/60 hover:text-white transition-colors">RallyPack</Link>
