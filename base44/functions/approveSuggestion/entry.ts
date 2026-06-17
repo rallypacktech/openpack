@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
-        const { suggestionId } = await req.json();
+        const { suggestionId, overrides } = await req.json();
 
         if (!suggestionId) {
             return Response.json({ error: 'suggestionId is required' }, { status: 400 });
@@ -17,10 +17,12 @@ Deno.serve(async (req) => {
 
         // Get the suggestion
         const suggestions = await base44.asServiceRole.entities.ProductRecommendationSuggestion.list();
-        const suggestion = suggestions.find(s => s.id === suggestionId);
-
-        if (!suggestion) {
-            return Response.json({ error: 'Suggestion not found' }, { status: 404 });
+        let suggestion = suggestions.find(s => s.id === suggestionId);
+        if (!suggestion) return Response.json({ error: 'Suggestion not found' }, { status: 404 });
+        // Apply any admin overrides before approving
+        if (overrides && Object.keys(overrides).length > 0) {
+          await base44.asServiceRole.entities.ProductRecommendationSuggestion.update(suggestionId, overrides);
+          suggestion = { ...suggestion, ...overrides };
         }
 
         // If original_recommendation_id exists, try to update it. If not found, fall through to create.

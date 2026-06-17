@@ -166,74 +166,57 @@ export default function AdminProducts() {
 
   // ── Save ────────────────────────────────────────────────────────────────────
 
+  const buildProductData = () => ({
+    item_name: editForm.item_name,
+    category: editForm.category,
+    cache_type: editForm.cache_type,
+    description: editForm.description,
+    quantity: editForm.quantity,
+    price_cents: editForm.price_cents,
+    image_url: editForm.image_url,
+    affiliate_link: editForm.affiliate_link,
+    family_member_types: editForm.family_member_types,
+    fema_regions: editForm.fema_regions,
+    disaster_types: editForm.disaster_types,
+    priority: editForm.priority,
+    active: editForm.active,
+    is_required: editForm.is_required,
+    source_organizations: editForm.source_organizations,
+    stripe_product_id: editForm.stripe_product_id,
+    pet_sizes: editForm.pet_sizes
+  });
+
   const handleSave = async () => {
     try {
       if (!editingItem) {
-        // Create new product directly
-        await base44.entities.ProductRecommendation.create({
-          item_name: editForm.item_name,
-          category: editForm.category,
-          cache_type: editForm.cache_type,
-          description: editForm.description,
-          quantity: editForm.quantity,
-          price_cents: editForm.price_cents,
-          image_url: editForm.image_url,
-          affiliate_link: editForm.affiliate_link,
-          family_member_types: editForm.family_member_types,
-          fema_regions: editForm.fema_regions,
-          disaster_types: editForm.disaster_types,
-          priority: editForm.priority,
-          active: editForm.active,
-          is_required: editForm.is_required,
-          source_organizations: editForm.source_organizations,
-          stripe_product_id: editForm.stripe_product_id,
-          pet_sizes: editForm.pet_sizes
-        });
+        await base44.functions.invoke('adminUpdateProduct', { action: 'create', data: buildProductData() });
       } else if (editingItem.isSuggestion) {
-        // Update suggestion fields first, then approve it
-        await base44.entities.ProductRecommendationSuggestion.update(editingItem.record.id, {
-          suggested_item_name: editForm.item_name,
-          suggested_category: editForm.category,
-          suggested_cache_type: editForm.cache_type,
-          suggested_description: editForm.description,
-          suggested_quantity: editForm.quantity,
-          suggested_price_cents: editForm.price_cents,
-          suggested_image_url: editForm.image_url,
-          suggested_affiliate_link: editForm.affiliate_link,
-          suggested_family_member_types: editForm.family_member_types,
-          suggested_fema_regions: editForm.fema_regions,
-          suggested_disaster_types: editForm.disaster_types,
-          source_organizations: editForm.source_organizations,
-          admin_notes: editForm.admin_notes
+        await base44.functions.invoke('approveSuggestion', {
+          suggestionId: editingItem.record.id,
+          overrides: {
+            suggested_item_name: editForm.item_name,
+            suggested_category: editForm.category,
+            suggested_cache_type: editForm.cache_type,
+            suggested_description: editForm.description,
+            suggested_quantity: editForm.quantity,
+            suggested_price_cents: editForm.price_cents,
+            suggested_image_url: editForm.image_url,
+            suggested_affiliate_link: editForm.affiliate_link,
+            suggested_family_member_types: editForm.family_member_types,
+            suggested_fema_regions: editForm.fema_regions,
+            suggested_disaster_types: editForm.disaster_types,
+            source_organizations: editForm.source_organizations,
+            admin_notes: editForm.admin_notes
+          }
         });
-        await base44.functions.invoke('approveSuggestion', { suggestionId: editingItem.record.id });
       } else {
-        // Update existing product
-        await base44.entities.ProductRecommendation.update(editingItem.record.id, {
-          item_name: editForm.item_name,
-          category: editForm.category,
-          cache_type: editForm.cache_type,
-          description: editForm.description,
-          quantity: editForm.quantity,
-          price_cents: editForm.price_cents,
-          image_url: editForm.image_url,
-          affiliate_link: editForm.affiliate_link,
-          family_member_types: editForm.family_member_types,
-          fema_regions: editForm.fema_regions,
-          disaster_types: editForm.disaster_types,
-          priority: editForm.priority,
-          active: editForm.active,
-          is_required: editForm.is_required,
-          source_organizations: editForm.source_organizations,
-          stripe_product_id: editForm.stripe_product_id,
-          pet_sizes: editForm.pet_sizes
-        });
+        await base44.functions.invoke('adminUpdateProduct', { action: 'update', id: editingItem.record.id, data: buildProductData() });
       }
       setEditDialog(false);
       await loadData();
     } catch (e) {
       console.error("Error saving:", e);
-      alert("Error saving");
+      alert("Error saving: " + e.message);
     }
   };
 
@@ -255,7 +238,7 @@ export default function AdminProducts() {
 
   const handleToggleActive = async (product) => {
     try {
-      await base44.entities.ProductRecommendation.update(product.id, { active: !product.active });
+      await base44.functions.invoke('adminUpdateProduct', { action: 'update', id: product.id, data: { active: !product.active } });
       await loadData();
     } catch (e) { console.error(e); }
   };
@@ -263,7 +246,7 @@ export default function AdminProducts() {
   const handleDeleteProduct = async (id) => {
     if (!confirm("Delete this product?")) return;
     try {
-      await base44.entities.ProductRecommendation.delete(id);
+      await base44.functions.invoke('adminUpdateProduct', { action: 'delete', id });
       await loadData();
     } catch (e) { console.error(e); alert("Error deleting"); }
   };
