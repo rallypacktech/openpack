@@ -98,7 +98,7 @@ export default function Equine() {
       <section className="relative h-[55vh] min-h-[380px] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534043464124-3be32fe000c9?w=1600&q=80')" }}
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1504198322253-cfa87a0ff25f?w=1600&q=80')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/80 to-transparent" />
         <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
