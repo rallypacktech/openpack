@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ClipboardList, ArrowRight, AlertTriangle, FileText, MapPin, Heart, Truck } from "lucide-react";
+import { ClipboardList, ArrowRight, AlertTriangle, FileText, MapPin, Heart, Truck, Flame, Wind, Droplets } from "lucide-react";
 
 const CHECKLIST = [
   { icon: FileText, title: "Vaccination & Microchip Records", desc: "Many emergency shelters require proof of rabies vaccination. Keep a copy in your go-bag and a photo on your phone." },
@@ -13,14 +13,7 @@ const CHECKLIST = [
 
 export default function Canine() {
   React.useEffect(() => {
-    document.title = "Dog Emergency Preparedness — Evacuating with Your Dog | RallyPack";
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
-    meta.content = "Emergency preparedness guide for dog owners. Learn how to evacuate with your dog during a wildfire, hurricane, tornado, or flood. Pet go-bag checklist, pet-friendly shelters, and disaster planning tools from RallyPack.";
-    let keywords = document.querySelector('meta[name="keywords"]');
-    if (!keywords) { keywords = document.createElement('meta'); keywords.name = "keywords"; document.head.appendChild(keywords); }
-    keywords.content = "dog emergency preparedness, evacuating with dogs, pet disaster plan, canine go bag, dog evacuation checklist, pet friendly shelter evacuation, dog natural disaster plan, dog wildfire evacuation, hurricane evacuation dogs, pet emergency kit dog, dog microchip disaster, how to evacuate with a dog, emergency plan for dog owners, disaster preparedness pets";
-    return () => {};
+    document.title = "Canine Emergency Preparedness | RallyPack";
   }, []);
 
   return (
@@ -28,10 +21,13 @@ export default function Canine() {
 
       {/* Hero */}
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1800&q=85')" }} />
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1800&q=85')" }}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
-          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Dog Emergency Preparedness · RallyPack</p>
+          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Canine Emergency Preparedness · RallyPack</p>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-none text-white mb-6 max-w-3xl">
             Your dog<br />goes where<br />you go.
           </h1>
@@ -41,7 +37,8 @@ export default function Canine() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/ReadinessQuiz">
               <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-[#be3f25] transition-colors text-sm tracking-widest uppercase">
-                <ClipboardList className="w-4 h-4" /> Take the readiness quiz
+                <ClipboardList className="w-4 h-4" />
+                Take the readiness quiz
               </button>
             </Link>
             <Link to="/register">
@@ -74,7 +71,7 @@ export default function Canine() {
 
       {/* Checklist */}
       <section className="py-24 max-w-6xl mx-auto px-6">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The dog emergency preparedness essentials</p>
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The canine preparedness essentials</p>
         <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-14 leading-tight max-w-xl">
           Six things every dog owner needs in place.
         </h2>
@@ -108,30 +105,6 @@ export default function Canine() {
         </div>
       </section>
 
-      {/* SEO section */}
-      <section className="py-16 max-w-6xl mx-auto px-6 border-t border-[#D8D2C6]">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Common questions & scenarios</p>
-        <h2 className="font-serif text-3xl font-bold text-[#1C1C1A] mb-8">What dog owners search for in an emergency</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-sans text-[#8A8577] leading-relaxed">
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">Dog go-bag checklist for disasters</h3>
-            <p>Every dog emergency kit should include: 3-day food supply, bottled water, collapsible bowls, leash and collar, crate or carrier, poop bags, vaccination records, microchip info, current photo, medications, and a familiar blanket or toy to reduce stress.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">Evacuating with dogs during a wildfire</h3>
-            <p>Keep your dog's crate accessible, not stored. During a wildfire evacuation, you may have minutes — not hours. Practice loading your dog quickly. Keep their records in your car or a go-bag by the door, not in a filing cabinet.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">Finding pet-friendly shelters and hotels</h3>
-            <p>Most Red Cross shelters and public evacuation centers don't accept pets. Before a disaster, research pet-friendly hotels along your two planned evacuation routes. Apps like BringFido or GoPetFriendly can help — bookmark them now, not during the emergency.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">What to do if you're separated from your dog</h3>
-            <p>A microchip and current ID tag are the fastest routes to reunification. Register your chip with a national database (Found Animals, HomeAgain) and keep your address current. File a report with local shelters immediately — don't wait.</p>
-          </div>
-        </div>
-      </section>
-
       {/* Final CTA */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
         <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1600&q=80')" }} />
@@ -152,7 +125,7 @@ export default function Canine() {
             </Link>
             <Link to="/register">
               <button className="inline-flex items-center gap-3 border border-white/30 text-white font-sans font-semibold px-10 py-4 rounded-none hover:bg-white/5 transition-colors text-xs tracking-widest uppercase w-full sm:w-auto justify-center">
-                Build your dog's plan <ArrowRight className="w-4 h-4" />
+                Build your canine plan <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
           </div>

@@ -13,14 +13,7 @@ const CHECKLIST = [
 
 export default function Infant() {
   React.useEffect(() => {
-    document.title = "Emergency Preparedness with a Baby or Infant | RallyPack";
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) { meta = document.createElement('meta'); meta.name = "description"; document.head.appendChild(meta); }
-    meta.content = "Emergency preparedness guide for parents of infants and babies. Learn what to pack in a baby go-bag, how to keep infants safe during a wildfire, hurricane, or power outage, and how to find infant-safe shelters. Free planning tools from RallyPack.";
-    let keywords = document.querySelector('meta[name="keywords"]');
-    if (!keywords) { keywords = document.createElement('meta'); keywords.name = "keywords"; document.head.appendChild(keywords); }
-    keywords.content = "baby emergency preparedness, infant disaster plan, baby go bag, newborn emergency kit, evacuating with a baby, infant evacuation checklist, emergency supplies for infants, baby formula disaster plan, newborn disaster preparedness, hurricane baby supplies, wildfire evacuation with infant, emergency plan new parents, baby emergency kit checklist, disaster preparedness with a newborn, FEMA infant preparedness";
-    return () => {};
+    document.title = "Infant Emergency Preparedness | RallyPack";
   }, []);
 
   return (
@@ -28,20 +21,24 @@ export default function Infant() {
 
       {/* Hero */}
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560800452-f2d475982b96?w=1800&q=85')" }} />
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560800452-f2d475982b96?w=1800&q=85')" }}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
-          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Baby & Infant Emergency Preparedness · RallyPack</p>
+          <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Infant Emergency Preparedness · RallyPack</p>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-none text-white mb-6 max-w-3xl">
             Infants can't<br />tell you<br />what they need.
           </h1>
           <p className="font-sans text-base md:text-lg text-white/75 max-w-md mb-10 leading-relaxed">
-            In a disaster, babies and newborns are among the most vulnerable. Formula runs out. Shelters lose power. Temperatures spike. RallyPack helps new parents build a plan before the emergency, not during it.
+            In a disaster, infants are among the most vulnerable. Formula runs out. Shelters lose power. Temperatures spike. RallyPack helps new parents build a plan before the emergency, not during it.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/ReadinessQuiz">
               <button className="inline-flex items-center gap-3 bg-[#D64A2E] text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-[#be3f25] transition-colors text-sm tracking-widest uppercase">
-                <ClipboardList className="w-4 h-4" /> Take the readiness quiz
+                <ClipboardList className="w-4 h-4" />
+                Take the readiness quiz
               </button>
             </Link>
             <Link to="/register">
@@ -58,7 +55,7 @@ export default function Infant() {
       <section className="bg-[#1C1C1A] text-white py-20">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10">
           {[
-            { n: "4M+", unit: "", label: "Infants born in the US each year — none of them come with a disaster plan attached" },
+            { n: "4M+", unit: "", label: "Infants born in the US each year — none of them have a disaster plan when they arrive" },
             { n: "72", unit: "hrs", label: "Before federal aid arrives — but formula and diapers aren't stockpiled the same way adult food is" },
             { n: "104°F", unit: "", label: "Dangerous fever threshold for infants — reached faster in hot shelters without climate control" },
           ].map((s) => (
@@ -74,7 +71,7 @@ export default function Infant() {
 
       {/* Checklist */}
       <section className="py-24 max-w-6xl mx-auto px-6">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The infant & baby preparedness essentials</p>
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">The infant preparedness essentials</p>
         <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-14 leading-tight max-w-xl">
           Six things every parent of an infant must have ready.
         </h2>
@@ -97,37 +94,13 @@ export default function Infant() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/85 to-transparent" />
         <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
           <div className="max-w-sm">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-sans mb-4">RallyPack for families with infants</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-sans mb-4">What RallyPack tracks for your infant</p>
             <p className="font-serif text-3xl text-white font-bold leading-tight mb-4">
               Immunization records. Pediatrician contacts. Medication schedules. All offline.
             </p>
             <p className="text-sm text-white/60 font-sans leading-relaxed">
               Shelters may ask for immunization records. Emergency responders need medication details. Have everything ready before the moment comes.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* SEO section */}
-      <section className="py-16 max-w-6xl mx-auto px-6 border-t border-[#D8D2C6]">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Common questions & scenarios</p>
-        <h2 className="font-serif text-3xl font-bold text-[#1C1C1A] mb-8">What new parents search for in an emergency</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-sans text-[#8A8577] leading-relaxed">
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">Baby go-bag checklist for disasters</h3>
-            <p>A complete infant emergency kit includes: 72-hour formula supply, bottles and sterilizing tablets, water for formula preparation, diapers and wipes, rash cream, infant pain reliever, digital thermometer, any prescriptions, birth certificate copy, immunization records, pediatrician number, and a portable white noise source for comfort.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">Keeping a newborn safe in a power outage</h3>
-            <p>Without electricity, formula preparation becomes harder and temperature regulation becomes critical. Keep a battery-powered thermometer, manual formula shaker, and an insulated cooler for expressed breast milk. Know the 4-hour rule for formula left at room temperature.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">Evacuating with an infant during a wildfire or hurricane</h3>
-            <p>Pack your infant's bag first — it's the most specialized kit in your household. Keep formula, diapers, and records in a single bag that's always ready to grab. In vehicles, ensure the car seat is installed correctly before a crisis, not during one.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-[#1C1C1A] mb-2">Finding infant-safe emergency shelters</h3>
-            <p>Call ahead to verify climate control and infant accommodations before relying on a public shelter. Many Red Cross shelters have dedicated family areas — ask specifically. If the shelter isn't appropriate for your infant's needs, plan to stay with family, in a hotel, or with your local faith community instead.</p>
           </div>
         </div>
       </section>
@@ -142,7 +115,7 @@ export default function Infant() {
             <em className="not-italic text-[#D64A2E]">formula and diapers ready?</em>
           </h2>
           <p className="text-base font-sans text-white/55 max-w-md mx-auto mb-12 leading-relaxed">
-            Take the free readiness quiz to see where your household stands, or create your RallyPack account to build a complete plan for your family.
+            Take the free readiness quiz to see where your household stands, or create your RallyPack account to build a complete plan for your infant.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/ReadinessQuiz">

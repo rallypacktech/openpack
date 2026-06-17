@@ -20,7 +20,6 @@ const Canine = lazy(() => import('./pages/Canine'));
 const Feline = lazy(() => import('./pages/Feline'));
 const Infant = lazy(() => import('./pages/Infant'));
 const Avian = lazy(() => import('./pages/Avian'));
-const Reptile = lazy(() => import('./pages/Reptile'));
 const Feedback = lazy(() => import('./pages/Feedback'));
 const Donate = lazy(() => import('./pages/Donate'));
 const TrackedItems = lazy(() => import('./pages/TrackedItems'));
@@ -61,7 +60,6 @@ const AuthenticatedApp = () => {
       <Route path="/feline" element={<LayoutWrapper currentPageName="Feline"><Feline /></LayoutWrapper>} />
       <Route path="/infant" element={<LayoutWrapper currentPageName="Infant"><Infant /></LayoutWrapper>} />
       <Route path="/avian" element={<LayoutWrapper currentPageName="Avian"><Avian /></LayoutWrapper>} />
-      <Route path="/reptile" element={<LayoutWrapper currentPageName="Reptile"><Reptile /></LayoutWrapper>} />
       <Route path="/Feedback" element={<Feedback />} />
       <Route path="/Donate" element={<LayoutWrapper currentPageName="Donate"><Donate /></LayoutWrapper>} />
 
