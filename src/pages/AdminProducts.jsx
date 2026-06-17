@@ -95,12 +95,9 @@ export default function AdminProducts() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [p, s] = await Promise.all([
-        base44.entities.ProductRecommendation.list('-priority', 500),
-        base44.entities.ProductRecommendationSuggestion.list('-created_date', 500)
-      ]);
-      setProducts(p);
-      setSuggestions(s);
+      const res = await base44.functions.invoke('getAdminProducts', {});
+      setProducts(res.data.products || []);
+      setSuggestions(res.data.suggestions || []);
     } catch (e) {
       console.error("Error loading data:", e);
     } finally {
