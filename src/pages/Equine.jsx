@@ -137,7 +137,7 @@ export default function Equine() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1508169351866-777fc0047ac5?w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=1600&q=80')" }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">Start today — it takes 10 minutes</p>
           <h2 className="font-serif text-5xl md:text-6xl font-bold text-white leading-none mb-8">
