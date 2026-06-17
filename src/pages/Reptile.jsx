@@ -90,7 +90,7 @@ export default function Reptile() {
 
       {/* Editorial */}
       <section className="relative h-[50vh] min-h-[340px] overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://media.base44.com/images/public/69dc170f0871ac017d79debb/6c87ccf99_generated_image.png')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://media.base44.com/images/public/69dc170f0871ac017d79debb/df12b2780_generated_image.png')" }} />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/85 to-transparent" />
         <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
           <div className="max-w-sm">
