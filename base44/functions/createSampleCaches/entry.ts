@@ -34,10 +34,17 @@ Deno.serve(async (req) => {
             description: 'Emergency supplies for vehicle breakdowns and roadside emergencies'
         });
 
-        // Minimal starter items - most shown as recommendations
+        // Minimal starter items — manuals are pre-added as "owned" documents
         const goBagItems = [
             { item_name: 'Flashlight', quantity: 2, category: 'tools', notes: 'Basic LED flashlight' },
-            { item_name: 'Local maps', quantity: 1, category: 'documents', notes: 'Paper maps of area' }
+            { item_name: 'Local maps', quantity: 1, category: 'documents', notes: 'Paper maps of area' },
+            { item_name: 'CPR Manual (Adult & Child)', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
+            { item_name: 'CPR Manual (Infant)', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
+            { item_name: 'Fire Extinguisher Guide (PASS)', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
+            { item_name: 'Choking & Heimlich Guide', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
+            { item_name: 'Bleeding Control & Tourniquet Guide', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
+            { item_name: 'Shelter in Place Guide', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
+            { item_name: 'Go-Bag Evacuation Checklist', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
         ];
 
         const automobileItems = [

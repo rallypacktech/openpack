@@ -10,6 +10,7 @@ import TrainingClasses from "../components/resources/TrainingClasses";
 import VolunteerOpportunities from "../components/resources/VolunteerOpportunities";
 import SharePlan from "../components/resources/SharePlan";
 import ExternalResourcesTab from "../components/resources/ExternalResourcesTab";
+import EmergencyManuals from "../components/manuals/EmergencyManuals";
 import { Link } from "react-router-dom";
 
 export default function Resources() {
@@ -25,7 +26,7 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share", "resources", "tracking"].includes(tab)) {
+    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share", "resources", "tracking", "manuals"].includes(tab)) {
       setActiveTab(tab);
     }
   }, []);
@@ -176,6 +177,7 @@ export default function Resources() {
             <TabsTrigger value="share">Share Plan</TabsTrigger>
             <TabsTrigger value="resources">Ext. Resources</TabsTrigger>
             <TabsTrigger value="tracking">Tracking</TabsTrigger>
+            <TabsTrigger value="manuals">Manuals</TabsTrigger>
           </TabsList>
 
           <TabsContent value="caches">
@@ -222,6 +224,14 @@ export default function Resources() {
 
           <TabsContent value="resources">
             <ExternalResourcesTab />
+          </TabsContent>
+
+          <TabsContent value="manuals">
+            <div className="mb-4">
+              <h2 className="font-serif text-xl font-bold text-foreground mb-1">Emergency Reference Manuals</h2>
+              <p className="text-sm text-muted-foreground font-sans">Expand any manual to read it. Use <strong>Save as PDF / Print</strong> to save it to your device for offline access.</p>
+            </div>
+            <EmergencyManuals />
           </TabsContent>
 
           <TabsContent value="tracking">

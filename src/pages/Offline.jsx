@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import OfflineMap from "@/components/offline/OfflineMap";
+import EmergencyManuals from "@/components/manuals/EmergencyManuals";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +21,8 @@ import {
   RefreshCw,
   Clock,
   Shield,
-  Download
+  Download,
+  BookOpen
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -223,6 +225,7 @@ export default function Offline() {
     { id: "caches", label: "Caches", icon: Package },
     { id: "firstaid", label: "First Aid", icon: Heart },
     { id: "pets", label: "Pets", icon: PawPrint },
+    { id: "manuals", label: "Manuals", icon: Download },
   ];
 
   return (
@@ -560,6 +563,17 @@ export default function Offline() {
                 );
               })
             )}
+          </div>
+        )}
+
+        {/* MANUALS */}
+        {activeSection === "manuals" && (
+          <div className="space-y-4">
+            <SectionHeader icon={Download} title="Emergency Manuals" subtitle="Tap any manual to read it — save as PDF for fully offline use" />
+            <div className="bg-secondary/50 border border-border rounded p-3 text-sm font-sans text-muted-foreground">
+              These reference guides are always available in the app without internet. To save them to your device, open a manual and tap <strong>Save as PDF / Print</strong>, then choose <em>Save as PDF</em> in the print dialog.
+            </div>
+            <EmergencyManuals />
           </div>
         )}
 

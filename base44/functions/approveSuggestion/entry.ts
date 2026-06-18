@@ -64,6 +64,7 @@ Deno.serve(async (req) => {
                 disaster_types: suggestion.suggested_disaster_types || [],
                 family_member_types: suggestion.suggested_family_member_types || [],
                 affiliate_link: suggestion.suggested_affiliate_link,
+                source_organizations: suggestion.source_organizations || [],
                 active: true,
                 priority: 0
             });
