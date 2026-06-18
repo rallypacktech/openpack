@@ -12,6 +12,7 @@ import {
   ShoppingCart, Package, ExternalLink, Search, Star, CheckCircle2,
   Circle, AlertTriangle, ChevronDown, ChevronUp, Info
 } from "lucide-react";
+import { DownloadResourceButton, getPrintableResource } from "@/components/manuals/PrintableResources";
 
 const CATEGORY_COLORS = {
   water: "bg-blue-100 text-blue-800", food: "bg-green-100 text-green-800",
@@ -300,6 +301,9 @@ export default function Shopping() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-2 flex-shrink-0">
+                        {getPrintableResource(rec.item_name) && (
+                          <DownloadResourceButton itemName={rec.item_name} className="text-xs h-8" />
+                        )}
                         {rec.affiliate_link && !owned && (
                           <button
                             onClick={() => handleAffiliateClick(rec)}
@@ -395,6 +399,9 @@ export default function Shopping() {
                       <p className="text-xl font-bold text-gray-900 mb-3">${(rec.price_cents / 100).toFixed(2)}</p>
                     )}
                     <div className="space-y-2">
+                      {getPrintableResource(rec.item_name) && (
+                        <DownloadResourceButton itemName={rec.item_name} fullWidth />
+                      )}
                       {!owned && user && (
                         <Button
                           variant="outline"
