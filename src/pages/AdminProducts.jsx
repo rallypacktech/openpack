@@ -320,14 +320,27 @@ export default function AdminProducts() {
   };
 
   const [descGenerating, setDescGenerating] = useState(false);
+  const [descProgress, setDescProgress] = useState(null);
   const handleGenerateDescriptions = async () => {
-    if (!confirm("Generate AI descriptions for all products missing one?")) return;
+    if (!confirm("Generate AI descriptions for all active products missing one? Runs one at a time.")) return;
     setDescGenerating(true);
+    setDescProgress({ processed: 0, total: 0, updated: 0 });
+    let index = 0;
+    let totalUpdated = 0;
     try {
-      const res = await base44.functions.invoke('generateDescriptions');
+      while (true) {
+        const res = await base44.functions.invoke('generateDescriptions', { index });
+        const d = res.data;
+        if (!d?.success) throw new Error(d?.error || "Unknown error");
+        totalUpdated += d.updated || 0;
+        setDescProgress({ processed: index + 1, total: d.total || 0, updated: totalUpdated });
+        if (!d.hasMore) break;
+        index = d.nextIndex;
+      }
       await loadData();
-      alert(`Done: ${res.data?.updated ?? 0} descriptions generated.`);
-    } catch (e) { console.error(e); alert("Error generating descriptions"); } finally { setDescGenerating(false); }
+      alert(`Done: ${totalUpdated} descriptions generated.`);
+    } catch (e) { console.error(e); alert("Error generating descriptions: " + e.message); }
+    finally { setDescGenerating(false); setDescProgress(null); }
   };
 
   const toggleFamilyType = (type) => {
@@ -584,7 +597,9 @@ export default function AdminProducts() {
               Generate Placeholders
             </Button>
             <Button onClick={handleGenerateDescriptions} disabled={descGenerating} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
-              {descGenerating ? "Generating…" : "Generate Descriptions"}
+              {descGenerating && descProgress
+                ? `Desc ${descProgress.processed}/${descProgress.total} (${descProgress.updated} done)`
+                : descGenerating ? "Starting…" : "Generate Descriptions"}
             </Button>
             <Button onClick={handleReRankPriorities} disabled={reRanking} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
               {reRanking ? "Re-ranking…" : "Re-rank Priorities"}
