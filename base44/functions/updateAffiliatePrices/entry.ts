@@ -4,8 +4,6 @@ Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
 
-        // Allow scheduled calls (no user) or admin users only
-        let isScheduled = false;
         try {
             const user = await base44.auth.me();
             if (user?.role !== 'admin') {
@@ -13,16 +11,20 @@ Deno.serve(async (req) => {
             }
         } catch {
             // No auth = scheduled/service call, allow through
-            isScheduled = true;
         }
 
-        const recommendations = await base44.asServiceRole.entities.ProductRecommendation.filter({ active: true });
-        const withLinks = recommendations.filter(rec => rec.affiliate_link);
+        const body = await req.json().catch(() => ({}));
+        const skip = body.skip || 0;
+        const limit = body.limit || 5; // Small batches to avoid timeout
+
+        const all = await base44.asServiceRole.entities.ProductRecommendation.filter({ active: true });
+        const withLinks = all.filter(rec => rec.affiliate_link);
+        const batch = withLinks.slice(skip, skip + limit);
 
         const updated = [];
         const errors = [];
 
-        for (const rec of withLinks) {
+        for (const rec of batch) {
             try {
                 const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
                     prompt: `Visit this product page and find the current sale/listing price:
@@ -33,6 +35,7 @@ Product: ${rec.item_name}
 
 Return only the current price in cents (e.g. $19.99 = 1999). If you cannot determine the price, return null.`,
                     add_context_from_internet: true,
+                    model: "gemini_3_flash",
                     response_json_schema: {
                         type: "object",
                         properties: {
@@ -52,7 +55,17 @@ Return only the current price in cents (e.g. $19.99 = 1999). If you cannot deter
             }
         }
 
-        return Response.json({ success: true, updated: updated.length, errors: errors.length, details: { updated, errors } });
+        const hasMore = skip + limit < withLinks.length;
+        return Response.json({
+            success: true,
+            updated: updated.length,
+            errors: errors.length,
+            processed: batch.length,
+            total: withLinks.length,
+            hasMore,
+            nextSkip: hasMore ? skip + limit : null,
+            details: { updated, errors }
+        });
 
     } catch (error) {
         console.error("Error updating affiliate prices:", error);

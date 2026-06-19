@@ -285,14 +285,27 @@ export default function AdminProducts() {
   };
 
   const [priceUpdating, setPriceUpdating] = useState(false);
+  const [priceProgress, setPriceProgress] = useState(null);
   const handleUpdatePrices = async () => {
-    if (!confirm("Fetch current prices from all affiliate links? This may take a while.")) return;
+    if (!confirm("Fetch current prices from all affiliate links? This runs in batches and may take a few minutes.")) return;
     setPriceUpdating(true);
+    setPriceProgress({ processed: 0, total: 0, updated: 0 });
+    let skip = 0;
+    let totalUpdated = 0;
     try {
-      const res = await base44.functions.invoke('updateAffiliatePrices');
+      while (true) {
+        const res = await base44.functions.invoke('updateAffiliatePrices', { skip, limit: 5 });
+        const d = res.data;
+        if (!d?.success) throw new Error(d?.error || "Unknown error");
+        totalUpdated += d.updated || 0;
+        setPriceProgress({ processed: skip + (d.processed || 0), total: d.total || 0, updated: totalUpdated });
+        if (!d.hasMore) break;
+        skip = d.nextSkip;
+      }
       await loadData();
-      alert(`Price update complete: ${res.data?.updated ?? 0} products updated.`);
-    } catch (e) { console.error(e); alert("Error updating prices"); } finally { setPriceUpdating(false); }
+      alert(`Price update complete: ${totalUpdated} products updated.`);
+    } catch (e) { console.error(e); alert("Error updating prices: " + e.message); }
+    finally { setPriceUpdating(false); setPriceProgress(null); }
   };
 
   const [reRanking, setReRanking] = useState(false);
@@ -556,7 +569,10 @@ export default function AdminProducts() {
           {/* Action Buttons */}
           <div className="flex gap-2 mt-3 flex-wrap">
             <Button onClick={handleUpdatePrices} disabled={priceUpdating} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
-              <DollarSign className="w-3 h-3 mr-1" /> {priceUpdating ? "Updating Prices…" : "Update Prices"}
+              <DollarSign className="w-3 h-3 mr-1" />
+              {priceUpdating && priceProgress
+                ? `${priceProgress.processed}/${priceProgress.total} (${priceProgress.updated} updated)`
+                : priceUpdating ? "Starting…" : "Update Prices"}
             </Button>
             <Button onClick={handleCheckLinks} variant="outline" size="sm" className="bg-blue-500 border-blue-400 text-white hover:bg-blue-400">
               <RefreshCw className="w-3 h-3 mr-1" /> Check Links
