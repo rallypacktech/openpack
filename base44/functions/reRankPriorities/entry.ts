@@ -9,6 +9,7 @@ const ORG_WEIGHTS = {
   "Ready.gov":                  15,
   "DHS":                        15,
   "OSHA":                       15,
+  "ANSI":                       12,
   "CODE3":                      10,
   "AAEP":                       12,
   "USDA/APHIS":                 12,

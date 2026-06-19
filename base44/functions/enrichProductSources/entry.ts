@@ -3,7 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 // Canonical org names this catalog recognizes
 const KNOWN_ORGS = [
   "FEMA", "Red Cross", "CDC", "American Heart Association", "Ready.gov",
-  "DHS", "OSHA", "CODE3", "AAEP", "USDA/APHIS", "SART", "NOAA",
+  "DHS", "OSHA", "ANSI", "CODE3", "AAEP", "USDA/APHIS", "SART", "NOAA",
   "Best Friends Animal Society", "Local Emergency Management",
 ];
 
@@ -18,6 +18,7 @@ function normalizeOrg(raw) {
   if (v.includes("usda") || v.includes("aphis")) return "USDA/APHIS";
   if (v.includes("heart")) return "American Heart Association";
   if (v === "osha") return "OSHA";
+  if (v === "ansi") return "ANSI";
   const match = KNOWN_ORGS.find(o => o.toLowerCase() === v);
   return match || null;
 }
