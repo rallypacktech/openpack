@@ -287,20 +287,20 @@ export default function AdminProducts() {
   const [priceUpdating, setPriceUpdating] = useState(false);
   const [priceProgress, setPriceProgress] = useState(null);
   const handleUpdatePrices = async () => {
-    if (!confirm("Fetch current prices from all affiliate links? This runs in batches and may take a few minutes.")) return;
+    if (!confirm("Fetch current prices from all affiliate links? This runs one item at a time and may take a while.")) return;
     setPriceUpdating(true);
     setPriceProgress({ processed: 0, total: 0, updated: 0 });
-    let skip = 0;
+    let index = 0;
     let totalUpdated = 0;
     try {
       while (true) {
-        const res = await base44.functions.invoke('updateAffiliatePrices', { skip, limit: 5 });
+        const res = await base44.functions.invoke('updateAffiliatePrices', { index });
         const d = res.data;
         if (!d?.success) throw new Error(d?.error || "Unknown error");
         totalUpdated += d.updated || 0;
-        setPriceProgress({ processed: skip + (d.processed || 0), total: d.total || 0, updated: totalUpdated });
+        setPriceProgress({ processed: index + 1, total: d.total || 0, updated: totalUpdated });
         if (!d.hasMore) break;
-        skip = d.nextSkip;
+        index = d.nextIndex;
       }
       await loadData();
       alert(`Price update complete: ${totalUpdated} products updated.`);

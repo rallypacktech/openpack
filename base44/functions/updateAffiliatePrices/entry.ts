@@ -14,57 +14,64 @@ Deno.serve(async (req) => {
         }
 
         const body = await req.json().catch(() => ({}));
-        const skip = body.skip || 0;
-        const limit = body.limit || 5; // Small batches to avoid timeout
+        const index = body.index ?? 0; // which single item to process
 
-        const all = await base44.asServiceRole.entities.ProductRecommendation.filter({ active: true });
-        const withLinks = all.filter(rec => rec.affiliate_link);
-        const batch = withLinks.slice(skip, skip + limit);
+        // Fetch all active products with links (ids + affiliate_link only via filter)
+        const all = await base44.asServiceRole.entities.ProductRecommendation.list(null, 500);
+        const withLinks = all.filter(rec => rec.active && rec.affiliate_link);
+        const total = withLinks.length;
 
-        const updated = [];
-        const errors = [];
+        if (total === 0) {
+            return Response.json({ success: true, updated: 0, processed: 0, total: 0, hasMore: false, nextIndex: null });
+        }
 
-        for (const rec of batch) {
-            try {
-                const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
-                    prompt: `Visit this product page and find the current sale/listing price:
+        if (index >= total) {
+            return Response.json({ success: true, updated: 0, processed: 0, total, hasMore: false, nextIndex: null });
+        }
+
+        const rec = withLinks[index];
+        let updated = 0;
+        let error = null;
+
+        try {
+            const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
+                prompt: `Visit this product page and find the current sale/listing price:
 
 ${rec.affiliate_link}
 
 Product: ${rec.item_name}
 
-Return only the current price in cents (e.g. $19.99 = 1999). If you cannot determine the price, return null.`,
-                    add_context_from_internet: true,
-                    model: "gemini_3_flash",
-                    response_json_schema: {
-                        type: "object",
-                        properties: {
-                            price_cents: { type: "number" }
-                        }
+Return only the current price in cents as an integer (e.g. $19.99 = 1999). If you cannot determine the price, return null.`,
+                add_context_from_internet: true,
+                model: "gemini_3_flash",
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        price_cents: { type: "number" }
                     }
-                });
-
-                if (llmResponse.price_cents && llmResponse.price_cents > 0 && llmResponse.price_cents !== rec.price_cents) {
-                    await base44.asServiceRole.entities.ProductRecommendation.update(rec.id, {
-                        price_cents: llmResponse.price_cents
-                    });
-                    updated.push({ id: rec.id, name: rec.item_name, old: rec.price_cents, new: llmResponse.price_cents });
                 }
-            } catch (err) {
-                errors.push({ id: rec.id, name: rec.item_name, error: err.message });
+            });
+
+            if (llmResponse.price_cents && llmResponse.price_cents > 0 && llmResponse.price_cents !== rec.price_cents) {
+                await base44.asServiceRole.entities.ProductRecommendation.update(rec.id, {
+                    price_cents: llmResponse.price_cents
+                });
+                updated = 1;
             }
+        } catch (err) {
+            error = err.message;
         }
 
-        const hasMore = skip + limit < withLinks.length;
+        const hasMore = index + 1 < total;
         return Response.json({
             success: true,
-            updated: updated.length,
-            errors: errors.length,
-            processed: batch.length,
-            total: withLinks.length,
+            updated,
+            error,
+            processed: 1,
+            total,
             hasMore,
-            nextSkip: hasMore ? skip + limit : null,
-            details: { updated, errors }
+            nextIndex: hasMore ? index + 1 : null,
+            item: rec.item_name
         });
 
     } catch (error) {
