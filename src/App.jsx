@@ -25,6 +25,7 @@ const Feedback = lazy(() => import('./pages/Feedback'));
 const Donate = lazy(() => import('./pages/Donate'));
 const TrackedItems = lazy(() => import('./pages/TrackedItems'));
 const BusinessDashboard = lazy(() => import('./pages/BusinessDashboard'));
+const BusinessOnboarding = lazy(() => import('./pages/BusinessOnboarding'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -90,8 +91,11 @@ const AuthenticatedApp = () => {
           ))
         }
         <Route path="/TrackedItems" element={<LayoutWrapper currentPageName="TrackedItems"><TrackedItems /></LayoutWrapper>} />
-        <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
+          <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
       </Route>
+
+      {/* Public business onboarding */}
+      <Route path="/BusinessOnboarding" element={<LayoutWrapper currentPageName="BusinessOnboarding"><BusinessOnboarding /></LayoutWrapper>} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>

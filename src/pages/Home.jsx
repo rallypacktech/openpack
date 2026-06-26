@@ -258,9 +258,24 @@ export default function Home() {
       {/* ── Resources Section ── */}
       <ResourcesSection />
 
-      {/* ── Mid-page Ad ── */}
-      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-6 flex justify-center">
-        <AdSlot size="leaderboard" />
+      {/* ── Sponsored referral banner ── */}
+      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-6">
+        <div className="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <p className="text-[10px] uppercase tracking-widest text-[#8A8577] font-sans mb-1">Sponsored</p>
+            <p className="font-sans text-sm text-[#1C1C1A] font-medium">
+              Lost a pet? <span className="text-[#D64A2E] font-semibold">Crumb</span> helps you find them — GPS pet tracking that works.
+            </p>
+          </div>
+          <a
+            href="https://crumb.pet/refer/db715b10-2a09-4fab-b730-eb20c538abe9"
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="flex-shrink-0 inline-flex items-center gap-2 bg-[#1C1C1A] text-white font-sans font-semibold text-xs tracking-widest uppercase px-6 py-3 hover:bg-[#D64A2E] transition-colors"
+          >
+            Get Crumb <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       </div>
 
       {/* ── Final CTA ── */}
