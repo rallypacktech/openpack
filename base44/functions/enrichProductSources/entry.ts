@@ -3,7 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 // Canonical org names this catalog recognizes
 const KNOWN_ORGS = [
   "FEMA", "Red Cross", "CDC", "American Heart Association", "Ready.gov",
-  "DHS", "OSHA", "ANSI", "CODE3", "AAEP", "USDA/APHIS", "SART", "NOAA",
+  "DHS", "OSHA", "ANSI", "CODE3", "AAEP", "USDA/APHIS", "NOAA",
   "Best Friends Animal Society", "Local Emergency Management",
 ];
 
@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
         prompt: `You are an emergency-preparedness expert. For each product below, list which of these official organizations publish guidance that recommends this item for emergency preparedness. ONLY choose from this exact list: ${KNOWN_ORGS.join(", ")}.
 
 Rules:
-- Only include an organization if it is well-established that they recommend this category of item (e.g. FEMA/Red Cross/Ready.gov for general go-bag staples; OSHA for workplace safety/PPE items like fire extinguishers, first aid kits, respirators, goggles, gloves, hard hats; CDC/American Heart Association for medical; AAEP/USDA/APHIS/SART for equine/livestock; Best Friends Animal Society for pets; NOAA for weather/flood; CDC for hygiene/medical).
+- Only include an organization if it is well-established that they recommend this category of item (e.g. FEMA/Red Cross/Ready.gov for general go-bag staples; OSHA for workplace safety/PPE items like fire extinguishers, first aid kits, respirators, goggles, gloves, hard hats; CDC/American Heart Association for medical; AAEP/USDA/APHIS for equine/livestock; Best Friends Animal Society for pets; NOAA for weather/flood; CDC for hygiene/medical).
 - Be conservative — do not invent endorsements. If unsure, return fewer orgs.
 - Use the EXACT names from the list.
 

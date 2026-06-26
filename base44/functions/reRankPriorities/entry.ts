@@ -13,7 +13,6 @@ const ORG_WEIGHTS = {
   "CODE3":                      10,
   "AAEP":                       12,
   "USDA/APHIS":                 12,
-  "SART":                       10,
   "NOAA":                       10,
   "Best Friends Animal Society": 8,
   "Local Emergency Management":  5,

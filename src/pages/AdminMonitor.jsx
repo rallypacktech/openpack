@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map } from "lucide-react";
 import QuizResultsTable from "../components/admin/QuizResultsTable";
 import IncidentMap from "../components/admin/IncidentMap";
-import PartnerOutreachDirectory from "../components/admin/PartnerOutreachDirectory";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -98,9 +97,6 @@ export default function AdminMonitor() {
             <TabsTrigger value="quiz" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" /> Quiz Results
             </TabsTrigger>
-            <TabsTrigger value="partners" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" /> Partner Directory
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="incidents">
@@ -109,10 +105,6 @@ export default function AdminMonitor() {
 
           <TabsContent value="quiz">
             <QuizResultsTable />
-          </TabsContent>
-
-          <TabsContent value="partners">
-            <PartnerOutreachDirectory />
           </TabsContent>
 
           <TabsContent value="users">

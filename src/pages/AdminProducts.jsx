@@ -28,7 +28,6 @@ const SOURCE_ORGS = [
   "CODE3",
   "AAEP",
   "USDA/APHIS",
-  "SART",
   "NOAA",
   "Best Friends Animal Society",
   "Local Emergency Management",

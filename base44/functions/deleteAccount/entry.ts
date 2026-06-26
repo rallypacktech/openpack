@@ -6,9 +6,12 @@ const SUPABASE_URL = Deno.env.get("supapublish");
 const SUPABASE_KEY = Deno.env.get("supasecret");
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Hash function for user ID
+// Hash function for user ID — salt sourced from environment variable for security
 async function hashData(data) {
-  const salt = "rallypack_salt_2025";
+  const salt = Deno.env.get("HASH_SALT");
+  if (!salt) {
+    throw new Error("HASH_SALT environment variable is not configured");
+  }
   const encoder = new TextEncoder();
   const dataWithSalt = encoder.encode(data + salt);
   const hashBuffer = await crypto.subtle.digest('SHA-256', dataWithSalt);
