@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Search, ExternalLink, Mail, Building2, Shield, HeartPulse,
-  PawPrint, Hotel, DollarSign, HandHeart
+  PawPrint, Hotel, DollarSign, HandHeart, Copy, Check
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -76,9 +76,52 @@ const DIRECTORY = [
   { name: "Crisis Assistance Ministry", category: "financial", desc: "Financial assistance for families in crisis", url: "https://www.crisisassistance.org/how-we-help/", contact: "Community partnership and referral network" },
 ];
 
+const OUTREACH_SCRIPT = `Hello,
+
+My name is [YOUR NAME] and I'm reaching out from RallyPack, a free, open-source emergency preparedness platform that helps families, pet owners, and organizations plan for disasters before they happen.
+
+We're building a national network of partners — relief organizations, animal welfare groups, hotels with disaster lodging programs, insurance providers, and financial assistance organizations — to ensure families in crisis can find the resources they need in one place.
+
+Our platform includes:
+• Personalized go-bag and emergency cache planning (FEMA-aligned)
+• Species-specific evacuation guidance for pets, equine, and livestock
+• Business dashboards for organizations managing team safety and first aid kits
+• A public partner onboarding page where organizations can be listed and referred: https://rallypack.tech/BusinessOnboarding
+
+We'd love to explore a partnership with [ORGANIZATION NAME] — whether that's a resource listing, a referral program, a volunteer pathway, or a disaster response collaboration.
+
+You can learn more or submit a partnership inquiry at: https://rallypack.tech/BusinessOnboarding
+
+Thank you for the critical work you do. I look forward to connecting.
+
+Best regards,
+[YOUR NAME]
+RallyPack
+beta@rallypack.tech
+https://rallypack.tech`;
+
 export default function PartnerOutreachDirectory() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(OUTREACH_SCRIPT);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (e) {
+      // Fallback for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = OUTREACH_SCRIPT;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
 
   const filtered = useMemo(() => {
     return DIRECTORY.filter((org) => {
@@ -112,6 +155,32 @@ export default function PartnerOutreachDirectory() {
               </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Copyable Outreach Script */}
+      <Card className="border-blue-200 bg-blue-50/30">
+        <CardContent className="p-4">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex items-start gap-2">
+              <Mail className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-gray-900 text-sm">Partnership Outreach Script</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Copy and paste when filling out partnership / volunteer intake forms.</p>
+              </div>
+            </div>
+            <Button
+              onClick={handleCopy}
+              size="sm"
+              variant={copied ? "default" : "outline"}
+              className={copied ? "bg-green-600 text-white hover:bg-green-600 flex-shrink-0" : "flex-shrink-0"}
+            >
+              {copied ? <><Check className="w-3.5 h-3.5 mr-1.5" />Copied!</> : <><Copy className="w-3.5 h-3.5 mr-1.5" />Copy Script</>}
+            </Button>
+          </div>
+          <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans bg-white border border-gray-200 rounded-md p-3 max-h-72 overflow-y-auto leading-relaxed">
+{OUTREACH_SCRIPT}
+          </pre>
         </CardContent>
       </Card>
 
