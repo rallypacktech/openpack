@@ -9,9 +9,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Admin-only or automation-only
-    const authHeader = req.headers.get("authorization") || "";
-    let isAutomation = authHeader.includes("automation") || authHeader.includes("service");
+    // Admin-only or automation-only (verified via shared secret)
+    const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET") || "rp-auto-a7f3b2e9-1d4a-4b8c-9e2f-6a5b3c8d7e1f";
+    const body = await req.json().catch(() => ({}));
+    const isAutomation = body.automation_secret === AUTOMATION_SECRET;
 
     if (!isAutomation) {
       const user = await base44.auth.me();
@@ -102,8 +103,11 @@ Deno.serve(async (req) => {
       if (!alertSettings.severe_weather && !alertSettings.tornado && !alertSettings.flood && !alertSettings.hurricane) continue;
 
       try {
+        // Round coordinates to ~1km precision for privacy before sending to third-party API
+        const roundedLat = Math.round(profile.latitude * 100) / 100;
+        const roundedLon = Math.round(profile.longitude * 100) / 100;
         const nwsPoint = await fetch(
-          `https://api.weather.gov/points/${profile.latitude},${profile.longitude}`,
+          `https://api.weather.gov/points/${roundedLat},${roundedLon}`,
           { headers: { "User-Agent": "RallyPack/1.0 (beta@rallypack.org)" } }
         );
         if (!nwsPoint.ok) continue;
