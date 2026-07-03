@@ -49,8 +49,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
-
-
       {/* ── Wikipedia-style support banner ── */}
       {!supportBannerDismissed && (
         <div className="bg-[#FFF8E7] border-b border-[#E8C84A]/40 px-4 py-3 flex items-center justify-between gap-4">
