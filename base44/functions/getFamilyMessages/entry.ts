@@ -26,16 +26,20 @@ Deno.serve(async (req) => {
       familyUserIds.add(creatorEmail);
     });
 
-    // Get all messages sent by or to anyone in the family network
-    const allMessages = await base44.asServiceRole.entities.FamilyMessage.list('-created_date', 100);
-    
-    const relevantMessages = allMessages.filter(msg => 
-      msg.sender_id === user.id || 
-      msg.receiver_id === user.id ||
-      msg.receiver_id === 'family' ||
-      familyUserIds.has(msg.sender_id) ||
-      familyUserIds.has(msg.receiver_id)
-    );
+    // Query only messages involving the user's family network (database-level filter, not in-memory)
+    const familyIdArray = [...familyUserIds];
+    const messagesQuery = {
+      $or: [
+        { sender_id: user.id },
+        { receiver_id: user.id },
+        { receiver_id: 'family' },
+        ...(familyIdArray.length > 0 ? [
+          { sender_id: { $in: familyIdArray } },
+          { receiver_id: { $in: familyIdArray } }
+        ] : [])
+      ]
+    };
+    const relevantMessages = await base44.asServiceRole.entities.FamilyMessage.filter(messagesQuery, '-created_date', 100);
 
     // Get sender profiles for display names
     const senderIds = [...new Set(relevantMessages.map(m => m.sender_id))];

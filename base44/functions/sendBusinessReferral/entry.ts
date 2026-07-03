@@ -16,6 +16,23 @@ Deno.serve(async (req) => {
         const referrer_name = body.referrer_name || user?.full_name || '';
         const referrer_email = body.referrer_email || user?.email || '';
 
+        // HTML-escape all user-provided fields to prevent injection in email templates
+        const escapeHtml = (str) => {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        };
+        const safe_organization = escapeHtml(organization_name);
+        const safe_referee_name = escapeHtml(referee_name);
+        const safe_referee_email = escapeHtml(referee_email);
+        const safe_message = escapeHtml(message);
+        const safe_referrer_name = escapeHtml(referrer_name);
+        const safe_referrer_email = escapeHtml(referrer_email);
+
         // Store the referral so admins can follow up
         const referral = await base44.asServiceRole.entities.BusinessReferral.create({
             referee_email,
@@ -37,12 +54,12 @@ Deno.serve(async (req) => {
                         <h1 style="color: #D64A2E; font-size: 24px;">New Business Referral</h1>
                         <p style="font-size: 16px;">A new business referral has been submitted:</p>
                         <table style="font-size: 14px; line-height: 1.8; border-collapse: collapse; margin: 16px 0;">
-                            <tr><td style="font-weight: bold; padding-right: 12px;">Business:</td><td>${organization_name || 'N/A'}</td></tr>
-                            <tr><td style="font-weight: bold; padding-right: 12px;">Contact:</td><td>${referee_name || 'N/A'}</td></tr>
-                            <tr><td style="font-weight: bold; padding-right: 12px;">Email:</td><td>${referee_email}</td></tr>
-                            <tr><td style="font-weight: bold; padding-right: 12px;">Referred by:</td><td>${referrer_name || 'Anonymous'} (${referrer_email || 'no email'})</td></tr>
+                            <tr><td style="font-weight: bold; padding-right: 12px;">Business:</td><td>${safe_organization || 'N/A'}</td></tr>
+                            <tr><td style="font-weight: bold; padding-right: 12px;">Contact:</td><td>${safe_referee_name || 'N/A'}</td></tr>
+                            <tr><td style="font-weight: bold; padding-right: 12px;">Email:</td><td>${safe_referee_email}</td></tr>
+                            <tr><td style="font-weight: bold; padding-right: 12px;">Referred by:</td><td>${safe_referrer_name || 'Anonymous'} (${safe_referrer_email || 'no email'})</td></tr>
                         </table>
-                        ${message ? `<p style="font-style: italic; color: #555;">"${message}"</p>` : ''}
+                        ${safe_message ? `<p style="font-style: italic; color: #555;">"${safe_message}"</p>` : ''}
                         <p style="font-size: 12px; color: #8A8577;">Review and follow up in the RallyPack admin dashboard.</p>
                     </div>
                 `;
@@ -50,7 +67,7 @@ Deno.serve(async (req) => {
                     try {
                         await base44.integrations.Core.SendEmail({
                             to: email,
-                            subject: 'New Business Referral: ' + (organization_name || referee_email),
+                            subject: 'New Business Referral: ' + (safe_organization || safe_referee_email),
                             body: emailBody,
                             from_name: 'RallyPack'
                         });
