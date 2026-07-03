@@ -357,7 +357,7 @@ export default function Emergency() {
                             <div>{shelter.address}</div>
                             <div>{shelter.city}, {shelter.state} {shelter.zip_code}</div>
                             {shelter.distance && (
-                              <div className="text-xs text-blue-600 mt-1">{shelter.distance} miles away</div>
+                              <div className="text-xs text-blue-600 mt-1">{shelter.distance} km away</div>
                             )}
                           </div>
                         </div>

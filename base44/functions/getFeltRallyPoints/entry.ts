@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     // Calculate distances if user location provided
     if (latitude && longitude) {
       rallyPoints.forEach(point => {
-        const R = 3958.8; // Earth radius in miles
+        const R = 6371; // Earth radius in kilometers
         const lat1 = latitude * Math.PI / 180;
         const lat2 = point.latitude * Math.PI / 180;
         const deltaLat = (point.latitude - latitude) * Math.PI / 180;

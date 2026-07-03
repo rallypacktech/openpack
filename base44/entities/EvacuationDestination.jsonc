@@ -49,9 +49,9 @@
       "type": "string",
       "description": "Available amenities (water, electricity, RV hookups, feed storage, etc.)"
     },
-    "distance_miles": {
+    "distance_km": {
       "type": "number",
-      "description": "Approximate distance from home in miles"
+      "description": "Approximate distance from home in kilometers"
     },
     "direction": {
       "type": "string",

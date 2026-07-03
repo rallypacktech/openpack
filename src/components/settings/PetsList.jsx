@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, PawPrint } from "lucide-react";
 
 const SIZE_LABELS = {
-  small: "Small (<20 lbs)",
-  medium: "Medium (20–50 lbs)",
-  large: "Large (50–100 lbs)",
-  "x-large": "X-Large (100+ lbs / Livestock)"
+  small: "Small (<9 kg)",
+  medium: "Medium (9–23 kg)",
+  large: "Large (23–45 kg)",
+  "x-large": "X-Large (45+ kg / Livestock)"
 };
 
 const EQUINE_SPECIES = ["equine", "livestock"];
@@ -148,10 +148,10 @@ export default function PetsList({ pets, onAdd, onUpdate, onDelete }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="small">Small (&lt;20 lbs)</SelectItem>
-                      <SelectItem value="medium">Medium (20–50 lbs)</SelectItem>
-                      <SelectItem value="large">Large (50–100 lbs)</SelectItem>
-                      <SelectItem value="x-large">X-Large (100+ lbs / Horses / Livestock)</SelectItem>
+                      <SelectItem value="small">Small (&lt;9 kg)</SelectItem>
+                      <SelectItem value="medium">Medium (9–23 kg)</SelectItem>
+                      <SelectItem value="large">Large (23–45 kg)</SelectItem>
+                      <SelectItem value="x-large">X-Large (45+ kg / Horses / Livestock)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

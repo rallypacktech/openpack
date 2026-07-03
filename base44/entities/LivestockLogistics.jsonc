@@ -6,9 +6,9 @@
       "type": "string",
       "description": "Towing vehicle make and model"
     },
-    "truck_towing_capacity_lbs": {
+    "truck_towing_capacity_kg": {
       "type": "number",
-      "description": "Maximum towing capacity of the tow vehicle in pounds"
+      "description": "Maximum towing capacity of the tow vehicle in kilograms"
     },
     "trailer_make_model": {
       "type": "string",
@@ -33,9 +33,9 @@
       "type": "boolean",
       "default": false
     },
-    "trailer_gvwr_lbs": {
+    "trailer_gvwr_kg": {
       "type": "number",
-      "description": "Trailer Gross Vehicle Weight Rating in pounds"
+      "description": "Trailer Gross Vehicle Weight Rating in kilograms"
     },
     "emergency_haul_contact_name": {
       "type": "string",

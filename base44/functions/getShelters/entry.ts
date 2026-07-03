@@ -28,8 +28,8 @@ Deno.serve(async (req) => {
 
       shelters = shelters.map(shelter => {
         if (shelter.latitude && shelter.longitude) {
-          // Calculate distance using Haversine formula (in miles)
-          const R = 3959; // Earth's radius in miles
+          // Calculate distance using Haversine formula (in kilometers)
+          const R = 6371; // Earth's radius in kilometers
           const dLat = (shelter.latitude - userLat) * Math.PI / 180;
           const dLon = (shelter.longitude - userLon) * Math.PI / 180;
           const a = Math.sin(dLat/2) * Math.sin(dLat/2) +

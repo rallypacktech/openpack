@@ -406,16 +406,16 @@ export default function CacheDetail() {
   };
 
   const calculateRations = (numPeople, numPets, durationDays) => {
-    if (durationDays === 0) return { waterGallons: 0, foodLbs: 0 };
-    const waterPerPersonPerDay = 1;
-    const waterPerPetPerDay = 0.5;
-    const foodPerPersonPerDay = 1.5;
-    const foodPerPetPerDay = 0.5;
+    if (durationDays === 0) return { waterLiters: 0, foodKg: 0 };
+    const waterPerPersonPerDay = 3.8;
+    const waterPerPetPerDay = 1.9;
+    const foodPerPersonPerDay = 0.7;
+    const foodPerPetPerDay = 0.25;
 
     const totalWater = (numPeople * waterPerPersonPerDay + numPets * waterPerPetPerDay) * durationDays;
     const totalFood = (numPeople * foodPerPersonPerDay + numPets * foodPerPetPerDay) * durationDays;
 
-    return { waterGallons: totalWater, foodLbs: totalFood };
+    return { waterLiters: Math.round(totalWater * 10) / 10, foodKg: Math.round(totalFood * 10) / 10 };
   };
 
   if (loading) {
@@ -542,7 +542,7 @@ export default function CacheDetail() {
                 const numPeople = familyMembers.length + 1;
                 const numPets = pets.length;
                 const durationDays = getRationDuration(cache.cache_type);
-                const { waterGallons, foodLbs } = calculateRations(numPeople, numPets, durationDays);
+                const { waterLiters, foodKg } = calculateRations(numPeople, numPets, durationDays);
 
                 return (
                   <div className="grid grid-cols-2 gap-4">
@@ -551,7 +551,7 @@ export default function CacheDetail() {
                         <Droplet className="w-5 h-5 text-blue-600" />
                         <span className="text-sm font-medium text-gray-700">Water Needed</span>
                       </div>
-                      <p className="text-2xl font-bold text-blue-600">{waterGallons} gal</p>
+                      <p className="text-2xl font-bold text-blue-600">{waterLiters} L</p>
                       <p className="text-xs text-gray-500 mt-1">
                         {numPeople} people × {durationDays}d + {numPets} pets × {durationDays}d
                       </p>
@@ -561,7 +561,7 @@ export default function CacheDetail() {
                         <UtensilsCrossed className="w-5 h-5 text-green-600" />
                         <span className="text-sm font-medium text-gray-700">Food Needed</span>
                       </div>
-                      <p className="text-2xl font-bold text-green-600">{foodLbs} lbs</p>
+                      <p className="text-2xl font-bold text-green-600">{foodKg} kg</p>
                       <p className="text-xs text-gray-500 mt-1">
                         {numPeople} people × {durationDays}d + {numPets} pets × {durationDays}d
                       </p>

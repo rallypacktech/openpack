@@ -123,7 +123,7 @@ export default function Equine() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#D8D2C6]">
           {[
             { icon: Flame, label: "Wildfire", desc: "Smoke inhalation, road closures, and terrified animals make fire the #1 cause of equine disaster deaths. Plan to leave early." },
-            { icon: Wind, label: "Hurricane", desc: "Pasture flooding and wind damage to structures. Know your storm surge zone and have a destination 100+ miles away." },
+            { icon: Wind, label: "Hurricane", desc: "Pasture flooding and wind damage to structures. Know your storm surge zone and have a destination 150+ km away." },
             { icon: Droplets, label: "Flood", desc: "Horses standing in floodwater develop hoof and leg conditions within hours. Elevated pasture or trailer evacuation is essential." },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="bg-[#F5F0E8] p-8">

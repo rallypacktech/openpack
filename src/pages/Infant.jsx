@@ -57,7 +57,7 @@ export default function Infant() {
           {[
             { n: "4M+", unit: "", label: "Infants born in the US each year — none of them have a disaster plan when they arrive" },
             { n: "72", unit: "hrs", label: "Before federal aid arrives — but formula and diapers aren't stockpiled the same way adult food is" },
-            { n: "104°F", unit: "", label: "Dangerous fever threshold for infants — reached faster in hot shelters without climate control" },
+            { n: "40°C", unit: "", label: "Dangerous fever threshold for infants — reached faster in hot shelters without climate control" },
           ].map((s) => (
             <div key={s.label} className="py-10 md:py-0 md:px-14 first:pl-0 last:pr-0">
               <div className="font-serif text-6xl md:text-7xl font-bold text-[#D64A2E] leading-none mb-3">

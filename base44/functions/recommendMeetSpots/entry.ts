@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
         suggestions: [
           `Find a safe location ${missingDirections[0] === 'N' ? 'north' : missingDirections[0] === 'S' ? 'south' : missingDirections[0] === 'E' ? 'east' : 'west'} of your home`,
           'Look for community centers, parks, or schools',
-          'Choose locations 0.5-2 miles from home'
+          'Choose locations 0.8-3 km from home'
         ]
       });
     }
@@ -95,20 +95,20 @@ Deno.serve(async (req) => {
     const hasClose = meetSpots.some(spot => {
       if (!spot.latitude || !spot.longitude) return false;
       const distance = calculateDistance(userLat, userLon, spot.latitude, spot.longitude);
-      return distance < 0.5;
+      return distance < 0.8;
     });
 
     const hasFar = meetSpots.some(spot => {
       if (!spot.latitude || !spot.longitude) return false;
       const distance = calculateDistance(userLat, userLon, spot.latitude, spot.longitude);
-      return distance > 2;
+      return distance > 3;
     });
 
     if (!hasClose) {
       recommendations.push({
         type: 'distance',
         title: 'Add a Nearby Meet Spot',
-        description: 'Have at least one spot within walking distance (0.25-0.5 miles)',
+        description: 'Have at least one spot within walking distance (0.4-0.8 km)',
         suggestions: [
           'Neighbor\'s house',
           'Corner store or mailbox',
@@ -144,9 +144,9 @@ Deno.serve(async (req) => {
   }
 });
 
-// Calculate distance in miles between two coordinates
+// Calculate distance in kilometers between two coordinates
 function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 3959; // Earth's radius in miles
+  const R = 6371; // Earth's radius in kilometers
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +

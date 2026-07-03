@@ -128,14 +128,14 @@ function generateRecommendations(breakdown, familyCount, petCount, hasLargeAnima
   // Large animal specific recommendations
   if (hasLargeAnimals) {
     const alertSettings = userProfile?.alert_settings || {};
-    const wildfireRadius = alertSettings.wildfire_radius_miles ?? 50;
-    const severeWeatherRadius = alertSettings.severe_weather_radius_miles ?? 75;
+    const wildfireRadius = alertSettings.wildfire_radius_km ?? 80;
+    const severeWeatherRadius = alertSettings.severe_weather_radius_km ?? 120;
 
-    if (wildfireRadius < 100) {
-      recommendations.push('🐴 You have equine or livestock — increase your wildfire alert radius to at least 100 miles. Large animals need more evacuation lead time and are highly sensitive to smoke.');
+    if (wildfireRadius < 150) {
+      recommendations.push('🐴 You have equine or livestock — increase your wildfire alert radius to at least 150 km. Large animals need more evacuation lead time and are highly sensitive to smoke.');
     }
-    if (severeWeatherRadius < 100) {
-      recommendations.push('🐴 Increase your severe weather alert radius to 100+ miles for earlier warning when evacuating large animals.');
+    if (severeWeatherRadius < 150) {
+      recommendations.push('🐴 Increase your severe weather alert radius to 150+ km for earlier warning when evacuating large animals.');
     }
     if (breakdown.caches.score < 25) {
       recommendations.push('🐴 Create a Barn / Livestock cache stocked with emergency feed, spare halters, and equine medical supplies');

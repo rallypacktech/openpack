@@ -406,7 +406,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                       )}
                       {point.distance && (
                         <p className="text-xs text-blue-600">
-                          {point.distance.toFixed(1)} miles away
+                          {point.distance.toFixed(1)} km away
                           {userHomeCoords && point.latitude && (
                             <> • {getDirection(point.latitude, point.longitude)}</>
                           )}

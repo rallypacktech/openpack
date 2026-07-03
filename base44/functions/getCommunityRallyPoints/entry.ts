@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
       if (!lat || !lon) return null;
 
       // Calculate distance
-      const R = 3958.8; // Earth radius in miles
+      const R = 6371; // Earth radius in kilometers
       const lat1 = latitude * Math.PI / 180;
       const lat2 = lat * Math.PI / 180;
       const deltaLat = (lat - latitude) * Math.PI / 180;

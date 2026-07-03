@@ -19,7 +19,7 @@ const STATIC_INCIDENTS = [
     longitude: -83.98,
     description: "Active wildfire complex in North Georgia mountains. FEMA DR-4xxx declared. Federal fire resources deployed.",
     agency: "FEMA + USFS",
-    radius_miles: 40,
+    radius_km: 65,
   },
   {
     id: "tx-flood-2026",
@@ -31,7 +31,7 @@ const STATIC_INCIDENTS = [
     longitude: -98.87,
     description: "Flash flooding along Guadalupe and Blanco Rivers. NWS Flash Flood Emergency.",
     agency: "FEMA + NWS",
-    radius_miles: 30,
+    radius_km: 50,
   },
   {
     id: "ca-drought-2026",
@@ -43,7 +43,7 @@ const STATIC_INCIDENTS = [
     longitude: -119.42,
     description: "Red Flag Warning across Sierra Nevada foothills. Elevated fire danger.",
     agency: "NWS + CalFire",
-    radius_miles: 80,
+    radius_km: 130,
   },
 ];
 
@@ -126,7 +126,7 @@ export default function IncidentMap() {
       longitude: a.longitude || (a.geometry?.coordinates ? a.geometry.coordinates[0] : null),
       description: a.properties?.description || a.description || "",
       agency: "NWS",
-      radius_miles: 20,
+      radius_km: 30,
     }))
     .filter(a => a.latitude && a.longitude);
 
@@ -164,7 +164,7 @@ export default function IncidentMap() {
           />
           {allIncidents.map(incident => {
             const cfg = TYPE_CONFIG[incident.type] || TYPE_CONFIG.other;
-            const radiusMeters = (incident.radius_miles || 20) * 1609.34;
+            const radiusMeters = (incident.radius_km || 30) * 1000;
             return (
               <React.Fragment key={incident.id}>
                 <Circle

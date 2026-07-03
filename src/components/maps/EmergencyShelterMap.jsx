@@ -35,7 +35,7 @@ export default function EmergencyShelterMap({
   rallyPoints = [], 
   userLocation = null,
   showRadius = false,
-  radiusMiles = 25 
+  radiusKm = 40 
 }) {
   const [center, setCenter] = useState([39.8283, -98.5795]); // Center of USA
   const [zoom, setZoom] = useState(4);
@@ -92,7 +92,7 @@ export default function EmergencyShelterMap({
                 {showRadius && (
                   <Circle
                     center={[userLocation.latitude, userLocation.longitude]}
-                    radius={radiusMiles * 1609.34} // Convert miles to meters
+                    radius={radiusKm * 1000} // Convert km to meters
                     pathOptions={{ 
                       color: "blue", 
                       fillColor: "blue", 
@@ -157,7 +157,7 @@ export default function EmergencyShelterMap({
                       )}
                       {shelter.distance && (
                         <div className="text-blue-600 font-medium">
-                          {shelter.distance} miles away
+                          {shelter.distance} km away
                         </div>
                       )}
                     </div>
@@ -196,7 +196,7 @@ export default function EmergencyShelterMap({
                       )}
                       {point.distance && (
                         <div className="text-green-600 font-medium">
-                          {point.distance.toFixed(1)} miles away
+                          {point.distance.toFixed(1)} km away
                         </div>
                       )}
                     </div>
