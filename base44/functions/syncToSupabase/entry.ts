@@ -96,8 +96,8 @@ Deno.serve(async (req) => {
                 state_province: userProfile.state_province || null,
                 country: userProfile.country || null,
                 notification_method: userProfile.notification_method || null,
-                latitude: userProfile.latitude || null,
-                longitude: userProfile.longitude || null,
+                latitude: userProfile.latitude ? Math.round(userProfile.latitude * 100) / 100 : null,
+                longitude: userProfile.longitude ? Math.round(userProfile.longitude * 100) / 100 : null,
                 synced_at: new Date().toISOString()
             };
 

@@ -63,9 +63,9 @@
           "type": "boolean",
           "default": true
         },
-        "wildfire_radius_miles": {
+        "wildfire_radius_km": {
           "type": "number",
-          "default": 50
+          "default": 80
         },
         "severe_weather": {
           "type": "boolean",

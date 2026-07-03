@@ -24,7 +24,7 @@
         "large",
         "x-large"
       ],
-      "description": "Size of the pet \u2014 small (<20 lbs), medium (20-50 lbs), large (50-100 lbs), x-large (100+ lbs / livestock / horses)"
+      "description": "Size of the pet \u2014 small (<9 kg), medium (9-23 kg), large (23-45 kg), x-large (45+ kg / livestock / horses)"
     },
     "breed": {
       "type": "string"

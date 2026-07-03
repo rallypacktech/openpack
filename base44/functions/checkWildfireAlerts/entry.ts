@@ -1,8 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
-// Haversine distance calculation (in miles)
+// Haversine distance calculation (in kilometers)
 function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 3959; // Earth's radius in miles
+  const R = 6371; // Earth's radius in kilometers
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = 
@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
       // Check alert preferences
       const alertSettings = profile.alert_settings || {};
       const wildfireEnabled = alertSettings.wildfire !== false;
-      const alertRadius = alertSettings.wildfire_radius_miles || 50;
+      const alertRadius = alertSettings.wildfire_radius_km || 80;
       
       if (!wildfireEnabled) continue;
 
@@ -58,12 +58,12 @@ Deno.serve(async (req) => {
             alertsToCreate.push({
               created_by: profile.created_by,
               title: `Wildfire Alert: ${fire.name}`,
-              message: `Active wildfire ${Math.round(distance)} miles from your location in ${fire.county} County. ${fire.acres} acres, ${fire.containment}% contained. Stay alert and follow local authorities.`,
+              message: `Active wildfire ${Math.round(distance)} km from your location in ${fire.county} County. ${Math.round((Number(fire.acres) || 0) * 0.4047)} hectares, ${fire.containment}% contained. Stay alert and follow local authorities.`,
               type: 'alert',
               read: false,
               metadata: {
                 wildfire_id: fire.id,
-                distance_miles: Math.round(distance),
+                distance_km: Math.round(distance),
                 county: fire.county,
                 acres: fire.acres
               }

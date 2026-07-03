@@ -221,17 +221,9 @@ export default function Dashboard() {
           96: "Thunderstorm with hail"
         };
 
-        // Check if user is in United States to use Fahrenheit
-        const isUS = country && (country.toLowerCase().includes("united states") || country.toLowerCase() === "usa");
-        const tempUnit = isUS ? "°F" : "°C";
-
-        // Convert Celsius to Fahrenheit if needed
-        const convertTemp = (celsius) => {
-          if (isUS) {
-            return Math.round((celsius * 9/5) + 32);
-          }
-          return Math.round(celsius);
-        };
+        // Universal metric: always display Celsius
+        const tempUnit = "°C";
+        const convertTemp = (celsius) => Math.round(celsius);
 
         setWeather({
           temperature: convertTemp(data.current.temperature_2m),

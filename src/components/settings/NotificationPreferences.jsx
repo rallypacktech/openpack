@@ -9,31 +9,31 @@ import { Bell, Save, Mail } from "lucide-react";
 
 // Alert types with optional radius support
 const alertTypes = [
-  { key: 'wildfire', label: 'Wildfire Alerts', description: 'Active wildfires within your radius', hasRadius: true, defaultRadius: 50 },
-  { key: 'severe_weather', label: 'Severe Weather', description: 'Thunderstorms, high winds, hail', hasRadius: true, defaultRadius: 75 },
-  { key: 'hurricane', label: 'Hurricane Warnings', description: 'Tropical storms and hurricanes', hasRadius: true, defaultRadius: 200 },
-  { key: 'tornado', label: 'Tornado Warnings', description: 'Tornado watches and warnings', hasRadius: true, defaultRadius: 50 },
-  { key: 'flood', label: 'Flood Alerts', description: 'Flash floods and flood warnings', hasRadius: true, defaultRadius: 25 },
+  { key: 'wildfire', label: 'Wildfire Alerts', description: 'Active wildfires within your radius', hasRadius: true, defaultRadius: 80 },
+  { key: 'severe_weather', label: 'Severe Weather', description: 'Thunderstorms, high winds, hail', hasRadius: true, defaultRadius: 120 },
+  { key: 'hurricane', label: 'Hurricane Warnings', description: 'Tropical storms and hurricanes', hasRadius: true, defaultRadius: 300 },
+  { key: 'tornado', label: 'Tornado Warnings', description: 'Tornado watches and warnings', hasRadius: true, defaultRadius: 80 },
+  { key: 'flood', label: 'Flood Alerts', description: 'Flash floods and flood warnings', hasRadius: true, defaultRadius: 40 },
   { key: 'temperature_thresholds', label: 'Extreme Temperatures', description: 'Heat waves and cold snaps', hasRadius: false },
   { key: 'precipitation', label: 'Heavy Precipitation', description: 'Significant rain or snow events', hasRadius: false },
-  { key: 'earthquake', label: 'Earthquake Alerts', description: 'Seismic activity notifications', hasRadius: true, defaultRadius: 100 },
+  { key: 'earthquake', label: 'Earthquake Alerts', description: 'Seismic activity notifications', hasRadius: true, defaultRadius: 150 },
 ];
 
 const defaultSettings = {
   wildfire: true,
-  wildfire_radius_miles: 50,
+  wildfire_radius_km: 80,
   severe_weather: true,
-  severe_weather_radius_miles: 75,
+  severe_weather_radius_km: 120,
   hurricane: true,
-  hurricane_radius_miles: 200,
+  hurricane_radius_km: 300,
   tornado: true,
-  tornado_radius_miles: 50,
+  tornado_radius_km: 80,
   flood: true,
-  flood_radius_miles: 25,
+  flood_radius_km: 40,
   temperature_thresholds: true,
   precipitation: true,
   earthquake: false,
-  earthquake_radius_miles: 100,
+  earthquake_radius_km: 150,
   alert_frequency: 'immediate'
 };
 
@@ -79,15 +79,15 @@ export default function NotificationPreferences({ profile, onSave, hasLargeAnima
             <div>
               <p className="text-sm font-semibold text-amber-900">Large Animal Advisory</p>
               <p className="text-sm text-amber-700 mt-0.5">
-                You have equine or livestock. FEMA and ASPCA recommend increasing wildfire and smoke alert radii to at least 100 miles for large animals — they're more sensitive to smoke and require more lead time to evacuate.
+                You have equine or livestock. FEMA and ASPCA recommend increasing wildfire and smoke alert radii to at least 150 km for large animals — they're more sensitive to smoke and require more lead time to evacuate.
               </p>
               <button
                 className="mt-2 text-xs text-amber-800 underline font-medium"
                 onClick={() => {
                   setSettings(prev => ({
                     ...prev,
-                    wildfire_radius_miles: Math.max(prev.wildfire_radius_miles || 50, 100),
-                    severe_weather_radius_miles: Math.max(prev.severe_weather_radius_miles || 75, 100)
+                    wildfire_radius_km: Math.max(prev.wildfire_radius_km || 80, 150),
+                    severe_weather_radius_km: Math.max(prev.severe_weather_radius_km || 120, 150)
                   }));
                 }}
               >
@@ -170,14 +170,14 @@ export default function NotificationPreferences({ profile, onSave, hasLargeAnima
                     <Input
                       type="number"
                       min="5"
-                      max="500"
-                      value={settings[`${alert.key}_radius_miles`] ?? alert.defaultRadius}
-                      onChange={(e) => updateSetting(`${alert.key}_radius_miles`, parseInt(e.target.value))}
+                      max="800"
+                      value={settings[`${alert.key}_radius_km`] ?? alert.defaultRadius}
+                      onChange={(e) => updateSetting(`${alert.key}_radius_km`, parseInt(e.target.value))}
                       className="w-20 h-7 text-sm"
                     />
-                    <span className="text-xs text-gray-500">miles</span>
+                    <span className="text-xs text-gray-500">km</span>
                     {hasLargeAnimals && (alert.key === 'wildfire' || alert.key === 'severe_weather') && (
-                      <span className="text-xs text-amber-600 font-medium">🐴 100+ recommended</span>
+                      <span className="text-xs text-amber-600 font-medium">🐴 150+ recommended</span>
                     )}
                   </div>
                 )}
