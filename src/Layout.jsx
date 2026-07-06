@@ -69,7 +69,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Emergency", page: "Emergency", icon: AlertTriangle, requiresAuth: true },
     { name: "Offline", page: "Offline", icon: WifiOff, requiresAuth: true },
     { name: "Settings", page: "Settings", icon: Settings, requiresAuth: true },
-    { name: "Business", page: "BusinessDashboard", icon: Building2, requiresAuth: true },
+    { name: "Business", page: "BusinessDashboard", publicPage: "BusinessOnboarding", icon: Building2, requiresAuth: false },
   ];
 
   if (isAdmin) {
@@ -101,17 +101,19 @@ export default function Layout({ children, currentPageName }) {
             </button>
           );
         }
+        const targetPage = !user && item.publicPage ? item.publicPage : item.page;
+        const isActive = currentPageName === item.page || currentPageName === item.publicPage;
         return (
           <Link
             key={item.page}
-            to={createPageUrl(item.page)}
+            to={createPageUrl(targetPage)}
             onClick={onClick}
             className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors font-sans ${
-              currentPageName === item.page
+              isActive
                 ? "bg-foreground/5 text-foreground font-medium"
                 : "text-muted-foreground hover:text-foreground"
             }`}
-            aria-current={currentPageName === item.page ? "page" : undefined}
+            aria-current={isActive ? "page" : undefined}
           >
             <item.icon className="w-4 h-4" aria-hidden="true" />
             <span>{item.name}</span>
@@ -252,19 +254,6 @@ export default function Layout({ children, currentPageName }) {
                         <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                         <circle cx="12" cy="12" r="4"/>
                         <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
-                      </svg>
-                    </a>
-                    <a href="https://www.facebook.com/profile.php?id=61583589766031" target="_blank" rel="noopener noreferrer" aria-label="Facebook rallypack" className="text-muted-foreground hover:text-foreground transition-colors">
-                      {/* Facebook icon */}
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                      </svg>
-                    </a>
-                    <a href="https://pixelfed.social/rallypack" target="_blank" rel="noopener noreferrer" aria-label="Pixelfed rallypack" className="text-muted-foreground hover:text-foreground transition-colors">
-                      {/* Camera/Pixelfed icon */}
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                        <circle cx="12" cy="13" r="4"/>
                       </svg>
                     </a>
                   </div>

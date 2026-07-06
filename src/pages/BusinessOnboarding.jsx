@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Mail, CheckCircle2, Users, Shield, MapPin, ArrowRight } from "lucide-react";
+import PricingSection from "@/components/business/PricingSection";
 
 export default function BusinessOnboarding() {
   const [form, setForm] = useState({
@@ -81,6 +82,9 @@ export default function BusinessOnboarding() {
           ))}
         </div>
       </section>
+
+      {/* Pricing */}
+      <PricingSection />
 
       {/* Referral Form */}
       <section className="py-12 max-w-2xl mx-auto px-6 pb-24">
