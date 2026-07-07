@@ -4,7 +4,6 @@ import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Package, MapPin, Heart, Shield, CheckCircle, ClipboardList, ArrowRight, Github, Wind, Flame, Droplets, Zap, AlertTriangle, X } from "lucide-react";
-import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
 import FooterContactForm from "../components/FooterContactForm";
 
@@ -105,9 +104,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Ad strip ── */}
+      {/* ── Partner spotlight ── */}
       <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-4 flex justify-center">
-        <AdSlot size="leaderboard" label={true} />
+        <div className="flex items-center gap-4">
+          <a href="https://mywhinny.com" target="_blank" rel="noopener noreferrer" aria-label="MyWhinny — visit mywhinny.com">
+            <img
+              src="https://media.base44.com/images/public/69dc170f0871ac017d79debb/b98797892_MyWhinnyR_logo.svg"
+              alt="MyWhinny"
+              className="h-10 w-auto"
+            />
+          </a>
+          <span className="hidden sm:inline text-[#D8D2C6]" aria-hidden="true">·</span>
+          <p className="hidden sm:block font-serif text-sm text-[#1C1C1A]/70 italic">
+            Connecting hooves with helping hands.
+          </p>
+        </div>
       </div>
 
       {/* ── Stats — raw numbers, no fluff ── */}
