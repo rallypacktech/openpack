@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets, Shield, Beef } from "lucide-react";
+import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets, Shield, Milk, Wheat, Ham, Egg } from "lucide-react";
 
 const CHECKLIST = [
   { icon: FileText, title: "Brands, Tags & Health Papers", desc: "Brand inspections, scrapie tags, ear tag records, and health certificates in a waterproof pouch. Reunification and interstate movement both depend on documentation." },
@@ -94,6 +94,28 @@ export default function Livestock() {
         </div>
       </section>
 
+      {/* Editorial image */}
+      <section className="relative h-[55vh] min-h-[380px] overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1498191923457-88552caeccb3?w=1600&q=80"
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/80 to-transparent" />
+        <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
+          <div className="max-w-sm">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-sans mb-4">What RallyPack tracks for you</p>
+            <p className="font-serif text-3xl md:text-4xl text-white font-bold leading-tight mb-4">
+              Brand records. Trailer capacity. Evacuation destinations. All in one place.
+            </p>
+            <p className="text-sm text-white/60 font-sans leading-relaxed">
+              Log your herd, health papers, trailer specs, and pre-authorized facilities — then access it offline when the internet goes down.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Evacuation rules */}
       <section className="bg-[#1C1C1A] text-white py-20">
         <div className="max-w-4xl mx-auto px-6">
@@ -128,10 +150,10 @@ export default function Livestock() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[#D8D2C6]">
           {[
-            { icon: Beef, label: "Cattle", desc: "Load in groups — isolated animals panic. Use a crowding tub and alley. Cows can be driven up ramps but balk at steep steps. Remove headgates only if the animal is calm." },
-            { icon: Beef, label: "Sheep & Goats", desc: "Herd animals that move together — load in small groups. Goats climb; ensure trailer ventilation is adequate and top doors are secured. Sheep will not move toward a dead-end." },
-            { icon: Beef, label: "Swine", desc: "Pigs are notoriously difficult to load. Use panels to create a narrow chute with no visual gaps. Move in small groups of 3–5. Never use electric prods on market hogs in heat stress." },
-            { icon: Beef, label: "Poultry (Flocks)", desc: "Crate in ventilated carriers — 8–10 birds per standard crate. Move at dusk when they're calm. Secure waterers; dehydration kills poultry faster than any disaster." },
+            { icon: Milk, label: "Cattle", desc: "Load in groups — isolated animals panic. Use a crowding tub and alley. Cows can be driven up ramps but balk at steep steps. Remove headgates only if the animal is calm." },
+            { icon: Wheat, label: "Sheep & Goats", desc: "Herd animals that move together — load in small groups. Goats climb; ensure trailer ventilation is adequate and top doors are secured. Sheep will not move toward a dead-end." },
+            { icon: Ham, label: "Swine", desc: "Pigs are notoriously difficult to load. Use panels to create a narrow chute with no visual gaps. Move in small groups of 3–5. Never use electric prods on market hogs in heat stress." },
+            { icon: Egg, label: "Poultry (Flocks)", desc: "Crate in ventilated carriers — 8–10 birds per standard crate. Move at dusk when they're calm. Secure waterers; dehydration kills poultry faster than any disaster." },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="bg-[#F5F0E8] p-8">
               <Icon className="w-6 h-6 text-[#D64A2E] mb-4" />
