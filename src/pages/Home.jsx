@@ -104,20 +104,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Partner spotlight ── */}
-      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-4 flex justify-center">
-        <div className="flex items-center gap-4">
-          <a href="https://mywhinny.com" target="_blank" rel="noopener noreferrer" aria-label="MyWhinny — visit mywhinny.com">
-            <img
-              src="https://media.base44.com/images/public/69dc170f0871ac017d79debb/b98797892_MyWhinnyR_logo.svg"
-              alt="MyWhinny"
-              className="h-10 w-auto"
-            />
-          </a>
-          <span className="hidden sm:inline text-[#D8D2C6]" aria-hidden="true">·</span>
-          <p className="hidden sm:block font-serif text-sm text-[#1C1C1A]/70 italic">
-            Connecting hooves with helping hands.
-          </p>
+      {/* ── Sponsored partner spotlight ── */}
+      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-4">
+        <div className="max-w-3xl mx-auto px-6 flex flex-col items-center gap-2">
+          <p className="text-[10px] uppercase tracking-widest text-[#8A8577] font-sans">Sponsored</p>
+          <div className="flex items-center gap-4">
+            <a href="https://mywhinny.com" target="_blank" rel="noopener noreferrer" aria-label="MyWhinny — visit mywhinny.com">
+              <img
+                src="https://media.base44.com/images/public/69dc170f0871ac017d79debb/b98797892_MyWhinnyR_logo.svg"
+                alt="MyWhinny"
+                className="h-10 w-auto"
+              />
+            </a>
+            <span className="hidden sm:inline text-[#D8D2C6]" aria-hidden="true">·</span>
+            <p className="hidden sm:block font-serif text-sm text-[#1C1C1A]/70 italic">
+              Connecting hooves with helping hands.
+            </p>
+          </div>
         </div>
       </div>
 
