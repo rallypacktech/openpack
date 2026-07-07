@@ -4,7 +4,7 @@
   "properties": {
     "session_id": {
       "type": "string",
-      "description": "Anonymous session ID to track pre-login quiz takers"
+      "description": "Anonymous session ID to track pre-login quiz takers. Bots use a stable hash of their user-agent."
     },
     "user_email": {
       "type": "string",
@@ -59,6 +59,15 @@
       "type": "boolean",
       "default": false,
       "description": "Whether the quiz taker has a RallyPack account"
+    },
+    "is_bot": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the quiz taker was detected as a bot/crawler"
+    },
+    "bot_name": {
+      "type": "string",
+      "description": "Name of the detected bot (e.g. Googlebot, Headless Chrome) \u2014 null for humans"
     }
   },
   "required": [
