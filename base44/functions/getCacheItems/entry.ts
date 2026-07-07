@@ -16,13 +16,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Cache ID required' }, { status: 400 });
     }
 
-    // Get all family members where current user is emergency contact
-    const allFamilyMembers = await base44.entities.FamilyMember.list();
-    const packOwnerEmails = allFamilyMembers
-      .filter(fm => fm.emergency_contact === user.email)
-      .map(fm => fm.created_by);
-
-    // Get the cache to verify access
+    // Strict ownership verification: only the cache owner or an admin may view items.
+    // RLS already enforces owner-only reads on EmergencyCache; this explicit check is defense-in-depth.
     const allCaches = await base44.entities.EmergencyCache.list();
     const cache = allCaches.find(c => c.id === cacheId);
 
@@ -30,8 +25,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Cache not found' }, { status: 404 });
     }
 
-    // Verify user has access to this cache
-    if (cache.created_by !== user.email && !packOwnerEmails.includes(cache.created_by)) {
+    if (cache.created_by !== user.email && user.role !== 'admin') {
       return Response.json({ error: 'Access denied' }, { status: 403 });
     }
 

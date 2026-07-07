@@ -14,7 +14,26 @@ Deno.serve(async (req) => {
             active: true
         });
 
-        const recommendationsWithLinks = recommendations.filter(rec => rec.affiliate_link);
+        // Whitelist of allowed e-commerce domains to prevent SSRF via attacker-controlled affiliate links
+        const ALLOWED_DOMAINS = [
+            'amazon.com', 'amazon.ca', 'amazon.co.uk', 'amazon.de', 'amazon.fr',
+            'target.com', 'walmart.com', 'costco.com', 'homedepot.com', 'lowes.com',
+            'rei.com', 'cabelas.com', 'basspro.com', 'tractorsupply.com',
+            'ebay.com', 'etsy.com', 'wayfair.com', 'acehardware.com',
+            'redcross.org', 'fema.gov', 'ready.gov'
+        ];
+
+        function isAllowedAffiliateUrl(urlStr) {
+            try {
+                const url = new URL(urlStr);
+                const hostname = url.hostname.toLowerCase().replace(/^www\./, '');
+                return url.protocol === 'https:' && ALLOWED_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d));
+            } catch {
+                return false;
+            }
+        }
+
+        const recommendationsWithLinks = recommendations.filter(rec => rec.affiliate_link && isAllowedAffiliateUrl(rec.affiliate_link));
 
         const suggestionsCreated = [];
         const errors = [];

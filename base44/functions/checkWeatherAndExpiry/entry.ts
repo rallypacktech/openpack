@@ -9,10 +9,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Admin-only or automation-only (verified via shared secret)
-    const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET") || "rp-auto-a7f3b2e9-1d4a-4b8c-9e2f-6a5b3c8d7e1f";
+    // Admin-only or automation-only (verified via shared secret from env — no hardcoded fallback)
+    const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET");
     const body = await req.json().catch(() => ({}));
-    const isAutomation = body.automation_secret === AUTOMATION_SECRET;
+    const isAutomation = AUTOMATION_SECRET && body.automation_secret === AUTOMATION_SECRET;
 
     if (!isAutomation) {
       const user = await base44.auth.me();
