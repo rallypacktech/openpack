@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets, Shield, Milk, Wheat, Ham, Egg } from "lucide-react";
+import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets, Shield, Milk, Wheat, PiggyBank, Egg } from "lucide-react";
 
 const CHECKLIST = [
   { icon: FileText, title: "Brands, Tags & Health Papers", desc: "Brand inspections, scrapie tags, ear tag records, and health certificates in a waterproof pouch. Reunification and interstate movement both depend on documentation." },
@@ -152,7 +152,7 @@ export default function Livestock() {
           {[
             { icon: Milk, label: "Cattle", desc: "Load in groups — isolated animals panic. Use a crowding tub and alley. Cows can be driven up ramps but balk at steep steps. Remove headgates only if the animal is calm." },
             { icon: Wheat, label: "Sheep & Goats", desc: "Herd animals that move together — load in small groups. Goats climb; ensure trailer ventilation is adequate and top doors are secured. Sheep will not move toward a dead-end." },
-            { icon: Ham, label: "Swine", desc: "Pigs are notoriously difficult to load. Use panels to create a narrow chute with no visual gaps. Move in small groups of 3–5. Never use electric prods on market hogs in heat stress." },
+            { icon: PiggyBank, label: "Swine", desc: "Pigs are notoriously difficult to load. Use panels to create a narrow chute with no visual gaps. Move in small groups of 3–5. Never use electric prods on market hogs in heat stress." },
             { icon: Egg, label: "Poultry (Flocks)", desc: "Crate in ventilated carriers — 8–10 birds per standard crate. Move at dusk when they're calm. Secure waterers; dehydration kills poultry faster than any disaster." },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="bg-[#F5F0E8] p-8">
