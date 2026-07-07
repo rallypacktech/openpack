@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
         try { user = await base44.auth.me(); } catch { /* anonymous referral allowed */ }
 
         const body = await req.json().catch(() => ({}));
-        const { referee_email, referee_name, organization_name, message } = body;
+        const { referee_email, referee_name, organization_name, message, audience_type } = body;
 
         if (!referee_email) {
             return Response.json({ error: 'Business email is required' }, { status: 400 });
@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
             referrer_name,
             referrer_email,
             message: message || '',
+            audience_type: audience_type || 'general',
             status: 'pending'
         });
 
@@ -58,6 +59,7 @@ Deno.serve(async (req) => {
                             <tr><td style="font-weight: bold; padding-right: 12px;">Contact:</td><td>${safe_referee_name || 'N/A'}</td></tr>
                             <tr><td style="font-weight: bold; padding-right: 12px;">Email:</td><td>${safe_referee_email}</td></tr>
                             <tr><td style="font-weight: bold; padding-right: 12px;">Referred by:</td><td>${safe_referrer_name || 'Anonymous'} (${safe_referrer_email || 'no email'})</td></tr>
+                            <tr><td style="font-weight: bold; padding-right: 12px;">Audience:</td><td>${escapeHtml(audience_type || 'general')}</td></tr>
                         </table>
                         ${safe_message ? `<p style="font-style: italic; color: #555;">"${safe_message}"</p>` : ''}
                         <p style="font-size: 12px; color: #8A8577;">Review and follow up in the RallyPack admin dashboard.</p>

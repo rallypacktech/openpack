@@ -8,7 +8,7 @@
     },
     "referee_name": {
       "type": "string",
-      "description": "Contact name at the referred business"
+      "description": "Contact name at the referred organization"
     },
     "organization_name": {
       "type": "string",
@@ -25,6 +25,21 @@
     "message": {
       "type": "string",
       "description": "Personal message from the referrer"
+    },
+    "audience_type": {
+      "type": "string",
+      "enum": [
+        "general",
+        "equine",
+        "canine",
+        "feline",
+        "infant",
+        "avian",
+        "reptile",
+        "livestock"
+      ],
+      "default": "general",
+      "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page"
     },
     "status": {
       "type": "string",
