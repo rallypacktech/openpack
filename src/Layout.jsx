@@ -38,7 +38,7 @@ export default function Layout({ children, currentPageName }) {
         setAuthChecked(true);
       } catch (e) {
         // Not logged in - redirect to Home if on protected page
-        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback"];
+        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback"];
         if (!publicPages.includes(currentPageName)) {
           window.location.href = createPageUrl("Home");
         } else {
@@ -49,7 +49,7 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, [currentPageName]);
 
-  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback"];
+  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback"];
   const isPublicPage = publicPages.includes(currentPageName);
   const isAdmin = user?.role === "admin";
 

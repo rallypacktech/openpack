@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { Package, MapPin, Heart, Shield, CheckCircle, ClipboardList, ArrowRight, Github, Wind, Flame, Droplets, Zap, AlertTriangle, X } from "lucide-react";
 import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
@@ -25,11 +26,10 @@ const SCENARIOS = [
 ];
 
 export default function Home() {
-  const [user, setUser] = React.useState(null);
-  const [supportBannerDismissed, setSupportBannerDismissed] = React.useState(false);
+  const { user } = useAuth();
+  const [supportBannerDismissed, setSupportBannerDismissed] = useState(false);
 
-  React.useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => setUser(null));
+  useEffect(() => {
     setSupportBannerDismissed(sessionStorage.getItem("supportBannerDismissed") === "true");
   }, []);
 
@@ -130,9 +130,11 @@ export default function Home() {
 
       {/* ── Full-bleed editorial image with overlaid quote ── */}
       <section className="relative h-[70vh] min-h-[420px] flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1519750157634-b6d493a0f77c?w=1600&q=80')" }}
+        <img
+          src="https://images.unsplash.com/photo-1519750157634-b6d493a0f77c?w=1600&q=80"
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-[#1C1C1A]/60" />
         <div className="relative max-w-3xl mx-auto px-6 text-center">
@@ -205,9 +207,11 @@ export default function Home() {
 
       {/* ── Third full-bleed image — action shot ── */}
       <section className="relative h-[55vh] min-h-[380px] overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-[center_30%]"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1591451204579-d1b6e3a72e7d?w=1600&q=80')" }}
+        <img
+          src="https://images.unsplash.com/photo-1591451204579-d1b6e3a72e7d?w=1600&q=80"
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/80 to-transparent" />
         <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
@@ -278,9 +282,11 @@ export default function Home() {
 
       {/* ── Final CTA ── */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80')" }}
+        <img
+          src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80"
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
         />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">The next emergency won't wait</p>
