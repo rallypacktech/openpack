@@ -384,7 +384,7 @@ export default function Shopping() {
                   <CardContent className="p-4">
                     {rec.image_url && (
                       <div className="aspect-square w-full mb-3 overflow-hidden rounded-lg">
-                        <img src={rec.image_url} alt={rec.item_name} className="w-full h-full object-cover" />
+                        <img src={rec.image_url} alt={rec.item_name} loading="lazy" className="w-full h-full object-cover" />
                       </div>
                     )}
                     <h3 className="font-semibold text-gray-900 mb-2 pr-6">{rec.item_name}</h3>

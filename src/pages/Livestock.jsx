@@ -34,7 +34,7 @@ export default function Livestock() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Livestock Emergency Preparedness · RallyPack</p>
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-none text-white mb-6 max-w-3xl">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-none text-white mb-6 max-w-3xl">
             Move the herd<br />before the<br />danger moves.
           </h1>
           <p className="font-sans text-base md:text-lg text-white/75 max-w-md mb-10 leading-relaxed">
@@ -186,7 +186,7 @@ export default function Livestock() {
         <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605000797489-7b29f30f5d9b?w=1600&q=80')" }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">Start today — it takes 10 minutes</p>
-          <h2 className="font-serif text-5xl md:text-6xl font-bold text-white leading-none mb-8">
+          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-none mb-8">
             Where would your herd go<br />
             <em className="not-italic text-[#D64A2E]">if you had 4 hours?</em>
           </h2>

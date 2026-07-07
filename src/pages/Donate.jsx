@@ -89,7 +89,7 @@ export default function Donate() {
       <div className="bg-[#1C1C1A] text-white py-20 px-4 text-center">
         <Heart className="w-10 h-10 text-[#D64A2E] mx-auto mb-5" />
         <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-sans mb-3">Support the mission</p>
-        <h1 className="font-serif text-5xl md:text-6xl font-bold mb-5 leading-none">
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold mb-5 leading-none">
           Keep RallyPack<br /><span className="text-[#D64A2E]">free for everyone.</span>
         </h1>
         <p className="text-white/60 font-sans max-w-xl mx-auto leading-relaxed text-base">

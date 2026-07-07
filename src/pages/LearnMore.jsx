@@ -184,6 +184,7 @@ export default function LearnMore() {
                     <img 
                       src={scenario.image} 
                       alt={scenario.title}
+                      loading="lazy"
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                   </div>
