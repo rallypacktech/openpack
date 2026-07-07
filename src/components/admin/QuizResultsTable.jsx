@@ -43,6 +43,7 @@ export default function QuizResultsTable() {
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState("created_date");
   const [sortDir, setSortDir] = useState("desc");
+  const [botFilter, setBotFilter] = useState("human");
 
   useEffect(() => {
     loadResults();
@@ -59,12 +60,18 @@ export default function QuizResultsTable() {
     }
   };
 
-  // Aggregate stats
-  const avgScore = results.length
-    ? Math.round(results.reduce((sum, r) => sum + (r.score || 0), 0) / results.length)
+  const botCount = results.filter(r => r.is_bot).length;
+  const humanCount = results.length - botCount;
+  const filteredResults = botFilter === "all" ? results
+    : botFilter === "bot" ? results.filter(r => r.is_bot)
+    : results.filter(r => !r.is_bot);
+
+  // Aggregate stats (based on filtered set)
+  const avgScore = filteredResults.length
+    ? Math.round(filteredResults.reduce((sum, r) => sum + (r.score || 0), 0) / filteredResults.length)
     : 0;
 
-  const regionCounts = results.reduce((acc, r) => {
+  const regionCounts = filteredResults.reduce((acc, r) => {
     const key = r.region || "unknown";
     acc[key] = (acc[key] || 0) + 1;
     return acc;
@@ -72,14 +79,14 @@ export default function QuizResultsTable() {
 
   const topRegion = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])[0];
 
-  const levelCounts = results.reduce((acc, r) => {
+  const levelCounts = filteredResults.reduce((acc, r) => {
     if (r.score_level) acc[r.score_level] = (acc[r.score_level] || 0) + 1;
     return acc;
   }, {});
 
-  const registeredCount = results.filter(r => r.is_registered_user).length;
+  const registeredCount = filteredResults.filter(r => r.is_registered_user).length;
 
-  const sorted = [...results].sort((a, b) => {
+  const sorted = [...filteredResults].sort((a, b) => {
     let av = a[sortField], bv = b[sortField];
     if (typeof av === "string") av = av.toLowerCase();
     if (typeof bv === "string") bv = bv.toLowerCase();
@@ -111,8 +118,8 @@ export default function QuizResultsTable() {
               <ClipboardList className="w-4 h-4 text-primary" />
               <span className="text-xs text-muted-foreground font-sans uppercase tracking-widest">Total Quizzes</span>
             </div>
-            <div className="text-3xl font-serif font-bold text-foreground">{results.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">{registeredCount} registered users</p>
+            <div className="text-3xl font-serif font-bold text-foreground">{filteredResults.length}</div>
+            <p className="text-xs text-muted-foreground mt-1">{humanCount} human · {botCount} bot</p>
           </CardContent>
         </Card>
 
@@ -150,7 +157,7 @@ export default function QuizResultsTable() {
               {levelCounts["Not Ready"] || 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {results.length ? Math.round(((levelCounts["Not Ready"] || 0) / results.length) * 100) : 0}% of respondents
+              {filteredResults.length ? Math.round(((levelCounts["Not Ready"] || 0) / filteredResults.length) * 100) : 0}% of respondents
             </p>
           </CardContent>
         </Card>
@@ -175,13 +182,34 @@ export default function QuizResultsTable() {
       {/* Data Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-serif">All Quiz Submissions</CardTitle>
-          <p className="text-xs text-muted-foreground font-sans">{results.length} total responses</p>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <CardTitle className="text-base font-serif">Quiz Submissions</CardTitle>
+              <p className="text-xs text-muted-foreground font-sans">{filteredResults.length} showing · {results.length} total</p>
+            </div>
+            <div className="flex gap-1 bg-secondary/50 rounded-lg p-0.5">
+              {[
+                { key: "human", label: "Human" },
+                { key: "bot", label: "Bot" },
+                { key: "all", label: "All" },
+              ].map(opt => (
+                <button
+                  key={opt.key}
+                  onClick={() => setBotFilter(opt.key)}
+                  className={`px-3 py-1 text-xs font-sans font-semibold rounded-md transition-colors ${
+                    botFilter === opt.key ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
-          {results.length === 0 ? (
+          {filteredResults.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground font-sans text-sm">
-              No quiz results yet. Share the quiz link to start collecting data.
+              No {botFilter !== "all" ? `${botFilter} ` : ""}quiz results to display.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -190,6 +218,7 @@ export default function QuizResultsTable() {
                   <tr className="border-b border-border bg-secondary/50 text-left">
                     {[
                       ["created_date", "Date"],
+                      ["is_bot", "Type"],
                       ["score", "Score"],
                       ["score_level", "Level"],
                       ["region", "Region"],
@@ -214,6 +243,17 @@ export default function QuizResultsTable() {
                     <tr key={r.id} className={`border-b border-border hover:bg-secondary/30 transition-colors ${i % 2 === 0 ? "" : "bg-secondary/10"}`}>
                       <td className="px-4 py-2.5 text-muted-foreground whitespace-nowrap">
                         {r.created_date ? format(new Date(r.created_date), "MMM d, yyyy") : "—"}
+                      </td>
+                      <td className="px-4 py-2.5">
+                        {r.is_bot ? (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 whitespace-nowrap" title={r.bot_name || "Bot"}>
+                            🤖 {r.bot_name || "Bot"}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                            Human
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-2.5 font-semibold text-foreground">{r.score ?? "—"}%</td>
                       <td className="px-4 py-2.5">

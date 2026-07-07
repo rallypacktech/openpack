@@ -4,6 +4,7 @@ import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { ChevronRight, ChevronLeft, AlertTriangle, CheckCircle, ExternalLink } from "lucide-react";
 import LoginWall from "../components/LoginWall";
+import { detectBot, getStableBotId } from "@/lib/botDetection";
 import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
 
@@ -164,6 +165,10 @@ const REGION_RESOURCES = {
 };
 
 function getSessionId() {
+  const { isBot } = detectBot();
+  if (isBot) {
+    return getStableBotId();
+  }
   let sid = localStorage.getItem("rp_quiz_session");
   if (!sid) {
     sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -197,8 +202,9 @@ function QuizResults({ score, answers, onRetake }) {
       const savedKey = `rp_quiz_saved_${sessionId}`;
       if (sessionStorage.getItem(savedKey)) return;
 
+      const { isBot, botName } = detectBot();
       try {
-        await base44.entities.QuizResult.create({
+        const res = await base44.functions.invoke("saveQuizResult", {
           session_id: sessionId,
           user_email: userEmail,
           score,
@@ -212,8 +218,12 @@ function QuizResults({ score, answers, onRetake }) {
           plan_documented: answers.plan_documented,
           insurance: answers.insurance,
           is_registered_user: isRegistered,
+          is_bot: isBot,
+          bot_name: botName,
         });
-        sessionStorage.setItem(savedKey, "1");
+        if (res.data?.saved || res.data?.reason === "duplicate") {
+          sessionStorage.setItem(savedKey, "1");
+        }
       } catch (e) {
         console.error("Failed to save quiz result:", e);
       }
