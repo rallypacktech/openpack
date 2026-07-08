@@ -53,6 +53,15 @@ export default function BusinessReferralsPanel() {
     loadReferrals();
   };
 
+  const triggerMailto = (url) => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   const handleContactAllPending = async () => {
     if (pendingCount === 0) return;
     if (!window.confirm(`Send audience-specific referral emails to all ${pendingCount} pending businesses? Emails the platform can deliver are sent automatically and marked contacted; others open in your email client (BCC'd by audience) and stay pending until sent.`)) return;
@@ -62,14 +71,18 @@ export default function BusinessReferralsPanel() {
       const data = res.data || res;
       // Open a mailto link for each audience group that needs manual sending
       const manualGroups = (data.per_audience || []).filter(g => g.mailto_url);
-      manualGroups.forEach(g => window.open(g.mailto_url, '_blank'));
+      manualGroups.forEach((g, i) => {
+        setTimeout(() => triggerMailto(g.mailto_url), i * 500);
+      });
       const summary = [
         data.message || `Contacted ${data.total} pending referrals.`,
         manualGroups.length > 0 ? `\n\nManual send needed for ${manualGroups.length} audience group(s):` : '',
         ...manualGroups.map(g => `• ${g.audience} (${g.fallback_count})`)
       ].join('');
-      window.alert(summary);
-      loadReferrals();
+      setTimeout(() => {
+        window.alert(summary);
+        loadReferrals();
+      }, Math.max(200, manualGroups.length * 500 + 200));
     } catch (error) {
       console.error("Error contacting pending referrals:", error);
       window.alert("Failed to contact pending referrals: " + (error.message || "Unknown error"));
@@ -83,13 +96,18 @@ export default function BusinessReferralsPanel() {
       const res = await base44.functions.invoke('contactPendingReferrals', { referral_ids: [referralId] });
       const data = res.data || res;
       const manualGroups = (data.per_audience || []).filter(g => g.mailto_url);
-      manualGroups.forEach(g => window.open(g.mailto_url, '_blank'));
-      if (data.sent_automatically > 0) {
+      if (manualGroups.length > 0) {
+        triggerMailto(manualGroups[0].mailto_url);
+        setTimeout(() => {
+          window.alert('Your email client has been opened. Send the email to complete the referral. Status stays pending until sent.');
+          loadReferrals();
+        }, 200);
+      } else if (data.sent_automatically > 0) {
         window.alert('Email sent automatically. Referral marked as contacted.');
-      } else if (manualGroups.length > 0) {
-        window.alert('Your email client has been opened. Send the email to complete the referral. Status stays pending until sent.');
+        loadReferrals();
+      } else {
+        loadReferrals();
       }
-      loadReferrals();
     } catch (error) {
       console.error("Error resending referral:", error);
       window.alert("Failed to resend: " + (error.message || "Unknown error"));
