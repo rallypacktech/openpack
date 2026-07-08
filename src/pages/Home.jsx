@@ -105,9 +105,8 @@ export default function Home() {
       </section>
 
       {/* ── Sponsored partner spotlight ── */}
-      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-4">
-        <div className="max-w-3xl mx-auto px-6 flex flex-col items-center gap-2">
-          <p className="text-[10px] uppercase tracking-widest text-[#8A8577] font-sans">Sponsored</p>
+      <div className="bg-[#EDE8DF] border-y border-[#D8D2C6] py-6">
+        <div className="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <a href="https://mywhinny.com" target="_blank" rel="noopener noreferrer" aria-label="MyWhinny — visit mywhinny.com">
               <img
@@ -116,11 +115,21 @@ export default function Home() {
                 className="h-10 w-auto"
               />
             </a>
-            <span className="hidden sm:inline text-[#D8D2C6]" aria-hidden="true">·</span>
-            <p className="hidden sm:block font-serif text-sm text-[#1C1C1A]/70 italic">
-              Connecting hooves with helping hands.
-            </p>
+            <div className="text-center sm:text-left">
+              <p className="text-[10px] uppercase tracking-widest text-[#8A8577] font-sans mb-1">Sponsored</p>
+              <p className="font-serif text-sm text-[#1C1C1A]/70 italic">
+                Connecting hooves with helping hands.
+              </p>
+            </div>
           </div>
+          <a
+            href="https://mywhinny.com"
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="flex-shrink-0 inline-flex items-center gap-2 bg-[#1C1C1A] text-white font-sans font-semibold text-xs tracking-widest uppercase px-6 py-3 hover:bg-[#D64A2E] transition-colors"
+          >
+            Find reliable equine services near you <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       </div>
 
