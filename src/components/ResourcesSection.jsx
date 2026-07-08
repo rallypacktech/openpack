@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Phone, Globe, MapPin } from "lucide-react";
 
 const FEMA_REGIONS = [
-  { region: "I — New England", states: "CT, MA, ME, NH, RI, VT", url: "https://www.fema.gov/region-1-ct-ma-me-nh-ri-vt" },
-  { region: "II — NY/NJ/Caribbean", states: "NJ, NY, PR, USVI", url: "https://www.fema.gov/region-2-nj-ny-pr-vi" },
-  { region: "III — Mid-Atlantic", states: "DC, DE, MD, PA, VA, WV", url: "https://www.fema.gov/region-3-dc-de-md-pa-va-wv" },
-  { region: "IV — Southeast", states: "AL, FL, GA, KY, MS, NC, SC, TN", url: "https://www.fema.gov/region-4-al-fl-ga-ky-ms-nc-sc-tn" },
-  { region: "V — Great Lakes", states: "IL, IN, MI, MN, OH, WI", url: "https://www.fema.gov/region-5-il-in-mi-mn-oh-wi" },
-  { region: "VI — South Central", states: "AR, LA, NM, OK, TX", url: "https://www.fema.gov/region-6-ar-la-nm-ok-tx" },
-  { region: "VII — Midwest", states: "IA, KS, MO, NE", url: "https://www.fema.gov/region-7-ia-ks-mo-ne" },
-  { region: "VIII — Mountain", states: "CO, MT, ND, SD, UT, WY", url: "https://www.fema.gov/region-8-co-mt-nd-sd-ut-wy" },
-  { region: "IX — Pacific Southwest", states: "AZ, CA, HI, NV, Pacific Islands", url: "https://www.fema.gov/region-9-az-ca-hi-nv-pacific-islands" },
-  { region: "X — Pacific Northwest", states: "AK, ID, OR, WA", url: "https://www.fema.gov/region-10-ak-id-or-wa" },
+  { region: "I — New England", states: "CT, MA, ME, NH, RI, VT", url: "https://www.fema.gov/about/regions/region-1" },
+  { region: "II — NY/NJ/Caribbean", states: "NJ, NY, PR, USVI", url: "https://www.fema.gov/about/regions/region-2" },
+  { region: "III — Mid-Atlantic", states: "DC, DE, MD, PA, VA, WV", url: "https://www.fema.gov/about/regions/region-3" },
+  { region: "IV — Southeast", states: "AL, FL, GA, KY, MS, NC, SC, TN", url: "https://www.fema.gov/about/regions/region-4" },
+  { region: "V — Great Lakes", states: "IL, IN, MI, MN, OH, WI", url: "https://www.fema.gov/about/regions/region-5" },
+  { region: "VI — South Central", states: "AR, LA, NM, OK, TX", url: "https://www.fema.gov/about/regions/region-6" },
+  { region: "VII — Midwest", states: "IA, KS, MO, NE", url: "https://www.fema.gov/about/regions/region-7" },
+  { region: "VIII — Mountain", states: "CO, MT, ND, SD, UT, WY", url: "https://www.fema.gov/about/regions/region-8" },
+  { region: "IX — Pacific Southwest", states: "AZ, CA, HI, NV, Pacific Islands", url: "https://www.fema.gov/about/regions/region-9" },
+  { region: "X — Pacific Northwest", states: "AK, ID, OR, WA", url: "https://www.fema.gov/about/regions/region-10" },
 ];
 
 const FEDERAL_RESOURCES = [
