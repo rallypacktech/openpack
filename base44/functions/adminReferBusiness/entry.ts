@@ -195,7 +195,7 @@ Deno.serve(async (req) => {
         const safe_message = escapeHtml(message);
         const adminName = escapeHtml(user.full_name || 'The RallyPack Team');
 
-        // Store the referral with status "contacted" since the email is being sent now
+        // Store as pending; only mark contacted if the email actually sends
         const referral = await base44.asServiceRole.entities.BusinessReferral.create({
             referee_email,
             referee_name: referee_name || '',
@@ -204,7 +204,7 @@ Deno.serve(async (req) => {
             referrer_email: user.email || '',
             message: message || '',
             audience_type: audienceKey,
-            status: 'contacted'
+            status: 'pending'
         });
 
         const origin = req.headers.get('origin') || req.headers.get('x-forwarded-origin') ||
@@ -224,6 +224,8 @@ Deno.serve(async (req) => {
                 from_name: 'RallyPack'
             });
             emailSent = true;
+            // Only mark as contacted now that the email was actually sent
+            await base44.asServiceRole.entities.BusinessReferral.update(referral.id, { status: 'contacted' });
         } catch (emailError) {
             // Platform may block emails to non-app users; provide a mailto fallback
             const textGreeting = safe_referee_name ? `Hello ${safe_referee_name},` : 'Hello,';

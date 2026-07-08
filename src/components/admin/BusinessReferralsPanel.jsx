@@ -55,7 +55,7 @@ export default function BusinessReferralsPanel() {
 
   const handleContactAllPending = async () => {
     if (pendingCount === 0) return;
-    if (!window.confirm(`Send a one-time, audience-specific referral email to all ${pendingCount} pending businesses? Styled emails are attempted first; any the platform can't deliver will open in your email client (BCC'd by audience). All will be marked as contacted.`)) return;
+    if (!window.confirm(`Send audience-specific referral emails to all ${pendingCount} pending businesses? Emails the platform can deliver are sent automatically and marked contacted; others open in your email client (BCC'd by audience) and stay pending until sent.`)) return;
     setContacting(true);
     try {
       const res = await base44.functions.invoke('contactPendingReferrals', {});
@@ -75,6 +75,24 @@ export default function BusinessReferralsPanel() {
       window.alert("Failed to contact pending referrals: " + (error.message || "Unknown error"));
     } finally {
       setContacting(false);
+    }
+  };
+
+  const handleResend = async (referralId) => {
+    try {
+      const res = await base44.functions.invoke('contactPendingReferrals', { referral_ids: [referralId] });
+      const data = res.data || res;
+      const manualGroups = (data.per_audience || []).filter(g => g.mailto_url);
+      manualGroups.forEach(g => window.open(g.mailto_url, '_blank'));
+      if (data.sent_automatically > 0) {
+        window.alert('Email sent automatically. Referral marked as contacted.');
+      } else if (manualGroups.length > 0) {
+        window.alert('Your email client has been opened. Send the email to complete the referral. Status stays pending until sent.');
+      }
+      loadReferrals();
+    } catch (error) {
+      console.error("Error resending referral:", error);
+      window.alert("Failed to resend: " + (error.message || "Unknown error"));
     }
   };
 
@@ -203,6 +221,15 @@ export default function BusinessReferralsPanel() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleResend(ref.id)}
+                      className="text-xs"
+                      title="Resend referral email"
+                    >
+                      <Send className="w-3.5 h-3.5 mr-1" /> Resend
+                    </Button>
                     <Select
                       value={ref.status}
                       onValueChange={(val) => handleStatusChange(ref.id, val)}

@@ -181,33 +181,53 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
+        const body = await req.json().catch(() => ({}));
+        const { referral_ids } = body;
+
         const origin = req.headers.get('origin') || req.headers.get('x-forwarded-origin') ||
             `https://${req.headers.get('host') || 'rallypack.base44.com'}`;
 
-        // Fetch all pending referrals
-        const pending = await base44.asServiceRole.entities.BusinessReferral.filter({ status: 'pending' });
+        // Fetch referrals: specific IDs if provided (for resend), otherwise all pending
+        let referrals;
+        if (referral_ids && Array.isArray(referral_ids) && referral_ids.length > 0) {
+            referrals = [];
+            for (const id of referral_ids) {
+                try {
+                    const r = await base44.asServiceRole.entities.BusinessReferral.get(id);
+                    if (r) referrals.push(r);
+                } catch (e) { /* skip not found */ }
+            }
+        } else {
+            referrals = await base44.asServiceRole.entities.BusinessReferral.filter({ status: 'pending' });
+        }
 
-        if (pending.length === 0) {
+        if (referrals.length === 0) {
             return Response.json({
                 success: true,
                 total: 0,
                 per_audience: [],
-                message: 'No pending referrals to contact.'
+                message: 'No referrals to contact.'
             });
         }
 
-        // Group unique emails by audience_type
+        // Group unique emails by audience_type, and track referral IDs per group
         const groups = {};
-        for (const r of pending) {
-            const email = (r.referee_email || '').trim();
+        const emailToReferralIds = {};
+
+        for (const r of referrals) {
+            const email = (r.referee_email || '').trim().toLowerCase();
             if (!email) continue;
             const key = AUDIENCE_CONFIG[r.audience_type] ? r.audience_type : 'general';
             if (!groups[key]) groups[key] = new Set();
-            groups[key].add(email.toLowerCase());
+            groups[key].add(email);
+            const mapKey = `${key}:${email}`;
+            if (!emailToReferralIds[mapKey]) emailToReferralIds[mapKey] = [];
+            emailToReferralIds[mapKey].push(r.id);
         }
 
         let sendEmailAvailable = true; // flipped false once the platform blocks an external address
         const perAudience = [];
+        const contactedIds = []; // only IDs where SendEmail succeeded
         let totalSent = 0;
         let totalFallback = 0;
 
@@ -230,6 +250,9 @@ Deno.serve(async (req) => {
                             from_name: 'RallyPack'
                         });
                         sent.push(email);
+                        // Mark corresponding referrals as contacted
+                        const mapKey = `${audienceKey}:${email}`;
+                        contactedIds.push(...(emailToReferralIds[mapKey] || []));
                         continue;
                     } catch (emailError) {
                         const msg = (emailError.message || '').toLowerCase();
@@ -259,22 +282,26 @@ Deno.serve(async (req) => {
             });
         }
 
-        // Mark all pending referrals as contacted
-        const ids = pending.map(r => r.id);
-        await base44.asServiceRole.entities.BusinessReferral.bulkUpdate(
-            ids.map(id => ({ id, status: 'contacted' }))
-        );
+        // Only mark as contacted the referrals where SendEmail actually succeeded
+        if (contactedIds.length > 0) {
+            await base44.asServiceRole.entities.BusinessReferral.bulkUpdate(
+                contactedIds.map(id => ({ id, status: 'contacted' }))
+            );
+        }
 
         const groupsNeedingManual = perAudience.filter(g => g.mailto_url).length;
         const message = totalSent > 0 && groupsNeedingManual === 0
-            ? `${totalSent} referral email(s) sent automatically. All ${pending.length} marked as contacted.`
-            : `${totalSent} sent automatically. ${totalFallback} require your email client (${groupsNeedingManual} audience group(s)). All ${pending.length} marked as contacted.`;
+            ? `${totalSent} referral email(s) sent automatically. ${contactedIds.length} marked as contacted.`
+            : totalSent > 0
+                ? `${totalSent} sent automatically (${contactedIds.length} marked contacted). ${totalFallback} require your email client (${groupsNeedingManual} audience group(s)).`
+                : `${totalFallback} referral(s) require your email client (${groupsNeedingManual} audience group(s)). Open the mailto link to send — referrals stay pending until actually sent.`;
 
         return Response.json({
             success: true,
-            total: pending.length,
+            total: referrals.length,
             sent_automatically: totalSent,
             needs_manual: totalFallback,
+            contacted_count: contactedIds.length,
             per_audience: perAudience,
             message
         });
