@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Mail, Building2, Clock, RefreshCw, Loader2 } from "lucide-react";
+import { Plus, Mail, Building2, Clock, RefreshCw, Loader2, Send } from "lucide-react";
 import AdminReferralForm from "./AdminReferralForm";
 
 const AUDIENCE_LABELS = {
@@ -22,6 +22,7 @@ export default function BusinessReferralsPanel() {
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [contacting, setContacting] = useState(false);
 
   const loadReferrals = useCallback(async () => {
     try {
@@ -52,6 +53,26 @@ export default function BusinessReferralsPanel() {
     loadReferrals();
   };
 
+  const handleContactAllPending = async () => {
+    if (pendingCount === 0) return;
+    if (!window.confirm(`Send a referral email to all ${pendingCount} pending businesses? This opens your email client with all addresses BCC'd and marks them as contacted.`)) return;
+    setContacting(true);
+    try {
+      const res = await base44.functions.invoke('contactPendingReferrals', {});
+      const data = res.data || res;
+      if (data.mailto_url) {
+        window.open(data.mailto_url, '_blank');
+      }
+      window.alert(data.message || `Contacted ${data.total} pending referrals.`);
+      loadReferrals();
+    } catch (error) {
+      console.error("Error contacting pending referrals:", error);
+      window.alert("Failed to contact pending referrals: " + (error.message || "Unknown error"));
+    } finally {
+      setContacting(false);
+    }
+  };
+
   const getTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -80,6 +101,12 @@ export default function BusinessReferralsPanel() {
           <Button variant="outline" size="sm" onClick={loadReferrals} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </Button>
+          {pendingCount > 0 && (
+            <Button variant="outline" size="sm" onClick={handleContactAllPending} disabled={contacting}>
+              {contacting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+              {contacting ? 'Sending...' : `Contact All Pending (${pendingCount})`}
+            </Button>
+          )}
           <Button size="sm" onClick={() => setShowForm(!showForm)}>
             <Plus className="w-4 h-4 mr-2" /> Refer a Business
           </Button>
