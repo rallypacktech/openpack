@@ -26,6 +26,8 @@ Deno.serve(async (req) => {
         function isAllowedAffiliateUrl(urlStr) {
             try {
                 const url = new URL(urlStr);
+                // Reject URLs with embedded credentials (SSRF / open-redirect hardening)
+                if (url.username || url.password) return false;
                 const hostname = url.hostname.toLowerCase().replace(/^www\./, '');
                 return url.protocol === 'https:' && ALLOWED_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d));
             } catch {

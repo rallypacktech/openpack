@@ -1,5 +1,18 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// Constant-time string comparison to prevent timing side-channel attacks on secret checks.
+function timingSafeEqual(a, b) {
+  const enc = new TextEncoder();
+  const bufA = enc.encode(String(a));
+  const bufB = enc.encode(String(b));
+  if (bufA.length !== bufB.length) return false;
+  let diff = 0;
+  for (let i = 0; i < bufA.length; i++) {
+    diff |= bufA[i] ^ bufB[i];
+  }
+  return diff === 0;
+}
+
 /**
  * Scheduled function: checks NWS weather alerts and supply expiration for all users.
  * Creates in-app Notification records always.
@@ -9,10 +22,11 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Admin-only or automation-only (verified via shared secret from env — no hardcoded fallback)
+    // Admin-only or automation-only (verified via shared secret from env — no hardcoded fallback).
+    // Timing-safe comparison prevents auth-bypass via timing side-channels on the secret.
     const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET");
     const body = await req.json().catch(() => ({}));
-    const isAutomation = AUTOMATION_SECRET && body.automation_secret === AUTOMATION_SECRET;
+    const isAutomation = AUTOMATION_SECRET && timingSafeEqual(body.automation_secret, AUTOMATION_SECRET);
 
     if (!isAutomation) {
       const user = await base44.auth.me();

@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Cache not found' }, { status: 404 });
     }
 
-    if (cache.created_by !== user.email && user.role !== 'admin') {
+    if (cache.created_by_id !== user.id && user.role !== 'admin') {
       return Response.json({ error: 'Access denied' }, { status: 403 });
     }
 
@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ 
       items,
-      isOwner: cache.created_by === user.email
+      isOwner: cache.created_by_id === user.id
     });
 
   } catch (error) {
