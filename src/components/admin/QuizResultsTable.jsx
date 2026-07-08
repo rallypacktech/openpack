@@ -41,6 +41,7 @@ const ANSWER_LABELS = {
 export default function QuizResultsTable() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sortField, setSortField] = useState("created_date");
   const [sortDir, setSortDir] = useState("desc");
   const [botFilter, setBotFilter] = useState("human");
@@ -51,10 +52,12 @@ export default function QuizResultsTable() {
 
   const loadResults = async () => {
     try {
-      const data = await base44.asServiceRole.entities.QuizResult.list("-created_date", 500);
+      setError(null);
+      const data = await base44.entities.QuizResult.list("-created_date", 500);
       setResults(data);
     } catch (e) {
       console.error("Error loading quiz results:", e);
+      setError(e.message || "Failed to load quiz results");
     } finally {
       setLoading(false);
     }
@@ -107,6 +110,17 @@ export default function QuizResultsTable() {
   );
 
   if (loading) return <div className="text-center py-8 text-gray-400">Loading quiz results...</div>;
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="py-8 text-center">
+          <p className="text-red-600 font-semibold mb-2">Failed to load quiz results</p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
