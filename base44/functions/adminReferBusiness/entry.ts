@@ -130,7 +130,7 @@ function buildReferralEmailHtml(config, origin, refereeName, organizationName, a
                 </tr>
                 <tr>
                   <td>
-                    <a href="${businessUrl}" style="display:inline-block;background-color:#f5f0e8;color:#1c1c1a;font-size:14px;font-weight:500;text-decoration:none;padding:12px 28px;border-radius:4px;border:1px solid #d8d2c6;">Explore Business Partnerships</a>
+                    <a href="${businessUrl}" style="display:inline-block;background-color:#f5f0e8;color:#1c1c1a;font-size:14px;font-weight:500;text-decoration:none;padding:12px 28px;border-radius:4px;border:1px solid #d8d2c6;">Explore Business Accounts</a>
                   </td>
                 </tr>
               </table>
@@ -141,8 +141,7 @@ function buildReferralEmailHtml(config, origin, refereeName, organizationName, a
 
               <p style="margin:0;font-size:14px;color:#1c1c1a;">
                 Stay safe,<br>
-                <strong>${adminName}</strong><br>
-                RallyPack Team
+                <strong>RallyPack Team</strong>
               </p>
 
             </td>
@@ -228,7 +227,7 @@ Deno.serve(async (req) => {
         } catch (emailError) {
             // Platform may block emails to non-app users; provide a mailto fallback
             const textGreeting = safe_referee_name ? `Hello ${safe_referee_name},` : 'Hello,';
-            const textBody = `${textGreeting}\n\n${adminName} from RallyPack thought ${safe_organization || 'your business'} would benefit from our free ${config.label.toLowerCase()} resources.\n\n${config.intro}\n\n${safe_message ? `"${safe_message}"\n— ${adminName}, RallyPack\n\n` : ''}Learn More: ${origin}${config.learnPath}\nTake the Free Readiness Quiz: ${origin}/ReadinessQuiz\nExplore Business Partnerships: ${origin}/BusinessOnboarding\n\nStay safe,\n${adminName}\nRallyPack Team`;
+            const textBody = `${textGreeting}\n\n${adminName} from RallyPack thought ${safe_organization || 'your business'} would benefit from our free ${config.label.toLowerCase()} resources.\n\n${config.intro}\n\n${safe_message ? `"${safe_message}"\n— ${adminName}, RallyPack\n\n` : ''}Learn More: ${origin}${config.learnPath}\nTake the Free Readiness Quiz: ${origin}/ReadinessQuiz\nExplore Business Accounts: ${origin}/BusinessOnboarding\n\nStay safe,\nRallyPack Team`;
             mailtoUrl = `mailto:${encodeURIComponent(referee_email)}?subject=${encodeURIComponent(config.subject)}&body=${encodeURIComponent(textBody)}`;
         }
 
