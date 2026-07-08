@@ -55,15 +55,20 @@ export default function BusinessReferralsPanel() {
 
   const handleContactAllPending = async () => {
     if (pendingCount === 0) return;
-    if (!window.confirm(`Send a referral email to all ${pendingCount} pending businesses? This opens your email client with all addresses BCC'd and marks them as contacted.`)) return;
+    if (!window.confirm(`Send a one-time, audience-specific referral email to all ${pendingCount} pending businesses? Styled emails are attempted first; any the platform can't deliver will open in your email client (BCC'd by audience). All will be marked as contacted.`)) return;
     setContacting(true);
     try {
       const res = await base44.functions.invoke('contactPendingReferrals', {});
       const data = res.data || res;
-      if (data.mailto_url) {
-        window.open(data.mailto_url, '_blank');
-      }
-      window.alert(data.message || `Contacted ${data.total} pending referrals.`);
+      // Open a mailto link for each audience group that needs manual sending
+      const manualGroups = (data.per_audience || []).filter(g => g.mailto_url);
+      manualGroups.forEach(g => window.open(g.mailto_url, '_blank'));
+      const summary = [
+        data.message || `Contacted ${data.total} pending referrals.`,
+        manualGroups.length > 0 ? `\n\nManual send needed for ${manualGroups.length} audience group(s):` : '',
+        ...manualGroups.map(g => `• ${g.audience} (${g.fallback_count})`)
+      ].join('');
+      window.alert(summary);
       loadReferrals();
     } catch (error) {
       console.error("Error contacting pending referrals:", error);
