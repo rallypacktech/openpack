@@ -3,10 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2 } from "lucide-react";
+import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck } from "lucide-react";
 import QuizResultsTable from "../components/admin/QuizResultsTable";
 import IncidentMap from "../components/admin/IncidentMap";
 import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
+import AlertDelegationsPanel from "../components/admin/AlertDelegationsPanel";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -98,6 +99,9 @@ export default function AdminMonitor() {
             <TabsTrigger value="quiz" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" /> Quiz Results
             </TabsTrigger>
+            <TabsTrigger value="delegations" className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4" /> Alert Delegations
+            </TabsTrigger>
             <TabsTrigger value="referrals" className="flex items-center gap-2">
               <Building2 className="w-4 h-4" /> Referrals
             </TabsTrigger>
@@ -113,6 +117,10 @@ export default function AdminMonitor() {
 
           <TabsContent value="referrals">
             <BusinessReferralsPanel />
+          </TabsContent>
+
+          <TabsContent value="delegations">
+            <AlertDelegationsPanel />
           </TabsContent>
 
           <TabsContent value="users">

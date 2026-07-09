@@ -9,6 +9,7 @@ import OrgMembersPanel from "@/components/business/OrgMembersPanel";
 import EvacuationPlanPanel from "@/components/business/EvacuationPlanPanel";
 import BusinessKitsPanel from "@/components/business/BusinessKitsPanel";
 import BusinessSubscriptionPanel from "@/components/business/BusinessSubscriptionPanel";
+import DelegatedAlertSender from "@/components/business/DelegatedAlertSender";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -17,6 +18,7 @@ export default function BusinessDashboard() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [hasDelegation, setHasDelegation] = useState(false);
 
   useEffect(() => {
     loadAll();
@@ -39,6 +41,15 @@ export default function BusinessDashboard() {
     setMembers(membersData);
     setKits(caches);
     setPlans(plansData);
+
+    // Check if this user is authorized to send delegated alerts
+    try {
+      const delegations = await base44.entities.AlertDelegation.filter({});
+      setHasDelegation(delegations.length > 0);
+    } catch (e) {
+      setHasDelegation(false);
+    }
+
     setLoading(false);
   };
 
@@ -154,6 +165,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="kits">First Aid Kits</TabsTrigger>
           <TabsTrigger value="evacuation">Evacuation Plans</TabsTrigger>
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
+          {hasDelegation && <TabsTrigger value="alerts">Emergency Alerts</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="members">
@@ -165,6 +177,11 @@ export default function BusinessDashboard() {
         <TabsContent value="evacuation">
           <EvacuationPlanPanel subscription={subscription} plans={plans} onRefresh={loadAll} />
         </TabsContent>
+        {hasDelegation && (
+          <TabsContent value="alerts">
+            <DelegatedAlertSender />
+          </TabsContent>
+        )}
         <TabsContent value="subscription">
           <BusinessSubscriptionPanel subscription={subscription} onRefresh={loadAll} />
         </TabsContent>

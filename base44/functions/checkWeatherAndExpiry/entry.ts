@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
 
     let notificationsCreated = 0;
     let emailsSent = 0;
+    let telegramPushed = 0;
 
     for (const profile of profiles) {
       const userEmail = profile.created_by;
@@ -180,6 +181,22 @@ Deno.serve(async (req) => {
             });
             emailsSent++;
           }
+
+          // Push critical weather alert via Telegram if connected
+          if (profile.telegram_chat_id) {
+            try {
+              await base44.asServiceRole.functions.invoke('sendTelegramAlert', {
+                message: `${headline}${desc ? '\n\n' + desc : ''}`,
+                event_type: props.event,
+                original_event_time: props.sent ? new Date(props.sent).toISOString() : new Date().toISOString(),
+                user_email: userEmail,
+                secret: AUTOMATION_SECRET
+              });
+              telegramPushed++;
+            } catch (tgErr) {
+              console.error(`Telegram delivery failed for ${userEmail}:`, tgErr.message);
+            }
+          }
         }
       } catch (weatherErr) {
         console.error(`Weather check failed for ${userEmail}:`, weatherErr.message);
@@ -190,6 +207,7 @@ Deno.serve(async (req) => {
       success: true,
       notificationsCreated,
       emailsSent,
+      telegramPushed,
       usersChecked: profiles.length,
     });
   } catch (error) {

@@ -1,0 +1,61 @@
+{
+  "name": "AlertDelegation",
+  "type": "object",
+  "properties": {
+    "organization_name": {
+      "type": "string",
+      "description": "Name of the organization authorized to send alerts (e.g. American Red Cross)"
+    },
+    "authorized_email": {
+      "type": "string",
+      "description": "Email of the RallyPack user authorized to trigger alerts on behalf of this organization"
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to the BusinessSubscription whose members will receive these alerts"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this delegation is currently active"
+    },
+    "granted_by": {
+      "type": "string",
+      "description": "Email of the admin who granted this delegation"
+    }
+  },
+  "required": [
+    "organization_name",
+    "authorized_email",
+    "subscription_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.authorized_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
