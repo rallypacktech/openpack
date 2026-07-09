@@ -23,7 +23,7 @@ export default function Infant() {
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560800452-f2d475982b96?w=1800&q=85')" }}
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1570657891791-e39a9d185540?w=1800&q=85')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
