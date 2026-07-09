@@ -10,14 +10,27 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const {
-      session_id, user_email, score, score_level, region,
+      session_id, score, score_level, region,
       county_plan, experienced_disaster, felt_prepared,
       meeting_spot, supplies, plan_documented, insurance,
-      is_registered_user, is_bot, bot_name
+      is_bot, bot_name
     } = body;
 
     if (score === undefined || score === null) {
       return Response.json({ error: 'Score is required' }, { status: 400 });
+    }
+
+    // Verify identity before associating an email — never trust client-supplied emails.
+    let verifiedEmail = null;
+    let is_registered_user = false;
+    try {
+      const user = await base44.auth.me();
+      if (user?.email) {
+        verifiedEmail = user.email;
+        is_registered_user = true;
+      }
+    } catch (_) {
+      // Anonymous quiz taker (human or bot) — no email associated.
     }
 
     // Dedup: if a result already exists for this session_id, skip creation.
@@ -32,7 +45,7 @@ Deno.serve(async (req) => {
 
     const record = await base44.asServiceRole.entities.QuizResult.create({
       session_id: session_id || null,
-      user_email: user_email || null,
+      user_email: verifiedEmail,
       score,
       score_level: score_level || null,
       region: region || null,
@@ -43,7 +56,7 @@ Deno.serve(async (req) => {
       supplies: supplies || null,
       plan_documented: plan_documented || null,
       insurance: insurance || null,
-      is_registered_user: is_registered_user || false,
+      is_registered_user,
       is_bot: is_bot || false,
       bot_name: bot_name || null,
     });

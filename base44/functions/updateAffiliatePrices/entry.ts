@@ -5,8 +5,14 @@ Deno.serve(async (req) => {
         const base44 = createClientFromRequest(req);
 
         const body = await req.json().catch(() => ({}));
-        const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET") || "rp-auto-a7f3b2e9-1d4a-4b8c-9e2f-6a5b3c8d7e1f";
-        const isAutomation = body.automation_secret === AUTOMATION_SECRET;
+        const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET");
+        if (!AUTOMATION_SECRET) {
+            return Response.json({ error: 'Automation secret not configured' }, { status: 500 });
+        }
+        const provided = String(body.automation_secret || '');
+        const expected = String(AUTOMATION_SECRET);
+        const isAutomation = provided.length === expected.length &&
+            [...provided].every((c, i) => c === expected[i]);
 
         if (!isAutomation) {
             const user = await base44.auth.me();

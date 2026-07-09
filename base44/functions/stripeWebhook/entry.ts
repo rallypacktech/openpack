@@ -10,13 +10,13 @@ Deno.serve(async (req) => {
         const body = await req.text();
         const sig = req.headers.get('stripe-signature');
 
-        let event;
-        if (webhookSecret && sig) {
-            event = await stripe.webhooks.constructEventAsync(body, sig, webhookSecret);
-        } else {
-            // Allow unsigned events in dev (no webhook secret set)
-            event = JSON.parse(body);
+        if (!webhookSecret) {
+            return Response.json({ error: 'Webhook secret not configured' }, { status: 500 });
         }
+        if (!sig) {
+            return Response.json({ error: 'Missing stripe-signature header' }, { status: 400 });
+        }
+        const event = await stripe.webhooks.constructEventAsync(body, sig, webhookSecret);
 
         const { type, data } = event;
 
