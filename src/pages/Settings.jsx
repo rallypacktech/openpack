@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Shield, Lock, AlertTriangle } from "lucide-react";
 import CountryEmergencySettings from "../components/settings/CountryEmergencySettings";
+import AddToHomeScreen from "../components/settings/AddToHomeScreen";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -222,6 +223,9 @@ export default function Settings() {
           onSave={handleProfileSave}
           isPaidAccount={false}
         />
+
+        {/* Add to Home Screen Instructions */}
+        <AddToHomeScreen />
 
         {/* Security Settings */}
         <Card>
