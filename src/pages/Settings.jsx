@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Shield, Lock, AlertTriangle } from "lucide-react";
 import CountryEmergencySettings from "../components/settings/CountryEmergencySettings";
 import AddToHomeScreen from "../components/settings/AddToHomeScreen";
+import TelegramConnect from "../components/settings/TelegramConnect";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -226,6 +227,9 @@ export default function Settings() {
 
         {/* Add to Home Screen Instructions */}
         <AddToHomeScreen />
+
+        {/* Telegram Emergency Alerts */}
+        <TelegramConnect profile={profile} onProfileUpdate={setProfile} />
 
         {/* Security Settings */}
         <Card>

@@ -145,6 +145,18 @@
       "type": "string",
       "format": "date-time",
       "description": "Date and time the user agreed to the terms"
+    },
+    "telegram_chat_id": {
+      "type": "string",
+      "description": "Telegram chat ID used to deliver emergency alerts to this user"
+    },
+    "telegram_username": {
+      "type": "string",
+      "description": "Telegram username of the connected account"
+    },
+    "telegram_connect_token": {
+      "type": "string",
+      "description": "One-time token used to link a Telegram chat to this profile via the /start deep link"
     }
   },
   "required": [],
