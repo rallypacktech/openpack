@@ -20,6 +20,48 @@
     "read": {
       "type": "boolean",
       "default": false
+    },
+    "original_event_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the underlying event actually occurred (may differ from delivery time, especially during outages)"
+    },
+    "delivery_attempts": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of delivery attempts made for this alert"
+    },
+    "delivery_channel": {
+      "type": "string",
+      "enum": [
+        "telegram",
+        "email",
+        "in_app"
+      ],
+      "description": "Channel used to deliver this notification"
+    },
+    "telegram_message_id": {
+      "type": "string",
+      "description": "Telegram message ID returned on successful delivery, for tracking"
+    },
+    "delivery_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "delivered",
+        "failed",
+        "stale"
+      ],
+      "default": "pending",
+      "description": "Current delivery status of this notification"
+    },
+    "alert_id": {
+      "type": "string",
+      "description": "Correlation ID grouping all delivery attempts of the same logical alert (used for retries)"
+    },
+    "recipient_email": {
+      "type": "string",
+      "description": "Email of the user this notification is addressed to"
     }
   },
   "required": [
@@ -35,6 +77,9 @@
       "$or": [
         {
           "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.recipient_email": "{{user.email}}"
         },
         {
           "user_condition": {
