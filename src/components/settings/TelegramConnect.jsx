@@ -98,7 +98,7 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
           </div>
         ) : (
           <div className="space-y-3">
-            <Button onClick={handleConnect} disabled={loading} className="w-full bg-crimson hover:bg-crimson/90">
+            <Button onClick={handleConnect} disabled={loading} className="w-full bg-primary hover:bg-primary/90">
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />

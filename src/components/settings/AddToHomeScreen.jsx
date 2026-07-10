@@ -1,6 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Smartphone, Apple, Share, MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Smartphone, Apple, Share, MoreVertical, ExternalLink } from "lucide-react";
 
 export default function AddToHomeScreen() {
   return (
@@ -18,6 +20,21 @@ export default function AddToHomeScreen() {
           No app store download required.
         </p>
 
+        {/* Navigate to Offline page first */}
+        <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-3 flex-wrap">
+          <div className="text-sm text-gray-700">
+            <p className="font-semibold mb-0.5">Step 0: Open the Offline page first</p>
+            <p className="text-xs text-gray-500 font-mono break-all">https://www.rallypack.org/offline</p>
+            <p className="text-xs text-gray-500 mt-1">The home screen bookmark saves whatever URL is in your address bar — so make sure it shows <strong>/offline</strong> before you add it.</p>
+          </div>
+          <Button asChild variant="default" size="sm" className="shrink-0 gap-2">
+            <Link to="/offline">
+              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+              Open Offline Page
+            </Link>
+          </Button>
+        </div>
+
         {/* iOS Instructions */}
         <div className="bg-gray-50 rounded-lg p-5 space-y-3">
           <h3 className="font-semibold flex items-center gap-2 text-gray-900">
@@ -27,7 +44,7 @@ export default function AddToHomeScreen() {
           <ol className="space-y-2.5 text-sm text-gray-700">
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">1</span>
-              <span>Open the <strong>Offline</strong> page in Safari (tap the button below to navigate there first).</span>
+              <span>Make sure the address bar shows <strong className="font-mono">rallypack.org/offline</strong> (use the "Open Offline Page" button above if not).</span>
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">2</span>
@@ -39,7 +56,7 @@ export default function AddToHomeScreen() {
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">4</span>
-              <span>Tap <strong>"Add"</strong> — the RallyPack icon will appear on your home screen for instant offline access.</span>
+              <span>Confirm the URL field shows <strong className="font-mono">rallypack.org/offline</strong> (you can't edit it), then tap <strong>"Add"</strong>.</span>
             </li>
           </ol>
         </div>
@@ -53,7 +70,7 @@ export default function AddToHomeScreen() {
           <ol className="space-y-2.5 text-sm text-gray-700">
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">1</span>
-              <span>Open the <strong>Offline</strong> page in Chrome (tap the button below to navigate there first).</span>
+              <span>Make sure the address bar shows <strong className="font-mono">rallypack.org/offline</strong> (use the "Open Offline Page" button above if not).</span>
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">2</span>
