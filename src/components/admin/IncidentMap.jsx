@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
 import { NIFC_OUTLOOK_META, getActiveFireRegions } from "@/lib/nifcOutlook";
+import { HURRICANE_OUTLOOK, FLOOD_OUTLOOK, TORNADO_OUTLOOK, getActiveHurricaneZones, getActiveFloodRegions, getActiveTornadoRegions } from "@/lib/hazardOutlooks";
+import OutlookOverlay from "@/components/admin/OutlookOverlay";
 
 // Known active federal disaster incidents (FEMA declarations + major ongoing events)
 // These are supplemented by live NWS alerts fetched below
@@ -90,9 +92,15 @@ export default function IncidentMap() {
   const [loading, setLoading] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(null);
   const [showOutlook, setShowOutlook] = useState(true);
+  const [showFloodOutlook, setShowFloodOutlook] = useState(false);
+  const [showHurricaneOutlook, setShowHurricaneOutlook] = useState(false);
+  const [showTornadoOutlook, setShowTornadoOutlook] = useState(false);
 
   const currentMonth = new Date().getMonth() + 1;
   const activeFireRegions = getActiveFireRegions(currentMonth);
+  const activeFloodRegions = getActiveFloodRegions(currentMonth);
+  const activeHurricaneZones = getActiveHurricaneZones(currentMonth);
+  const activeTornadoRegions = getActiveTornadoRegions(currentMonth);
 
   useEffect(() => {
     fetchLiveAlerts();
@@ -145,7 +153,7 @@ export default function IncidentMap() {
           <h2 className="text-lg font-semibold text-gray-900">Active Federal Incidents</h2>
           <p className="text-sm text-gray-500">FEMA declarations & NWS emergency alerts requiring federal response</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button
             variant={showOutlook ? "default" : "outline"}
             size="sm"
@@ -154,7 +162,37 @@ export default function IncidentMap() {
             title="Toggle NIFC significant fire potential outlook overlay"
           >
             <Flame className="w-3.5 h-3.5" />
-            Fire Outlook
+            Fire
+          </Button>
+          <Button
+            variant={showFloodOutlook ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowFloodOutlook(!showFloodOutlook)}
+            className="gap-2"
+            title="Toggle NWS monthly flood outlook overlay"
+          >
+            <CloudRain className="w-3.5 h-3.5" />
+            Flood
+          </Button>
+          <Button
+            variant={showHurricaneOutlook ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowHurricaneOutlook(!showHurricaneOutlook)}
+            className="gap-2"
+            title="Toggle NOAA hurricane season outlook overlay"
+          >
+            <Wind className="w-3.5 h-3.5" />
+            Hurricane
+          </Button>
+          <Button
+            variant={showTornadoOutlook ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowTornadoOutlook(!showTornadoOutlook)}
+            className="gap-2"
+            title="Toggle NOAA/SPC peak tornado season overlay"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            Tornado
           </Button>
           <Button variant="outline" size="sm" onClick={fetchLiveAlerts} disabled={loading} className="gap-2">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -182,6 +220,51 @@ export default function IncidentMap() {
         </div>
       )}
 
+      {/* Flood outlook banner */}
+      {showFloodOutlook && (
+        <div className="flex items-center gap-3 rounded-lg border border-blue-300 bg-blue-50 px-4 py-3">
+          <CloudRain className="w-5 h-5 text-blue-600 shrink-0" />
+          <div className="text-sm">
+            <p className="font-semibold text-blue-900">
+              NWS Monthly Flood Outlook ({FLOOD_OUTLOOK.period}) — {activeFloodRegions.length} elevated risk region(s)
+            </p>
+            <p className="text-xs text-blue-700">
+              {FLOOD_OUTLOOK.summary} · Source: {FLOOD_OUTLOOK.source}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Hurricane outlook banner */}
+      {showHurricaneOutlook && (
+        <div className="flex items-center gap-3 rounded-lg border border-purple-300 bg-purple-50 px-4 py-3">
+          <Wind className="w-5 h-5 text-purple-600 shrink-0" />
+          <div className="text-sm">
+            <p className="font-semibold text-purple-900">
+              2026 Atlantic Hurricane Season: {HURRICANE_OUTLOOK.forecast} Forecast — {HURRICANE_OUTLOOK.namedStorms} named storms, {HURRICANE_OUTLOOK.hurricanes} hurricanes
+            </p>
+            <p className="text-xs text-purple-700">
+              Season: {HURRICANE_OUTLOOK.season} (peak {HURRICANE_OUTLOOK.peakPeriod}) · {activeHurricaneZones.length} coastal risk zone(s) shown · {HURRICANE_OUTLOOK.elNinoNote} · Source: {HURRICANE_OUTLOOK.source}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Tornado outlook banner */}
+      {showTornadoOutlook && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
+          <Zap className="w-5 h-5 text-amber-600 shrink-0" />
+          <div className="text-sm">
+            <p className="font-semibold text-amber-900">
+              Peak Tornado Season (NOAA Climatology) — {activeTornadoRegions.length} region(s) in peak season this month
+            </p>
+            <p className="text-xs text-amber-700">
+              {TORNADO_OUTLOOK.summary} · Live outlooks: {TORNADO_OUTLOOK.liveOutlookUrl} · Source: {TORNADO_OUTLOOK.source}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Map */}
       <div className="rounded-lg overflow-hidden border border-gray-200" style={{ height: 420 }}>
         <MapContainer
@@ -194,37 +277,50 @@ export default function IncidentMap() {
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
           />
-          {showOutlook && activeFireRegions.map(region => (
-            <React.Fragment key={`outlook-${region.id}`}>
-              <Circle
-                center={[region.latitude, region.longitude]}
-                radius={region.radius_km * 1000}
-                pathOptions={{ color: "#f97316", fillColor: "#f97316", fillOpacity: 0.12, weight: 1.5, dashArray: "6 4" }}
-              />
-              <Marker
-                position={[region.latitude, region.longitude]}
-                icon={L.divIcon({
-                  className: "",
-                  html: `<div style="width:28px;height:28px;border-radius:50%;background:#f97316;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:13px;">🔥</div>`,
-                  iconSize: [28, 28],
-                  iconAnchor: [14, 14],
-                })}
-              >
-                <Popup maxWidth={280}>
-                  <div className="text-sm space-y-1">
-                    <p className="font-bold text-gray-900">{region.label}</p>
-                    <span className="inline-block text-xs px-2 py-0.5 rounded border font-medium bg-orange-100 text-orange-800 border-orange-300">
-                      ABOVE-NORMAL FIRE POTENTIAL
-                    </span>
-                    <p className="text-xs text-gray-700 mt-1">
-                      NIFC forecast: above-normal significant wildland fire potential for this region this month.
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">Source: NIFC Predictive Services</p>
-                  </div>
-                </Popup>
-              </Marker>
-            </React.Fragment>
-          ))}
+          {showOutlook && (
+            <OutlookOverlay
+              regions={activeFireRegions}
+              color="#f97316"
+              icon="🔥"
+              badgeText="ABOVE-NORMAL FIRE POTENTIAL"
+              badgeClass="bg-orange-100 text-orange-800 border-orange-300"
+              descriptionFallback="NIFC forecast: above-normal significant wildland fire potential for this region this month."
+              sourceLabel="Source: NIFC Predictive Services"
+            />
+          )}
+          {showFloodOutlook && (
+            <OutlookOverlay
+              regions={activeFloodRegions}
+              color="#3b82f6"
+              icon="🌊"
+              badgeText="ELEVATED FLOOD RISK"
+              badgeClass="bg-blue-100 text-blue-800 border-blue-300"
+              descriptionFallback="NWS flood outlook: elevated flood risk for this region this month."
+              sourceLabel="Source: NWS National Water Center"
+            />
+          )}
+          {showHurricaneOutlook && (
+            <OutlookOverlay
+              regions={activeHurricaneZones}
+              color="#8b5cf6"
+              icon="🌀"
+              badgeText="HURRICANE SEASON RISK ZONE"
+              badgeClass="bg-purple-100 text-purple-800 border-purple-300"
+              descriptionFallback="This coastal region is at risk during the 2026 Atlantic hurricane season (June 1 – November 30)."
+              sourceLabel="Source: NOAA Climate Prediction Center"
+            />
+          )}
+          {showTornadoOutlook && (
+            <OutlookOverlay
+              regions={activeTornadoRegions}
+              color="#f59e0b"
+              icon="🌪"
+              badgeText="PEAK TORNADO SEASON"
+              badgeClass="bg-amber-100 text-amber-800 border-amber-300"
+              descriptionFallback="NOAA climatology: this region is in peak tornado season this month. Check SPC Convective Outlook for real-time risk."
+              sourceLabel="Source: NOAA / SPC Storm Prediction Center"
+            />
+          )}
           {allIncidents.map(incident => {
             const cfg = TYPE_CONFIG[incident.type] || TYPE_CONFIG.other;
             const radiusMeters = (incident.radius_km || 30) * 1000;
