@@ -303,6 +303,120 @@ export const MANUALS = [
     footer: "Source: FEMA / Ready.gov. Follow official guidance from local emergency management.",
   },
   {
+    id: "wildfire_smoke",
+    title: "Wildfire Smoke & Air Quality Safety",
+    category: "tools",
+    icon: "💨",
+    source: "EPA / CDC / NIFC",
+    summary: "Wildfire smoke carries fine particles (PM2.5) deep into the lungs. Protect your household when the Air Quality Index (AQI) reaches unhealthy levels.",
+    sections: [
+      {
+        heading: "Check Air Quality Daily",
+        steps: [
+          "Check AirNow.gov or the AirNow app for your local AQI — especially during wildfire season (June–October in the West).",
+          "AQI 0–50: Good. 51–100: Moderate. 101–150: Unhealthy for sensitive groups. 151–200: Unhealthy. 201–300: Very Unhealthy. 301+: Hazardous.",
+          "Sensitive groups: children under 18, adults 65+, pregnant people, and anyone with asthma, heart disease, COPD, or diabetes.",
+        ],
+      },
+      {
+        heading: "Create a Clean-Air Room",
+        steps: [
+          "Choose one room in your home with the fewest windows and doors — a bedroom is ideal.",
+          "Run a portable HEPA air purifier sized for the room (look for a Clean Air Delivery Rate / CADR of 300+ for smoke).",
+          "Keep windows and doors closed. Seal gaps with weather stripping or duct tape.",
+          "Run the purifier continuously on the highest setting when smoke is present.",
+          "Avoid activities that create indoor pollution: no smoking, no frying, no burning candles or incense.",
+        ],
+      },
+      {
+        heading: "When to Wear a Mask Outdoors",
+        steps: [
+          "Wear a NIOSH-approved N95 or P100 respirator when AQI is 151+ and you must go outside.",
+          "Cloth masks, surgical masks, and bandanas do NOT filter fine wildfire smoke particles (PM2.5).",
+          "Ensure the N95 fits tightly — no gaps around the edges. Facial hair prevents a proper seal.",
+          "Children should stay indoors instead of wearing adult masks, which do not fit properly.",
+        ],
+      },
+      {
+        heading: "When to Evacuate Due to Smoke",
+        steps: [
+          "Evacuate if AQI reaches Hazardous (301+) and you cannot maintain clean indoor air.",
+          "Evacuate immediately if you have trouble breathing, chest pain, or dizziness — seek medical attention.",
+          "Consider relocating to a public clean-air shelter (often set up at community centers, libraries, or malls during severe smoke events).",
+          "Follow local evacuation orders — smoke can be deadly even without direct fire threat.",
+        ],
+      },
+      {
+        heading: "Protect Pets and Livestock",
+        steps: [
+          "Bring pets indoors when AQI is 151+. Keep bathroom trips short.",
+          "Reduce livestock exertion — avoid working animals in heavy smoke.",
+          "Provide plenty of clean water — smoke irritation increases thirst.",
+          "Watch for coughing, eye discharge, or labored breathing in animals — contact a veterinarian if symptoms persist.",
+        ],
+      },
+    ],
+    footer: "Sources: EPA (airnow.gov/wildfire-guide-factsheets), CDC (cdc.gov/air/wildfire-smoke), NIFC predictive outlook (nifc.gov). Check AirNow.gov for real-time AQI during wildfire events.",
+  },
+  {
+    id: "wildfire_ready_set_go",
+    title: "Wildfire Evacuation — Ready, Set, Go!",
+    category: "tools",
+    icon: "🔥",
+    source: "NIFC / IAFC Ready, Set, Go! / Ready.gov",
+    summary: "Wildfire moves fast. The Ready, Set, Go! program gives you a 3-step action plan to prepare before fire threatens, act when it does, and leave early.",
+    sections: [
+      {
+        heading: "READY — Prepare Before Wildfire Season",
+        steps: [
+          "Create defensible space: clear dead leaves, dry brush, and flammable debris within 30 meters (100 feet) of your home.",
+          "Move firewood, propane tanks, and combustibles at least 10 meters (30 feet) away from structures.",
+          "Clean roofs and gutters of leaves and pine needles.",
+          "Use fire-resistant building materials for roofing, siding, and decking where possible.",
+          "Assemble a go-bag and keep it accessible. Include N95 masks for smoke.",
+          "Sign up for local emergency alerts. Know your evacuation routes — identify at least two ways out.",
+          "Check the NIFC monthly/seasonal outlook to know if your area is in an above-normal fire potential zone.",
+        ],
+      },
+      {
+        heading: "SET — Be Alert When Fire Threatens",
+        steps: [
+          "Monitor local fire reports, NWS Red Flag Warnings, and emergency alerts.",
+          "Load your go-bag into your vehicle. Park facing the direction of escape.",
+          "Move furniture to the center of rooms, away from windows and walls.",
+          "Close all windows and doors (but leave them unlocked for firefighter access).",
+          "Shut off gas at the meter and turn off propane tanks.",
+          "Connect garden hoses and fill buckets — but do not stay to fight the fire yourself.",
+          "Bring pets inside and load carriers. Prepare livestock trailers for quick loading.",
+          "Place a ladder against the house (for firefighters) and leave outdoor lights on.",
+        ],
+      },
+      {
+        heading: "GO! — Evacuate Immediately",
+        steps: [
+          "Leave as soon as you are told to evacuate — do not wait. Wildfire can overrun a neighborhood in minutes.",
+          "Follow designated evacuation routes. Do not take shortcuts — you may be trapped.",
+          "Drive slowly with headlights on. Watch for fleeing wildlife and pedestrians.",
+          "If caught in smoke while driving: slow down, close windows, turn off outside air, and turn on headlights. Pull over if visibility is near zero.",
+          "If trapped and you cannot evacuate: call 911, stay in your car (it provides some thermal protection), lie on the floor, and cover up.",
+          "Do not return home until authorities give the all-clear.",
+        ],
+      },
+      {
+        heading: "After the Fire — Returning Home",
+        steps: [
+          "Wait for official clearance before returning.",
+          "Watch for hot spots, smoldering debris, and downed power lines.",
+          "Check the roof and attic for hidden embers for several days — re-ignition is common.",
+          "Document all damage with photos and video before cleanup for insurance claims.",
+          "Contact your insurance company and register with FEMA at DisasterAssistance.gov if a disaster is declared.",
+          "Reach out to your local COAD (Community Organizations Active in Disaster) for volunteer help with cleanup and recovery.",
+        ],
+      },
+    ],
+    footer: "Sources: NIFC (nifc.gov), IAFC Ready, Set, Go! Program (wildlandfiresrsg.org), Ready.gov/wildfires, Firewise USA (nfpa.org/Public-Education/By-topic/Wildfires/Firewise-USA). Review your plan and update your go-bag every 6 months.",
+  },
+  {
     id: "evacuation_checklist",
     title: "Go-Bag Evacuation Checklist",
     category: "documents",

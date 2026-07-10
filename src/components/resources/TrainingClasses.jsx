@@ -82,6 +82,30 @@ const CLASSES = [
       { name: "Personal Finance & Resilience", url: "https://operationhope.org/programs/", format: "Online / Free" },
     ],
   },
+  {
+    org: "National VOAD — Disaster Recovery Training",
+    icon: "🌐",
+    url: "https://www.nvoad.org/resources/training/",
+    description: "National VOAD (Voluntary Organizations Active in Disaster) provides training on long-term disaster recovery, disaster case management, volunteer coordination, donations management, and building Community Organizations Active in Disaster (COAD) chapters.",
+    courses: [
+      { name: "Long-Term Recovery Groups (LTRG)", url: "https://www.nvoad.org/resources/training/", format: "Online / Free" },
+      { name: "Disaster Case Management", url: "https://www.nvoad.org/resources/training/", format: "Online / Free" },
+      { name: "Donations Management & Volunteer Coordination", url: "https://www.nvoad.org/resources/training/", format: "Online / Free" },
+      { name: "Building a Local COAD", url: "https://www.nvoad.org/local-affiliates/", format: "Online / Free" },
+    ],
+  },
+  {
+    org: "NWCG / NIFC Wildland Fire Training",
+    icon: "🔥",
+    url: "https://www.nwcg.gov/training-courses",
+    description: "The National Wildfire Coordinating Group (NWCG), coordinated through NIFC, offers standardized wildland fire training courses — from basic fire behavior and incident command to advanced wildland firefighter qualifications.",
+    courses: [
+      { name: "S-130: Firefighter Training", url: "https://www.nwcg.gov/training-courses/s-130", format: "In-person / Hybrid" },
+      { name: "S-190: Intro to Wildland Fire Behavior", url: "https://www.nwcg.gov/training-courses/s-190", format: "Online / In-person" },
+      { name: "ICS-100: Intro to Incident Command (Wildfire)", url: "https://www.nwcg.gov/training-courses/ics-100", format: "Online / Free" },
+      { name: "L-180: Human Factors in the Wildland Fire Service", url: "https://www.nwcg.gov/training-courses/l-180", format: "Online / In-person" },
+    ],
+  },
 ];
 
 export default function TrainingClasses() {

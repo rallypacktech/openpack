@@ -112,6 +112,26 @@ const VOLUNTEER_ORGS = [
     description: "National VOAD is the umbrella organization that coordinates all major U.S. disaster relief groups. Their directory helps you find local chapter volunteer opportunities with any member organization.",
     roles: ["Find local member orgs", "Community preparedness coalitions", "Long-term disaster recovery", "Interfaith & community support"],
   },
+  {
+    name: "Find a Local COAD (Community Organizations Active in Disaster)",
+    icon: "📍",
+    country: ["USA"],
+    focus: "Local networks of nonprofits, faith-based groups, and civic orgs for community-level disaster recovery",
+    url: "https://www.nvoad.org/local-affiliates/",
+    signupUrl: "https://www.nvoad.org/local-affiliates/",
+    description: "A COAD is a local coalition of churches, nonprofits, community groups, and small businesses that work together before, during, and after disasters. Find your county or state COAD to volunteer at the community level — closer to the people who need help most.",
+    roles: ["Pre-disaster community preparedness", "Local volunteer coordination", "Donations & goods distribution", "Long-term recovery committee member"],
+  },
+  {
+    name: "NIFC Wildland Fire Support & Prevention",
+    icon: "🔥",
+    country: ["USA"],
+    focus: "Wildland fire information, preparedness, and community wildfire defense",
+    url: "https://www.nifc.gov",
+    signupUrl: "https://www.nifc.gov/fire-information/nfn",
+    description: "The National Interagency Fire Center (NIFC) coordinates wildland fire response across federal agencies. While NIFC itself deploys professional firefighters, community members can volunteer through Firewise USA (community wildfire mitigation), local fire departments, and Rangeland Fire Protection Associations. Check the NIFC outlook to know when your area is at elevated risk.",
+    roles: ["Firewise USA community wildfire mitigation", "Volunteer fire department", "Rangeland Fire Protection Association", "Community wildfire preparedness planning"],
+  },
 ];
 
 const COUNTRY_FILTERS = ["All", "USA", "Canada", "Mexico"];
