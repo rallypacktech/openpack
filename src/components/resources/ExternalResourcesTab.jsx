@@ -34,6 +34,21 @@ const RESOURCE_CATEGORIES = [
     ],
   },
   {
+    id: "volunteer_orgs",
+    label: "Volunteer & Community Organizations",
+    icon: Heart,
+    color: "text-amber-700",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    resources: [
+      { name: "National VOAD", desc: "Coalition of nonprofits that coordinate disaster response and recovery. Find member organizations to volunteer with or donate to.", url: "https://www.nvoad.org", icon: "🤝" },
+      { name: "National VOAD — Our Members", desc: "Complete directory of National VOAD member organizations (Red Cross, Team Rubicon, Adventist Community Services, and more) for volunteering and donations.", url: "https://www.nvoad.org/our-members/", icon: "📋" },
+      { name: "Find a Local COAD", desc: "A COAD (Community Organizations Active in Disaster) is a local network of nonprofits, faith-based groups, and civic organizations. Find your local chapter for community-level recovery support.", url: "https://www.nvoad.org/local-affiliates/", icon: "📍" },
+      { name: "NIFC Predictive Outlook", desc: "National Interagency Fire Center monthly/seasonal significant wildland fire potential outlook — forecast of above-normal fire risk by region.", url: "https://www.nifc.gov/nicc-files/predictive/outlooks/monthly_seasonal_outlook.pdf", icon: "🔥" },
+      { name: "NIFC — National Fire News", desc: "Current national fire situation, preparedness level, and large incident summaries from the National Interagency Fire Center.", url: "https://www.nifc.gov/fire-information/nfn", icon: "📰" },
+    ],
+  },
+  {
     id: "donations",
     label: "Donations & Goods",
     icon: Heart,

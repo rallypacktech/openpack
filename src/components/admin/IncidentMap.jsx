@@ -5,6 +5,7 @@ import { AlertTriangle, RefreshCw, Flame, CloudRain, Wind, Zap } from "lucide-re
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
+import { NIFC_OUTLOOK_META, getActiveFireRegions } from "@/lib/nifcOutlook";
 
 // Known active federal disaster incidents (FEMA declarations + major ongoing events)
 // These are supplemented by live NWS alerts fetched below
@@ -88,6 +89,10 @@ export default function IncidentMap() {
   const [liveAlerts, setLiveAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(null);
+  const [showOutlook, setShowOutlook] = useState(true);
+
+  const currentMonth = new Date().getMonth() + 1;
+  const activeFireRegions = getActiveFireRegions(currentMonth);
 
   useEffect(() => {
     fetchLiveAlerts();
@@ -140,14 +145,41 @@ export default function IncidentMap() {
           <h2 className="text-lg font-semibold text-gray-900">Active Federal Incidents</h2>
           <p className="text-sm text-gray-500">FEMA declarations & NWS emergency alerts requiring federal response</p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchLiveAlerts} disabled={loading} className="gap-2">
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-          {loading ? "Fetching..." : "Refresh"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={showOutlook ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowOutlook(!showOutlook)}
+            className="gap-2"
+            title="Toggle NIFC significant fire potential outlook overlay"
+          >
+            <Flame className="w-3.5 h-3.5" />
+            Fire Outlook
+          </Button>
+          <Button variant="outline" size="sm" onClick={fetchLiveAlerts} disabled={loading} className="gap-2">
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Fetching..." : "Refresh"}
+          </Button>
+        </div>
       </div>
 
       {lastRefresh && (
         <p className="text-xs text-gray-400">Last updated: {lastRefresh.toLocaleTimeString()}</p>
+      )}
+
+      {/* NIFC Preparedness banner */}
+      {showOutlook && (
+        <div className="flex items-center gap-3 rounded-lg border border-orange-300 bg-orange-50 px-4 py-3">
+          <Flame className="w-5 h-5 text-orange-600 shrink-0" />
+          <div className="text-sm">
+            <p className="font-semibold text-orange-900">
+              National Preparedness Level {NIFC_OUTLOOK_META.preparednessLevel}/{NIFC_OUTLOOK_META.preparednessLevelMax} — {activeFireRegions.length} above-normal fire potential region(s) active this month
+            </p>
+            <p className="text-xs text-orange-700">
+              {NIFC_OUTLOOK_META.acresBurned.toLocaleString()} acres burned ({NIFC_OUTLOOK_META.acresVsAverage} of 10-yr avg) · {NIFC_OUTLOOK_META.wildfiresReported.toLocaleString()} wildfires ({NIFC_OUTLOOK_META.wildfiresVsAverage} of avg) · Source: {NIFC_OUTLOOK_META.source}
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Map */}
@@ -162,6 +194,37 @@ export default function IncidentMap() {
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
           />
+          {showOutlook && activeFireRegions.map(region => (
+            <React.Fragment key={`outlook-${region.id}`}>
+              <Circle
+                center={[region.latitude, region.longitude]}
+                radius={region.radius_km * 1000}
+                pathOptions={{ color: "#f97316", fillColor: "#f97316", fillOpacity: 0.12, weight: 1.5, dashArray: "6 4" }}
+              />
+              <Marker
+                position={[region.latitude, region.longitude]}
+                icon={L.divIcon({
+                  className: "",
+                  html: `<div style="width:28px;height:28px;border-radius:50%;background:#f97316;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:13px;">🔥</div>`,
+                  iconSize: [28, 28],
+                  iconAnchor: [14, 14],
+                })}
+              >
+                <Popup maxWidth={280}>
+                  <div className="text-sm space-y-1">
+                    <p className="font-bold text-gray-900">{region.label}</p>
+                    <span className="inline-block text-xs px-2 py-0.5 rounded border font-medium bg-orange-100 text-orange-800 border-orange-300">
+                      ABOVE-NORMAL FIRE POTENTIAL
+                    </span>
+                    <p className="text-xs text-gray-700 mt-1">
+                      NIFC forecast: above-normal significant wildland fire potential for this region this month.
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">Source: NIFC Predictive Services</p>
+                  </div>
+                </Popup>
+              </Marker>
+            </React.Fragment>
+          ))}
           {allIncidents.map(incident => {
             const cfg = TYPE_CONFIG[incident.type] || TYPE_CONFIG.other;
             const radiusMeters = (incident.radius_km || 30) * 1000;
