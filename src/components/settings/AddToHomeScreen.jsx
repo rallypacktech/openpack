@@ -2,9 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Smartphone, Apple, Share, MoreVertical, ExternalLink } from "lucide-react";
+import { Smartphone, Apple, Share, MoreVertical, ExternalLink, CheckCircle } from "lucide-react";
 
-export default function AddToHomeScreen() {
+export default function AddToHomeScreen({ embedded = false }) {
   return (
     <Card id="add-to-home-screen">
       <CardHeader className="pb-4">
@@ -20,20 +20,29 @@ export default function AddToHomeScreen() {
           No app store download required.
         </p>
 
-        {/* Navigate to Offline page first */}
-        <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-3 flex-wrap">
-          <div className="text-sm text-gray-700">
-            <p className="font-semibold mb-0.5">Step 0: Open the Offline page first</p>
-            <p className="text-xs text-gray-500 font-mono break-all">https://www.rallypack.org/offline</p>
-            <p className="text-xs text-gray-500 mt-1">The home screen bookmark saves whatever URL is in your address bar — so make sure it shows <strong>/offline</strong> before you add it.</p>
+        {embedded ? (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" aria-hidden="true" />
+            <div className="text-sm text-emerald-900">
+              <p className="font-semibold">You're already on the Offline page</p>
+              <p className="text-xs text-emerald-700 mt-0.5">Your address bar shows <strong className="font-mono">rallypack.org/offline</strong> — the correct URL. Follow the steps below to save it to your home screen.</p>
+            </div>
           </div>
-          <Button asChild variant="default" size="sm" className="shrink-0 gap-2">
-            <Link to="/offline">
-              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-              Open Offline Page
-            </Link>
-          </Button>
-        </div>
+        ) : (
+          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-sm text-gray-700">
+              <p className="font-semibold mb-0.5">Step 0: Open the Offline page first</p>
+              <p className="text-xs text-gray-500 font-mono break-all">https://www.rallypack.org/offline</p>
+              <p className="text-xs text-gray-500 mt-1">The home screen bookmark saves whatever URL is in your address bar — so make sure it shows <strong>/offline</strong> before you add it.</p>
+            </div>
+            <Button asChild variant="default" size="sm" className="shrink-0 gap-2">
+              <Link to="/offline">
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                Open Offline Page
+              </Link>
+            </Button>
+          </div>
+        )}
 
         {/* iOS Instructions */}
         <div className="bg-gray-50 rounded-lg p-5 space-y-3">

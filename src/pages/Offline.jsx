@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import OfflineMap from "@/components/offline/OfflineMap";
 import EmergencyManuals from "@/components/manuals/EmergencyManuals";
+import AddToHomeScreen from "@/components/settings/AddToHomeScreen";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,8 @@ import {
   Clock,
   Shield,
   Download,
-  BookOpen
+  BookOpen,
+  Smartphone
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -226,6 +228,7 @@ export default function Offline() {
     { id: "firstaid", label: "First Aid", icon: Heart },
     { id: "pets", label: "Pets", icon: PawPrint },
     { id: "manuals", label: "Manuals", icon: Download },
+    { id: "homescreen", label: "Home Screen", icon: Smartphone },
   ];
 
   return (
@@ -574,6 +577,14 @@ export default function Offline() {
               These reference guides are always available in the app without internet. To save them to your device, open a manual and tap <strong>Save as PDF / Print</strong>, then choose <em>Save as PDF</em> in the print dialog.
             </div>
             <EmergencyManuals />
+          </div>
+        )}
+
+        {/* HOME SCREEN */}
+        {activeSection === "homescreen" && (
+          <div className="space-y-4">
+            <SectionHeader icon={Smartphone} title="Add to Home Screen" subtitle="Save this page for offline access during emergencies" />
+            <AddToHomeScreen embedded={true} />
           </div>
         )}
 

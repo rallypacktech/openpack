@@ -17,7 +17,7 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
     try {
       const res = await base44.functions.invoke('getTelegramConnectLink', {});
       if (res.data?.connect_url) {
-        window.open(res.data.connect_url, '_blank');
+        window.location.href = res.data.connect_url;
       } else if (res.data?.error) {
         setError(res.data.error);
       }
