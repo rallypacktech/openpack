@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Smartphone, Apple, Share, MoreVertical, ExternalLink, CheckCircle } from "lucide-react";
@@ -33,14 +32,14 @@ export default function AddToHomeScreen({ embedded = false }) {
             <div className="text-sm text-gray-700">
               <p className="font-semibold mb-0.5">Step 0: Open the Offline page first</p>
               <p className="text-xs text-gray-500 font-mono break-all">https://www.rallypack.org/offline</p>
-              <p className="text-xs text-gray-500 mt-1">The home screen bookmark saves whatever URL is in your address bar — so make sure it shows <strong>/offline</strong> before you add it.</p>
+              <p className="text-xs text-gray-500 mt-1">The home screen bookmark saves whatever URL is in your address bar — so make sure it shows <strong>/offline</strong> before you add it. This button opens a fresh page load at that URL.</p>
             </div>
-            <Button asChild variant="default" size="sm" className="shrink-0 gap-2">
-              <Link to="/offline">
+            <a href="/offline" className="shrink-0">
+              <Button variant="default" size="sm" className="gap-2">
                 <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 Open Offline Page
-              </Link>
-            </Button>
+              </Button>
+            </a>
           </div>
         )}
 
@@ -53,7 +52,7 @@ export default function AddToHomeScreen({ embedded = false }) {
           <ol className="space-y-2.5 text-sm text-gray-700">
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">1</span>
-              <span>Make sure the address bar shows <strong className="font-mono">rallypack.org/offline</strong> (use the "Open Offline Page" button above if not).</span>
+              <span>If you used the "Open Offline Page" button above, the page has reloaded at the correct address. Check that your address bar shows <strong className="font-mono">rallypack.org/offline</strong>.</span>
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">2</span>
@@ -79,7 +78,7 @@ export default function AddToHomeScreen({ embedded = false }) {
           <ol className="space-y-2.5 text-sm text-gray-700">
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">1</span>
-              <span>Make sure the address bar shows <strong className="font-mono">rallypack.org/offline</strong> (use the "Open Offline Page" button above if not).</span>
+              <span>If you used the "Open Offline Page" button above, the page has reloaded at the correct address. Check that your address bar shows <strong className="font-mono">rallypack.org/offline</strong>.</span>
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">2</span>

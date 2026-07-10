@@ -33,9 +33,14 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
     setError(null);
     try {
       const userData = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ created_by: userData.email });
+      const profiles = await base44.entities.UserProfile.filter({ created_by_id: userData.id });
       if (profiles.length > 0 && onProfileUpdate) {
         onProfileUpdate(profiles[0]);
+        if (!profiles[0].telegram_chat_id) {
+          setError("No Telegram connection detected yet. Make sure you sent the message in Telegram, then try again.");
+        }
+      } else {
+        setError("Couldn't find your profile. Try disconnecting and reconnecting.");
       }
     } catch (e) {
       setError('Failed to refresh connection status');
