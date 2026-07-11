@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Bell, ShoppingCart, AlertTriangle, Info, CheckCircle } from "lucide-react";
+import AddToCacheDialog from "./AddToCacheDialog";
 
-export default function NotificationsList({ notifications, onViewAll }) {
+export default function NotificationsList({ notifications, onViewAll, caches }) {
   const navigate = useNavigate();
   
   const typeConfig = {
@@ -40,14 +41,18 @@ export default function NotificationsList({ notifications, onViewAll }) {
                       <h4 className="font-medium text-gray-900 text-sm">{notification.title}</h4>
                       <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                       {notification.recommendation && (
-                        <Button 
-                          size="sm" 
-                          className="mt-2 bg-blue-600 hover:bg-blue-700"
-                          onClick={() => navigate(createPageUrl("Shopping"))}
-                        >
-                          <ShoppingCart className="w-3 h-3 mr-1" />
-                          Shop Now
-                        </Button>
+                        notification.recommendation.price_cents ? (
+                          <Button
+                            size="sm"
+                            className="mt-2 bg-blue-600 hover:bg-blue-700"
+                            onClick={() => navigate(createPageUrl("Shopping"))}
+                          >
+                            <ShoppingCart className="w-3 h-3 mr-1" />
+                            Shop Now
+                          </Button>
+                        ) : (
+                          <AddToCacheDialog recommendation={notification.recommendation} caches={caches} />
+                        )
                       )}
                     </div>
                     {!notification.read && (

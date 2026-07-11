@@ -821,6 +821,7 @@ export default function Dashboard() {
             <NotificationsList 
               notifications={notifications} 
               onViewAll={() => {}} 
+              caches={caches}
             />
           </div>
         </div>
