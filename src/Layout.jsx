@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { base44 } from "@/api/base44Client";
+import { useActivityHeartbeat } from "@/hooks/useActivityHeartbeat";
 import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySettings";
 import { 
   LayoutDashboard, 
@@ -26,6 +27,8 @@ export default function Layout({ children, currentPageName }) {
   const [profile, setProfile] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+
+  useActivityHeartbeat();
 
   useEffect(() => {
     const loadUser = async () => {

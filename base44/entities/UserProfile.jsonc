@@ -157,6 +157,11 @@
     "telegram_connect_token": {
       "type": "string",
       "description": "One-time token used to link a Telegram chat to this profile via the /start deep link"
+    },
+    "last_active": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the user's last activity in the app \u2014 updated by the activity heartbeat hook, used by the admin system monitor to track online users"
     }
   },
   "required": [],

@@ -31,11 +31,11 @@ export default function AdminMonitor() {
       const needHelp = profiles.filter(p => p.current_status === 'needs_assistance');
       setNeedHelpUsers(needHelp);
 
-      // Calculate online users (updated in last 5 minutes)
+      // Calculate online users (active in last 5 minutes via heartbeat)
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
       const online = profiles.filter(p => {
-        const updated = new Date(p.updated_date);
-        return updated > fiveMinutesAgo;
+        if (!p.last_active) return false;
+        return new Date(p.last_active) > fiveMinutesAgo;
       });
       setOnlineUsers(online);
     } catch (error) {
@@ -274,7 +274,7 @@ export default function AdminMonitor() {
                         <div className="mt-2 flex items-center gap-1">
                           <Circle className="w-2 h-2 fill-green-500 text-green-500" />
                           <span className="text-xs text-green-600 font-medium">
-                            Active {getTimeAgo(profile.updated_date)}
+                            Active {getTimeAgo(profile.last_active)}
                           </span>
                         </div>
 
