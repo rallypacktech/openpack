@@ -1,9 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 // Dispatches an approved alert submission to all organization members.
-// Critical and custom alerts go to BOTH email and Telegram (bypassing user preferences).
+// Critical and custom alerts go to BOTH email and Telegram/Discord (bypassing user preferences).
+// Discord is sent if the member has a webhook URL configured on their profile.
 // Non-critical alerts respect user notification_method settings.
 // Creates Notification records for each delivery.
+// Email, Telegram, and Discord all use the same unified template (generated_title + generated_body).
 
 function buildEmailHtml(title, body, orgName, eventLevel) {
   const levelColor = eventLevel === 'critical' ? '#dc2626' : eventLevel === 'warning' ? '#ea580c' : eventLevel === 'watch' ? '#ca8a04' : '#2563eb';
@@ -27,6 +29,30 @@ function buildEmailHtml(title, body, orgName, eventLevel) {
   </div>
 </body>
 </html>`;
+}
+
+// Builds a Discord webhook payload using the same title/body/level as email and Telegram.
+// Matches the email color scheme and the Telegram metadata (timestamp + delivery attempt).
+function buildDiscordPayload(title, body, orgName, eventLevel, eventTime, attempt) {
+  const levelColor = eventLevel === 'critical' ? 0xdc2626 : eventLevel === 'warning' ? 0xea580c : eventLevel === 'watch' ? 0xca8a04 : 0x2563eb;
+  const levelLabel = eventLevel.charAt(0).toUpperCase() + eventLevel.slice(1);
+  const formattedTime = new Date(eventTime).toISOString().replace('T', ' ').substring(0, 16) + ' UTC';
+  return {
+    username: 'RallyPack Emergency Alerts',
+    embeds: [{
+      title: `\u{1F6A8} ${title}`,
+      description: body || '',
+      color: levelColor,
+      fields: [
+        { name: 'Organization', value: orgName, inline: true },
+        { name: 'Level', value: levelLabel, inline: true },
+        { name: 'Valid as of', value: formattedTime, inline: false },
+        { name: 'Delivery attempt', value: String(attempt), inline: true },
+      ],
+      footer: { text: 'RallyPack \u00b7 Always verify current status in the app.' },
+      timestamp: eventTime,
+    }],
+  };
 }
 
 Deno.serve(async (req) => {
@@ -77,6 +103,7 @@ Deno.serve(async (req) => {
 
     let emailDelivered = 0;
     let telegramDelivered = 0;
+    let discordDelivered = 0;
     let inAppCreated = 0;
     let failed = 0;
     let noContact = 0;
@@ -87,19 +114,21 @@ Deno.serve(async (req) => {
     for (const member of members) {
       if (!member.email) continue;
 
-      // Look up the member's profile for notification preferences + Telegram
+      // Look up the member's profile for notification preferences + Telegram + Discord
       const profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by: member.email });
       const profile = profiles.length > 0 ? profiles[0] : null;
       const notificationMethod = profile?.notification_method || 'both';
       const telegramConnected = !!profile?.telegram_chat_id;
+      const discordConnected = !!profile?.discord_webhook_url;
 
       // Determine which channels to use
       let channels = [];
       if (isCriticalOrCustom) {
-        // Critical and custom messages always go to BOTH email and Telegram
+        // Critical and custom messages always go to BOTH email and Telegram/Discord
         channels.push('email');
         if (telegramConnected) channels.push('telegram');
-        else channels.push('in_app'); // fallback if Telegram not connected
+        if (discordConnected) channels.push('discord');
+        if (!telegramConnected && !discordConnected) channels.push('in_app'); // fallback
       } else {
         // Respect user notification settings
         if (notificationMethod === 'email') channels.push('email');
@@ -108,8 +137,9 @@ Deno.serve(async (req) => {
           channels.push('email');
           channels.push('in_app');
         }
-        // Also send to Telegram if connected
+        // Also send to Telegram and Discord if connected
         if (telegramConnected) channels.push('telegram');
+        if (discordConnected) channels.push('discord');
       }
 
       if (channels.length === 0) {
@@ -170,6 +200,38 @@ Deno.serve(async (req) => {
               memberResult.channels.telegram = tgData.reason || 'failed';
               failed++;
             }
+          } else if (channel === 'discord') {
+            // Post to the member's Discord webhook using the same template as email/Telegram
+            const dcRes = await fetch(profile.discord_webhook_url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(buildDiscordPayload(
+                submission.generated_title,
+                submission.generated_body,
+                submission.organization_name,
+                submission.event_level,
+                eventTime,
+                1
+              )),
+            });
+            if (dcRes.ok) {
+              discordDelivered++;
+              memberResult.channels.discord = 'delivered';
+              await base44.asServiceRole.entities.Notification.create({
+                title: submission.generated_title,
+                message: submission.generated_body,
+                type: submission.event_level === 'critical' ? 'alert' : 'warning',
+                recipient_email: member.email,
+                original_event_time: eventTime,
+                delivery_channel: 'discord',
+                delivery_status: 'delivered',
+                alert_id: submission.id,
+                read: false,
+              });
+            } else {
+              memberResult.channels.discord = `failed (HTTP ${dcRes.status})`;
+              failed++;
+            }
           } else if (channel === 'in_app') {
             await base44.asServiceRole.entities.Notification.create({
               title: submission.generated_title,
@@ -197,6 +259,7 @@ Deno.serve(async (req) => {
       total_members: members.length,
       email_delivered: emailDelivered,
       telegram_delivered: telegramDelivered,
+      discord_delivered: discordDelivered,
       in_app_created: inAppCreated,
       failed,
       no_contact: noContact,
@@ -216,6 +279,7 @@ Deno.serve(async (req) => {
       total_members: members.length,
       email_delivered: emailDelivered,
       telegram_delivered: telegramDelivered,
+      discord_delivered: discordDelivered,
       in_app_created: inAppCreated,
       failed,
       no_contact: noContact,

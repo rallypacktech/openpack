@@ -16,6 +16,7 @@ import DefaultHomePageSetting from "../components/settings/DefaultHomePageSettin
 import StatusAlertChannels from "../components/settings/StatusAlertChannels";
 import AddToHomeScreen from "../components/settings/AddToHomeScreen";
 import TelegramConnect from "../components/settings/TelegramConnect";
+import DiscordConnect from "../components/settings/DiscordConnect";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -238,6 +239,9 @@ export default function Settings() {
 
         {/* Telegram Emergency Alerts */}
         <TelegramConnect profile={profile} onProfileUpdate={setProfile} />
+
+        {/* Discord Emergency Alerts */}
+        <DiscordConnect profile={profile} onProfileUpdate={setProfile} />
 
         {/* Security Settings */}
         <Card>

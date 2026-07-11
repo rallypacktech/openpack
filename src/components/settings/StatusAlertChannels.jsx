@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Send, MessageCircle, Radio, Link2, Check } from "lucide-react";
+import { Mail, Send, MessageCircle, Radio, Check } from "lucide-react";
 
 const CHANNELS = [
   { key: "email", label: "Email", desc: "Send to family members' email addresses", icon: Mail, needsConnection: false, connectText: "Always available" },
   { key: "telegram", label: "Telegram", desc: "Send to linked family members on Telegram", icon: Send, needsConnection: true, connectText: "Connect Telegram below" },
-  { key: "discord", label: "Discord", desc: "Post to a Discord family server channel", icon: MessageCircle, needsConnection: true, connectText: "Paste a webhook URL below" },
+  { key: "discord", label: "Discord", desc: "Post to a Discord family server channel", icon: MessageCircle, needsConnection: true, connectText: "Set up your webhook in the Discord card below" },
   { key: "threads", label: "Threads", desc: "Generate a share link with pre-filled text", icon: Radio, needsConnection: false, connectText: "No connection needed — opens share" },
   { key: "signal", label: "Signal", desc: "Generate a share link with pre-filled text", icon: Radio, needsConnection: false, connectText: "No connection needed — opens share" },
 ];
 
 export default function StatusAlertChannels({ profile, onSave }) {
   const [selected, setSelected] = useState(profile?.status_alert_channels || ["email"]);
-  const [webhookUrl, setWebhookUrl] = useState(profile?.discord_webhook_url || "");
 
   useEffect(() => {
     setSelected(profile?.status_alert_channels || ["email"]);
-    setWebhookUrl(profile?.discord_webhook_url || "");
   }, [profile]);
 
   const toggleChannel = (key) => {
@@ -27,10 +24,6 @@ export default function StatusAlertChannels({ profile, onSave }) {
       : [...selected, key];
     setSelected(next);
     onSave({ status_alert_channels: next.length > 0 ? next : ["email"] });
-  };
-
-  const handleWebhookSave = () => {
-    onSave({ discord_webhook_url: webhookUrl });
   };
 
   return (
@@ -85,27 +78,6 @@ export default function StatusAlertChannels({ profile, onSave }) {
             );
           })}
         </div>
-
-        {/* Discord webhook URL input */}
-        {selected.includes("discord") && (
-          <div className="p-4 bg-muted/30 rounded-lg space-y-2">
-            <Label htmlFor="discord-webhook" className="flex items-center gap-1.5 text-sm font-medium">
-              <Link2 className="w-3.5 h-3.5" /> Discord Webhook URL
-            </Label>
-            <Input
-              id="discord-webhook"
-              type="url"
-              placeholder="https://discord.com/api/webhooks/..."
-              value={webhookUrl}
-              onChange={(e) => setWebhookUrl(e.target.value)}
-              onBlur={handleWebhookSave}
-              className="bg-white"
-            />
-            <p className="text-xs text-muted-foreground">
-              Create one in Discord: Server Settings → Integrations → Webhooks → New Webhook → Copy URL
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

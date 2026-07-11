@@ -36,7 +36,8 @@
       "enum": [
         "telegram",
         "email",
-        "in_app"
+        "in_app",
+        "discord"
       ],
       "description": "Channel used to deliver this notification"
     },
