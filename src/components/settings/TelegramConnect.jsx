@@ -41,7 +41,7 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
     setError(null);
     try {
       const userData = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ created_by_id: userData.id });
+      const profiles = await base44.entities.UserProfile.filter({ created_by: userData.email });
       if (profiles.length > 0 && onProfileUpdate) {
         onProfileUpdate(profiles[0]);
         if (profiles[0].telegram_chat_id) {
@@ -93,11 +93,6 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
     }
   };
 
-  // Build the native tg:// deep link (more reliable on iOS for opening the app directly)
-  const tgDeepLink = connectInfo
-    ? `tg://resolve?domain=${connectInfo.botUsername}&start=${connectInfo.token}`
-    : null;
-
   return (
     <Card>
       <CardHeader className="pb-4">
@@ -132,24 +127,15 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
               <p className="text-xs text-blue-700">Tap a button below to open Telegram with a pre-filled message, then press send.</p>
             </div>
 
-            {/* Native tg:// deep link — most reliable for opening the installed app on iOS */}
-            <a
-              href={tgDeepLink}
-              className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-sm py-2.5 rounded-lg transition-colors"
-            >
-              <Smartphone className="w-4 h-4" aria-hidden="true" />
-              Open Telegram App
-            </a>
-
-            {/* Web link fallback — for browsers that block the tg:// scheme */}
+            {/* t.me link — works via Universal Links on iOS (opens installed app + sends /start automatically) and web on desktop */}
             <a
               href={connectInfo.webUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full border border-border hover:border-primary/50 text-foreground font-sans font-medium text-sm py-2.5 rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-sm py-2.5 rounded-lg transition-colors"
             >
-              <ExternalLink className="w-4 h-4" aria-hidden="true" />
-              Open via t.me (web fallback)
+              <Smartphone className="w-4 h-4" aria-hidden="true" />
+              Open Telegram
             </a>
 
             <div className="p-3 bg-muted/50 rounded-lg space-y-2">

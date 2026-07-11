@@ -15,7 +15,7 @@ import StructuredAddressInput from "../components/settings/StructuredAddressInpu
 import ReadinessScore from "../components/dashboard/ReadinessScore";
 import SafetyBeacon from "../components/dashboard/SafetyBeacon";
 import FamilyMemberForm from "../components/onboarding/FamilyMemberForm";
-import TermsAgreement from "../components/onboarding/TermsAgreement";
+import TermsAgreement, { TERMS_VERSION } from "../components/onboarding/TermsAgreement";
 import { safeSessionGet, safeSessionSet } from "../lib/utils";
 
 export default function Dashboard() {
@@ -448,7 +448,11 @@ export default function Dashboard() {
   // Onboarding Flow
   const sessionTermsKey = "rallypack_terms_ack_session";
   const sessionTermsAcked = safeSessionGet(sessionTermsKey) === "true";
-  const needsTermsAgreement = dataLoaded && (!sessionTermsAcked);
+  const agreedVersion = userProfile?.terms_agreed_version;
+  const agreedDate = userProfile?.terms_agreed_date;
+  const sameVersion = agreedVersion === TERMS_VERSION;
+  const withinWeek = agreedDate && (Date.now() - new Date(agreedDate).getTime()) < 7 * 24 * 60 * 60 * 1000;
+  const needsTermsAgreement = dataLoaded && !sessionTermsAcked && !sameVersion && !withinWeek;
 
   // An "established" user has already added family members or has a complete address — don't force them through onboarding steps they haven't done
   const isEstablishedUser = familyMembers.length > 0;

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, FileText, Lock, ExternalLink, CheckSquare } from "lucide-react";
 import { createPageUrl } from "@/utils";
 
-const TERMS_VERSION = "1.0";
+export const TERMS_VERSION = "1.0";
 
 export default function TermsAgreement({ onAgree }) {
   const [checkedTerms, setCheckedTerms] = useState(false);
