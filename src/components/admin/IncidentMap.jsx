@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Circle, WMSTileLayer } from "react-leaflet";
 import { base44 } from "@/api/base44Client";
-import { AlertTriangle, RefreshCw, Flame, CloudRain, Wind, Zap, Clock, ExternalLink } from "lucide-react";
+import { AlertTriangle, RefreshCw, Flame, CloudRain, Wind, Zap, Clock, ExternalLink, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
@@ -57,6 +57,7 @@ export default function IncidentMap() {
   const [showFloodOutlook, setShowFloodOutlook] = useState(false);
   const [showHurricaneOutlook, setShowHurricaneOutlook] = useState(false);
   const [showTornadoOutlook, setShowTornadoOutlook] = useState(false);
+  const [showEffisFires, setShowEffisFires] = useState(false);
 
   const currentMonth = new Date().getMonth() + 1;
   const activeFireRegions = getActiveFireRegions(currentMonth);
@@ -167,6 +168,16 @@ export default function IncidentMap() {
             <Zap className="w-3.5 h-3.5" />
             Tornado
           </Button>
+          <Button
+            variant={showEffisFires ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowEffisFires(!showEffisFires)}
+            className="gap-2"
+            title="Toggle EFFIS (Copernicus) active fire detection overlay — satellite hotspots for Europe"
+          >
+            <Globe className="w-3.5 h-3.5" />
+            EFFIS
+          </Button>
           <Button variant="outline" size="sm" onClick={fetchLiveAlerts} disabled={loading} className="gap-2">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             {loading ? "Fetching..." : "Refresh"}
@@ -252,6 +263,30 @@ export default function IncidentMap() {
         </div>
       )}
 
+      {/* EFFIS active fires banner */}
+      {showEffisFires && (
+        <div className="flex items-center gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3">
+          <Globe className="w-5 h-5 text-red-600 shrink-0" />
+          <div className="text-sm flex-1">
+            <p className="font-semibold text-red-900">
+              EFFIS Active Fire Detection — Copernicus Emergency Management Service
+            </p>
+            <p className="text-xs text-red-700">
+              Satellite hotspots (MODIS + VIIRS, filtered to reduce false alarms) for Europe, Middle East, and North Africa · Updated 6× daily within 2–3 hours of satellite pass
+            </p>
+          </div>
+          <a
+            href="https://forest-fire.emergency.copernicus.eu/apps/effis.viewer/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-red-700 hover:underline inline-flex items-center gap-1 shrink-0"
+          >
+            EFFIS Viewer
+            <ExternalLink className="w-3 h-3" aria-hidden="true" />
+          </a>
+        </div>
+      )}
+
       {/* Map */}
       <div className="rounded-lg overflow-hidden border border-gray-200" style={{ height: 420 }}>
         <MapContainer
@@ -295,6 +330,18 @@ export default function IncidentMap() {
               badgeClass="bg-purple-100 text-purple-800 border-purple-300"
               descriptionFallback="This coastal region is at risk during the 2026 Atlantic hurricane season (June 1 – November 30)."
               sourceLabel="Source: NOAA Climate Prediction Center"
+            />
+          )}
+          {showEffisFires && (
+            <WMSTileLayer
+              url="https://maps.effis.emergency.copernicus.eu/effis"
+              layers="all.hs"
+              format="image/png"
+              transparent={true}
+              version="1.1.1"
+              srs="EPSG:4326"
+              opacity={0.85}
+              attribution="&copy; EFFIS — Copernicus Emergency Management Service (JRC)"
             />
           )}
           {showTornadoOutlook && (
