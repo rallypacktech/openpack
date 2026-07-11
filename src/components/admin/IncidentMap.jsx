@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import { base44 } from "@/api/base44Client";
-import { AlertTriangle, RefreshCw, Flame, CloudRain, Wind, Zap } from "lucide-react";
+import { AlertTriangle, RefreshCw, Flame, CloudRain, Wind, Zap, Clock, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
@@ -9,46 +9,8 @@ import { NIFC_OUTLOOK_META, getActiveFireRegions } from "@/lib/nifcOutlook";
 import { HURRICANE_OUTLOOK, FLOOD_OUTLOOK, TORNADO_OUTLOOK, getActiveHurricaneZones, getActiveFloodRegions, getActiveTornadoRegions } from "@/lib/hazardOutlooks";
 import OutlookOverlay from "@/components/admin/OutlookOverlay";
 
-// Known active federal disaster incidents (FEMA declarations + major ongoing events)
-// These are supplemented by live NWS alerts fetched below
-const STATIC_INCIDENTS = [
-  {
-    id: "ga-wildfires-2026",
-    title: "Georgia Wildfires",
-    state: "Georgia",
-    type: "wildfire",
-    severity: "major",
-    latitude: 34.52,
-    longitude: -83.98,
-    description: "Active wildfire complex in North Georgia mountains. FEMA DR-4xxx declared. Federal fire resources deployed.",
-    agency: "FEMA + USFS",
-    radius_km: 65,
-  },
-  {
-    id: "tx-flood-2026",
-    title: "Texas Hill Country Flooding",
-    state: "Texas",
-    type: "flood",
-    severity: "major",
-    latitude: 30.27,
-    longitude: -98.87,
-    description: "Flash flooding along Guadalupe and Blanco Rivers. NWS Flash Flood Emergency.",
-    agency: "FEMA + NWS",
-    radius_km: 50,
-  },
-  {
-    id: "ca-drought-2026",
-    title: "California Drought / Fire Watch",
-    state: "California",
-    type: "wildfire",
-    severity: "watch",
-    latitude: 37.77,
-    longitude: -119.42,
-    description: "Red Flag Warning across Sierra Nevada foothills. Elevated fire danger.",
-    agency: "NWS + CalFire",
-    radius_km: 130,
-  },
-];
+// Static incidents removed — the map now shows live NWS active alerts fetched in real time.
+// The NWS API provides timestamps (sent, expires) so admin can verify freshness at a glance.
 
 const TYPE_CONFIG = {
   wildfire: { color: "#ef4444", bgColor: "rgba(239,68,68,0.15)", icon: Flame, label: "Wildfire" },
@@ -87,10 +49,10 @@ function makeIncidentIcon(type) {
 }
 
 export default function IncidentMap() {
-  const [incidents, setIncidents] = useState(STATIC_INCIDENTS);
   const [liveAlerts, setLiveAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(null);
+  const [fetchedAt, setFetchedAt] = useState(null);
   const [showOutlook, setShowOutlook] = useState(true);
   const [showFloodOutlook, setShowFloodOutlook] = useState(false);
   const [showHurricaneOutlook, setShowHurricaneOutlook] = useState(false);
@@ -109,10 +71,11 @@ export default function IncidentMap() {
   const fetchLiveAlerts = async () => {
     setLoading(true);
     try {
-      const res = await base44.functions.invoke("fetchNWSAlerts", {});
+      const res = await base44.functions.invoke("fetchNationalAlerts", {});
       const alerts = res?.data?.alerts || [];
       setLiveAlerts(alerts);
       setLastRefresh(new Date());
+      setFetchedAt(res?.data?.fetched_at || null);
     } catch (err) {
       console.error("Failed to load live alerts:", err);
     } finally {
@@ -120,38 +83,48 @@ export default function IncidentMap() {
     }
   };
 
-  // Parse NWS alerts with coordinates into map markers
+  // Parse NWS alerts into map incidents — now with timestamps for freshness tracking
   const liveIncidents = liveAlerts
-    .filter(a => a.geometry?.coordinates || a.latitude)
-    .map((a, i) => ({
-      id: `nws-${i}`,
-      title: a.properties?.event || a.title || "NWS Alert",
-      state: a.properties?.areaDesc || a.area || "",
-      type: (a.properties?.event || "").toLowerCase().includes("fire") ? "wildfire"
-           : (a.properties?.event || "").toLowerCase().includes("flood") ? "flood"
-           : (a.properties?.event || "").toLowerCase().includes("tornado") ? "tornado"
-           : (a.properties?.event || "").toLowerCase().includes("hurricane") ? "hurricane"
-           : "other",
-      severity: a.properties?.severity === "Extreme" ? "major"
-               : a.properties?.severity === "Severe" ? "moderate"
-               : "watch",
-      latitude: a.latitude || (a.geometry?.coordinates ? a.geometry.coordinates[1] : null),
-      longitude: a.longitude || (a.geometry?.coordinates ? a.geometry.coordinates[0] : null),
-      description: a.properties?.description || a.description || "",
-      agency: "NWS",
-      radius_km: 30,
-    }))
-    .filter(a => a.latitude && a.longitude);
+    .filter(a => a.latitude && a.longitude)
+    .map((a, i) => {
+      const eventText = a.event || "";
+      const isExpired = a.expires && new Date(a.expires) < new Date();
+      return {
+        id: `nws-${a.id || i}`,
+        title: a.headline || eventText || "NWS Alert",
+        state: a.areaDesc || "",
+        type: eventText.toLowerCase().includes("fire") ? "wildfire"
+             : eventText.toLowerCase().includes("flood") ? "flood"
+             : eventText.toLowerCase().includes("tornado") ? "tornado"
+             : eventText.toLowerCase().includes("hurricane") || eventText.toLowerCase().includes("tropical") ? "hurricane"
+             : "other",
+        severity: a.severity === "Extreme" ? "major"
+                 : a.severity === "Severe" ? "moderate"
+                 : a.urgency === "Immediate" ? "major"
+                 : a.urgency === "Expected" ? "moderate"
+                 : "advisory",
+        latitude: a.latitude,
+        longitude: a.longitude,
+        description: a.description || "",
+        agency: "NWS",
+        radius_km: 30,
+        sent: a.sent || null,
+        effective: a.effective || null,
+        expires: a.expires || null,
+        isExpired,
+        eventId: a.id,
+      };
+    });
 
-  const allIncidents = [...STATIC_INCIDENTS, ...liveIncidents];
+  const allIncidents = liveIncidents;
 
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Active Federal Incidents</h2>
-          <p className="text-sm text-gray-500">FEMA declarations & NWS emergency alerts requiring federal response</p>
+          <h2 className="text-lg font-semibold text-gray-900">Active Incidents</h2>
+          <p className="text-sm text-gray-500">Live NWS alerts nationwide — refresh to pull the latest data</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button
@@ -201,9 +174,23 @@ export default function IncidentMap() {
         </div>
       </div>
 
-      {lastRefresh && (
-        <p className="text-xs text-gray-400">Last updated: {lastRefresh.toLocaleTimeString()}</p>
-      )}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-xs text-gray-400">
+          {liveAlerts.length > 0
+            ? `${liveAlerts.length} active NWS alert${liveAlerts.length !== 1 ? "s" : ""} loaded`
+            : "No live alerts loaded yet"}
+          {lastRefresh && ` · Refreshed: ${lastRefresh.toLocaleString()}`}
+        </p>
+        <a
+          href="https://api.weather.gov/alerts/active"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1"
+        >
+          Verify on NWS
+          <ExternalLink className="w-3 h-3" aria-hidden="true" />
+        </a>
+      </div>
 
       {/* NIFC Preparedness banner */}
       {showOutlook && (
@@ -342,11 +329,24 @@ export default function IncidentMap() {
                       <span className={`inline-block text-xs px-2 py-0.5 rounded border font-medium ${SEVERITY_BADGE[incident.severity] || SEVERITY_BADGE.watch}`}>
                         {incident.severity?.toUpperCase()}
                       </span>
+                      {incident.sent && (
+                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                          <Clock className="w-3 h-3" aria-hidden="true" />
+                          Issued: {new Date(incident.sent).toLocaleString()}
+                        </p>
+                      )}
+                      {incident.expires && (
+                        <p className={`text-xs flex items-center gap-1 ${incident.isExpired ? "text-red-600 font-medium" : "text-gray-500"}`}>
+                          <Clock className="w-3 h-3" aria-hidden="true" />
+                          {incident.isExpired ? "Expired: " : "Expires: "}
+                          {new Date(incident.expires).toLocaleString()}
+                        </p>
+                      )}
                       {incident.description && (
                         <p className="text-xs text-gray-700 mt-1 leading-relaxed line-clamp-4">{incident.description}</p>
                       )}
                       {incident.agency && (
-                        <p className="text-xs text-gray-400 mt-1">Responding: {incident.agency}</p>
+                        <p className="text-xs text-gray-400 mt-1">Source: {incident.agency}</p>
                       )}
                     </div>
                   </Popup>
@@ -384,11 +384,30 @@ export default function IncidentMap() {
                   <span className={`text-xs px-2 py-0.5 rounded border font-medium ${SEVERITY_BADGE[incident.severity] || SEVERITY_BADGE.watch}`}>
                     {incident.severity?.toUpperCase()}
                   </span>
+                  {incident.isExpired && (
+                    <span className="text-xs px-2 py-0.5 rounded border font-medium bg-gray-100 text-gray-500 border-gray-300">
+                      EXPIRED
+                    </span>
+                  )}
                   {incident.agency && (
                     <span className="text-xs text-gray-400 font-mono">{incident.agency}</span>
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">{incident.state}</p>
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                  {incident.sent && (
+                    <p className="text-xs text-gray-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3" aria-hidden="true" />
+                      Issued {new Date(incident.sent).toLocaleString()}
+                    </p>
+                  )}
+                  {incident.expires && (
+                    <p className={`text-xs flex items-center gap-1 ${incident.isExpired ? "text-red-600 font-medium" : "text-gray-400"}`}>
+                      <Clock className="w-3 h-3" aria-hidden="true" />
+                      {incident.isExpired ? "Expired" : "Expires"} {new Date(incident.expires).toLocaleString()}
+                    </p>
+                  )}
+                </div>
                 {incident.description && (
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-2">{incident.description}</p>
                 )}
