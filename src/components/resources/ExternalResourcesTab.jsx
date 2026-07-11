@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Phone, Globe, MapPin, Heart, Home, Brain, Shield, Plane, TrendingUp } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const RESOURCE_CATEGORIES = [
   {
@@ -172,14 +173,133 @@ const FEMA_REGIONS = [
   { region: "X — Pacific Northwest", states: "AK, ID, OR, WA", url: "https://www.fema.gov/region-10-ak-id-or-wa" },
 ];
 
+const SPAIN_RESOURCES = [
+  {
+    id: "spain_immediate",
+    label: "España — Emergencias y Alertas",
+    icon: Shield,
+    color: "text-red-700",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    resources: [
+      { name: "AEMET — Avisos Meteorológicos", desc: "Alertas meteorológicas oficiales de la Agencia Estatal de Meteorología. Fenómenos adversos activos por zona.", url: "https://www.aemet.es/es/eltiempo/prediccion/avisos", icon: "⚠️" },
+      { name: "112 España — Emergencias", desc: "Número único de emergencias. Llama al 112 para policia, bomberos y ambulancia en toda España.", url: "https://www.112.es", phone: "112", icon: "🚨" },
+      { name: "Protección Civil", desc: "Planificación y gestión de emergencias. Planes de autoprotección, alertas y recomendaciones por tipo de riesgo.", url: "https://www.proteccioncivil.es", icon: "🛡️" },
+      { name: "ES-Alert — Sistema Nacional", desc: "Sistema nacional de alertas a la población mediante difusión celular. Mensajes de emergencia enviados al móvil automáticamente.", url: "https://www.proteccioncivil.es/es/alertas-emergencias/es-alert", icon: "📲" },
+    ],
+  },
+  {
+    id: "spain_fires",
+    label: "España — Incendios Forestales",
+    icon: Heart,
+    color: "text-orange-700",
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+    resources: [
+      { name: "EFFIS — Incendios Activos (Copernicus)", desc: "Mapa europeo de incendios activos detectados por satélite (MODIS + VIIRS). Cobertura para España y todo el Mediterráneo.", url: "https://forest-fire.emergency.copernicus.eu/apps/effis.viewer/", icon: "🔥" },
+      { name: "AEMET — Riesgo de Incendio", desc: "Predicción de riesgo de incendio forestal por comunidad autónoma. Índice de peligro diario.", url: "https://www.aemet.es/es/eltiempo/prediccion/incendios", icon: "🌡️" },
+      { name: "Ministerio para la Transición Ecológica — Incendios", desc: "Estadísticas y prevención de incendios forestales. MITECO coordina la lucha contra incendios a nivel nacional.", url: "https://www.miteco.gob.es/es/biodiversidad/temas/defensa-incendios-forestales/", icon: "🌳" },
+    ],
+  },
+  {
+    id: "spain_services",
+    label: "España — Servicios y Asistencia",
+    icon: Home,
+    color: "text-blue-700",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    resources: [
+      { name: "Cruz Roja Española", desc: "Asistencia en emergencias, refugios, ayuda humanitaria y formación en primeros auxilios.", url: "https://www2.cruzroja.es", icon: "🔴" },
+      { name: "DGT — Tráfico", desc: "Estado de las carreteras, alertas de tráfico y rutas alternativas durante emergencias.", url: "https://www.dgt.es", icon: "🚗" },
+      { name: "Guardia Civil", desc: "Cuerpo de seguridad del Estado. Atención al ciudadano y protección civil en zonas rurales.", url: "https://www.guardiacivil.es", icon: "👮" },
+      { name: "Ministerio del Interior", desc: "Coordinación de protección civil y emergencias a nivel nacional. Planes especiales y protocolos.", url: "https://www.interior.gob.es", icon: "🏛️" },
+      { name: "CEDEX — Centro de Estudios Hidrográficos", desc: "Información hidrológica y riesgo de inundaciones. Predicción de avenidas y embalses.", url: "https://www.cedex.es", icon: "💧" },
+    ],
+  },
+];
+
 export default function ExternalResourcesTab() {
   const [openCategories, setOpenCategories] = useState({ immediate: true });
   const [femaOpen, setFemaOpen] = useState(false);
+  const [isSpainUser, setIsSpainUser] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const user = await base44.auth.me();
+        const profiles = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+        if (profiles.length > 0) {
+          const country = (profiles[0].country || '').toLowerCase().trim();
+          setIsSpainUser(country === 'spain' || country === 'españa' || country === 'es' || country === 'esp');
+        }
+      } catch (e) {
+        // Not logged in or error — default to non-Spain view
+      }
+    })();
+  }, []);
 
   const toggle = (id) => setOpenCategories(prev => ({ ...prev, [id]: !prev[id] }));
 
   return (
     <div className="space-y-4">
+      {/* Spain Resources — only shown for users in Spain */}
+      {isSpainUser && (
+        <div className="rounded-lg border-2 border-yellow-400 bg-yellow-50 px-4 py-3 mb-2">
+          <p className="text-sm font-semibold text-yellow-900">
+            🇪🇸 Recursos de emergencia para España
+          </p>
+          <p className="text-xs text-yellow-700 mt-0.5">
+            Se muestran recursos locales porque tu perfil indica que resides en España.
+          </p>
+        </div>
+      )}
+      {isSpainUser && SPAIN_RESOURCES.map(cat => {
+        const Icon = cat.icon;
+        const isOpen = openCategories[cat.id];
+        return (
+          <div key={cat.id} className={`border rounded-lg overflow-hidden ${cat.border}`}>
+            <button
+              onClick={() => toggle(cat.id)}
+              className={`w-full flex items-center justify-between px-5 py-3.5 text-left ${cat.bg}`}
+            >
+              <div className="flex items-center gap-3">
+                <Icon className={`w-4 h-4 ${cat.color}`} />
+                <span className={`font-sans font-semibold text-sm ${cat.color}`}>{cat.label}</span>
+                <span className="text-xs text-muted-foreground font-sans">{cat.resources.length} recursos</span>
+              </div>
+              {isOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            </button>
+            {isOpen && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-card">
+                {cat.resources.map(r => (
+                  <a
+                    key={r.name}
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-start gap-3 bg-background border border-border rounded p-4 hover:border-primary/40 hover:shadow-sm transition-all"
+                  >
+                    <span className="text-xl mt-0.5 shrink-0">{r.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 mb-1">
+                        <span className="font-sans font-semibold text-foreground text-sm">{r.name}</span>
+                        <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-primary shrink-0" />
+                      </div>
+                      <p className="text-xs text-muted-foreground font-sans leading-relaxed">{r.desc}</p>
+                      {r.phone && (
+                        <p className="text-xs font-sans font-semibold text-primary mt-1 flex items-center gap-1">
+                          <Phone className="w-3 h-3" /> {r.phone}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
       {/* Category Accordions */}
       {RESOURCE_CATEGORIES.map(cat => {
         const Icon = cat.icon;
@@ -269,10 +389,21 @@ export default function ExternalResourcesTab() {
       <div className="flex flex-col sm:flex-row items-center gap-4 bg-primary/5 border border-primary/20 rounded p-5">
         <Phone className="w-5 h-5 text-primary shrink-0" />
         <div className="text-center sm:text-left">
-          <p className="font-sans font-semibold text-foreground text-sm">
-            In an active emergency: <strong>911</strong> · FEMA Helpline: <strong>1-800-621-3362</strong> · Disaster Distress: <strong>1-800-985-5990</strong>
-          </p>
-          <p className="text-xs text-muted-foreground font-sans mt-0.5">TTY: 1-800-462-7585 · Crisis Text: text HOME to 741741 · 988 Lifeline: call or text 988</p>
+          {isSpainUser ? (
+            <>
+              <p className="font-sans font-semibold text-foreground text-sm">
+                En caso de emergencia: <strong>112</strong> · AEMET: <a href="https://www.aemet.es" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">www.aemet.es</a> · Protección Civil: <a href="https://www.proteccioncivil.es" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">www.proteccioncivil.es</a>
+              </p>
+              <p className="text-xs text-muted-foreground font-sans mt-0.5">ES-Alert activa mensajes automáticos en tu móvil · Cruz Roja: <strong>900 222 222</strong></p>
+            </>
+          ) : (
+            <>
+              <p className="font-sans font-semibold text-foreground text-sm">
+                In an active emergency: <strong>911</strong> · FEMA Helpline: <strong>1-800-621-3362</strong> · Disaster Distress: <strong>1-800-985-5990</strong>
+              </p>
+              <p className="text-xs text-muted-foreground font-sans mt-0.5">TTY: 1-800-462-7585 · Crisis Text: text HOME to 741741 · 988 Lifeline: call or text 988</p>
+            </>
+          )}
         </div>
       </div>
     </div>
