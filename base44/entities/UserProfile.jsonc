@@ -169,6 +169,27 @@
       "type": "string",
       "description": "One-time token used to link a Telegram chat to this profile via the /start deep link"
     },
+    "status_alert_channels": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "email",
+          "telegram",
+          "discord",
+          "threads",
+          "signal"
+        ]
+      },
+      "default": [
+        "email"
+      ],
+      "description": "Which apps to broadcast I'm Safe / Need Help status alerts through"
+    },
+    "discord_webhook_url": {
+      "type": "string",
+      "description": "Discord webhook URL for posting status alerts to a family server channel"
+    },
     "last_active": {
       "type": "string",
       "format": "date-time",

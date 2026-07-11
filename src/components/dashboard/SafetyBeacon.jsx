@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, AlertTriangle, MapPin, Clock, Users } from "lucide-react";
+import { CheckCircle, AlertTriangle, MapPin, Clock, Users, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 /**
@@ -20,6 +20,7 @@ export default function SafetyBeacon() {
   const [selectedRallySpot, setSelectedRallySpot] = useState(null);
   const [posting, setPosting] = useState(false);
   const [showRallyPicker, setShowRallyPicker] = useState(false);
+  const [shareLinks, setShareLinks] = useState(null);
 
   useEffect(() => {
     load();
@@ -64,18 +65,24 @@ export default function SafetyBeacon() {
         await base44.entities.UserProfile.create(profileData);
       }
 
-      // Send a family message with status + rally spot
-      const spotMsg = spot ? ` — rallying at ${spot.name}` : "";
-      await base44.entities.FamilyMessage.create({
-        sender_id: user.id,
-        receiver_id: "family",
-        content: status === "safe"
-          ? `✅ I'm safe${spotMsg}`
-          : `🆘 I need assistance${spotMsg}`,
-        message_type: status === "safe" ? "status_safe" : "status_needs_assistance",
+      // Broadcast status via selected channels (email, Telegram, Discord, Threads/Signal share links)
+      const resp = await base44.functions.invoke("sendStatusAlert", {
+        status,
+        rally_spot_name: spot?.name || null,
       });
+      const alertResults = resp.data?.results;
+      if (alertResults?.share_links && Object.keys(alertResults.share_links).length > 0) {
+        setShareLinks(alertResults.share_links);
+      } else {
+        setShareLinks(null);
+      }
 
-      toast.success(status === "safe" ? "Status posted: Safe" : "Status posted: Needs Assistance");
+      const channelsUsed = profile?.status_alert_channels || ["email"];
+      const channelSummary = channelsUsed.filter(c => c !== "threads" && c !== "signal").join(", ");
+      toast.success(
+        status === "safe" ? "Status posted: Safe" : "Status posted: Needs Assistance",
+        { description: channelSummary ? `Alerted via: ${channelSummary}` : undefined }
+      );
       setShowRallyPicker(false);
       setSelectedRallySpot(null);
       load();
@@ -119,7 +126,7 @@ export default function SafetyBeacon() {
         )}
 
         {/* Action buttons */}
-        {!showRallyPicker ? (
+        {!showRallyPicker && !shareLinks ? (
           <div className="grid grid-cols-2 gap-2">
             <Button
               size="sm"
@@ -139,6 +146,33 @@ export default function SafetyBeacon() {
             >
               <AlertTriangle className="w-3.5 h-3.5 mr-1" />
               Need Help
+            </Button>
+          </div>
+        ) : shareLinks ? (
+          <div className="space-y-2">
+            <p className="text-xs font-sans font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+              <Share2 className="w-3 h-3" /> Share your status
+            </p>
+            <p className="text-xs text-muted-foreground font-sans">Email/Telegram/Discord alerts sent. Tap to share on your app:</p>
+            <div className="grid grid-cols-2 gap-2">
+              {shareLinks.threads && (
+                <a href={shareLinks.threads} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border hover:border-primary/50 text-xs font-sans font-medium text-foreground transition-colors">
+                  <Share2 className="w-3 h-3" /> Threads
+                </a>
+              )}
+              {shareLinks.signal && (
+                <a href={shareLinks.signal} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border hover:border-primary/50 text-xs font-sans font-medium text-foreground transition-colors">
+                  <Share2 className="w-3 h-3" /> Signal
+                </a>
+              )}
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="font-sans text-xs w-full"
+              onClick={() => setShareLinks(null)}
+            >
+              Done
             </Button>
           </div>
         ) : (
