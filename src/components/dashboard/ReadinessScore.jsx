@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { base44 } from "@/api/base44Client";
-import { Shield, TrendingUp } from "lucide-react";
+import { Shield, TrendingUp, ClipboardList } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 export default function ReadinessScore() {
   const [scoreData, setScoreData] = useState(null);
+  const [hasQuizResult, setHasQuizResult] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,8 +16,12 @@ export default function ReadinessScore() {
 
   const loadScore = async () => {
     try {
-      const response = await base44.functions.invoke('calculateReadinessScore');
+      const [response, quizResults] = await Promise.all([
+        base44.functions.invoke('calculateReadinessScore'),
+        base44.entities.QuizResult.list(),
+      ]);
       setScoreData(response.data);
+      setHasQuizResult(quizResults.length > 0);
     } catch (error) {
       console.error('Error loading readiness score:', error);
     } finally {
@@ -99,6 +105,18 @@ export default function ReadinessScore() {
               <span className="text-sm font-semibold">Next Steps:</span>
             </div>
             <ul className="space-y-1">
+              {!hasQuizResult && (
+                <li className="text-sm flex items-start gap-2">
+                  <ClipboardList className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span>
+                    Take the{" "}
+                    <Link to="/ReadinessQuiz" className="text-primary font-medium underline hover:opacity-80">
+                      Readiness Quiz
+                    </Link>{" "}
+                    to get a personalized preparedness baseline.
+                  </span>
+                </li>
+              )}
               {scoreData.recommendations.slice(0, 3).map((rec, idx) => (
                 <li key={idx} className="text-sm text-gray-600 flex items-start gap-2">
                   <span className="text-blue-600">•</span>
