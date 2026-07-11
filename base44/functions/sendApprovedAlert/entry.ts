@@ -201,36 +201,40 @@ Deno.serve(async (req) => {
               failed++;
             }
           } else if (channel === 'discord') {
-            // Post to the member's Discord webhook using the same template as email/Telegram
-            const dcRes = await fetch(profile.discord_webhook_url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(buildDiscordPayload(
-                submission.generated_title,
-                submission.generated_body,
-                submission.organization_name,
-                submission.event_level,
-                eventTime,
-                1
-              )),
-            });
-            if (dcRes.ok) {
-              discordDelivered++;
-              memberResult.channels.discord = 'delivered';
-              await base44.asServiceRole.entities.Notification.create({
-                title: submission.generated_title,
-                message: submission.generated_body,
-                type: submission.event_level === 'critical' ? 'alert' : 'warning',
-                recipient_email: member.email,
-                original_event_time: eventTime,
-                delivery_channel: 'discord',
-                delivery_status: 'delivered',
-                alert_id: submission.id,
-                read: false,
-              });
-            } else {
-              memberResult.channels.discord = `failed (HTTP ${dcRes.status})`;
+            if (!isSafeDiscordWebhookUrl(profile.discord_webhook_url)) {
+              memberResult.channels.discord = 'failed (invalid webhook URL)';
               failed++;
+            } else {
+              const dcRes = await fetch(profile.discord_webhook_url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(buildDiscordPayload(
+                  submission.generated_title,
+                  submission.generated_body,
+                  submission.organization_name,
+                  submission.event_level,
+                  eventTime,
+                  1
+                )),
+              });
+              if (dcRes.ok) {
+                discordDelivered++;
+                memberResult.channels.discord = 'delivered';
+                await base44.asServiceRole.entities.Notification.create({
+                  title: submission.generated_title,
+                  message: submission.generated_body,
+                  type: submission.event_level === 'critical' ? 'alert' : 'warning',
+                  recipient_email: member.email,
+                  original_event_time: eventTime,
+                  delivery_channel: 'discord',
+                  delivery_status: 'delivered',
+                  alert_id: submission.id,
+                  read: false,
+                });
+              } else {
+                memberResult.channels.discord = `failed (HTTP ${dcRes.status})`;
+                failed++;
+              }
             }
           } else if (channel === 'in_app') {
             await base44.asServiceRole.entities.Notification.create({

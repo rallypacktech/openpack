@@ -4,6 +4,18 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 // via the user's selected channels: email, Telegram, Discord webhook.
 // For Threads and Signal (no bot API), returns share links with pre-filled text.
 
+// Validates that a webhook URL is a legitimate Discord webhook endpoint.
+// Prevents SSRF: users could otherwise point discord_webhook_url at internal
+// services (loopback, link-local, cloud metadata endpoints).
+function isSafeDiscordWebhookUrl(url) {
+  if (typeof url !== 'string') return false;
+  const allowed = [
+    'https://discord.com/api/webhooks/',
+    'https://discordapp.com/api/webhooks/',
+  ];
+  return allowed.some(prefix => url.startsWith(prefix));
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -82,6 +94,9 @@ Deno.serve(async (req) => {
 
     // 4. DISCORD — post to webhook URL if configured
     if (channels.includes('discord') && profile.discord_webhook_url) {
+      if (!isSafeDiscordWebhookUrl(profile.discord_webhook_url)) {
+        results.discord = { delivered: false, error: 'invalid_discord_webhook_url' };
+      } else {
       try {
         const color = isSafe ? 3066993 : 15158332; // green : red
         const dcRes = await fetch(profile.discord_webhook_url, {
@@ -102,6 +117,7 @@ Deno.serve(async (req) => {
         results.discord = { delivered: dcRes.ok, status: dcRes.status };
       } catch (e) {
         results.discord = { delivered: false, error: e.message };
+      }
       }
     }
 
