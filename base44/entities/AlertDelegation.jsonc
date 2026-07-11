@@ -22,6 +22,33 @@
     "granted_by": {
       "type": "string",
       "description": "Email of the admin who granted this delegation"
+    },
+    "provides_shelters": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this organization operates emergency shelters \u2014 enables shelter and evacuation alerts"
+    },
+    "is_contracted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this organization is contracted by a government entity (county, state) to send official alerts \u2014 enables all incident types"
+    },
+    "contracted_type": {
+      "type": "string",
+      "enum": [
+        "county",
+        "state",
+        "federal",
+        "red_cross",
+        "private_shelter_provider",
+        "voad",
+        "other"
+      ],
+      "description": "Type of contracting entity if is_contracted is true"
+    },
+    "contracted_entity_name": {
+      "type": "string",
+      "description": "Name of the contracting government entity (e.g. 'Williamson County, TX')"
     }
   },
   "required": [

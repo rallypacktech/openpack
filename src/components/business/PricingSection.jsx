@@ -15,12 +15,12 @@ const TIER_META = {
   professional: {
     id: "professional",
     name: "Professional",
-    features: ["20 first aid kits tracked", "100 team members", "Chain of command alerts", "Unlimited evacuation plans", "Priority support"],
+    features: ["20 first aid kits tracked", "100 team members", "Chain of command alerts", "Unlimited evacuation plans", "Emergency alert sending (3/mo)", "Shelter provider verification", "Dual email + Telegram delivery", "Priority support"],
   },
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
-    features: ["Unlimited kits", "Unlimited members", "Custom integrations", "Dedicated support", "SLA guarantee"],
+    features: ["Unlimited kits", "Unlimited members", "Custom integrations", "Unlimited emergency alerts", "Contracted org / county verification", "Custom incident types", "Dual email + Telegram delivery", "Dedicated support", "SLA guarantee"],
   },
 };
 

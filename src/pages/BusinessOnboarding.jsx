@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Mail, CheckCircle2, Users, Shield, MapPin, ArrowRight } from "lucide-react";
+import { Building2, Mail, CheckCircle2, Users, Shield, MapPin, ArrowRight, AlertTriangle } from "lucide-react";
 import PricingSection from "@/components/business/PricingSection";
 
 export default function BusinessOnboarding() {
@@ -77,6 +77,33 @@ export default function BusinessOnboarding() {
                 <f.icon className="w-8 h-8 text-[#D64A2E] mx-auto mb-4" />
                 <h3 className="font-sans font-semibold text-foreground mb-2">{f.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Emergency Alert Sending */}
+      <section className="py-16 max-w-5xl mx-auto px-6 bg-amber-50/50">
+        <div className="text-center mb-8">
+          <AlertTriangle className="w-10 h-10 text-[#D64A2E] mx-auto mb-4" />
+          <h2 className="font-serif text-3xl font-bold text-foreground mb-3">Emergency Alert Sending</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Professional and Enterprise plans can submit official emergency alerts. All alerts use FEMA-aligned unified templates — one message, delivered to both email and Telegram.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          {[
+            { step: "1", title: "Onboard", desc: "Sign up, add your organization details, and subscribe to a plan." },
+            { step: "2", title: "Get Authorized", desc: "Admin verifies your org — shelter provider or contracted entity (county, state, Red Cross)." },
+            { step: "3", title: "Submit for Review", desc: "Select incident type and severity. Unified template generates the message. Admin reviews." },
+            { step: "4", title: "Dispatch", desc: "Once approved, dispatch to all members. Critical alerts go to both email and Telegram." },
+          ].map(s => (
+            <Card key={s.step} className="text-center border-border">
+              <CardContent className="pt-6 pb-4 px-4">
+                <div className="w-8 h-8 rounded-full bg-[#D64A2E] text-white flex items-center justify-center font-bold text-sm mx-auto mb-3">{s.step}</div>
+                <h3 className="font-sans font-semibold text-foreground text-sm mb-1">{s.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
               </CardContent>
             </Card>
           ))}

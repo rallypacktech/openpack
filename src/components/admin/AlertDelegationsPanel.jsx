@@ -12,7 +12,7 @@ export default function AlertDelegationsPanel() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ organization_name: "", authorized_email: "", subscription_id: "" });
+  const [form, setForm] = useState({ organization_name: "", authorized_email: "", subscription_id: "", provides_shelters: false, is_contracted: false, contracted_type: "", contracted_entity_name: "" });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function AlertDelegationsPanel() {
         is_active: true,
         granted_by: me.email
       });
-      setForm({ organization_name: "", authorized_email: "", subscription_id: "" });
+      setForm({ organization_name: "", authorized_email: "", subscription_id: "", provides_shelters: false, is_contracted: false, contracted_type: "", contracted_entity_name: "" });
       setShowForm(false);
       await loadData();
     } catch (e) {
@@ -129,6 +129,55 @@ export default function AlertDelegationsPanel() {
                 ))}
               </select>
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex items-center gap-2 text-sm font-sans cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.provides_shelters}
+                  onChange={(e) => setForm({ ...form, provides_shelters: e.target.checked })}
+                  className="rounded border-border"
+                />
+                Provides Shelters
+              </label>
+              <label className="flex items-center gap-2 text-sm font-sans cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.is_contracted}
+                  onChange={(e) => setForm({ ...form, is_contracted: e.target.checked })}
+                  className="rounded border-border"
+                />
+                Contracted (County/State)
+              </label>
+            </div>
+            {form.is_contracted && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Contracted Type</Label>
+                  <select
+                    className="w-full px-3 py-2 border rounded text-sm bg-background"
+                    value={form.contracted_type}
+                    onChange={(e) => setForm({ ...form, contracted_type: e.target.value })}
+                  >
+                    <option value="">Select type...</option>
+                    <option value="county">County</option>
+                    <option value="state">State</option>
+                    <option value="federal">Federal</option>
+                    <option value="red_cross">Red Cross</option>
+                    <option value="private_shelter_provider">Private Shelter Provider</option>
+                    <option value="voad">VOAD</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Contracting Entity</Label>
+                  <Input
+                    placeholder="e.g. Williamson County, TX"
+                    value={form.contracted_entity_name}
+                    onChange={(e) => setForm({ ...form, contracted_entity_name: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
             <div className="flex gap-2">
               <Button onClick={handleCreate} disabled={saving || !form.organization_name || !form.authorized_email || !form.subscription_id}>
                 {saving ? "Granting..." : "Grant Access"}
@@ -161,6 +210,16 @@ export default function AlertDelegationsPanel() {
                   <p className="text-xs text-muted-foreground mt-0.5">
                     Sends to: {subName(d.subscription_id)}
                   </p>
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    {d.provides_shelters && (
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300 text-xs">Shelter Provider</Badge>
+                    )}
+                    {d.is_contracted && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
+                        Contracted: {d.contracted_type || "Verified"}
+                      </Badge>
+                    )}
+                  </div>
                   {d.granted_by && (
                     <p className="text-xs text-muted-foreground/70 mt-0.5">
                       Granted by: {d.granted_by}

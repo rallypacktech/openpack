@@ -1,0 +1,168 @@
+{
+  "name": "AlertSubmission",
+  "type": "object",
+  "properties": {
+    "organization_name": {
+      "type": "string",
+      "description": "Name of the submitting organization"
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to the BusinessSubscription"
+    },
+    "delegation_id": {
+      "type": "string",
+      "description": "Reference to the AlertDelegation that authorizes this org to send alerts"
+    },
+    "incident_type": {
+      "type": "string",
+      "enum": [
+        "wildfire",
+        "flood",
+        "hurricane",
+        "tornado",
+        "earthquake",
+        "severe_weather",
+        "evacuation",
+        "shelter_open",
+        "shelter_close",
+        "active_shooter",
+        "custom"
+      ],
+      "description": "Type of incident being reported"
+    },
+    "event_level": {
+      "type": "string",
+      "enum": [
+        "advisory",
+        "watch",
+        "warning",
+        "critical"
+      ],
+      "description": "Severity level of the alert"
+    },
+    "target_area": {
+      "type": "string",
+      "description": "Geographic area affected by the alert"
+    },
+    "instructions": {
+      "type": "string",
+      "description": "Custom instructions appended to the template message"
+    },
+    "custom_message": {
+      "type": "string",
+      "description": "Full custom message body (used for 'custom' incident type)"
+    },
+    "generated_title": {
+      "type": "string",
+      "description": "The unified message title generated from the template"
+    },
+    "generated_body": {
+      "type": "string",
+      "description": "The unified message body generated from the template"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "rejected",
+        "sent"
+      ],
+      "default": "pending_review",
+      "description": "Approval and dispatch status of this submission"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "not_required"
+      ],
+      "default": "pending",
+      "description": "Whether payment has been confirmed for this alert submission"
+    },
+    "stripe_checkout_session_id": {
+      "type": "string",
+      "description": "Stripe checkout session ID for per-incident fee payment"
+    },
+    "submitted_by_email": {
+      "type": "string",
+      "description": "Email of the user who submitted the alert"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Email of the admin who approved or rejected the submission"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Notes from the admin reviewer"
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the alert was dispatched to recipients"
+    },
+    "delivery_summary": {
+      "type": "string",
+      "description": "JSON string summarizing delivery results (delivered, failed, channels)"
+    }
+  },
+  "required": [
+    "organization_name",
+    "subscription_id",
+    "incident_type",
+    "event_level",
+    "submitted_by_email"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.submitted_by_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

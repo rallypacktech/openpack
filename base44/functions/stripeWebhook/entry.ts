@@ -1,6 +1,17 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@17.5.0';
 
+function getTierSettings(tier) {
+  switch (tier) {
+    case 'professional':
+      return { alert_sending_enabled: true, alert_incidents_included: 3, max_first_aid_kits: 20, max_members: 100 };
+    case 'enterprise':
+      return { alert_sending_enabled: true, alert_incidents_included: -1, max_first_aid_kits: 9999, max_members: 9999 };
+    default:
+      return { alert_sending_enabled: false, alert_incidents_included: 0, max_first_aid_kits: 5, max_members: 25 };
+  }
+}
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
@@ -39,11 +50,12 @@ Deno.serve(async (req) => {
             const mappedStatus = statusMap[status] || 'trialing';
 
             if (subs.length > 0) {
+                const tierSettings = tierOverride ? getTierSettings(tierOverride) : {};
                 await base44.asServiceRole.entities.BusinessSubscription.update(subs[0].id, {
                     status: mappedStatus,
                     stripe_subscription_id: stripeSubId,
                     stripe_customer_id: stripeCustomerId,
-                    ...(tierOverride ? { tier: tierOverride } : {}),
+                    ...(tierOverride ? { tier: tierOverride, ...tierSettings } : {}),
                 });
             }
         };
@@ -79,26 +91,28 @@ Deno.serve(async (req) => {
                     owner_email: userEmail,
                 });
                 if (existing.length > 0) {
+                    const tierSettings = tier ? getTierSettings(tier) : {};
                     await base44.asServiceRole.entities.BusinessSubscription.update(existing[0].id, {
                         status: 'active',
                         stripe_subscription_id: sub.id,
                         stripe_customer_id: sub.customer,
-                        ...(tier ? { tier } : {}),
+                        ...(tier ? { tier, ...tierSettings } : {}),
                         current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
                         current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
                     });
                 } else if (userEmail) {
+                    const finalTier = tier || 'basic';
+                    const tierSettings = getTierSettings(finalTier);
                     await base44.asServiceRole.entities.BusinessSubscription.create({
                         owner_email: userEmail,
                         organization_name: session.metadata?.organization_name || userEmail,
                         status: 'active',
-                        tier: tier || 'basic',
+                        tier: finalTier,
                         stripe_subscription_id: sub.id,
                         stripe_customer_id: sub.customer,
                         current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
                         current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-                        max_first_aid_kits: 5,
-                        max_members: 25,
+                        ...tierSettings,
                     });
                 }
             }

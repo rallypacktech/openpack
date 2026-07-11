@@ -8,6 +8,7 @@ import QuizResultsTable from "../components/admin/QuizResultsTable";
 import IncidentMap from "../components/admin/IncidentMap";
 import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
 import AlertDelegationsPanel from "../components/admin/AlertDelegationsPanel";
+import AlertSubmissionsPanel from "../components/admin/AlertSubmissionsPanel";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -102,6 +103,9 @@ export default function AdminMonitor() {
             <TabsTrigger value="delegations" className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4" /> Alert Delegations
             </TabsTrigger>
+            <TabsTrigger value="submissions" className="flex items-center gap-2">
+              <ClipboardList className="w-4 h-4" /> Alert Submissions
+            </TabsTrigger>
             <TabsTrigger value="referrals" className="flex items-center gap-2">
               <Building2 className="w-4 h-4" /> Referrals
             </TabsTrigger>
@@ -121,6 +125,10 @@ export default function AdminMonitor() {
 
           <TabsContent value="delegations">
             <AlertDelegationsPanel />
+          </TabsContent>
+
+          <TabsContent value="submissions">
+            <AlertSubmissionsPanel />
           </TabsContent>
 
           <TabsContent value="users">

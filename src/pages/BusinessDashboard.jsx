@@ -9,7 +9,8 @@ import OrgMembersPanel from "@/components/business/OrgMembersPanel";
 import EvacuationPlanPanel from "@/components/business/EvacuationPlanPanel";
 import BusinessKitsPanel from "@/components/business/BusinessKitsPanel";
 import BusinessSubscriptionPanel from "@/components/business/BusinessSubscriptionPanel";
-import DelegatedAlertSender from "@/components/business/DelegatedAlertSender";
+import AlertSubmissionForm from "@/components/business/AlertSubmissionForm";
+import ContactAdminForm from "@/components/business/ContactAdminForm";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -166,6 +167,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="evacuation">Evacuation Plans</TabsTrigger>
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
           {hasDelegation && <TabsTrigger value="alerts">Emergency Alerts</TabsTrigger>}
+          <TabsTrigger value="contact">Contact Admin</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members">
@@ -179,11 +181,14 @@ export default function BusinessDashboard() {
         </TabsContent>
         {hasDelegation && (
           <TabsContent value="alerts">
-            <DelegatedAlertSender />
+            <AlertSubmissionForm />
           </TabsContent>
         )}
         <TabsContent value="subscription">
           <BusinessSubscriptionPanel subscription={subscription} onRefresh={loadAll} />
+        </TabsContent>
+        <TabsContent value="contact">
+          <ContactAdminForm organizationName={subscription?.organization_name} />
         </TabsContent>
       </Tabs>
     </div>
