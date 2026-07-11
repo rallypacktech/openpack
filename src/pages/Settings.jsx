@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Shield, Lock, AlertTriangle } from "lucide-react";
 import CountryEmergencySettings from "../components/settings/CountryEmergencySettings";
+import DefaultHomePageSetting from "../components/settings/DefaultHomePageSetting";
 import AddToHomeScreen from "../components/settings/AddToHomeScreen";
 import TelegramConnect from "../components/settings/TelegramConnect";
 import {
@@ -199,6 +200,9 @@ export default function Settings() {
 
         {/* Profile Section */}
         <ProfileForm user={user} profile={profile} onSave={handleProfileSave} />
+
+        {/* Default Home Page */}
+        <DefaultHomePageSetting profile={profile} onSave={handleProfileSave} />
 
         {/* Family Members Section */}
         <div id="family-section">

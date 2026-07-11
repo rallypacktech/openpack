@@ -102,6 +102,17 @@ export default function Dashboard() {
     loadData();
   }, []);
 
+  // Mark onboarding as completed once user has an address or family members
+  useEffect(() => {
+    if (!dataLoaded || !userProfile || userProfile.onboarding_completed) return;
+    const isEstablished = familyMembers.length > 0;
+    if (userProfile.street_address || isEstablished) {
+      base44.entities.UserProfile.update(userProfile.id, { onboarding_completed: true })
+        .then(() => setUserProfile({ ...userProfile, onboarding_completed: true }))
+        .catch(() => {});
+    }
+  }, [dataLoaded, userProfile, familyMembers]);
+
   const loadData = async () => {
     try {
       const user = await base44.auth.me();

@@ -360,14 +360,14 @@ function QuizResults({ score, answers, onRetake }) {
             <div className="bg-card border border-border rounded p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <p className="font-serif text-lg font-semibold text-foreground">Results saved to your account.</p>
-                <p className="text-sm text-muted-foreground font-sans mt-1">Head to your dashboard to build your kit or update your plan.</p>
+                <p className="text-sm text-muted-foreground font-sans mt-1">Set up your household profile, address, and emergency plan — it takes 2 minutes.</p>
               </div>
               <div className="flex gap-3 flex-shrink-0">
                 <button onClick={onRetake} className="text-sm font-sans text-muted-foreground hover:text-foreground underline transition-colors">
                   Retake quiz
                 </button>
                 <Link to="/Dashboard" className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-medium px-6 py-2.5 rounded hover:bg-primary/90 transition-colors text-sm">
-                  Go to Dashboard <ChevronRight className="w-4 h-4" />
+                  Start Onboarding <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>

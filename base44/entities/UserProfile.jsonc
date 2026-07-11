@@ -135,7 +135,18 @@
     },
     "onboarding_completed": {
       "type": "boolean",
-      "default": false
+      "default": false,
+      "description": "Whether the user has completed the initial onboarding flow"
+    },
+    "default_home_page": {
+      "type": "string",
+      "enum": [
+        "dashboard",
+        "offline",
+        "resources"
+      ],
+      "default": "dashboard",
+      "description": "Which page the user lands on after logging in \u2014 dashboard (default), offline mode, or resources"
     },
     "terms_agreed_version": {
       "type": "string",

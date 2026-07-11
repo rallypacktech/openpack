@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -25,12 +25,44 @@ const SCENARIOS = [
 ];
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isLoadingAuth } = useAuth();
   const [supportBannerDismissed, setSupportBannerDismissed] = useState(false);
+  const [homeRedirect, setHomeRedirect] = useState(null);
 
   useEffect(() => {
     setSupportBannerDismissed(sessionStorage.getItem("supportBannerDismissed") === "true");
   }, []);
+
+  useEffect(() => {
+    if (isLoadingAuth || !user) return;
+    (async () => {
+      try {
+        const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+        const profile = profiles[0];
+        const defaultHome = profile?.default_home_page || "dashboard";
+        if (profile?.onboarding_completed && (defaultHome === "offline" || defaultHome === "resources")) {
+          setHomeRedirect(defaultHome);
+        } else {
+          setHomeRedirect("dashboard");
+        }
+      } catch {
+        setHomeRedirect("dashboard");
+      }
+    })();
+  }, [user, isLoadingAuth]);
+
+  if (isLoadingAuth || (user && !homeRedirect)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" role="status" aria-label="Loading"></div>
+      </div>
+    );
+  }
+
+  if (homeRedirect) {
+    const path = homeRedirect === "offline" ? "/Offline" : homeRedirect === "resources" ? "/Resources" : "/Dashboard";
+    return <Navigate to={path} replace />;
+  }
 
   const handleSignUp = () => {
     base44.auth.redirectToLogin("/Dashboard");
