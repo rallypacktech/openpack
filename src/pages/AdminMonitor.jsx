@@ -3,12 +3,13 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck, Flame } from "lucide-react";
 import QuizResultsTable from "../components/admin/QuizResultsTable";
 import IncidentMap from "../components/admin/IncidentMap";
 import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
 import AlertDelegationsPanel from "../components/admin/AlertDelegationsPanel";
 import AlertSubmissionsPanel from "../components/admin/AlertSubmissionsPanel";
+import IncidentDataDashboard from "../components/admin/IncidentDataDashboard";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -109,6 +110,9 @@ export default function AdminMonitor() {
             <TabsTrigger value="referrals" className="flex items-center gap-2">
               <Building2 className="w-4 h-4" /> Referrals
             </TabsTrigger>
+            <TabsTrigger value="historical" className="flex items-center gap-2">
+              <Flame className="w-4 h-4" /> Historical Incidents
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="incidents">
@@ -129,6 +133,10 @@ export default function AdminMonitor() {
 
           <TabsContent value="submissions">
             <AlertSubmissionsPanel />
+          </TabsContent>
+
+          <TabsContent value="historical">
+            <IncidentDataDashboard />
           </TabsContent>
 
           <TabsContent value="users">
