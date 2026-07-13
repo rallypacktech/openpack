@@ -1,0 +1,64 @@
+{
+  "name": "HolidayFireworkDisplay",
+  "type": "object",
+  "properties": {
+    "holiday_name": {
+      "type": "string",
+      "description": "Name of the holiday (e.g., Independence Day, New Year's Eve, Diwali, Bastille Day)"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "admin1_code": {
+      "type": "string",
+      "description": "State/province code (nullable for country-wide holidays)"
+    },
+    "admin1_name": {
+      "type": "string",
+      "description": "State/province name"
+    },
+    "county_territory_id": {
+      "type": "string",
+      "description": "Reference to CountyTerritory (null for country-wide holidays)"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "has_public_fireworks": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this holiday typically has public firework displays in this area"
+    },
+    "typical_location": {
+      "type": "string",
+      "description": "Typical venue or area for fireworks display"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "holiday_name",
+    "country_code",
+    "date"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

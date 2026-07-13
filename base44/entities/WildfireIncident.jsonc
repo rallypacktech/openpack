@@ -1,0 +1,120 @@
+{
+  "name": "WildfireIncident",
+  "type": "object",
+  "properties": {
+    "incident_name": {
+      "type": "string",
+      "description": "Name of the wildfire incident"
+    },
+    "county_territory_id": {
+      "type": "string",
+      "description": "Reference to CountyTerritory (nullable if county not yet in DB)"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "admin1_name": {
+      "type": "string",
+      "description": "State/province name"
+    },
+    "admin2_name": {
+      "type": "string",
+      "description": "County/district name"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "containment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "hectares_burned": {
+      "type": "number",
+      "description": "Area burned in hectares (universal metric unit)"
+    },
+    "acres_burned": {
+      "type": "number",
+      "description": "Area burned in acres (US units, kept for source data conversion)"
+    },
+    "responding_organizations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of organizations that responded to the incident"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "NIFC",
+        "NASA_FIRMS",
+        "CAL_FIRE",
+        "INCIWEB",
+        "COPERNICUS_EFFIS",
+        "GFW",
+        "MANUAL",
+        "OTHER"
+      ]
+    },
+    "source_incident_id": {
+      "type": "string",
+      "description": "ID from the source system for deduplication"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "minor",
+        "moderate",
+        "major",
+        "catastrophic"
+      ]
+    },
+    "cause": {
+      "type": "string",
+      "description": "Cause of the wildfire (human, lightning, unknown, etc.)"
+    },
+    "structures_destroyed": {
+      "type": "number"
+    },
+    "fatalities": {
+      "type": "number"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "incident_name",
+    "country_code",
+    "start_date"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "name": "ReportingAgency",
+  "type": "object",
+  "properties": {
+    "county_territory_id": {
+      "type": "string",
+      "description": "Reference to CountyTerritory"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "agency_name": {
+      "type": "string",
+      "description": "Name of the reporting agency (or 'Unknown' for NULL entries)"
+    },
+    "agency_type": {
+      "type": "string",
+      "enum": [
+        "fire_department",
+        "police",
+        "sheriff",
+        "emergency_management",
+        "national_guard",
+        "red_cross",
+        "voad",
+        "utility",
+        "public_works",
+        "health_department",
+        "wildfire_management",
+        "other"
+      ],
+      "description": "Type of reporting agency in the chain of command"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "is_null_entry": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this is a placeholder row \u2014 agency unknown but county is accounted for in the chain of command"
+    },
+    "jurisdiction_level": {
+      "type": "string",
+      "enum": [
+        "county",
+        "state",
+        "federal",
+        "tribal",
+        "private",
+        "other"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "county_territory_id",
+    "agency_name",
+    "agency_type"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "name": "CountyContact",
+  "type": "object",
+  "properties": {
+    "county_territory_id": {
+      "type": "string",
+      "description": "Reference to CountyTerritory"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "general_email": {
+      "type": "string",
+      "description": "General team inbox for sending general messages to the county/territory"
+    },
+    "general_phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "emergency_management_email": {
+      "type": "string",
+      "description": "Emergency management office email"
+    },
+    "emergency_management_phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "county_territory_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
