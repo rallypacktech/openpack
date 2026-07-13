@@ -53,15 +53,6 @@ export default function BusinessReferralsPanel() {
     loadReferrals();
   };
 
-  const triggerMailto = (url) => {
-    const a = document.createElement('a');
-    a.href = url;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
   const handleContactAllPending = async () => {
     if (pendingCount === 0) return;
     if (!window.confirm(`Send referral emails to all ${pendingCount} pending businesses via Resend?`)) return;
@@ -69,17 +60,8 @@ export default function BusinessReferralsPanel() {
     try {
       const res = await base44.functions.invoke('contactPendingReferrals', {});
       const data = res.data || res;
-      const failedGroups = (data.per_audience || []).filter(g => g.mailto_url);
-      failedGroups.forEach((g, i) => {
-        setTimeout(() => triggerMailto(g.mailto_url), i * 500);
-      });
-      const summary = failedGroups.length > 0
-        ? `${data.message}\n\nManual send needed for ${failedGroups.length} group(s):\n` + failedGroups.map(g => `• ${g.audience} (${g.fallback_count})`).join('\n')
-        : data.message || `Sent ${data.sent_automatically} email(s).`;
-      setTimeout(() => {
-        window.alert(summary);
-        loadReferrals();
-      }, Math.max(200, failedGroups.length * 500 + 200));
+      window.alert(data.message || `Sent ${data.sent_automatically || 0} email(s).`);
+      loadReferrals();
     } catch (error) {
       console.error("Error contacting pending referrals:", error);
       window.alert("Failed to contact pending referrals: " + (error.message || "Unknown error"));
@@ -95,12 +77,10 @@ export default function BusinessReferralsPanel() {
     try {
       const res = await base44.functions.invoke('contactPendingReferrals', { referral_ids: [referralId] });
       const data = res.data || res;
-      const failedGroups = (data.per_audience || []).filter(g => g.mailto_url);
-      if (failedGroups.length > 0) {
-        triggerMailto(failedGroups[0].mailto_url);
-        window.alert('Resend failed — your email client has been opened as a fallback.');
+      if (data.sent_automatically > 0) {
+        window.alert(`Email sent from no-reply@rallypack.org. Referral marked as contacted.`);
       } else {
-        window.alert(`Email sent via Resend. Referral marked as contacted.`);
+        window.alert('Email failed to send. Please try again.');
       }
       loadReferrals();
     } catch (error) {
