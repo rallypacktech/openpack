@@ -1,5 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+// To send to external business addresses, verify your domain (rallypack.tech) in Resend dashboard:
+// https://resend.com/domains — add the provided DNS records (SPF, DKIM, DMARC), then emails send instantly.
+const FROM_EMAIL = 'RallyPack <noreply@rallypack.tech>';
+
 const AUDIENCE_CONFIG = {
     general: {
         label: 'General Preparedness',
@@ -165,6 +169,33 @@ function buildReferralEmailText(config, origin) {
     ].join('\n');
 }
 
+async function sendViaResend(to, subject, html, text) {
+    const apiKey = Deno.env.get('RESEND_API_KEY');
+    if (!apiKey) throw new Error('RESEND_API_KEY not set');
+
+    const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            from: FROM_EMAIL,
+            to: [to],
+            subject,
+            html,
+            text
+        })
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Resend API error (${response.status}): ${errorBody}`);
+    }
+
+    return await response.json();
+}
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
@@ -205,6 +236,9 @@ Deno.serve(async (req) => {
             return Response.json({
                 success: true,
                 total: 0,
+                sent_automatically: 0,
+                needs_manual: 0,
+                contacted_count: 0,
                 per_audience: [],
                 message: 'No referrals to contact.'
             });
@@ -225,11 +259,10 @@ Deno.serve(async (req) => {
             emailToReferralIds[mapKey].push(r.id);
         }
 
-        let sendEmailAvailable = true; // flipped false once the platform blocks an external address
         const perAudience = [];
-        const contactedIds = []; // only IDs where SendEmail succeeded
+        const contactedIds = [];
         let totalSent = 0;
-        let totalFallback = 0;
+        let totalFailed = 0;
 
         for (const [audienceKey, emailSet] of Object.entries(groups)) {
             const config = AUDIENCE_CONFIG[audienceKey];
@@ -241,48 +274,36 @@ Deno.serve(async (req) => {
             const failed = [];
 
             for (const email of emails) {
-                if (sendEmailAvailable) {
-                    try {
-                        await base44.asServiceRole.integrations.Core.SendEmail({
-                            to: email,
-                            subject: config.subject,
-                            body: html,
-                            from_name: 'RallyPack'
-                        });
-                        sent.push(email);
-                        // Mark corresponding referrals as contacted
-                        const mapKey = `${audienceKey}:${email}`;
-                        contactedIds.push(...(emailToReferralIds[mapKey] || []));
-                        continue;
-                    } catch (emailError) {
-                        const msg = (emailError.message || '').toLowerCase();
-                        if (msg.includes('outside the app') || msg.includes('users outside')) {
-                            // Platform-wide restriction on external addresses — stop attempting
-                            sendEmailAvailable = false;
-                        }
-                    }
+                try {
+                    await sendViaResend(email, config.subject, html, text);
+                    sent.push(email);
+                    const mapKey = `${audienceKey}:${email}`;
+                    contactedIds.push(...(emailToReferralIds[mapKey] || []));
+                } catch (e) {
+                    failed.push({ email, error: e.message });
                 }
-                failed.push(email);
             }
 
+            // Build mailto fallback only for emails that failed
             let mailtoUrl = null;
             if (failed.length > 0) {
-                mailtoUrl = `mailto:?bcc=${failed.map(e => encodeURIComponent(e)).join(',')}&subject=${encodeURIComponent(config.subject)}&body=${encodeURIComponent(text)}`;
+                mailtoUrl = `mailto:?bcc=${failed.map(f => encodeURIComponent(f.email)).join(',')}&subject=${encodeURIComponent(config.subject)}&body=${encodeURIComponent(text)}`;
             }
 
             totalSent += sent.length;
-            totalFallback += failed.length;
+            totalFailed += failed.length;
             perAudience.push({
                 audience: config.label,
                 audience_key: audienceKey,
                 subject: config.subject,
                 sent_count: sent.length,
                 fallback_count: failed.length,
-                mailto_url: mailtoUrl
+                mailto_url: mailtoUrl,
+                errors: failed.map(f => ({ email: f.email, error: f.error }))
             });
         }
 
-        // Only mark as contacted the referrals where SendEmail actually succeeded
+        // Mark referrals as contacted where Resend succeeded
         if (contactedIds.length > 0) {
             await base44.asServiceRole.entities.BusinessReferral.bulkUpdate(
                 contactedIds.map(id => ({ id, status: 'contacted' }))
@@ -290,17 +311,15 @@ Deno.serve(async (req) => {
         }
 
         const groupsNeedingManual = perAudience.filter(g => g.mailto_url).length;
-        const message = totalSent > 0 && groupsNeedingManual === 0
-            ? `${totalSent} referral email(s) sent automatically. ${contactedIds.length} marked as contacted.`
-            : totalSent > 0
-                ? `${totalSent} sent automatically (${contactedIds.length} marked contacted). ${totalFallback} require your email client (${groupsNeedingManual} audience group(s)).`
-                : `${totalFallback} referral(s) require your email client (${groupsNeedingManual} audience group(s)). Open the mailto link to send — referrals stay pending until actually sent.`;
+        const message = totalFailed === 0
+            ? `${totalSent} referral email(s) sent via Resend. ${contactedIds.length} marked as contacted.`
+            : `${totalSent} sent via Resend (${contactedIds.length} contacted). ${totalFailed} failed (${groupsNeedingManual} group(s) need manual send).`;
 
         return Response.json({
             success: true,
             total: referrals.length,
             sent_automatically: totalSent,
-            needs_manual: totalFallback,
+            needs_manual: totalFailed,
             contacted_count: contactedIds.length,
             per_audience: perAudience,
             message

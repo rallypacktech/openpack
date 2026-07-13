@@ -64,25 +64,22 @@ export default function BusinessReferralsPanel() {
 
   const handleContactAllPending = async () => {
     if (pendingCount === 0) return;
-    if (!window.confirm(`Send audience-specific referral emails to all ${pendingCount} pending businesses? Emails the platform can deliver are sent automatically and marked contacted; others open in your email client (BCC'd by audience) and stay pending until sent.`)) return;
+    if (!window.confirm(`Send referral emails to all ${pendingCount} pending businesses via Resend?`)) return;
     setContacting(true);
     try {
       const res = await base44.functions.invoke('contactPendingReferrals', {});
       const data = res.data || res;
-      // Open a mailto link for each audience group that needs manual sending
-      const manualGroups = (data.per_audience || []).filter(g => g.mailto_url);
-      manualGroups.forEach((g, i) => {
+      const failedGroups = (data.per_audience || []).filter(g => g.mailto_url);
+      failedGroups.forEach((g, i) => {
         setTimeout(() => triggerMailto(g.mailto_url), i * 500);
       });
-      const summary = [
-        data.message || `Contacted ${data.total} pending referrals.`,
-        manualGroups.length > 0 ? `\n\nManual send needed for ${manualGroups.length} audience group(s):` : '',
-        ...manualGroups.map(g => `• ${g.audience} (${g.fallback_count})`)
-      ].join('');
+      const summary = failedGroups.length > 0
+        ? `${data.message}\n\nManual send needed for ${failedGroups.length} group(s):\n` + failedGroups.map(g => `• ${g.audience} (${g.fallback_count})`).join('\n')
+        : data.message || `Sent ${data.sent_automatically} email(s).`;
       setTimeout(() => {
         window.alert(summary);
         loadReferrals();
-      }, Math.max(200, manualGroups.length * 500 + 200));
+      }, Math.max(200, failedGroups.length * 500 + 200));
     } catch (error) {
       console.error("Error contacting pending referrals:", error);
       window.alert("Failed to contact pending referrals: " + (error.message || "Unknown error"));
@@ -91,26 +88,26 @@ export default function BusinessReferralsPanel() {
     }
   };
 
+  const [resendingId, setResendingId] = useState(null);
+
   const handleResend = async (referralId) => {
+    setResendingId(referralId);
     try {
       const res = await base44.functions.invoke('contactPendingReferrals', { referral_ids: [referralId] });
       const data = res.data || res;
-      const manualGroups = (data.per_audience || []).filter(g => g.mailto_url);
-      if (manualGroups.length > 0) {
-        triggerMailto(manualGroups[0].mailto_url);
-        setTimeout(() => {
-          window.alert('Your email client has been opened. Send the email to complete the referral. Status stays pending until sent.');
-          loadReferrals();
-        }, 200);
-      } else if (data.sent_automatically > 0) {
-        window.alert('Email sent automatically. Referral marked as contacted.');
-        loadReferrals();
+      const failedGroups = (data.per_audience || []).filter(g => g.mailto_url);
+      if (failedGroups.length > 0) {
+        triggerMailto(failedGroups[0].mailto_url);
+        window.alert('Resend failed — your email client has been opened as a fallback.');
       } else {
-        loadReferrals();
+        window.alert(`Email sent via Resend. Referral marked as contacted.`);
       }
+      loadReferrals();
     } catch (error) {
       console.error("Error resending referral:", error);
       window.alert("Failed to resend: " + (error.message || "Unknown error"));
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -243,10 +240,16 @@ export default function BusinessReferralsPanel() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleResend(ref.id)}
+                      disabled={resendingId === ref.id}
                       className="text-xs"
-                      title="Resend referral email"
+                      title="Resend referral email via Resend"
                     >
-                      <Send className="w-3.5 h-3.5 mr-1" /> Resend
+                      {resendingId === ref.id ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                      ) : (
+                        <Send className="w-3.5 h-3.5 mr-1" />
+                      )}
+                      Resend
                     </Button>
                     <Select
                       value={ref.status}
