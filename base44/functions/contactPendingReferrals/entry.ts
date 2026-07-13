@@ -1,8 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-// To send to external business addresses, verify your domain (rallypack.tech) in Resend dashboard:
-// https://resend.com/domains — add the provided DNS records (SPF, DKIM, DMARC), then emails send instantly.
-const FROM_EMAIL = 'RallyPack <noreply@rallypack.tech>';
+const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
 
 const AUDIENCE_CONFIG = {
     general: {
