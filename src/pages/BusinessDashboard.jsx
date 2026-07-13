@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Users, Shield, MapPin, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
+import { Building2, Users, Shield, MapPin, AlertTriangle, CheckCircle2, Clock, Flame } from "lucide-react";
 import OrgMembersPanel from "@/components/business/OrgMembersPanel";
 import EvacuationPlanPanel from "@/components/business/EvacuationPlanPanel";
 import BusinessKitsPanel from "@/components/business/BusinessKitsPanel";
 import BusinessSubscriptionPanel from "@/components/business/BusinessSubscriptionPanel";
 import AlertSubmissionForm from "@/components/business/AlertSubmissionForm";
 import ContactAdminForm from "@/components/business/ContactAdminForm";
+import WildfireTimeline from "@/components/admin/WildfireTimeline";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -37,7 +38,26 @@ export default function BusinessDashboard() {
       base44.entities.EvacuationPlan.list(),
     ]);
 
-    const activeSub = subs.find(s => s.status === "active" || s.status === "trialing") || subs[0] || null;
+    let activeSub;
+    if (me.role === "admin") {
+      const myActiveSub = subs.find(s => s.owner_email === me.email && (s.status === "active" || s.status === "trialing"));
+      if (myActiveSub) {
+        activeSub = myActiveSub;
+      } else {
+        activeSub = await base44.entities.BusinessSubscription.create({
+          organization_name: "RallyPack Admin",
+          owner_email: me.email,
+          status: "active",
+          tier: "enterprise",
+          max_first_aid_kits: 999,
+          max_members: 999,
+          alert_incidents_included: -1,
+          alert_sending_enabled: true,
+        });
+      }
+    } else {
+      activeSub = subs.find(s => s.status === "active" || s.status === "trialing") || subs[0] || null;
+    }
     setSubscription(activeSub);
     setMembers(membersData);
     setKits(caches);
@@ -64,7 +84,8 @@ export default function BusinessDashboard() {
 
   // Lock business features for users without an active/trialing subscription
   const isSubscribed = subscription && (subscription.status === "active" || subscription.status === "trialing");
-  if (!isSubscribed) {
+  const isAdmin = user?.role === "admin";
+  if (!isSubscribed && !isAdmin) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <Building2 className="w-12 h-12 text-primary/40 mx-auto mb-4" />
@@ -116,6 +137,9 @@ export default function BusinessDashboard() {
               {subscription.status}
             </span>
             <Badge variant="outline" className="capitalize">{subscription.tier} plan</Badge>
+            {isAdmin && !subscription?.stripe_subscription_id && (
+              <Badge className="bg-green-100 text-green-800">Free Admin</Badge>
+            )}
           </div>
         )}
       </div>
@@ -167,6 +191,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="evacuation">Evacuation Plans</TabsTrigger>
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
           {hasDelegation && <TabsTrigger value="alerts">Emergency Alerts</TabsTrigger>}
+          <TabsTrigger value="wildfire">Wildfire History</TabsTrigger>
           <TabsTrigger value="contact">Contact Admin</TabsTrigger>
         </TabsList>
 
@@ -189,6 +214,9 @@ export default function BusinessDashboard() {
         </TabsContent>
         <TabsContent value="contact">
           <ContactAdminForm organizationName={subscription?.organization_name} />
+        </TabsContent>
+        <TabsContent value="wildfire">
+          <WildfireTimeline showIncidentList={true} />
         </TabsContent>
       </Tabs>
     </div>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Flame, RefreshCw, TrendingUp, MapPin, Calendar, Database } from "lucide-react";
 import { MapContainer, TileLayer, Circle, Popup } from "react-leaflet";
+import WildfireTimeline from "@/components/admin/WildfireTimeline";
 
 const SEVERITY_CONFIG = {
   catastrophic: { color: "#7f1d1d", fill: "rgba(127,29,29,0.35)", label: "Catastrophic" },
@@ -180,6 +181,8 @@ export default function IncidentDataDashboard() {
           </CardContent>
         </Card>
       )}
+
+      <WildfireTimeline />
 
       <Card>
         <CardHeader>
