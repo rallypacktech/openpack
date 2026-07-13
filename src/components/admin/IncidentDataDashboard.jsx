@@ -2,9 +2,32 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Flame, RefreshCw, TrendingUp, MapPin, Calendar, Database } from "lucide-react";
+import { Flame, RefreshCw, TrendingUp, MapPin, Calendar, Database, Globe } from "lucide-react";
 import { MapContainer, TileLayer, Circle, Popup } from "react-leaflet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WildfireTimeline from "@/components/admin/WildfireTimeline";
+
+const EFFIS_COUNTRIES = [
+  { code: "ES", name: "Spain" }, { code: "PT", name: "Portugal" }, { code: "GR", name: "Greece" },
+  { code: "IT", name: "Italy" }, { code: "FR", name: "France" }, { code: "HR", name: "Croatia" },
+  { code: "BG", name: "Bulgaria" }, { code: "CY", name: "Cyprus" }, { code: "CZ", name: "Czech Republic" },
+  { code: "EE", name: "Estonia" }, { code: "FI", name: "Finland" }, { code: "DE", name: "Germany" },
+  { code: "HU", name: "Hungary" }, { code: "LV", name: "Latvia" }, { code: "LT", name: "Lithuania" },
+  { code: "PL", name: "Poland" }, { code: "RO", name: "Romania" }, { code: "SK", name: "Slovakia" },
+  { code: "SE", name: "Sweden" }, { code: "CH", name: "Switzerland" }, { code: "TR", name: "Turkey" },
+  { code: "LB", name: "Lebanon" },
+];
+
+const SOURCE_LABELS = {
+  COPERNICUS_EFFIS: "EFFIS",
+  NIFC: "NIFC",
+  NASA_FIRMS: "NASA FIRMS",
+  CAL_FIRE: "CAL FIRE",
+  INCIWEB: "InciWeb",
+  GFW: "GFW",
+  MANUAL: "Manual",
+  OTHER: "Other",
+};
 
 const SEVERITY_CONFIG = {
   catastrophic: { color: "#7f1d1d", fill: "rgba(127,29,29,0.35)", label: "Catastrophic" },
@@ -27,6 +50,8 @@ export default function IncidentDataDashboard() {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
+  const [fetchingEffis, setFetchingEffis] = useState(false);
+  const [effisCountry, setEffisCountry] = useState("ES");
   const [severityFilter, setSeverityFilter] = useState("all");
 
   useEffect(() => {
@@ -57,6 +82,18 @@ export default function IncidentDataDashboard() {
     }
   };
 
+  const handleFetchEffis = async () => {
+    setFetchingEffis(true);
+    try {
+      await base44.functions.invoke("fetchEFFISHistory", { country_code: effisCountry, years_back: 10 });
+      await loadIncidents();
+    } catch (e) {
+      console.error("Error fetching EFFIS history:", e);
+    } finally {
+      setFetchingEffis(false);
+    }
+  };
+
   const filtered = severityFilter === "all"
     ? incidents
     : incidents.filter((i) => i.severity === severityFilter);
@@ -74,13 +111,29 @@ export default function IncidentDataDashboard() {
           </h2>
           <p className="text-sm text-gray-500 mt-1">Past wildfire data with hectares burned, responding organizations, and location mapping.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={loadIncidents} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
           <Button size="sm" onClick={handleFetchHistory} disabled={fetching}>
-            {fetching ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Fetching...</> : <><Database className="w-4 h-4 mr-1" /> Fetch More Data</>}
+            {fetching ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Fetching...</> : <><Database className="w-4 h-4 mr-1" /> Fetch US Data</>}
           </Button>
+          <div className="flex items-center gap-1.5">
+            <Globe className="w-4 h-4 text-blue-600" />
+            <Select value={effisCountry} onValueChange={setEffisCountry}>
+              <SelectTrigger className="w-[140px] h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {EFFIS_COUNTRIES.map(c => (
+                  <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" onClick={handleFetchEffis} disabled={fetchingEffis}>
+              {fetchingEffis ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Importing...</> : <>Import EFFIS</>}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -207,6 +260,7 @@ export default function IncidentDataDashboard() {
                     <th className="pb-2 pr-4">Location</th>
                     <th className="pb-2 pr-4 text-right">Hectares</th>
                     <th className="pb-2 pr-4">Severity</th>
+                    <th className="pb-2 pr-4">Source</th>
                     <th className="pb-2">Responding Orgs</th>
                   </tr>
                 </thead>
@@ -222,6 +276,15 @@ export default function IncidentDataDashboard() {
                         <td className="py-2 pr-4">
                           <span className="px-2 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: cfg.fill, color: cfg.color }}>
                             {cfg.label}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-4">
+                          <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                            inc.source === 'COPERNICUS_EFFIS'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {SOURCE_LABELS[inc.source] || inc.source || '—'}
                           </span>
                         </td>
                         <td className="py-2 text-gray-600 text-xs">
