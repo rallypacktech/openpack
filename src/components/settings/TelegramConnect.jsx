@@ -48,7 +48,7 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
           setConnectInfo(null);
           toast.success("Telegram connected successfully!");
         } else {
-          setError("No Telegram connection detected yet. Make sure you sent the message in Telegram, then try again.");
+          setError("No Telegram connection detected yet. Make sure you sent the message in Telegram, then try again. If you're using a VPN, try disabling it — VPNs can block the connection.");
         }
       } else {
         setError("Couldn't find your profile. Try disconnecting and reconnecting.");
@@ -206,10 +206,12 @@ export default function TelegramConnect({ profile, onProfileUpdate }) {
           <p className="text-sm text-red-600" role="alert">{error}</p>
         )}
 
-        <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
-          <strong>Free & best-effort:</strong> Telegram alerts depend on your internet connection.
+        <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg space-y-1">
+          <p><strong>Free & best-effort:</strong> Telegram alerts depend on your internet connection.
           During tower outages, messages may be delayed — that's why each alert carries its original
-          timestamp. Always verify critical status in the RallyPack app.
+          timestamp. Always verify critical status in the RallyPack app.</p>
+          <p><strong>VPN users:</strong> If the connection doesn't go through, try disabling your VPN
+          and tapping "Check connection" again — VPNs can block Telegram's webhook delivery.</p>
         </div>
       </CardContent>
     </Card>
