@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
 // Broadcasts a user's "I'm Safe" or "Need Help" status to family members
 // via the user's selected channels: email, Telegram, Discord webhook.
@@ -8,12 +8,18 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 // Prevents SSRF: users could otherwise point discord_webhook_url at internal
 // services (loopback, link-local, cloud metadata endpoints).
 function isSafeDiscordWebhookUrl(url) {
-  if (typeof url !== 'string') return false;
-  const allowed = [
-    'https://discord.com/api/webhooks/',
-    'https://discordapp.com/api/webhooks/',
-  ];
-  return allowed.some(prefix => url.startsWith(prefix));
+  if (typeof url !== 'string' || url.length > 2048) return false;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return false;
+    if (!['discord.com', 'discordapp.com'].includes(parsed.hostname)) return false;
+    if (!parsed.pathname.startsWith('/api/webhooks/')) return false;
+    // Reject URLs with credentials or fragments that could be used to confuse parsers
+    if (parsed.username || parsed.password) return false;
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 Deno.serve(async (req) => {
