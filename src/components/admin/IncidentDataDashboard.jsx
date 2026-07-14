@@ -18,6 +18,21 @@ const EFFIS_COUNTRIES = [
   { code: "LB", name: "Lebanon" },
 ];
 
+const GLOBAL_COUNTRIES = [
+  { code: "US", name: "United States" }, { code: "AU", name: "Australia" }, { code: "CA", name: "Canada" },
+  { code: "BR", name: "Brazil" }, { code: "AR", name: "Argentina" }, { code: "CL", name: "Chile" },
+  { code: "ZA", name: "South Africa" }, { code: "ID", name: "Indonesia" }, { code: "RU", name: "Russia" },
+  { code: "MX", name: "Mexico" }, { code: "CO", name: "Colombia" }, { code: "BO", name: "Bolivia" },
+  { code: "NZ", name: "New Zealand" }, { code: "MN", name: "Mongolia" }, { code: "KZ", name: "Kazakhstan" },
+  { code: "IN", name: "India" }, { code: "CN", name: "China" }, { code: "TH", name: "Thailand" },
+  { code: "VN", name: "Vietnam" }, { code: "PH", name: "Philippines" }, { code: "NG", name: "Nigeria" },
+  { code: "KE", name: "Kenya" }, { code: "TZ", name: "Tanzania" }, { code: "PE", name: "Peru" },
+  { code: "EC", name: "Ecuador" }, { code: "VE", name: "Venezuela" }, { code: "PY", name: "Paraguay" },
+  { code: "UY", name: "Uruguay" }, { code: "MZ", name: "Mozambique" }, { code: "AO", name: "Angola" },
+  { code: "ZM", name: "Zambia" }, { code: "ZW", name: "Zimbabwe" }, { code: "BW", name: "Botswana" },
+  { code: "NA", name: "Namibia" }, { code: "AU", name: "Australia" },
+];
+
 const SOURCE_LABELS = {
   COPERNICUS_EFFIS: "EFFIS",
   NIFC: "NIFC",
@@ -51,7 +66,9 @@ export default function IncidentDataDashboard() {
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
   const [fetchingEffis, setFetchingEffis] = useState(false);
+  const [fetchingAllEffis, setFetchingAllEffis] = useState(false);
   const [effisCountry, setEffisCountry] = useState("ES");
+  const [globalCountry, setGlobalCountry] = useState("US");
   const [severityFilter, setSeverityFilter] = useState("all");
 
   useEffect(() => {
@@ -73,7 +90,7 @@ export default function IncidentDataDashboard() {
   const handleFetchHistory = async () => {
     setFetching(true);
     try {
-      await base44.functions.invoke("fetchWildfireHistory", { country_code: "US" });
+      await base44.functions.invoke("fetchWildfireHistory", { country_code: globalCountry });
       await loadIncidents();
     } catch (e) {
       console.error("Error fetching history:", e);
@@ -92,6 +109,30 @@ export default function IncidentDataDashboard() {
     } finally {
       setFetchingEffis(false);
     }
+  };
+
+  const handleFetchAllMissingEffis = async () => {
+    const existingCountries = new Set(incidents.map(i => i.country_code));
+    const missing = EFFIS_COUNTRIES.filter(c => !existingCountries.has(c.code));
+    if (missing.length === 0) {
+      window.alert("All EFFIS countries already have data.");
+      return;
+    }
+    if (!window.confirm(`Import wildfire history for ${missing.length} missing EFFIS countries: ${missing.map(c => c.name).join(", ")}?\n\nThis will take several minutes.`)) return;
+    setFetchingAllEffis(true);
+    const results = [];
+    for (const country of missing) {
+      try {
+        const res = await base44.functions.invoke("fetchEFFISHistory", { country_code: country.code, years_back: 10 });
+        const data = res.data || res;
+        results.push(`${country.name}: ${data.incidents_created || 0} imported`);
+        await loadIncidents();
+      } catch (e) {
+        results.push(`${country.name}: FAILED (${e.message || "error"})`);
+      }
+    }
+    setFetchingAllEffis(false);
+    window.alert(`EFFIS import complete:\n\n${results.join("\n")}`);
   };
 
   const filtered = severityFilter === "all"
@@ -115,9 +156,24 @@ export default function IncidentDataDashboard() {
           <Button variant="outline" size="sm" onClick={loadIncidents} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
-          <Button size="sm" onClick={handleFetchHistory} disabled={fetching}>
-            {fetching ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Fetching...</> : <><Database className="w-4 h-4 mr-1" /> Fetch US Data</>}
-          </Button>
+          {/* Global / LLM-based history import */}
+          <div className="flex items-center gap-1.5">
+            <Globe className="w-4 h-4 text-orange-600" />
+            <Select value={globalCountry} onValueChange={setGlobalCountry}>
+              <SelectTrigger className="w-[160px] h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {GLOBAL_COUNTRIES.map(c => (
+                  <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button size="sm" onClick={handleFetchHistory} disabled={fetching}>
+              {fetching ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Fetching...</> : <><Database className="w-4 h-4 mr-1" /> Fetch History</>}
+            </Button>
+          </div>
+          {/* EFFIS import */}
           <div className="flex items-center gap-1.5">
             <Globe className="w-4 h-4 text-blue-600" />
             <Select value={effisCountry} onValueChange={setEffisCountry}>
@@ -132,6 +188,9 @@ export default function IncidentDataDashboard() {
             </Select>
             <Button variant="outline" size="sm" onClick={handleFetchEffis} disabled={fetchingEffis}>
               {fetchingEffis ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Importing...</> : <>Import EFFIS</>}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleFetchAllMissingEffis} disabled={fetchingAllEffis || fetchingEffis}>
+              {fetchingAllEffis ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Batch...</> : <>Fill Missing EFFIS</>}
             </Button>
           </div>
         </div>
