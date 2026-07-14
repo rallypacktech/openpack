@@ -206,7 +206,8 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
                 </thead>
                 <tbody>
                   {filteredIncidents
-                    .sort((a, b) => new Date(b.start_date) - new Date(a.start_date))
+                    .slice()
+                    .sort((a, b) => new Date(b.start_date || 0) - new Date(a.start_date || 0))
                     .slice(0, 50)
                     .map(inc => {
                       const color = SEVERITY_COLORS[inc.severity] || SEVERITY_COLORS.moderate;
