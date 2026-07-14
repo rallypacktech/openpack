@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
 Deno.serve(async (req) => {
   try {
@@ -24,17 +24,9 @@ Deno.serve(async (req) => {
 
     const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
 
-    // Ensure the webhook is registered with Telegram (idempotent — safe to call repeatedly)
-    try {
-      const webhookUrl = req.url.replace('getTelegramConnectLink', 'telegramWebhook');
-      await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: webhookUrl })
-      });
-    } catch (e) {
-      console.error('Webhook setup failed:', e);
-    }
+    // Webhook URL is self-registered by the telegramWebhook function itself,
+    // so we don't need to set it here (req.url uses hash-based dispatcher URLs,
+    // so string replacement of function names doesn't work).
 
     // Look up the bot's username to build the deep link
     const meResponse = await fetch(`https://api.telegram.org/bot${botToken}/getMe`);

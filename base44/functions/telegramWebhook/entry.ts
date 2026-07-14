@@ -1,7 +1,20 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
 Deno.serve(async (req) => {
   try {
+    // Self-register this function's URL as the Telegram webhook (idempotent)
+    // req.url is the public dispatcher URL for this function
+    const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
+    try {
+      await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: req.url, allowed_updates: ["message"] })
+      });
+    } catch (e) {
+      console.error('Webhook self-registration failed:', e);
+    }
+
     const body = await req.json();
 
     // Telegram sends updates with an update_id and a message object
