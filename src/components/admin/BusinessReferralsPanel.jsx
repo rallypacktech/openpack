@@ -80,7 +80,9 @@ export default function BusinessReferralsPanel() {
       if (data.sent_automatically > 0) {
         window.alert(`Email sent from no-reply@rallypack.org. Referral marked as contacted.`);
       } else {
-        window.alert('Email failed to send. Please try again.');
+        const errors = data.per_audience?.flatMap(a => a.errors || []);
+        const errorDetail = errors.length > 0 ? errors.map(e => `${e.email}: ${e.error}`).join('\n') : 'Unknown error';
+        window.alert(`Email failed to send.\n\n${errorDetail}`);
       }
       loadReferrals();
     } catch (error) {
