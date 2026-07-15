@@ -12,6 +12,7 @@ import BusinessSubscriptionPanel from "@/components/business/BusinessSubscriptio
 import AlertSubmissionForm from "@/components/business/AlertSubmissionForm";
 import ContactAdminForm from "@/components/business/ContactAdminForm";
 import WildfireTimeline from "@/components/admin/WildfireTimeline";
+import HolidayFireworkCorrelation from "@/components/admin/HolidayFireworkCorrelation";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -216,7 +217,10 @@ export default function BusinessDashboard() {
           <ContactAdminForm organizationName={subscription?.organization_name} />
         </TabsContent>
         <TabsContent value="wildfire">
-          <WildfireTimeline showIncidentList={true} />
+          <div className="space-y-6">
+            <WildfireTimeline showIncidentList={true} />
+            <HolidayFireworkCorrelation />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

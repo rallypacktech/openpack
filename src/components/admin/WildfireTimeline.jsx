@@ -53,7 +53,7 @@ function CustomTooltip({ active, payload }) {
 export default function WildfireTimeline({ showIncidentList = false, maxHeight = 380 }) {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [countyFilter, setCountyFilter] = useState("all");
+  const [countryFilter, setCountryFilter] = useState("all");
 
   useEffect(() => {
     loadIncidents();
@@ -74,25 +74,20 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
     }
   };
 
-  const counties = useMemo(() => {
-    const set = new Set();
+  const countries = useMemo(() => {
+    const map = new Map();
     incidents.forEach(i => {
-      if (i.admin2_name && i.admin1_name) {
-        set.add(`${i.admin2_name}, ${i.admin1_name}`);
-      } else if (i.admin1_name) {
-        set.add(i.admin1_name);
+      if (i.country_code && !map.has(i.country_code)) {
+        map.set(i.country_code, i.admin1_name ? `${i.country_code}` : i.country_code);
       }
     });
-    return Array.from(set).sort();
+    return Array.from(map.keys()).sort();
   }, [incidents]);
 
   const filteredIncidents = useMemo(() => {
-    if (countyFilter === "all") return incidents;
-    return incidents.filter(i => {
-      const loc = i.admin2_name ? `${i.admin2_name}, ${i.admin1_name}` : i.admin1_name;
-      return loc === countyFilter;
-    });
-  }, [incidents, countyFilter]);
+    if (countryFilter === "all") return incidents;
+    return incidents.filter(i => i.country_code === countryFilter);
+  }, [incidents, countryFilter]);
 
   const chartData = useMemo(() => {
     return filteredIncidents
@@ -122,13 +117,13 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
         </div>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-400" />
-          <Select value={countyFilter} onValueChange={setCountyFilter}>
+          <Select value={countryFilter} onValueChange={setCountryFilter}>
             <SelectTrigger className="w-[240px] h-8 text-sm">
-              <SelectValue placeholder="Filter by county/territory" />
+              <SelectValue placeholder="Filter by country" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All locations</SelectItem>
-              {counties.map(c => (
+              <SelectItem value="all">All countries</SelectItem>
+              {countries.map(c => (
                 <SelectItem key={c} value={c}>{c}</SelectItem>
               ))}
             </SelectContent>
