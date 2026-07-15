@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flame, Filter, Calendar, MapPin } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const SEVERITY_COLORS = {
@@ -18,6 +18,12 @@ const SEVERITY_LABELS = {
   moderate: "Moderate",
   minor: "Minor",
 };
+
+const CAUSE_COLORS = [
+  "#dc2626", "#f97316", "#fbbf24", "#84cc16", "#10b981",
+  "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6", "#ec4899",
+  "#64748b", "#78716c",
+];
 
 function formatNumber(n) {
   if (!n) return "—";
@@ -94,7 +100,7 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
       .filter(i => i.start_date)
       .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
       .map(i => ({
-        dateLabel: new Date(i.start_date).toLocaleDateString("en-US", { year: "numeric", month: "short" }),
+        dateLabel: new Date(i.start_date).toLocaleDateString("en-US", { year: "numeric" }),
         hectares: i.hectares_burned || 0,
         name: i.incident_name,
         severity: i.severity || "moderate",
@@ -104,6 +110,17 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
         fatalities: i.fatalities,
         cause: i.cause,
       }));
+  }, [filteredIncidents]);
+
+  const causeData = useMemo(() => {
+    const map = new Map();
+    filteredIncidents.forEach(i => {
+      const cause = i.cause ? i.cause.trim() : "Unknown";
+      map.set(cause, (map.get(cause) || 0) + 1);
+    });
+    return Array.from(map.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
   }, [filteredIncidents]);
 
   return (
@@ -170,16 +187,47 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
         </CardContent>
       </Card>
 
-      <div className="flex items-center gap-4 flex-wrap">
-        {Object.entries(SEVERITY_COLORS).map(([key, color]) => (
-          <div key={key} className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
-            <span className="text-xs text-gray-600">{SEVERITY_LABELS[key]}</span>
-          </div>
-        ))}
-        <span className="text-xs text-gray-400 ml-auto">
-          {filteredIncidents.length} incidents
-        </span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
+          {Object.entries(SEVERITY_COLORS).map(([key, color]) => (
+            <div key={key} className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+              <span className="text-xs text-gray-600">{SEVERITY_LABELS[key]}</span>
+            </div>
+          ))}
+          <span className="text-xs text-gray-400 ml-auto">
+            {filteredIncidents.length} incidents
+          </span>
+        </div>
+
+        {causeData.length > 0 && causeData.some(c => c.name !== "Unknown") && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Causes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie
+                    data={causeData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label={(e) => `${e.name}: ${e.value}`}
+                    labelLine={false}
+                  >
+                    {causeData.map((_, idx) => (
+                      <Cell key={idx} fill={CAUSE_COLORS[idx % CAUSE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {showIncidentList && filteredIncidents.length > 0 && (
