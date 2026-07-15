@@ -128,6 +128,28 @@ function shouldInclude(alert) {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+
+    // Authorization: admin user OR valid automation secret (for scheduled jobs)
+    const automationSecret = Deno.env.get("AUTOMATION_SECRET");
+    const providedSecret = req.headers.get("x-automation-secret");
+    let isAuthorized = false;
+    if (automationSecret && providedSecret) {
+      const a = new TextEncoder().encode(automationSecret);
+      const b = new TextEncoder().encode(providedSecret);
+      if (a.length === b.length) {
+        let diff = 0;
+        for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+        isAuthorized = diff === 0;
+      }
+    }
+    if (!isAuthorized) {
+      const user = await base44.auth.me();
+      isAuthorized = user && user.role === 'admin';
+    }
+    if (!isAuthorized) {
+      return Response.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
     const sr = base44.asServiceRole;
 
     // 1. Load all user profiles
