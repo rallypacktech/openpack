@@ -8,18 +8,18 @@
     },
     "county_territory_id": {
       "type": "string",
-      "description": "Reference to CountyTerritory (nullable if county not yet in DB)"
+      "description": "Reference to CountyTerritory (nullable if province not yet in DB)"
     },
     "country_code": {
       "type": "string"
     },
     "admin1_name": {
       "type": "string",
-      "description": "State/province name"
+      "description": "Territory/province name"
     },
     "admin2_name": {
       "type": "string",
-      "description": "County/district name"
+      "description": "Province/district name"
     },
     "start_date": {
       "type": "string",

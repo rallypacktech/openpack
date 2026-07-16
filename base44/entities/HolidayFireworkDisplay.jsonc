@@ -11,11 +11,11 @@
     },
     "admin1_code": {
       "type": "string",
-      "description": "State/province code (nullable for country-wide holidays)"
+      "description": "Territory/province code (nullable for country-wide holidays)"
     },
     "admin1_name": {
       "type": "string",
-      "description": "State/province name"
+      "description": "Territory/province name"
     },
     "county_territory_id": {
       "type": "string",

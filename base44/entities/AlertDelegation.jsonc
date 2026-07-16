@@ -31,13 +31,13 @@
     "is_contracted": {
       "type": "boolean",
       "default": false,
-      "description": "Whether this organization is contracted by a government entity (county, state) to send official alerts \u2014 enables all incident types"
+      "description": "Whether this organization is contracted by a government entity (province, territory) to send official alerts \u2014 enables all incident types"
     },
     "contracted_type": {
       "type": "string",
       "enum": [
-        "county",
-        "state",
+        "province",
+        "territory",
         "federal",
         "red_cross",
         "private_shelter_provider",

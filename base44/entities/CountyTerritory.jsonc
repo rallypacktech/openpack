@@ -11,30 +11,28 @@
     },
     "admin1_code": {
       "type": "string",
-      "description": "State/province/region code"
+      "description": "Territory/province/region code"
     },
     "admin1_name": {
       "type": "string",
-      "description": "State/province/region name (e.g., Texas, New South Wales)"
+      "description": "Territory/province/region name (e.g., Texas, New South Wales)"
     },
     "admin2_code": {
       "type": "string",
-      "description": "County/district/municipality code (e.g., FIPS code in the US)"
+      "description": "Province/district/municipality code (e.g., FIPS code in the US)"
     },
     "admin2_name": {
       "type": "string",
-      "description": "County/district/municipality name"
+      "description": "Province/district/municipality name"
     },
     "admin2_type": {
       "type": "string",
       "enum": [
-        "county",
         "parish",
         "borough",
         "district",
         "municipality",
         "province",
-        "department",
         "prefecture",
         "canton",
         "shire",
@@ -62,7 +60,7 @@
     "has_alert_contract": {
       "type": "boolean",
       "default": false,
-      "description": "Whether an AlertDelegation contract exists for this county/territory"
+      "description": "Whether an AlertDelegation contract exists for this province/territory"
     }
   },
   "required": [
