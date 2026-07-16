@@ -1,0 +1,130 @@
+{
+  "name": "GrantLOI",
+  "type": "object",
+  "properties": {
+    "grant_name": {
+      "type": "string",
+      "description": "Name of the grant program"
+    },
+    "funder_name": {
+      "type": "string",
+      "description": "Funding organization (e.g. FEMA, Google.org, Robert Wood Johnson Foundation)"
+    },
+    "grant_category": {
+      "type": "string",
+      "enum": [
+        "emergency_admin",
+        "remote_disaster_relief",
+        "emergency_tech",
+        "public_health_prep",
+        "community_resilience",
+        "other"
+      ],
+      "description": "Grant category RallyPack qualifies for"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "identified",
+        "drafting",
+        "internal_review",
+        "submitted",
+        "awarded",
+        "declined"
+      ],
+      "default": "identified",
+      "description": "Pipeline stage of the LOI"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "LOI or full application deadline"
+    },
+    "amount_requested": {
+      "type": "number",
+      "description": "Requested funding amount in USD"
+    },
+    "award_amount": {
+      "type": "number",
+      "description": "Awarded amount (filled if awarded)"
+    },
+    "loi_draft": {
+      "type": "string",
+      "description": "Draft Letter of Intent content (markdown)"
+    },
+    "loi_sections": {
+      "type": "object",
+      "description": "Structured LOI sections: need, approach, impact, budget_summary, org_capacity",
+      "properties": {
+        "need": {
+          "type": "string"
+        },
+        "approach": {
+          "type": "string"
+        },
+        "impact": {
+          "type": "string"
+        },
+        "budget_summary": {
+          "type": "string"
+        },
+        "org_capacity": {
+          "type": "string"
+        }
+      }
+    },
+    "grant_url": {
+      "type": "string",
+      "description": "URL to the grant program page"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of the admin assigned to this LOI"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "review_notes": {
+      "type": "string",
+      "description": "Internal review notes and feedback"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    }
+  },
+  "required": [
+    "grant_name",
+    "funder_name",
+    "grant_category",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
