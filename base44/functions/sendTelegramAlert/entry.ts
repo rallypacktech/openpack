@@ -4,7 +4,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json();
-    const { message, event_type, original_event_time, alert_id, user_email, secret } = body;
+    const { message, event_type, original_event_time, alert_id, user_email, secret, chat_id } = body;
 
     // Internal/automated calls pass the AUTOMATION_SECRET; otherwise the caller
     // must be authenticated and may only send to themselves (useful for testing).
@@ -21,19 +21,25 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'user_email is required for internal alert calls' }, { status: 400 });
     }
 
-    // Look up the recipient's profile
-    const profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by: targetEmail });
-    if (profiles.length === 0) {
-      return Response.json({ delivered: false, reason: 'no_profile' });
-    }
-    const profile = profiles[0];
-
     const eventTime = original_event_time || new Date().toISOString();
     const eventDate = new Date(eventTime);
     const correlationId = alert_id || crypto.randomUUID();
 
+    // Use chat_id directly if provided by the calling function (avoids re-lookup
+    // and issues with created_by not being queryable in some SDK versions).
+    // Otherwise fall back to profile lookup by email.
+    let telegramChatId = chat_id;
+
+    if (!telegramChatId) {
+      const profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by: targetEmail });
+      if (profiles.length === 0) {
+        return Response.json({ delivered: false, reason: 'no_profile' });
+      }
+      telegramChatId = profiles[0].telegram_chat_id;
+    }
+
     // If the user hasn't connected Telegram, record a failed delivery attempt and exit
-    if (!profile.telegram_chat_id) {
+    if (!telegramChatId) {
       await base44.asServiceRole.entities.Notification.create({
         title: `${event_type || 'Alert'} (undelivered — Telegram not connected)`,
         message: message || '',
@@ -60,18 +66,23 @@ Deno.serve(async (req) => {
 
     const attempts = (notification?.delivery_attempts || 0) + 1;
 
-    // Build the metadata-rich message with timestamp + attempt number + staleness warning
+    // Build the metadata-rich message — using HTML parse_mode to avoid
+    // Markdown parse errors when alert text contains *, _, [ etc. (common in NWS alerts)
+    function escapeHtml(text) {
+      return (text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     const formattedTime = eventDate.toISOString().replace('T', ' ').substring(0, 16) + ' UTC';
     const ageHours = (Date.now() - eventDate.getTime()) / (1000 * 60 * 60);
 
-    let stalenessNote = '';
+    let stalenessHtml = '';
     if (ageHours > 6) {
-      stalenessNote = `\n\n⚠️ *STALE ALERT:* This notification is ${Math.round(ageHours)} hours old. Information may be out of date — check the RallyPack app for current status.`;
+      stalenessHtml = `\n\n⚠️ <b>STALE ALERT:</b> This notification is ${Math.round(ageHours)} hours old. Information may be out of date — check the RallyPack app for current status.`;
     } else if (ageHours > 1) {
-      stalenessNote = `\n\n⚠️ Note: This notification is ${Math.round(ageHours)} hour(s) old. Verify current status in the RallyPack app.`;
+      stalenessHtml = `\n\n⚠️ Note: This notification is ${Math.round(ageHours)} hour(s) old. Verify current status in the RallyPack app.`;
     }
 
-    const telegramText = `🚨 *EMERGENCY ALERT*\n━━━━━━━━━━━━━\n*Type:* ${event_type || 'Alert'}\n*Valid as of:* ${formattedTime}\n*Delivery attempt:* ${attempts}\n\n${message || ''}${stalenessNote}\n\n_Always verify current status in the RallyPack app._`;
+    const telegramText = `🚨 <b>EMERGENCY ALERT</b>\n━━━━━━━━━━━━━\n<b>Type:</b> ${escapeHtml(event_type || 'Alert')}\n<b>Valid as of:</b> ${escapeHtml(formattedTime)}\n<b>Delivery attempt:</b> ${attempts}\n\n${escapeHtml(message || '')}${stalenessHtml}\n\n<i>Always verify current status in the RallyPack app.</i>`;
 
     // Send via Telegram Bot API
     const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
@@ -79,13 +90,21 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: profile.telegram_chat_id,
+        chat_id: telegramChatId,
         text: telegramText,
-        parse_mode: 'Markdown'
+        parse_mode: 'HTML'
       })
     });
 
-    const tgData = await tgResponse.json();
+    // Handle non-JSON responses gracefully (e.g. 502 Bad Gateway returns plain text)
+    let tgData;
+    const contentType = tgResponse.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      tgData = await tgResponse.json();
+    } else {
+      const rawBody = await tgResponse.text();
+      tgData = { ok: false, description: `HTTP ${tgResponse.status}: ${rawBody.substring(0, 300)}` };
+    }
 
     const recordResult = async (status, telegramMessageId) => {
       if (notification) {

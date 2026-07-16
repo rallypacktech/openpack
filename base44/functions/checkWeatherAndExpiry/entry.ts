@@ -199,6 +199,7 @@ Deno.serve(async (req) => {
                   message: fireMsg,
                   event_type: `Seasonal Fire Potential — ${region.label}`,
                   user_email: userEmail,
+                  chat_id: profile.telegram_chat_id,
                   secret: AUTOMATION_SECRET,
                 });
                 telegramPushed++;
@@ -295,6 +296,7 @@ Deno.serve(async (req) => {
                 event_type: props.event,
                 original_event_time: props.sent ? new Date(props.sent).toISOString() : new Date().toISOString(),
                 user_email: userEmail,
+                chat_id: profile.telegram_chat_id,
                 secret: AUTOMATION_SECRET
               });
               telegramPushed++;

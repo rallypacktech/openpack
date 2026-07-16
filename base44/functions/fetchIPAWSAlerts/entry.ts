@@ -170,6 +170,7 @@ Deno.serve(async (req) => {
                 event_type: props.event || 'Emergency Alert',
                 original_event_time: eventTime,
                 user_email: userEmail,
+                chat_id: profile.telegram_chat_id,
                 secret: AUTOMATION_SECRET,
               });
               telegramPushed++;
