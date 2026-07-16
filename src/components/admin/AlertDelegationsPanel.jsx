@@ -146,7 +146,7 @@ export default function AlertDelegationsPanel() {
                   onChange={(e) => setForm({ ...form, is_contracted: e.target.checked })}
                   className="rounded border-border"
                 />
-                Contracted (County/State)
+                Contracted (Province/Territory)
               </label>
             </div>
             {form.is_contracted && (
@@ -159,8 +159,8 @@ export default function AlertDelegationsPanel() {
                     onChange={(e) => setForm({ ...form, contracted_type: e.target.value })}
                   >
                     <option value="">Select type...</option>
-                    <option value="county">County</option>
-                    <option value="state">State</option>
+                    <option value="province">Province</option>
+                    <option value="territory">Territory</option>
                     <option value="federal">Federal</option>
                     <option value="red_cross">Red Cross</option>
                     <option value="private_shelter_provider">Private Shelter Provider</option>

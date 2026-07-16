@@ -219,7 +219,7 @@ export default function IncidentDataDashboard() {
           <CardContent className="pt-5">
             <div className="flex items-center gap-2 mb-1">
               <MapPin className="w-4 h-4 text-blue-600" />
-              <span className="text-xs font-medium text-gray-500">States Affected</span>
+              <span className="text-xs font-medium text-gray-500">Territories Affected</span>
             </div>
             <div className="text-2xl font-bold text-gray-900">{statesAffected}</div>
           </CardContent>

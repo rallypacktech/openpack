@@ -146,7 +146,7 @@ export default function StructuredAddressInput({ formData, onFieldChange, onAddr
         />
       </div>
 
-      {/* City, State, Zip in a row */}
+      {/* City, Territory, Zip in a row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label htmlFor="city" className="text-sm font-medium text-gray-700">
@@ -163,7 +163,7 @@ export default function StructuredAddressInput({ formData, onFieldChange, onAddr
         </div>
         <div>
           <Label htmlFor="state_province" className="text-sm font-medium text-gray-700">
-            State/Province <span className="text-red-500">*</span>
+            Territory/Province <span className="text-red-500">*</span>
           </Label>
           <Input
             id="state_province"
