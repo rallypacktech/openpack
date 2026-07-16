@@ -82,7 +82,11 @@
     },
     "cause": {
       "type": "string",
-      "description": "Cause of the wildfire (human, lightning, unknown, etc.)"
+      "description": "Original cause of the wildfire as recorded by the source system \u2014 preserved unchanged for data integrity"
+    },
+    "cause_cleaned": {
+      "type": "string",
+      "description": "Standardized/merged cause value used on user-facing pages. Original cause is preserved in the 'cause' field."
     },
     "structures_destroyed": {
       "type": "number"

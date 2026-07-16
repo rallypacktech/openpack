@@ -108,14 +108,14 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
         fullDate: formatDate(i.start_date),
         structures: i.structures_destroyed,
         fatalities: i.fatalities,
-        cause: i.cause,
+        cause: i.cause_cleaned || i.cause,
       }));
   }, [filteredIncidents]);
 
   const causeData = useMemo(() => {
     const map = new Map();
     filteredIncidents.forEach(i => {
-      const cause = i.cause ? i.cause.trim() : "Unknown";
+      const cause = (i.cause_cleaned || i.cause || "Unknown").trim();
       map.set(cause, (map.get(cause) || 0) + 1);
     });
     return Array.from(map.entries())
