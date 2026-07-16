@@ -64,6 +64,15 @@ export default function GrantLOIEditor({ loi, open, onClose, onSave }) {
         </DialogHeader>
 
         <div className="space-y-4 py-2">
+          <div>
+            <Label className="text-xs">Grant / Award Title</Label>
+            <Input
+              value={form.grant_name || ""}
+              onChange={(e) => setForm({ ...form, grant_name: e.target.value })}
+              placeholder="Enter title..."
+              className="mt-1"
+            />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <Label className="text-xs">Type</Label>
