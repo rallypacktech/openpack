@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Users, Shield, MapPin, AlertTriangle, CheckCircle2, Clock, Flame } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Building2, Users, Shield, MapPin, AlertTriangle, CheckCircle2, Clock, Flame, Zap } from "lucide-react";
 import OrgMembersPanel from "@/components/business/OrgMembersPanel";
 import EvacuationPlanPanel from "@/components/business/EvacuationPlanPanel";
 import BusinessKitsPanel from "@/components/business/BusinessKitsPanel";
@@ -13,6 +14,7 @@ import AlertSubmissionForm from "@/components/business/AlertSubmissionForm";
 import ContactAdminForm from "@/components/business/ContactAdminForm";
 import WildfireTimeline from "@/components/admin/WildfireTimeline";
 import HolidayFireworkCorrelation from "@/components/admin/HolidayFireworkCorrelation";
+import ProfessionalUpgradeCard from "@/components/business/ProfessionalUpgradeCard";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -22,6 +24,7 @@ export default function BusinessDashboard() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [hasDelegation, setHasDelegation] = useState(false);
+  const [showProUpgrade, setShowProUpgrade] = useState(false);
 
   useEffect(() => {
     loadAll();
@@ -94,23 +97,16 @@ export default function BusinessDashboard() {
         <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed">
           Team member tracking, first aid kit management, chain-of-command alerts, and evacuation planning are available on a Business subscription.
         </p>
-        <div className="bg-card border rounded-lg p-6 max-w-md mx-auto text-left">
-          <p className="text-sm font-semibold text-foreground mb-4">What's included:</p>
-          <ul className="space-y-2 text-sm text-muted-foreground mb-6">
-            {["Track multiple first aid kits across locations", "Chain-of-command emergency alerts", "Member roster with notification settings", "Evacuation plan builder"].map(f => (
-              <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />{f}</li>
-            ))}
-          </ul>
+        <ProfessionalUpgradeCard organizationName={subscription?.organization_name} onSubscribed={loadAll} />
+        <p className="text-xs text-muted-foreground mt-6">
+          Looking for other plans?{" "}
           <button
-            onClick={() => {
-              setSubscription({ id: null, organization_name: "", status: null, tier: "basic" });
-            }}
-            className="w-full bg-primary text-primary-foreground font-semibold py-2.5 rounded text-sm hover:bg-primary/90 transition-colors"
+            onClick={() => setSubscription({ id: null, organization_name: "", status: null, tier: "basic" })}
+            className="underline hover:text-foreground"
           >
-            View Plans & Subscribe
+            View all tiers
           </button>
-        </div>
-        {/* Show subscription panel below if they clicked "View Plans" */}
+        </p>
         {subscription?.id === null && (
           <div className="mt-10 text-left">
             <BusinessSubscriptionPanel subscription={null} onRefresh={loadAll} />
@@ -144,6 +140,22 @@ export default function BusinessDashboard() {
           </div>
         )}
       </div>
+
+      {/* Professional upsell for basic-tier users */}
+      {subscription?.tier === "basic" && (
+        <div className="mb-6 bg-primary/5 border border-primary/20 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Zap className="w-5 h-5 text-primary shrink-0" />
+            <div>
+              <p className="font-semibold text-foreground text-sm">Unlock Professional features</p>
+              <p className="text-xs text-muted-foreground">More kits, more members, emergency alert sending, and priority support.</p>
+            </div>
+          </div>
+          <Button size="sm" onClick={() => setShowProUpgrade(true)} className="shrink-0">
+            <Zap className="w-3.5 h-3.5 mr-1" /> Upgrade
+          </Button>
+        </div>
+      )}
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -223,6 +235,22 @@ export default function BusinessDashboard() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Professional upgrade dialog for basic-tier users */}
+      <Dialog open={showProUpgrade} onOpenChange={setShowProUpgrade}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">Upgrade to Professional</DialogTitle>
+          </DialogHeader>
+          <ProfessionalUpgradeCard
+            organizationName={subscription?.organization_name}
+            onSubscribed={() => {
+              setShowProUpgrade(false);
+              loadAll();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
