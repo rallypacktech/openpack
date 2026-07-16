@@ -5,11 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import GrantLOIEditor from "@/components/admin/GrantLOIEditor";
 import {
-  GRANT_LIBRARY, GRANT_CATEGORY_LABELS, LOI_STAGES, PRIORITY_LABELS
+  GRANT_LIBRARY, AWARD_LIBRARY, GRANT_CATEGORY_LABELS, LOI_STAGES, PRIORITY_LABELS
 } from "@/lib/grantLibrary";
 import {
-  Plus, FileText, Search, Sparkles, TrendingUp, Calendar, DollarSign, Loader2
+  Plus, FileText, Search, Sparkles, TrendingUp, Calendar, DollarSign, Loader2, Trophy
 } from "lucide-react";
+
+const ALL_OPPORTUNITIES = [...GRANT_LIBRARY, ...AWARD_LIBRARY];
 
 export default function GrantLOIWorkflow() {
   const [lois, setLois] = useState([]);
@@ -17,6 +19,7 @@ export default function GrantLOIWorkflow() {
   const [editing, setEditing] = useState(null);
   const [showLibrary, setShowLibrary] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [creating, setCreating] = useState(false);
 
   useEffect(() => { loadLOIs(); }, []);
@@ -54,6 +57,7 @@ export default function GrantLOIWorkflow() {
         grant_name: grant.grant_name,
         funder_name: grant.funder_name,
         grant_category: grant.grant_category,
+        opportunity_type: grant.opportunity_type || "grant",
         grant_url: grant.grant_url,
         amount_requested: grant.amount_requested,
         priority: grant.priority,
@@ -117,9 +121,11 @@ export default function GrantLOIWorkflow() {
   };
 
   const filteredLibrary = useMemo(() => {
-    if (filter === "all") return GRANT_LIBRARY;
-    return GRANT_LIBRARY.filter(g => g.grant_category === filter);
-  }, [filter]);
+    let list = ALL_OPPORTUNITIES;
+    if (typeFilter !== "all") list = list.filter(g => (g.opportunity_type || "grant") === typeFilter);
+    if (filter !== "all") list = list.filter(g => g.grant_category === filter);
+    return list;
+  }, [filter, typeFilter]);
 
   return (
     <div className="space-y-6">
@@ -193,6 +199,11 @@ export default function GrantLOIWorkflow() {
                         ${(loi.amount_requested / 1000).toFixed(0)}K requested
                       </p>
                     )}
+                    {loi.opportunity_type === "award" && (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-700 mt-1">
+                        <Trophy className="w-2.5 h-2.5" /> Award
+                      </span>
+                    )}
                     {loi.deadline && (
                       <p className="text-[10px] text-muted-foreground mt-0.5">
                         Due: {new Date(loi.deadline).toLocaleDateString()}
@@ -240,6 +251,15 @@ export default function GrantLOIWorkflow() {
               <div className="flex flex-wrap gap-2 items-center">
                 <Search className="w-4 h-4 text-muted-foreground" />
                 <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="text-sm border rounded px-2 py-1 bg-background"
+                >
+                  <option value="all">All Types</option>
+                  <option value="grant">Grants</option>
+                  <option value="award">Awards</option>
+                </select>
+                <select
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
                   className="text-sm border rounded px-2 py-1 bg-background"
@@ -263,9 +283,15 @@ export default function GrantLOIWorkflow() {
                         <Badge variant="secondary" className="text-[10px]">
                           {GRANT_CATEGORY_LABELS[grant.grant_category]}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          ${grant.amount_requested.toLocaleString()} requested
-                        </span>
+                        {grant.opportunity_type === "award" ? (
+                          <Badge className="text-[10px] bg-amber-100 text-amber-800 hover:bg-amber-100">
+                            <Trophy className="w-2.5 h-2.5 mr-0.5" /> Award
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">
+                            ${grant.amount_requested.toLocaleString()} requested
+                          </span>
+                        )}
                         {grant.priority === "high" && (
                           <span className={`text-[10px] font-semibold ${PRIORITY_LABELS.high.color}`}>High Priority</span>
                         )}

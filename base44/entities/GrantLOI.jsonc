@@ -4,7 +4,7 @@
   "properties": {
     "grant_name": {
       "type": "string",
-      "description": "Name of the grant program"
+      "description": "Name of the grant program or award"
     },
     "funder_name": {
       "type": "string",
@@ -21,6 +21,15 @@
         "other"
       ],
       "description": "Grant category RallyPack qualifies for"
+    },
+    "opportunity_type": {
+      "type": "string",
+      "enum": [
+        "grant",
+        "award"
+      ],
+      "default": "grant",
+      "description": "Whether this is a funding grant or a recognition award"
     },
     "status": {
       "type": "string",

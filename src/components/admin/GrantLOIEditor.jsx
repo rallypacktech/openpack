@@ -66,6 +66,17 @@ export default function GrantLOIEditor({ loi, open, onClose, onSave }) {
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
+              <Label className="text-xs">Type</Label>
+              <select
+                value={form.opportunity_type || "grant"}
+                onChange={(e) => setForm({ ...form, opportunity_type: e.target.value })}
+                className="w-full mt-1 border rounded px-2 py-1.5 text-sm bg-background"
+              >
+                <option value="grant">Grant (Funding)</option>
+                <option value="award">Award (Recognition)</option>
+              </select>
+            </div>
+            <div>
               <Label className="text-xs">Stage</Label>
               <select
                 value={form.status}

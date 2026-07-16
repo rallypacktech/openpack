@@ -123,6 +123,106 @@ export const GRANT_LIBRARY = [
   }
 ];
 
+// Recognition awards RallyPack qualifies for, across all categories.
+export const AWARD_LIBRARY = [
+  {
+    grant_name: "AWS Pathfinder Award",
+    funder_name: "Amazon Web Services",
+    grant_category: "emergency_tech",
+    opportunity_type: "award",
+    grant_url: "https://aws.amazon.com/startups/pathfinder",
+    amount_requested: 0,
+    priority: "high",
+    loi_sections: {
+      need: "Emergency tech innovators need visibility and cloud infrastructure support to scale life-saving alert and preparedness platforms.",
+      approach: "RallyPack delivers a multi-feed wildfire and severe-weather alert platform reaching households across 20+ countries with sub-minute latency.",
+      impact: "Recognized as a leading climate-tech innovator, expanding reach to 500,000 users through AWS infrastructure credits and visibility.",
+      budget_summary: "Recognition + AWS credits + technical mentorship (non-monetary award).",
+      org_capacity: "Production platform with NASA FIRMS, Copernicus EFFIS, NWS, and global CAP ingestion; multi-channel alert delivery; 20+ country wildfire database."
+    }
+  },
+  {
+    grant_name: "FEMA Individual and Community Preparedness Award",
+    funder_name: "FEMA",
+    grant_category: "emergency_admin",
+    opportunity_type: "award",
+    grant_url: "https://www.fema.gov/emergency-managers/individuals-communities/awards",
+    amount_requested: 0,
+    priority: "high",
+    loi_sections: {
+      need: "Individuals and community organizations leading grassroots preparedness innovation deserve national recognition to amplify their impact.",
+      approach: "RallyPack empowers households with free, accessible, multilingual preparedness tools including go-bag tracking, readiness quizzes, and family status alerts.",
+      impact: "Recognized nationally as a model for individual and community preparedness innovation, inspiring replication in 50+ counties.",
+      budget_summary: "Recognition award (non-monetary); national visibility and FEMA partnership opportunities.",
+      org_capacity: "Free open-source platform serving active users across multiple countries with county-level emergency management partnerships."
+    }
+  },
+  {
+    grant_name: "Disaster Response Innovation Award",
+    funder_name: "Global Disaster Preparedness Center",
+    grant_category: "remote_disaster_relief",
+    opportunity_type: "award",
+    grant_url: "https://preparecenter.org",
+    amount_requested: 0,
+    priority: "medium",
+    loi_sections: {
+      need: "Field-tested disaster response innovations need a platform to scale and be recognized by the global humanitarian community.",
+      approach: "RallyPack's offline-capable PWA delivers emergency manuals, shelter maps, and family status broadcasting via Telegram and Discord in low-bandwidth environments.",
+      impact: "Recognized as a scalable disaster response innovation, deployed to 5 additional disaster-affected regions within 12 months.",
+      budget_summary: "Recognition + network access to humanitarian partners (non-monetary).",
+      org_capacity: "PWA with offline caching, 7 embedded emergency manuals, and multi-channel family status alerts already deployed in active disasters."
+    }
+  },
+  {
+    grant_name: "Public Health Preparedness Hero Award",
+    funder_name: "ASTHO / CDC Foundation",
+    grant_category: "public_health_prep",
+    opportunity_type: "award",
+    grant_url: "https://www.cdcfoundation.org",
+    amount_requested: 0,
+    priority: "medium",
+    loi_sections: {
+      need: "Public health preparedness champions advancing household medical readiness deserve recognition to drive broader adoption.",
+      approach: "RallyPack's first-aid kit tracker with expiration monitoring and monthly inventory reminders closes the household medical preparedness gap.",
+      impact: "Recognized as a public health preparedness innovator, expanding first-aid tracking to 15 counties and 10,000 kits.",
+      budget_summary: "Recognition + CDC Foundation partnership opportunities (non-monetary).",
+      org_capacity: "First-aid kit location tracking with item-level expiration monitoring and automated monthly inventory reminders already in production."
+    }
+  },
+  {
+    grant_name: "Community Resilience Innovation Award",
+    funder_name: "Robert Wood Johnson Foundation",
+    grant_category: "community_resilience",
+    opportunity_type: "award",
+    grant_url: "https://www.rwjf.org",
+    amount_requested: 0,
+    priority: "medium",
+    loi_sections: {
+      need: "Community resilience innovations addressing equity gaps in disaster preparedness deserve recognition to attract scaling investment.",
+      approach: "RallyPack delivers culturally and species-aware preparedness: multilingual alerts, pet/livestock evacuation planning, and a free readiness quiz.",
+      impact: "Recognized as a leading community resilience innovation, reaching 40,000 underserved residents across 8 counties.",
+      budget_summary: "Recognition + RWJF network access (non-monetary).",
+      org_capacity: "Species-specific preparedness pages (equine, livestock, infant), livestock logistics planner, and country-aware emergency number directory."
+    }
+  },
+  {
+    grant_name: "Tech for Good Award",
+    funder_name: "NTEN / TechSoup",
+    grant_category: "other",
+    opportunity_type: "award",
+    grant_url: "https://www.nten.org",
+    amount_requested: 0,
+    priority: "low",
+    loi_sections: {
+      need: "Nonprofit technology projects delivering measurable social good need recognition to sustain and scale their impact.",
+      approach: "RallyPack is a free, open-source disaster preparedness platform built for equity, accessibility, and multilingual reach.",
+      impact: "Recognized as a Tech for Good leader, attracting volunteer contributors and pro-bono partnerships.",
+      budget_summary: "Recognition + TechSoup product donation eligibility (non-monetary).",
+      org_capacity: "Open-source MIT-licensed platform with active beta users, GDPR/CCPA compliance, and accessibility-first design including high-contrast and reduced-motion modes."
+    }
+  }
+];
+
 export const GRANT_CATEGORY_LABELS = {
   emergency_admin: "Emergency Admin",
   remote_disaster_relief: "Remote Disaster Relief",
