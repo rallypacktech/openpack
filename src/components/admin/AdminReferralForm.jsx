@@ -144,7 +144,7 @@ export default function AdminReferralForm({ onSuccess, onCancel }) {
 
       {selectedAudience && (
         <p className="text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded">
-          The email will link to <strong>{selectedAudience.path}</strong> and the readiness quiz.
+          The email will include the audience type ({selectedAudience.label}) and link to <strong>/BusinessOnboarding</strong> and <strong>{selectedAudience.path}</strong>.
         </p>
       )}
 

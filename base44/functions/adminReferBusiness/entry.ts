@@ -103,12 +103,16 @@ function buildReferralEmailHtml(config, origin, refereeName, organizationName, a
           <tr>
             <td style="padding:32px 40px;">
 
-              <h2 style="margin:0 0 16px;font-family:Georgia,serif;font-size:20px;font-weight:600;color:#1c1c1a;">${config.label}</h2>
+              <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:20px;font-weight:600;color:#1c1c1a;">${config.label}</h2>
+
+              <p style="margin:0 0 16px;">
+                <span style="display:inline-block;background-color:#f5f0e8;color:#1c1c1a;font-size:12px;font-weight:600;padding:4px 12px;border-radius:3px;border:1px solid #d8d2c6;">Audience: ${config.label}</span>
+              </p>
 
               <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">${greeting}</p>
 
               <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">
-                The RallyPack Team thought ${orgText} would benefit from our free ${config.label.toLowerCase()} resources.
+                The RallyPack Team thought ${orgText} would benefit from partnering with RallyPack on ${config.label.toLowerCase()} resources for your customers.
               </p>
 
               <p style="margin:0 0 20px;font-size:15px;color:#1c1c1a;">
@@ -120,17 +124,12 @@ function buildReferralEmailHtml(config, origin, refereeName, organizationName, a
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
                 <tr>
                   <td style="padding-bottom:12px;">
-                    <a href="${learnUrl}" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Learn More &rarr;</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding-bottom:12px;">
-                    <a href="${quizUrl}" style="display:inline-block;background-color:#1c1c1a;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Take the Free Readiness Quiz</a>
+                    <a href="${businessUrl}" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Explore Business Accounts &rarr;</a>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <a href="${businessUrl}" style="display:inline-block;background-color:#f5f0e8;color:#1c1c1a;font-size:14px;font-weight:500;text-decoration:none;padding:12px 28px;border-radius:4px;border:1px solid #d8d2c6;">Explore Business Accounts</a>
+                    <a href="${learnUrl}" style="display:inline-block;background-color:#1c1c1a;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Learn More</a>
                   </td>
                 </tr>
               </table>
@@ -229,7 +228,7 @@ Deno.serve(async (req) => {
         } catch (emailError) {
             // Platform may block emails to non-app users; provide a mailto fallback
             const textGreeting = safe_referee_name ? `Hello ${safe_referee_name},` : 'Hello,';
-            const textBody = `${textGreeting}\n\nThe RallyPack Team thought ${safe_organization || 'your business'} would benefit from our free ${config.label.toLowerCase()} resources.\n\n${config.intro}\n\n${safe_message ? `"${safe_message}"\n— RallyPack Team\n\n` : ''}Learn More: ${origin}${config.learnPath}\nTake the Free Readiness Quiz: ${origin}/ReadinessQuiz\nExplore Business Accounts: ${origin}/BusinessOnboarding\n\nStay safe,\nRallyPack Team`;
+            const textBody = `${textGreeting}\n\nAudience: ${config.label}\n\nThe RallyPack Team thought ${safe_organization || 'your business'} would benefit from partnering with RallyPack on ${config.label.toLowerCase()} resources for your customers.\n\n${config.intro}\n\n${safe_message ? `"${safe_message}"\n— RallyPack Team\n\n` : ''}Explore Business Accounts: ${origin}/BusinessOnboarding\nLearn More: ${origin}${config.learnPath}\n\nStay safe,\nRallyPack Team`;
             mailtoUrl = `mailto:${encodeURIComponent(referee_email)}?subject=${encodeURIComponent(config.subject)}&body=${encodeURIComponent(textBody)}`;
         }
 
