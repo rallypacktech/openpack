@@ -1,0 +1,54 @@
+{
+  "name": "Donation",
+  "type": "object",
+  "properties": {
+    "amount_cents": {
+      "type": "number",
+      "description": "Donation amount in cents"
+    },
+    "donor_email": {
+      "type": "string",
+      "description": "Email of the donor (from Stripe checkout)"
+    },
+    "donor_name": {
+      "type": "string",
+      "description": "Optional display name of the donor"
+    },
+    "stripe_checkout_session_id": {
+      "type": "string"
+    },
+    "stripe_payment_intent_id": {
+      "type": "string"
+    },
+    "is_anonymous": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the donor chose to remain anonymous"
+    }
+  },
+  "required": [
+    "amount_cents"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

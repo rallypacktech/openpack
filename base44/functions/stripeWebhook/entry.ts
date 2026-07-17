@@ -79,6 +79,16 @@ Deno.serve(async (req) => {
 
         if (type === 'checkout.session.completed') {
             const session = data.object;
+            // One-time donation — record it
+            if (session.mode === 'payment' && session.metadata?.donation === 'true') {
+                await base44.asServiceRole.entities.Donation.create({
+                    amount_cents: session.amount_total || 0,
+                    donor_email: session.customer_email || '',
+                    donor_name: session.metadata?.donor_name || '',
+                    stripe_checkout_session_id: session.id,
+                    stripe_payment_intent_id: session.payment_intent || '',
+                });
+            }
             if (session.mode === 'subscription' && session.subscription) {
                 const sub = await stripe.subscriptions.retrieve(session.subscription, {
                     expand: ['items.data.price.product'],
