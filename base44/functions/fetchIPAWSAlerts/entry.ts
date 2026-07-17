@@ -41,6 +41,48 @@ function getNotifType(severity) {
   return 'info';
 }
 
+// Haversine distance in km between two lat/lon points
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// Extract a representative lat/lon from an NWS alert's GeoJSON geometry
+function getAlertCenter(feature) {
+  const geom = feature.geometry;
+  if (!geom) return null;
+  if (geom.type === 'Point' && geom.coordinates) {
+    return { lat: geom.coordinates[1], lon: geom.coordinates[0] };
+  }
+  if (geom.type === 'Polygon' && geom.coordinates?.[0]) {
+    const ring = geom.coordinates[0];
+    if (ring.length === 0) return null;
+    let sumLat = 0, sumLon = 0;
+    for (const [lon, lat] of ring) { sumLat += lat; sumLon += lon; }
+    return { lat: sumLat / ring.length, lon: sumLon / ring.length };
+  }
+  return null;
+}
+
+// Map NWS event names to the user's alert_settings key
+function eventToAlertKey(event) {
+  const e = (event || '').toLowerCase();
+  if (e.includes('tornado')) return 'tornado';
+  if (e.includes('flood')) return 'flood';
+  if (e.includes('hurricane') || e.includes('tropical') || e.includes('tsunami')) return 'hurricane';
+  if (e.includes('thunderstorm') || e.includes('severe') || e.includes('wind') || e.includes('winter') || e.includes('blizzard')) return 'severe_weather';
+  if (e.includes('fire') || e.includes('red flag')) return 'wildfire';
+  if (e.includes('earthquake')) return 'earthquake';
+  return null;
+}
+
+const DEFAULT_RADII = { wildfire: 80, severe_weather: 120, hurricane: 300, tornado: 80, flood: 40, earthquake: 150 };
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -121,7 +163,9 @@ Deno.serve(async (req) => {
     const errors = [];
     const matchedAlerts = [];
 
-    // 5. Match alerts to users by state
+    // 5. Match alerts to users by distance using their per-event-type radius settings
+    const locatedProfiles = profiles.filter(p => p.latitude && p.longitude);
+
     for (const feature of filtered) {
       const props = feature.properties || {};
       const nwsId = props.id;
@@ -130,20 +174,32 @@ Deno.serve(async (req) => {
       if (props.expires && new Date(props.expires) < new Date()) continue;
 
       const areaDesc = props.areaDesc || '';
-      const areaLower = areaDesc.toLowerCase();
+      const alertCenter = getAlertCenter(feature);
+      const eventKey = eventToAlertKey(props.event);
+      const isEvac = isEvacNotice(props.event, props.headline);
 
-      // Match users by state — areaDesc format: "Williamson County, TX; Travis County, TX" or "Texas"
-      const matchedProfiles = profiles.filter(p => {
-        const state = (p.state_province || '').toLowerCase().trim();
-        const country = (p.country || '').toLowerCase().trim();
-        const isUS = country === 'us' || country === 'united states' || country === 'usa' || country === '';
-        if (!isUS || !state) return false;
+      // Match users by distance — only those with coordinates and within their radius
+      const matchedProfiles = locatedProfiles.filter(p => {
+        const alertSettings = p.alert_settings || {};
 
-        // Resolve to 2-letter code so "Texas" matches "TX" in area descriptions
-        const stateCode = state.length === 2 ? state : (US_STATE_CODE[state] || '');
-        return areaLower.includes(`, ${state}`) ||
-               (stateCode && areaLower.includes(`, ${stateCode}`)) ||
-               areaLower.includes(state);
+        // Skip if this alert type is explicitly disabled
+        if (eventKey && alertSettings[eventKey] === false) return false;
+
+        // Determine the user's radius for this event type
+        let radiusKm;
+        if (eventKey) {
+          radiusKm = alertSettings[`${eventKey}_radius_km`] || DEFAULT_RADII[eventKey] || 80;
+        } else if (isEvac) {
+          radiusKm = 50; // Evacuation notices: tight radius since they're location-specific
+        } else {
+          radiusKm = 80; // Default fallback
+        }
+
+        // Can't do distance matching without alert geometry — skip
+        if (!alertCenter) return false;
+
+        const dist = haversineKm(p.latitude, p.longitude, alertCenter.lat, alertCenter.lon);
+        return dist <= radiusKm;
       });
 
       if (matchedProfiles.length === 0) continue;
