@@ -8,7 +8,7 @@ const OPERATING_COSTS = [
   { label: "Base44 Builder Subscription", amount: 2400, description: "App hosting, database, backend functions, and integrations (~$200/mo)" },
   { label: "Domain Registration (Name.com)", amount: 50, description: "Annual domain renewal" },
   { label: "Email & Communication Tools", amount: 350, description: "Resend, Telegram Bot infrastructure, and notification delivery" },
-  { label: "Payment Processing & Buffer", amount: 2200, description: "Stripe transaction fees and contingency reserve" },
+  { label: "Payment Processing & Buffer", amount: 2200, description: "Stripe transaction fees and contingency reserve. We participate in the Stripe Climate program — a portion of every transaction funds carbon removal projects." },
 ];
 
 Deno.serve(async (req) => {
