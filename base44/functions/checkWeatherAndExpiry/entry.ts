@@ -264,9 +264,9 @@ Deno.serve(async (req) => {
             created_by: userEmail,
             title: `🌩️ ${props.event}`,
           });
-          // Simple dedup: skip if a notification with same title was created in last 6h
-          const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
-          const recentDuplicate = existing.some(n => new Date(n.created_date) > sixHoursAgo);
+          // Simple dedup: skip if a notification with same title was created in last 4h
+          const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
+          const recentDuplicate = existing.some(n => new Date(n.created_date) > fourHoursAgo);
           if (recentDuplicate) continue;
 
           await base44.asServiceRole.entities.Notification.create({

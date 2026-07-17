@@ -28,18 +28,28 @@ Deno.serve(async (req) => {
       return Response.json({ message: 'No profiles with coordinates found.', processed: 0 });
     }
 
-    // 2. Load existing NWS notification titles to avoid duplicates
-    //    We store the NWS alert ID inside the title as a prefix: "[nws_<id>]"
+    // 2. Build per-user-per-event-type cooldown map (4h) to truncate repeating warnings.
+    const COOLDOWN_MS = 4 * 60 * 60 * 1000;
+    const nowMs = Date.now();
     const existingNotifs = await srBase44.entities.Notification.list();
-    const existingKeys = new Set(
-      existingNotifs
-        .filter(n => n.title && n.title.startsWith('[nws_'))
-        .map(n => {
-          const match = n.title.match(/^\[nws_([^\]]+)\]/);
-          return match ? `nws_${match[1]}` : null;
-        })
-        .filter(Boolean)
-    );
+    const recentEventMap = new Map(); // key: `${userEmail}__${eventLower}` -> createdMs
+
+    for (const n of existingNotifs) {
+      const email = n.recipient_email || n.created_by;
+      if (!email) continue;
+      const createdMs = n.created_date ? new Date(n.created_date).getTime() : 0;
+      if (!createdMs || nowMs - createdMs > COOLDOWN_MS) continue;
+
+      let eventType = null;
+      if (n.alert_id && n.alert_id.startsWith('nws_event:')) {
+        eventType = n.alert_id.substring('nws_event:'.length).toLowerCase();
+      }
+      if (!eventType) continue;
+
+      const mapKey = `${email}__${eventType}`;
+      const prev = recentEventMap.get(mapKey);
+      if (!prev || createdMs > prev) recentEventMap.set(mapKey, createdMs);
+    }
 
     let totalCreated = 0;
     const errors = [];
@@ -108,11 +118,14 @@ Deno.serve(async (req) => {
             if (!isHighPriority) continue;
           }
 
-          // Skip if already saved
-          if (nwsId && existingKeys.has(alertKey(nwsId))) continue;
-
           // Check if alert is still valid (not expired)
           if (expires && new Date(expires) < new Date()) continue;
+
+          const eventLower = (event || 'alert').toLowerCase();
+          const userEmail = profile.created_by;
+
+          // Truncate repeating warnings — skip if user received this event type within 4h
+          if (recentEventMap.has(`${userEmail}__${eventLower}`)) continue;
 
           const type = getNotificationType(severity, urgency);
           const shortDesc = description.split('\n')[0].slice(0, 300);
@@ -124,11 +137,13 @@ Deno.serve(async (req) => {
             message: (shortDesc + expiresNote).slice(0, 500) || `${event} in your area.`,
             type,
             read: false,
-            created_by: profile.created_by,
+            created_by: userEmail,
+            recipient_email: userEmail,
+            alert_id: `nws_event:${event}`,
           };
 
           await srBase44.entities.Notification.create(notifData);
-          existingKeys.add(alertKey(nwsId));
+          recentEventMap.set(`${userEmail}__${eventLower}`, nowMs);
           totalCreated++;
         }
       } catch (profileErr) {

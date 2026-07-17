@@ -52,17 +52,48 @@ Deno.serve(async (req) => {
       return Response.json({ message: 'No profiles found.', processed: 0 });
     }
 
-    // 2. Load existing IPAWS notifications for dedup
+    // 2. Build per-user-per-event-type cooldown map (4h) to truncate repeating warnings.
+    //    A user receives at most one notification per event type per 4-hour window.
+    //    After 4 hours, if the alert is still active, it will be re-sent.
+    const COOLDOWN_MS = 4 * 60 * 60 * 1000;
+    const nowMs = Date.now();
     const existingNotifs = await sr.entities.Notification.list();
-    const existingKeys = new Set(
-      existingNotifs
-        .filter(n => n.title && n.title.startsWith('[ipaws_'))
-        .map(n => {
-          const match = n.title.match(/^\[ipaws_([^\]]+)\]/);
-          return match ? `ipaws_${match[1]}` : null;
-        })
-        .filter(Boolean)
-    );
+    const recentEventMap = new Map(); // key: `${userEmail}__${eventLower}` -> createdMs
+
+    const KNOWN_EVENTS = [
+      'flash flood warning', 'flash flood watch',
+      'flood warning', 'flood watch',
+      'severe thunderstorm warning', 'severe thunderstorm watch',
+      'tornado warning', 'tornado watch',
+      'hurricane warning', 'hurricane watch',
+      'tropical storm warning', 'tropical storm watch',
+      'tsunami warning', 'tsunami watch',
+      'extreme wind warning',
+      'winter storm warning', 'winter storm watch',
+      'blizzard warning',
+      'evacuation immediate', 'shelter in place warning',
+      'civil emergency message', 'law enforcement warning',
+    ];
+
+    for (const n of existingNotifs) {
+      const email = n.recipient_email || n.created_by;
+      if (!email) continue;
+      const createdMs = n.created_date ? new Date(n.created_date).getTime() : 0;
+      if (!createdMs || nowMs - createdMs > COOLDOWN_MS) continue;
+
+      let eventType = null;
+      if (n.alert_id && n.alert_id.startsWith('ipaws_event:')) {
+        eventType = n.alert_id.substring('ipaws_event:'.length).toLowerCase();
+      } else if (n.title) {
+        const afterPrefix = n.title.replace(/^\[[^\]]+\]\s*/, '').toLowerCase();
+        eventType = KNOWN_EVENTS.find(e => afterPrefix.startsWith(e)) || null;
+      }
+      if (!eventType) continue;
+
+      const mapKey = `${email}__${eventType}`;
+      const prev = recentEventMap.get(mapKey);
+      if (!prev || createdMs > prev) recentEventMap.set(mapKey, createdMs);
+    }
 
     // 3. Fetch ALL active NWS alerts nationally (one call covers all US states)
     const res = await fetch(NWS_API, {
@@ -94,9 +125,6 @@ Deno.serve(async (req) => {
     for (const feature of filtered) {
       const props = feature.properties || {};
       const nwsId = props.id;
-      const key = `ipaws_${nwsId}`;
-
-      if (existingKeys.has(key)) continue;
 
       // Skip expired alerts
       if (props.expires && new Date(props.expires) < new Date()) continue;
@@ -123,13 +151,18 @@ Deno.serve(async (req) => {
 
       for (const profile of matchedProfiles) {
         try {
+          const eventLower = (props.event || 'alert').toLowerCase();
+          const userEmail = profile.created_by;
+
+          // Truncate repeating warnings — skip if user received this event type within 4h
+          if (recentEventMap.has(`${userEmail}__${eventLower}`)) continue;
+
           const type = getNotifType(props.severity);
           const shortDesc = (props.description || props.headline || props.event || '').split('\n')[0].slice(0, 300);
           const expiresNote = props.expires ? ` Expires: ${new Date(props.expires).toLocaleString()}.` : '';
           const instruction = props.instruction ? `\n${props.instruction.slice(0, 150)}` : '';
           const alertTitle = `[ipaws_${nwsId}] ${props.headline || props.event}`.slice(0, 200);
           const alertMessage = (`${shortDesc}${instruction}\n\nArea: ${areaDesc}\nSeverity: ${props.severity}${expiresNote}`).slice(0, 500);
-          const userEmail = profile.created_by;
           const wantsEmail = profile.notification_method === 'email' || profile.notification_method === 'both';
           const eventTime = props.sent || new Date().toISOString();
 
@@ -140,11 +173,13 @@ Deno.serve(async (req) => {
             read: false,
             created_by: userEmail,
             recipient_email: userEmail,
+            alert_id: `ipaws_event:${props.event}`,
             original_event_time: eventTime,
             delivery_channel: 'in_app',
             delivery_status: 'delivered',
           });
           totalCreated++;
+          recentEventMap.set(`${userEmail}__${eventLower}`, nowMs);
 
           // Email delivery
           if (wantsEmail) {
@@ -182,7 +217,6 @@ Deno.serve(async (req) => {
           errors.push({ profile_id: profile.id, error: e.message });
         }
       }
-      existingKeys.add(key);
     }
 
     return Response.json({
