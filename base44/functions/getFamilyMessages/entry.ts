@@ -9,37 +9,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get family members where user is the creator (their family)
-    const myFamilyMembers = await base44.entities.FamilyMember.filter({ created_by: user.email });
-    
-    // Get family members where user is linked as emergency contact
-    const linkedFamilyMembers = await base44.asServiceRole.entities.FamilyMember.filter({ 
-      linked_user_id: user.id 
-    });
-
-    // Collect all relevant user IDs (family network)
-    const familyUserIds = new Set([user.id]);
-    
-    // Add creators of family members where I'm linked
-    linkedFamilyMembers.forEach(fm => {
-      const creatorEmail = fm.created_by;
-      familyUserIds.add(creatorEmail);
-    });
-
-    // Query only messages involving the user's family network (database-level filter, not in-memory)
-    const familyIdArray = [...familyUserIds];
-    const messagesQuery = {
-      $or: [
-        { sender_id: user.id },
-        { receiver_id: user.id },
-        { receiver_id: 'family' },
-        ...(familyIdArray.length > 0 ? [
-          { sender_id: { $in: familyIdArray } },
-          { receiver_id: { $in: familyIdArray } }
-        ] : [])
-      ]
-    };
-    const relevantMessages = await base44.asServiceRole.entities.FamilyMessage.filter(messagesQuery, '-created_date', 100);
+    // Fetch messages the user is authorized to see — RLS on FamilyMessage already
+    // restricts reads to messages where sender_id = user.id, receiver_id = user.id,
+    // or receiver_id = 'family'. Using user-scoped SDK (not asServiceRole) enforces
+    // RLS and eliminates the dynamic $or/$in query injection surface.
+    const relevantMessages = await base44.entities.FamilyMessage.filter({}, '-created_date', 100);
 
     // Get sender profiles for display names
     const senderIds = [...new Set(relevantMessages.map(m => m.sender_id))];

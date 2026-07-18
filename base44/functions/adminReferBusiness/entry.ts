@@ -206,8 +206,8 @@ Deno.serve(async (req) => {
             status: 'pending'
         });
 
-        const origin = req.headers.get('origin') || req.headers.get('x-forwarded-origin') ||
-            `https://${req.headers.get('host') || 'rallypack.base44.com'}`;
+        // Hardcoded to prevent origin/host header spoofing — update if a custom domain is configured
+        const origin = 'https://rallypack.base44.com';
 
         const html = buildReferralEmailHtml(
             config, origin, safe_referee_name, safe_organization, adminName, safe_message
