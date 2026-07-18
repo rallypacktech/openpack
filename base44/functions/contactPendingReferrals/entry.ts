@@ -4,10 +4,10 @@ const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
 
 const AUDIENCE_CONFIG = {
     general: {
-        label: 'General Preparedness',
-        learnPath: '/LearnMore',
-        subject: 'Help your community prepare for emergencies with RallyPack',
-        intro: 'RallyPack is a free, open-source emergency preparedness platform that helps families and households build go-bags, evacuation plans, and emergency supply caches. As a trusted local business, you can point your customers to resources that could save lives.',
+        label: 'Workplace Preparedness',
+        learnPath: '/BusinessOnboarding',
+        subject: 'Fire marshal compliance & emergency tracking for your business',
+        intro: 'RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard.',
     },
     equine: {
         label: 'Equine Emergency Preparedness',
@@ -112,7 +112,7 @@ function buildReferralEmailHtml(config, origin) {
               </table>
 
               <p style="margin:0 0 16px;font-size:13px;color:#6b6b66;">
-                RallyPack is free and open-source. No account is required to access preparedness guides and checklists.
+                Business plans include multi-location kit tracking, expiry alerts, evacuation plan documentation, and emergency team notifications.
               </p>
 
               <p style="margin:0;font-size:14px;color:#1c1c1a;">
@@ -156,7 +156,7 @@ function buildReferralEmailText(config, origin) {
         'Explore Business Accounts: ' + businessUrl,
         'Learn More: ' + learnUrl,
         '',
-        'RallyPack is free and open-source. No account is required to access preparedness guides and checklists.',
+        'Business plans include multi-location kit tracking, expiry alerts, evacuation plan documentation, and emergency team notifications.',
         '',
         'Stay safe,',
         'RallyPack Team',
