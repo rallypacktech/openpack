@@ -10,7 +10,7 @@ import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
 import AlertDelegationsPanel from "../components/admin/AlertDelegationsPanel";
 import AlertSubmissionsPanel from "../components/admin/AlertSubmissionsPanel";
 import GrantLOIWorkflow from "../components/admin/GrantLOIWorkflow";
-import CauseCleanupPanel from "../components/admin/CauseCleanupPanel";
+import CleanupPanel from "../components/admin/CleanupPanel";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -147,7 +147,7 @@ export default function AdminMonitor() {
           </TabsContent>
 
           <TabsContent value="causes">
-            <CauseCleanupPanel />
+            <CleanupPanel />
           </TabsContent>
 
           <TabsContent value="users">

@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Flame, GitCompare } from "lucide-react";
+import { AlertTriangle, Flame } from "lucide-react";
 import IncidentMap from "./IncidentMap";
 import IncidentDataDashboard from "./IncidentDataDashboard";
-import IncidentDiscrepancies from "./IncidentDiscrepancies";
 
 export default function IncidentsPanel() {
   const [subTab, setSubTab] = useState("live");
@@ -25,9 +24,6 @@ export default function IncidentsPanel() {
           <TabsTrigger value="historical" className="flex items-center gap-2">
             <Flame className="w-4 h-4" /> Historical
           </TabsTrigger>
-          <TabsTrigger value="discrepancies" className="flex items-center gap-2">
-            <GitCompare className="w-4 h-4" /> Discrepancies
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="live" className="mt-4">
@@ -36,10 +32,6 @@ export default function IncidentsPanel() {
 
         <TabsContent value="historical" className="mt-4">
           <IncidentDataDashboard />
-        </TabsContent>
-
-        <TabsContent value="discrepancies" className="mt-4">
-          <IncidentDiscrepancies />
         </TabsContent>
       </Tabs>
     </div>
