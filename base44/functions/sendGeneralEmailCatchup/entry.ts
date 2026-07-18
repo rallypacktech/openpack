@@ -138,7 +138,13 @@ function buildReferralEmailText(config, origin) {
     ].join('\n');
 }
 
-async function sendViaResend(to, subject, html, text) {
+function isQuotaError(status, errorMessage) {
+    if (status === 429) return true;
+    const lower = (errorMessage || '').toLowerCase();
+    return lower.includes('limit') || lower.includes('quota') || lower.includes('exceeded') || lower.includes('rate');
+}
+
+async function sendViaResend(to, subject, html, text, base44, sourceFunction) {
     const apiKey = Deno.env.get('RESEND_API_KEY');
     if (!apiKey) throw new Error('RESEND_API_KEY not set');
 
@@ -159,6 +165,19 @@ async function sendViaResend(to, subject, html, text) {
 
     if (!response.ok) {
         const errorBody = await response.text();
+        if (isQuotaError(response.status, errorBody) && base44) {
+            await base44.asServiceRole.entities.EmailQueue.create({
+                recipient_email: to,
+                subject,
+                html_body: html,
+                text_body: text,
+                from_name: FROM_EMAIL,
+                source_function: sourceFunction || 'sendGeneralEmailCatchup',
+                status: 'pending',
+                queued_at: new Date().toISOString(),
+            });
+            return { queued: true };
+        }
         throw new Error(`Resend API error (${response.status}): ${errorBody}`);
     }
 
@@ -194,6 +213,7 @@ Deno.serve(async (req) => {
         const contactedIds = [];
         let sent = 0;
         let failed = 0;
+        let queued = 0;
         const errors = [];
 
         for (const r of needsGeneral) {
@@ -202,9 +222,13 @@ Deno.serve(async (req) => {
             seenEmails.add(email);
 
             try {
-                await sendViaResend(email, config.subject, html, text);
-                contactedIds.push(r.id);
-                sent++;
+                const result = await sendViaResend(email, config.subject, html, text, base44, 'sendGeneralEmailCatchup');
+                if (result.queued) {
+                    queued++;
+                } else {
+                    contactedIds.push(r.id);
+                    sent++;
+                }
             } catch (e) {
                 failed++;
                 errors.push({ email, error: e.message });
@@ -221,9 +245,10 @@ Deno.serve(async (req) => {
         return Response.json({
             success: true,
             sent,
+            queued,
             failed,
             total: needsGeneral.length,
-            message: `${sent} general email(s) sent. ${failed} failed.`,
+            message: `${sent} general email(s) sent. ${queued} queued (Resend cap). ${failed} failed.`,
             errors: errors.length > 0 ? errors : undefined
         });
     } catch (error) {

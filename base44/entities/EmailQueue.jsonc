@@ -1,0 +1,80 @@
+{
+  "name": "EmailQueue",
+  "type": "object",
+  "properties": {
+    "recipient_email": {
+      "type": "string",
+      "description": "Email address of the recipient"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "html_body": {
+      "type": "string",
+      "description": "HTML email body"
+    },
+    "text_body": {
+      "type": "string",
+      "description": "Plain-text fallback body"
+    },
+    "from_name": {
+      "type": "string",
+      "description": "From email/name used by the sender"
+    },
+    "source_function": {
+      "type": "string",
+      "description": "Name of the backend function that queued this email"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Delivery status of the queued email"
+    },
+    "queued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this email was queued (Resend cap was hit)"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error details if sending from the queue failed"
+    }
+  },
+  "required": [
+    "recipient_email",
+    "subject",
+    "html_body",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

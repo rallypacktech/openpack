@@ -188,7 +188,13 @@ function buildReferralEmailText(config, origin) {
     ].join('\n');
 }
 
-async function sendViaResend(to, subject, html, text) {
+function isQuotaError(status, errorMessage) {
+    if (status === 429) return true;
+    const lower = (errorMessage || '').toLowerCase();
+    return lower.includes('limit') || lower.includes('quota') || lower.includes('exceeded') || lower.includes('rate');
+}
+
+async function sendViaResend(to, subject, html, text, base44, sourceFunction) {
     const apiKey = Deno.env.get('RESEND_API_KEY');
     if (!apiKey) throw new Error('RESEND_API_KEY not set');
 
@@ -209,6 +215,19 @@ async function sendViaResend(to, subject, html, text) {
 
     if (!response.ok) {
         const errorBody = await response.text();
+        if (isQuotaError(response.status, errorBody) && base44) {
+            await base44.asServiceRole.entities.EmailQueue.create({
+                recipient_email: to,
+                subject,
+                html_body: html,
+                text_body: text,
+                from_name: FROM_EMAIL,
+                source_function: sourceFunction || 'contactPendingReferrals',
+                status: 'pending',
+                queued_at: new Date().toISOString(),
+            });
+            return { queued: true };
+        }
         throw new Error(`Resend API error (${response.status}): ${errorBody}`);
     }
 
@@ -293,13 +312,18 @@ Deno.serve(async (req) => {
 
             const sent = [];
             const failed = [];
+            let queuedCount = 0;
 
             for (const email of emails) {
                 try {
-                    await sendViaResend(email, config.subject, html, text);
-                    sent.push(email);
-                    const mapKey = `${audienceKey}:${email}`;
-                    contactedIds.push(...(emailToReferralIds[mapKey] || []));
+                    const result = await sendViaResend(email, config.subject, html, text, base44, 'contactPendingReferrals');
+                    if (result.queued) {
+                        queuedCount++;
+                    } else {
+                        sent.push(email);
+                        const mapKey = `${audienceKey}:${email}`;
+                        contactedIds.push(...(emailToReferralIds[mapKey] || []));
+                    }
                 } catch (e) {
                     failed.push({ email, error: e.message });
                 }
@@ -318,6 +342,7 @@ Deno.serve(async (req) => {
                 audience_key: audienceKey,
                 subject: config.subject,
                 sent_count: sent.length,
+                queued_count: queuedCount,
                 fallback_count: failed.length,
                 mailto_url: mailtoUrl,
                 errors: failed.map(f => ({ email: f.email, error: f.error }))
