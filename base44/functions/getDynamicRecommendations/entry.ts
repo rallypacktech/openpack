@@ -52,20 +52,25 @@ Deno.serve(async (req) => {
     // Get all recommendations
     const allRecommendations = await base44.entities.ProductRecommendation.filter({ active: true }, "-priority");
 
-    // Filter recommendations based on:
-    // 1. Cache type
-    // 2. FEMA region (if specified)
-    // 3. Family member types (if specified)
+    // SAMPLE caches: show ALL items of matching cache type (skip FEMA/family/pet filters)
+    // Custom caches: include general + low-priority items alongside filtered recommendations
+    const isSampleCache = (cache.name || '').toUpperCase().includes('SAMPLE');
+
     const filteredRecs = allRecommendations.filter(rec => {
-      // Cache type must match
-      if (rec.cache_type !== cacheType && rec.cache_type !== "general") {
-        return false;
-      }
+      const cacheTypeMatches = rec.cache_type === cacheType || rec.cache_type === "general";
+      if (!cacheTypeMatches) return false;
+
+      // SAMPLE caches: show everything of matching type — no FEMA/family/pet filtering
+      if (isSampleCache) return true;
+
+      // Custom caches: also include low-priority general items without other filters
+      const isLowPriorityGeneral = (rec.priority || 0) <= 0 && rec.cache_type === "general";
+      if (isLowPriorityGeneral) return true;
 
       // If rec specifies FEMA regions, user's region must match
       if (rec.fema_regions && rec.fema_regions.length > 0) {
         if (!userProfile || !userProfile.fema_region) {
-          return false; // Skip region-specific items if user has no region
+          return false;
         }
         if (!rec.fema_regions.includes(userProfile.fema_region)) {
           return false;

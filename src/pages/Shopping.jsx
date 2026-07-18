@@ -41,6 +41,7 @@ export default function Shopping() {
   const [user, setUser] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [userProgress, setUserProgress] = useState([]); // UserCacheProgress records
+  const [caches, setCaches] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Checklist state
@@ -68,13 +69,15 @@ export default function Shopping() {
         const me = await base44.auth.me();
         setUser(me);
 
-        const [profiles, pets, progress] = await Promise.all([
+        const [profiles, pets, progress, userCaches] = await Promise.all([
           base44.entities.UserProfile.filter({ created_by: me.email }),
           base44.entities.Pet.filter({ created_by: me.email }),
-          base44.entities.UserCacheProgress.filter({ created_by: me.email })
+          base44.entities.UserCacheProgress.filter({ created_by: me.email }),
+          base44.entities.EmergencyCache.filter({ created_by: me.email })
         ]);
 
         setUserProgress(progress);
+        setCaches(userCaches);
 
         const userProfile = profiles[0];
         const familyTypes = ["person"];
@@ -115,6 +118,21 @@ export default function Shopping() {
   const ownedCount = requiredItems.filter(r => isOwned(r.id)).length;
   const progressPct = requiredItems.length > 0 ? Math.round((ownedCount / requiredItems.length) * 100) : 100;
 
+  const isExpired = (recId) => {
+    const p = progressMap[recId];
+    return p?.expiration_date && new Date(p.expiration_date) < new Date();
+  };
+
+  // Completed items clear from checklist — only show what's still needed or expired
+  const visibleChecklistItems = requiredItems.filter(r => !isOwned(r.id) || isExpired(r.id));
+
+  // When all essentials done OR user has a custom cache, show general + low priority items
+  const hasCustomCache = caches.some(c => !(c.name || '').toUpperCase().includes('SAMPLE'));
+  const allRequiredDone = requiredItems.length > 0 && requiredItems.every(r => isOwned(r.id) && !isExpired(r.id));
+  const additionalItems = (allRequiredDone || hasCustomCache)
+    ? recommendations.filter(r => !r.is_required && !isOwned(r.id) && (r.cache_type === 'general' || (r.priority || 0) <= 0))
+    : [];
+
   const toggleSelected = (id) => {
     const next = new Set(selected);
     if (next.has(id)) next.delete(id); else next.add(id);
@@ -126,7 +144,7 @@ export default function Shopping() {
       base44.auth.redirectToLogin(window.location.pathname);
       return;
     }
-    const missing = requiredItems.filter(r => !isOwned(r.id)).map(r => r.id);
+    const missing = visibleChecklistItems.filter(r => !isOwned(r.id)).map(r => r.id);
     setSelected(new Set(missing));
   };
 
@@ -203,7 +221,7 @@ export default function Shopping() {
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-8">
 
         {/* ── Required Items Checklist ─────────────────────────────────── */}
-        {requiredItems.length > 0 && (
+        {(visibleChecklistItems.length > 0 || additionalItems.length > 0) && (
           <section>
             {/* Progress */}
             <div className="bg-white rounded-xl shadow-sm p-5 mb-3">
@@ -248,7 +266,7 @@ export default function Shopping() {
                   )}
                 </div>
 
-                {requiredItems.map((rec, i) => {
+                {visibleChecklistItems.map((rec, i) => {
                   const owned = isOwned(rec.id);
                   const progress = progressMap[rec.id];
                   const isChecked = selected.has(rec.id);
@@ -322,6 +340,58 @@ export default function Shopping() {
                     </div>
                   );
                 })}
+
+                {/* Additional recommendations when all essentials done or custom cache exists */}
+                {additionalItems.length > 0 && (
+                  <div className="border-t">
+                    <div className="px-4 py-3 bg-blue-50 border-b">
+                      <p className="text-sm font-medium text-blue-900">
+                        {allRequiredDone ? "✓ All essentials covered! Here are more items to consider:" : "Additional items for your cache:"}
+                      </p>
+                    </div>
+                    {additionalItems.map((rec, i) => {
+                      const isChecked = selected.has(rec.id);
+                      return (
+                        <div
+                          key={rec.id}
+                          className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                        >
+                          <Checkbox
+                            checked={isChecked}
+                            onCheckedChange={() => toggleSelected(rec.id)}
+                            className="flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium text-gray-900">{rec.item_name}</span>
+                              <Badge className={`text-xs ${CATEGORY_COLORS[rec.category]}`}>{rec.category}</Badge>
+                              <Badge variant="outline" className="text-xs">{rec.cache_type}</Badge>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {getPrintableResource(rec.item_name) && (
+                              <DownloadResourceButton itemName={rec.item_name} className="text-xs h-8" />
+                            )}
+                            {rec.affiliate_link && (
+                              <button
+                                onClick={() => handleAffiliateClick(rec)}
+                                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">{getStoreName(rec.affiliate_link)}</span>
+                              </button>
+                            )}
+                            {rec.price_cents > 0 && (
+                              <span className="text-sm font-semibold text-gray-700">
+                                ${(rec.price_cents / 100).toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </section>

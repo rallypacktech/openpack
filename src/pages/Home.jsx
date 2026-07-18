@@ -189,6 +189,8 @@ export default function Home() {
             <a href="https://emergency.cdc.gov" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">CDC Emergency</a>
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://bestfriends.org/network/issues/emergency-response" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Best Friends Animal Society</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://www.sierraclub.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Sierra Club</a>
           </div>
         </div>
       </section>
