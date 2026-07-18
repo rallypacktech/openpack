@@ -53,6 +53,27 @@ const AUDIENCE_CONFIG = {
     },
 };
 
+async function loadTemplates(base44) {
+    const result = {};
+    for (const [key, config] of Object.entries(AUDIENCE_CONFIG)) {
+        result[key] = { ...config };
+    }
+    try {
+        const templates = await base44.asServiceRole.entities.EmailTemplate.list();
+        for (const t of templates) {
+            if (result[t.audience_key]) {
+                result[t.audience_key] = {
+                    label: t.label || result[t.audience_key].label,
+                    learnPath: t.learn_path || result[t.audience_key].learnPath,
+                    subject: t.subject || result[t.audience_key].subject,
+                    intro: t.intro || result[t.audience_key].intro,
+                };
+            }
+        }
+    } catch (e) { /* use defaults */ }
+    return result;
+}
+
 function buildReferralEmailHtml(config, origin) {
     const learnUrl = `${origin}${config.learnPath}`;
     const quizUrl = `${origin}/ReadinessQuiz`;
@@ -241,6 +262,9 @@ Deno.serve(async (req) => {
             });
         }
 
+        // Load email templates from entity (with fallback to built-in defaults)
+        const templates = await loadTemplates(base44);
+
         // Group unique emails by audience_type, and track referral IDs per group
         const groups = {};
         const emailToReferralIds = {};
@@ -248,7 +272,7 @@ Deno.serve(async (req) => {
         for (const r of referrals) {
             const email = (r.referee_email || '').trim().toLowerCase();
             if (!email) continue;
-            const key = AUDIENCE_CONFIG[r.audience_type] ? r.audience_type : 'general';
+            const key = templates[r.audience_type] ? r.audience_type : 'general';
             if (!groups[key]) groups[key] = new Set();
             groups[key].add(email);
             const mapKey = `${key}:${email}`;
@@ -262,7 +286,7 @@ Deno.serve(async (req) => {
         let totalFailed = 0;
 
         for (const [audienceKey, emailSet] of Object.entries(groups)) {
-            const config = AUDIENCE_CONFIG[audienceKey];
+            const config = templates[audienceKey];
             const emails = Array.from(emailSet);
             const html = buildReferralEmailHtml(config, origin);
             const text = buildReferralEmailText(config, origin);

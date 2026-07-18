@@ -51,6 +51,11 @@
       ],
       "default": "pending",
       "description": "Processing status of the referral"
+    },
+    "general_email_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the general (business) follow-up email has been sent to this referral"
     }
   },
   "required": [

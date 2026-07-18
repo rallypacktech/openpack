@@ -1,0 +1,64 @@
+{
+  "name": "EmailTemplate",
+  "type": "object",
+  "properties": {
+    "audience_key": {
+      "type": "string",
+      "enum": [
+        "general",
+        "equine",
+        "canine",
+        "feline",
+        "infant",
+        "avian",
+        "reptile",
+        "livestock"
+      ],
+      "description": "Audience key matching BusinessReferral.audience_type"
+    },
+    "label": {
+      "type": "string",
+      "description": "Display label for the audience"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Email subject line"
+    },
+    "intro": {
+      "type": "string",
+      "description": "Intro paragraph text for the email body"
+    },
+    "learn_path": {
+      "type": "string",
+      "description": "Path for the Learn More button (e.g. /BusinessOnboarding, /equine)"
+    }
+  },
+  "required": [
+    "audience_key",
+    "label",
+    "subject",
+    "intro"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

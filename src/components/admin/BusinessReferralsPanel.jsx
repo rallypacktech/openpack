@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Mail, Building2, Clock, RefreshCw, Loader2, Send } from "lucide-react";
+import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import AdminReferralForm from "./AdminReferralForm";
+import EmailTemplatesEditor from "./EmailTemplatesEditor";
 
 const AUDIENCE_LABELS = {
   general: 'General',
@@ -45,6 +47,15 @@ export default function BusinessReferralsPanel() {
       setReferrals(prev => prev.map(r => r.id === referralId ? { ...r, status: newStatus } : r));
     } catch (error) {
       console.error("Error updating referral status:", error);
+    }
+  };
+
+  const handleAudienceChange = async (referralId, newAudience) => {
+    try {
+      await base44.entities.BusinessReferral.update(referralId, { audience_type: newAudience });
+      setReferrals(prev => prev.map(r => r.id === referralId ? { ...r, audience_type: newAudience } : r));
+    } catch (error) {
+      console.error("Error updating referral audience:", error);
     }
   };
 
@@ -108,6 +119,12 @@ export default function BusinessReferralsPanel() {
 
   return (
     <div className="space-y-6">
+      <Tabs defaultValue="referrals">
+        <TabsList>
+          <TabsTrigger value="referrals">Referrals</TabsTrigger>
+          <TabsTrigger value="templates">Email Templates</TabsTrigger>
+        </TabsList>
+        <TabsContent value="referrals" className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-xl font-bold flex items-center gap-2">
@@ -234,6 +251,24 @@ export default function BusinessReferralsPanel() {
                       Resend
                     </Button>
                     <Select
+                      value={ref.audience_type || 'general'}
+                      onValueChange={(val) => handleAudienceChange(ref.id, val)}
+                    >
+                      <SelectTrigger className="w-36">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="equine">Equine</SelectItem>
+                        <SelectItem value="canine">Canine</SelectItem>
+                        <SelectItem value="feline">Feline</SelectItem>
+                        <SelectItem value="infant">Infant</SelectItem>
+                        <SelectItem value="avian">Avian</SelectItem>
+                        <SelectItem value="reptile">Reptile</SelectItem>
+                        <SelectItem value="livestock">Livestock</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
                       value={ref.status}
                       onValueChange={(val) => handleStatusChange(ref.id, val)}
                     >
@@ -254,6 +289,11 @@ export default function BusinessReferralsPanel() {
           ))}
         </div>
       )}
+        </TabsContent>
+        <TabsContent value="templates">
+          <EmailTemplatesEditor />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
