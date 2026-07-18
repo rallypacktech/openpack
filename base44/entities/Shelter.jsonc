@@ -35,11 +35,25 @@
     },
     "is_open": {
       "type": "boolean",
-      "default": true
+      "default": false
+    },
+    "shelter_type": {
+      "type": "string",
+      "enum": [
+        "people",
+        "small_animal",
+        "large_animal",
+        "mixed"
+      ],
+      "description": "Type of shelter \u2014 people, small animals, large animals/livestock, or mixed"
     },
     "pets_allowed": {
       "type": "boolean",
       "default": false
+    },
+    "animal_types": {
+      "type": "string",
+      "description": "Types of animals accepted (e.g. 'dogs, cats', 'horses, cattle, goats')"
     },
     "medical_services": {
       "type": "boolean",
@@ -51,6 +65,10 @@
     "disaster_type": {
       "type": "string",
       "description": "Type of disaster (hurricane, wildfire, flood, etc.)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional info \u2014 donation needs, entry instructions, hours"
     },
     "opened_date": {
       "type": "string",

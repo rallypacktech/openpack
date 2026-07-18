@@ -11,6 +11,7 @@ import VolunteerOpportunities from "../components/resources/VolunteerOpportuniti
 import SharePlan from "../components/resources/SharePlan";
 import ExternalResourcesTab from "../components/resources/ExternalResourcesTab";
 import EmergencyManuals from "../components/manuals/EmergencyManuals";
+import LocalShelters from "../components/resources/LocalShelters";
 import { Link } from "react-router-dom";
 
 export default function Resources() {
@@ -26,7 +27,7 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share", "resources", "tracking", "manuals"].includes(tab)) {
+    if (tab && ["caches", "meetspots", "firstaid", "training", "volunteer", "share", "resources", "tracking", "manuals", "shelters"].includes(tab)) {
       setActiveTab(tab);
     }
   }, []);
@@ -177,6 +178,7 @@ export default function Resources() {
             <TabsTrigger value="share">Share Plan</TabsTrigger>
             <TabsTrigger value="resources">Ext. Resources</TabsTrigger>
             <TabsTrigger value="tracking">Tracking</TabsTrigger>
+            <TabsTrigger value="shelters">Shelters & Contacts</TabsTrigger>
             <TabsTrigger value="manuals">Manuals</TabsTrigger>
           </TabsList>
 
@@ -224,6 +226,10 @@ export default function Resources() {
 
           <TabsContent value="resources">
             <ExternalResourcesTab />
+          </TabsContent>
+
+          <TabsContent value="shelters">
+            <LocalShelters />
           </TabsContent>
 
           <TabsContent value="manuals">

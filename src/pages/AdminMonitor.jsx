@@ -5,11 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck, Flame, FileText, Sparkles } from "lucide-react";
 import QuizResultsTable from "../components/admin/QuizResultsTable";
-import IncidentMap from "../components/admin/IncidentMap";
+import IncidentsPanel from "../components/admin/IncidentsPanel";
 import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
 import AlertDelegationsPanel from "../components/admin/AlertDelegationsPanel";
 import AlertSubmissionsPanel from "../components/admin/AlertSubmissionsPanel";
-import IncidentDataDashboard from "../components/admin/IncidentDataDashboard";
 import GrantLOIWorkflow from "../components/admin/GrantLOIWorkflow";
 import CauseCleanupPanel from "../components/admin/CauseCleanupPanel";
 
@@ -98,7 +97,7 @@ export default function AdminMonitor() {
               <Users className="w-4 h-4" /> User Monitor
             </TabsTrigger>
             <TabsTrigger value="incidents" className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" /> Incident Map
+              <AlertTriangle className="w-4 h-4" /> Incidents
             </TabsTrigger>
             <TabsTrigger value="quiz" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" /> Quiz Results
@@ -112,9 +111,7 @@ export default function AdminMonitor() {
             <TabsTrigger value="referrals" className="flex items-center gap-2">
               <Building2 className="w-4 h-4" /> Referrals
             </TabsTrigger>
-            <TabsTrigger value="historical" className="flex items-center gap-2">
-              <Flame className="w-4 h-4" /> Historical Incidents
-            </TabsTrigger>
+
             <TabsTrigger value="grants" className="flex items-center gap-2">
               <FileText className="w-4 h-4" /> Grants & LOI
             </TabsTrigger>
@@ -124,7 +121,7 @@ export default function AdminMonitor() {
           </TabsList>
 
           <TabsContent value="incidents">
-            <IncidentMap />
+            <IncidentsPanel />
           </TabsContent>
 
           <TabsContent value="quiz">
@@ -143,9 +140,7 @@ export default function AdminMonitor() {
             <AlertSubmissionsPanel />
           </TabsContent>
 
-          <TabsContent value="historical">
-            <IncidentDataDashboard />
-          </TabsContent>
+
 
           <TabsContent value="grants">
             <GrantLOIWorkflow />

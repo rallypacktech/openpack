@@ -14,7 +14,10 @@
         "relief_organization",
         "local_emergency",
         "mental_health",
-        "financial_assistance"
+        "financial_assistance",
+        "animal_shelter",
+        "livestock_shelter",
+        "volunteer_org"
       ]
     },
     "phone": {
@@ -28,7 +31,7 @@
     },
     "service_area": {
       "type": "string",
-      "description": "National, Regional, or specific states"
+      "description": "National, Regional, or specific states/counties"
     },
     "available_24_7": {
       "type": "boolean",
