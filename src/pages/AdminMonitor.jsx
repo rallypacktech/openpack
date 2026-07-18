@@ -116,7 +116,7 @@ export default function AdminMonitor() {
               <FileText className="w-4 h-4" /> Grants & LOI
             </TabsTrigger>
             <TabsTrigger value="causes" className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" /> Cause Cleanup
+              <Sparkles className="w-4 h-4" /> Cleanup
             </TabsTrigger>
           </TabsList>
 

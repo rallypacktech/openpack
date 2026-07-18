@@ -67,6 +67,7 @@ export default function IncidentDataDashboard() {
   const [fetching, setFetching] = useState(false);
   const [fetchingEffis, setFetchingEffis] = useState(false);
   const [fetchingAllEffis, setFetchingAllEffis] = useState(false);
+  const [fetchingNifc, setFetchingNifc] = useState(false);
   const [effisCountry, setEffisCountry] = useState("ES");
   const [globalCountry, setGlobalCountry] = useState("US");
   const [severityFilter, setSeverityFilter] = useState("all");
@@ -108,6 +109,18 @@ export default function IncidentDataDashboard() {
       console.error("Error fetching EFFIS history:", e);
     } finally {
       setFetchingEffis(false);
+    }
+  };
+
+  const handleFetchNifcActive = async () => {
+    setFetchingNifc(true);
+    try {
+      await base44.functions.invoke("fetchNIFCActiveIncidents", {});
+      await loadIncidents();
+    } catch (e) {
+      console.error("Error fetching NIFC active incidents:", e);
+    } finally {
+      setFetchingNifc(false);
     }
   };
 
@@ -156,6 +169,11 @@ export default function IncidentDataDashboard() {
           <Button variant="outline" size="sm" onClick={loadIncidents} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
+          {/* NIFC Active Incidents */}
+          <Button variant="outline" size="sm" onClick={handleFetchNifcActive} disabled={fetchingNifc}>
+            {fetchingNifc ? <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Fetching...</> : <><Flame className="w-4 h-4 mr-1" /> NIFC Active</>}
+          </Button>
+
           {/* Global / LLM-based history import */}
           <div className="flex items-center gap-1.5">
             <Globe className="w-4 h-4 text-orange-600" />
