@@ -238,7 +238,8 @@ export const LOI_STAGES = [
   { key: "internal_review", label: "Internal Review", color: "bg-purple-100 text-purple-800 border-purple-300" },
   { key: "submitted", label: "Submitted", color: "bg-cyan-100 text-cyan-800 border-cyan-300" },
   { key: "awarded", label: "Awarded", color: "bg-green-100 text-green-800 border-green-300" },
-  { key: "declined", label: "Declined", color: "bg-red-100 text-red-800 border-red-300" }
+  { key: "declined", label: "Declined", color: "bg-red-100 text-red-800 border-red-300" },
+  { key: "archived", label: "Archived", color: "bg-gray-100 text-gray-600 border-gray-300" }
 ];
 
 export const PRIORITY_LABELS = {

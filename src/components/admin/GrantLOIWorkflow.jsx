@@ -8,7 +8,7 @@ import {
   GRANT_LIBRARY, AWARD_LIBRARY, GRANT_CATEGORY_LABELS, LOI_STAGES, PRIORITY_LABELS
 } from "@/lib/grantLibrary";
 import {
-  Plus, FileText, Search, Sparkles, TrendingUp, Calendar, DollarSign, Loader2, Trophy
+  Plus, FileText, Search, Sparkles, TrendingUp, Calendar, DollarSign, Loader2, Trophy, RefreshCw
 } from "lucide-react";
 
 const ALL_OPPORTUNITIES = [...GRANT_LIBRARY, ...AWARD_LIBRARY];
@@ -21,6 +21,7 @@ export default function GrantLOIWorkflow() {
   const [filter, setFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [creating, setCreating] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => { loadLOIs(); }, []);
 
@@ -105,6 +106,25 @@ export default function GrantLOIWorkflow() {
     }
   };
 
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true);
+      const res = await base44.functions.invoke("refreshGrantOpportunities", {});
+      const d = res.data || {};
+      const parts = [];
+      if (d.archived_overdue) parts.push(`${d.archived_overdue} overdue → archived`);
+      if (d.new_identified) parts.push(`${d.new_identified} new identified`);
+      if (d.reactivated) parts.push(`${d.reactivated} reactivated`);
+      const msg = parts.length ? parts.join(", ") : "No changes found";
+      window.alert(`Grant refresh complete: ${msg}`);
+      await loadLOIs();
+    } catch (e) {
+      window.alert("Refresh failed: " + (e.message || "Unknown error"));
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const moveStage = async (loiId, newStatus) => {
     const loi = lois.find(l => l.id === loiId);
     if (!loi) return;
@@ -139,9 +159,15 @@ export default function GrantLOIWorkflow() {
             Track Letters of Intent for grants RallyPack qualifies for.
           </p>
         </div>
-        <Button onClick={() => setShowLibrary(true)} size="sm">
-          <Plus className="w-4 h-4 mr-1" /> New LOI
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleRefresh} variant="outline" size="sm" disabled={refreshing}>
+            {refreshing ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-1" />}
+            Refresh Opportunities
+          </Button>
+          <Button onClick={() => setShowLibrary(true)} size="sm">
+            <Plus className="w-4 h-4 mr-1" /> New LOI
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

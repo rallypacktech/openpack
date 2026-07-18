@@ -39,10 +39,11 @@
         "internal_review",
         "submitted",
         "awarded",
-        "declined"
+        "declined",
+        "archived"
       ],
       "default": "identified",
-      "description": "Pipeline stage of the LOI"
+      "description": "Pipeline stage of the LOI. 'archived' = overdue or inactive, kept for deadline re-checking."
     },
     "deadline": {
       "type": "string",
