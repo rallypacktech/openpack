@@ -25,7 +25,17 @@ Deno.serve(async (req) => {
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    // Group by normalized name + state
+    // Two fires in the same location with different start dates are SEPARATE fires.
+    // Only consider them duplicates if start dates are within 7 days of each other
+    // (allows for source reporting delays while excluding different time frames).
+    const DATE_PROXIMITY_DAYS = 7;
+    function datesWithinDays(d1, d2) {
+      if (!d1 || !d2) return true; // missing date = can't confirm different, allow grouping
+      const diff = Math.abs(new Date(d1).getTime() - new Date(d2).getTime());
+      return diff <= DATE_PROXIMITY_DAYS * 24 * 60 * 60 * 1000;
+    }
+
+    // Group by normalized name + state, then cluster by date proximity
     const nameGroups = {};
     all.forEach(inc => {
       const normName = normalizeName(inc.incident_name);
@@ -36,7 +46,24 @@ Deno.serve(async (req) => {
       nameGroups[key].push(inc);
     });
 
-    const nameDups = Object.values(nameGroups).filter(g => g.length > 1);
+    // Within each name+state group, split into sub-clusters by date proximity
+    const nameDups = [];
+    Object.values(nameGroups).forEach(group => {
+      if (group.length <= 1) return;
+      const clusters = [];
+      for (const inc of group) {
+        let placed = false;
+        for (const cluster of clusters) {
+          if (cluster.some(c => datesWithinDays(c.start_date, inc.start_date))) {
+            cluster.push(inc);
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) clusters.push([inc]);
+      }
+      clusters.forEach(c => { if (c.length > 1) nameDups.push(c); });
+    });
 
     // Track which IDs are already grouped by name
     const alreadyGrouped = new Set();
@@ -49,7 +76,7 @@ Deno.serve(async (req) => {
     for (let i = 0; i < ungrouped.length; i++) {
       for (let j = i + 1; j < ungrouped.length; j++) {
         const dist = haversine(ungrouped[i].latitude, ungrouped[i].longitude, ungrouped[j].latitude, ungrouped[j].longitude);
-        if (dist <= 10) {
+        if (dist <= 10 && datesWithinDays(ungrouped[i].start_date, ungrouped[j].start_date)) {
           let group = geoGroups.find(g => g.some(inc => inc.id === ungrouped[i].id || inc.id === ungrouped[j].id));
           if (!group) { group = []; geoGroups.push(group); }
           if (!group.find(inc => inc.id === ungrouped[i].id)) group.push(ungrouped[i]);

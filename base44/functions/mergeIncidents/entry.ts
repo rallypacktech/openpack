@@ -28,6 +28,20 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Safety guard: refuse to merge fires with start dates >7 days apart — they are
+    // separate fires in different time frames, even if co-located.
+    const DATE_PROXIMITY_DAYS = 7;
+    for (const rec of deleteRecords) {
+      if (keepRecord.start_date && rec.start_date) {
+        const diff = Math.abs(new Date(keepRecord.start_date).getTime() - new Date(rec.start_date).getTime());
+        if (diff > DATE_PROXIMITY_DAYS * 24 * 60 * 60 * 1000) {
+          return Response.json({
+            error: `Refused to merge: "${rec.incident_name}" (start ${rec.start_date}) and "${keepRecord.incident_name}" (start ${keepRecord.start_date}) are more than ${DATE_PROXIMITY_DAYS} days apart — these are likely separate fires, not duplicates.`,
+          }, { status: 400 });
+        }
+      }
+    }
+
     // Merge: fill in missing fields from delete records into keep record
     const updateData = {};
     const mergedFields = [];
