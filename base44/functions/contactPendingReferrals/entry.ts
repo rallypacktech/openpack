@@ -213,8 +213,7 @@ Deno.serve(async (req) => {
         const body = await req.json().catch(() => ({}));
         const { referral_ids } = body;
 
-        const origin = req.headers.get('origin') || req.headers.get('x-forwarded-origin') ||
-            `https://${req.headers.get('host') || 'rallypack.base44.com'}`;
+        const origin = 'https://rallypack.base44.com';
 
         // Fetch referrals: specific IDs if provided (for resend), otherwise all pending
         let referrals;

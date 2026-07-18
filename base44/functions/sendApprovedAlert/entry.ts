@@ -7,24 +7,44 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 // Creates Notification records for each delivery.
 // Email, Telegram, and Discord all use the same unified template (generated_title + generated_body).
 
+function escapeHtml(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function isSafeDiscordWebhookUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return false;
+    const allowedHosts = ['discord.com', 'discordapp.com'];
+    if (!allowedHosts.includes(parsed.hostname)) return false;
+    if (parsed.username || parsed.password) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function buildEmailHtml(title, body, orgName, eventLevel) {
+  const safeTitle = escapeHtml(title);
+  const safeOrgName = escapeHtml(orgName);
+  const safeLevelLabel = escapeHtml(eventLevel.charAt(0).toUpperCase() + eventLevel.slice(1));
   const levelColor = eventLevel === 'critical' ? '#dc2626' : eventLevel === 'warning' ? '#ea580c' : eventLevel === 'watch' ? '#ca8a04' : '#2563eb';
-  const levelLabel = eventLevel.charAt(0).toUpperCase() + eventLevel.slice(1);
-  const bodyHtml = (body || '').split('\n').map(line => `<p style="margin:0 0 10px 0;line-height:1.6;">${line.replace(/</g, '&lt;')}</p>`).join('');
+  const bodyHtml = (body || '').split('\n').map(line => `<p style="margin:0 0 10px 0;line-height:1.6;">${escapeHtml(line)}</p>`).join('');
   return `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${safeTitle}</title></head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:600px;margin:0 auto;padding:20px;">
     <div style="background:${levelColor};color:#fff;padding:16px 20px;border-radius:8px 8px 0 0;">
-      <p style="margin:0;font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.9;">${orgName} \u2014 Emergency Alert</p>
-      <h1 style="margin:4px 0 0 0;font-size:22px;font-weight:700;">${title}</h1>
+      <p style="margin:0;font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.9;">${safeOrgName} \u2014 Emergency Alert</p>
+      <h1 style="margin:4px 0 0 0;font-size:22px;font-weight:700;">${safeTitle}</h1>
     </div>
     <div style="background:#fff;padding:20px;border:1px solid #e4e4e7;border-top:none;border-radius:0 0 8px 8px;">
-      <div style="display:inline-block;background:${levelColor}20;color:${levelColor};padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600;margin-bottom:16px;">${levelLabel}</div>
+      <div style="display:inline-block;background:${levelColor}20;color:${levelColor};padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600;margin-bottom:16px;">${safeLevelLabel}</div>
       ${bodyHtml}
       <hr style="border:none;border-top:1px solid #e4e4e7;margin:20px 0;">
-      <p style="margin:0;font-size:12px;color:#71717a;">This alert was issued by <strong>${orgName}</strong> via RallyPack. Always verify current status in the RallyPack app.</p>
+      <p style="margin:0;font-size:12px;color:#71717a;">This alert was issued by <strong>${safeOrgName}</strong> via RallyPack. Always verify current status in the RallyPack app.</p>
     </div>
   </div>
 </body>
