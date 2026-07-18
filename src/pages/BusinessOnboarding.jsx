@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Mail, CheckCircle2, Users, Shield, MapPin, ArrowRight, AlertTriangle } from "lucide-react";
+import { Building2, Mail, CheckCircle2, Users, Shield, MapPin, ArrowRight } from "lucide-react";
 import PricingSection from "@/components/business/PricingSection";
 
 export default function BusinessOnboarding() {
@@ -56,10 +56,10 @@ export default function BusinessOnboarding() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Building2 className="w-12 h-12 text-[#D64A2E] mx-auto mb-6" />
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4 leading-tight">
-            RallyPack for Business
+            Fire Marshal Compliance, Simplified
           </h1>
           <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto">
-            Protect your team with FEMA-aligned emergency preparedness. Track first aid kits, manage evacuation plans, and keep your chain of command ready.
+            Track every first aid kit across every floor, keep supplies in date, and document your evacuation plan — all in one place. Show the fire marshal you're ready.
           </p>
         </div>
       </section>
@@ -68,9 +68,9 @@ export default function BusinessOnboarding() {
       <section className="py-16 max-w-5xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { icon: Users, title: "Team Tracking", desc: "Roster management with chain-of-command notification order for emergencies." },
-            { icon: Shield, title: "Kit Management", desc: "Track first aid kits across multiple locations with expiry alerts." },
-            { icon: MapPin, title: "Evacuation Plans", desc: "Build and document evacuation plans with assembly points and routes." },
+            { icon: Shield, title: "Multi-Kit Inventory", desc: "Track first aid kits across every floor, wing, and building. Get expiry alerts before supplies go out of date." },
+            { icon: MapPin, title: "Evacuation Plans", desc: "Document evacuation routes, assembly points, and procedures — ready to show the fire marshal." },
+            { icon: Users, title: "Compliance Roster", desc: "Maintain your chain of command and assigned floor wardens. Prove your team is trained and accounted for." },
           ].map((f) => (
             <Card key={f.title} className="text-center border-border">
               <CardContent className="pt-8 pb-6 px-6">
@@ -83,21 +83,21 @@ export default function BusinessOnboarding() {
         </div>
       </section>
 
-      {/* Emergency Alert Sending */}
+      {/* How It Works — Compliance Workflow */}
       <section className="py-16 max-w-5xl mx-auto px-6 bg-amber-50/50">
         <div className="text-center mb-8">
-          <AlertTriangle className="w-10 h-10 text-[#D64A2E] mx-auto mb-4" />
-          <h2 className="font-serif text-3xl font-bold text-foreground mb-3">Emergency Alert Sending</h2>
+          <CheckCircle2 className="w-10 h-10 text-[#D64A2E] mx-auto mb-4" />
+          <h2 className="font-serif text-3xl font-bold text-foreground mb-3">Audit-Ready in Four Steps</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Professional and Enterprise plans can submit official emergency alerts. All alerts use FEMA-aligned unified templates — one message, delivered to both email and Telegram.
+            Whether the fire marshal walks in tomorrow or next quarter, your kit inventory, expiry dates, and evacuation plan are all in one place and up to date.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
           {[
-            { step: "1", title: "Onboard", desc: "Sign up, add your organization details, and subscribe to a plan." },
-            { step: "2", title: "Get Authorized", desc: "Admin verifies your org — shelter provider or contracted entity (county, state, Red Cross)." },
-            { step: "3", title: "Submit for Review", desc: "Select incident type and severity. Unified template generates the message. Admin reviews." },
-            { step: "4", title: "Dispatch", desc: "Once approved, dispatch to all members. Critical alerts go to both email and Telegram." },
+            { step: "1", title: "Add Your Kits", desc: "Log every first aid kit by building, floor, or room. Record contents and expiry dates." },
+            { step: "2", title: "Document Your Plan", desc: "Map evacuation routes, assembly points, and floor wardens. Assign chain-of-command." },
+            { step: "3", title: "Stay Compliant", desc: "Automatic expiry alerts keep supplies current. No more expired kits during an inspection." },
+            { step: "4", title: "Show the Marshal", desc: "Pull up your dashboard — kits, plans, and trained personnel, all in one view." },
           ].map(s => (
             <Card key={s.step} className="text-center border-border">
               <CardContent className="pt-6 pb-4 px-4">
@@ -141,8 +141,8 @@ export default function BusinessOnboarding() {
                       (sent.org ? sent.org + ' — ' : '') + 'Check out RallyPack for Business'
                     )}&body=${encodeURIComponent(
                       `Hi${sent.name ? ' ' + sent.name : ''},\n\n` +
-                      `I thought your organization${sent.org ? ' (' + sent.org + ')' : ''} would benefit from RallyPack for Business — a FEMA-aligned emergency preparedness platform.\n\n` +
-                      `Features include:\n• Team member tracking & chain-of-command alerts\n• First aid kit management\n• Evacuation plan builder\n\n` +
+                      `I thought your organization${sent.org ? ' (' + sent.org + ')' : ''} would benefit from RallyPack — it tracks first aid kit inventory, expiry dates, and evacuation plans so you're always fire marshal ready.\n\n` +
+                      `Features include:\n• Multi-location first aid kit tracking with expiry alerts\n• Evacuation plan documentation\n• Floor warden & chain-of-command roster\n\n` +
                       (sent.message ? `My note: ${sent.message}\n\n` : '') +
                       `Check it out: https://rallypack.tech/BusinessOnboarding\n\nThanks!`
                     )}`}

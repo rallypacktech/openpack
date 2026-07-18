@@ -140,7 +140,7 @@ export default function Layout({ children, currentPageName }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-14">
                 {/* Logo */}
-                <Link to={user ? createPageUrl("Dashboard") : createPageUrl("Home")} className="flex items-center gap-2" aria-label="RallyPack Home">
+                <Link to={user ? createPageUrl("Dashboard") : "/"} className="flex items-center gap-2" aria-label="RallyPack Home">
                   <span className="font-serif text-xl font-bold text-foreground tracking-tight">RallyPack</span>
                 </Link>
 
