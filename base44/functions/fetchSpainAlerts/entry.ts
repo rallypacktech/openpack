@@ -34,8 +34,12 @@ Deno.serve(async (req) => {
       }
     }
     if (!isAuthorized) {
-      const user = await base44.auth.me();
-      isAuthorized = user && user.role === 'admin';
+      try {
+        const user = await base44.auth.me();
+        isAuthorized = !!(user && user.role === 'admin');
+      } catch {
+        isAuthorized = false;
+      }
     }
     if (!isAuthorized) {
       return Response.json({ error: 'Unauthorized' }, { status: 403 });

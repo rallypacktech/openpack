@@ -19,6 +19,7 @@ function isSafeDiscordWebhookUrl(url) {
     const allowedHosts = ['discord.com', 'discordapp.com'];
     if (!allowedHosts.includes(parsed.hostname)) return false;
     if (parsed.username || parsed.password) return false;
+    if (!parsed.pathname.startsWith('/api/webhooks/')) return false;
     return true;
   } catch {
     return false;
@@ -227,6 +228,7 @@ Deno.serve(async (req) => {
             } else {
               const dcRes = await fetch(profile.discord_webhook_url, {
                 method: 'POST',
+                redirect: 'manual',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(buildDiscordPayload(
                   submission.generated_title,

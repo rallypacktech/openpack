@@ -4,6 +4,31 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
+    // Authorization: admin user OR valid automation secret (for scheduled jobs)
+    const automationSecret = Deno.env.get("AUTOMATION_SECRET");
+    const providedSecret = req.headers.get("x-automation-secret");
+    let isAuthorized = false;
+    if (automationSecret && providedSecret) {
+      const a = new TextEncoder().encode(automationSecret);
+      const b = new TextEncoder().encode(providedSecret);
+      if (a.length === b.length) {
+        let diff = 0;
+        for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+        isAuthorized = diff === 0;
+      }
+    }
+    if (!isAuthorized) {
+      try {
+        const user = await base44.auth.me();
+        isAuthorized = !!(user && user.role === 'admin');
+      } catch {
+        isAuthorized = false;
+      }
+    }
+    if (!isAuthorized) {
+      return Response.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
     // This runs as a scheduled job — use service role
     const users = await base44.asServiceRole.entities.User.list();
     const requiredItems = await base44.asServiceRole.entities.ProductRecommendation.filter({ is_required: true, active: true });
