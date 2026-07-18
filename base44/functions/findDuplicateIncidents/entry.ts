@@ -35,6 +35,24 @@ Deno.serve(async (req) => {
       return diff <= DATE_PROXIMITY_DAYS * 24 * 60 * 60 * 1000;
     }
 
+    // Two records are only duplicates if EITHER the name matches OR the acres match.
+    // If both differ, they are separate fires — keep both, don't group.
+    function acresMatch(a1, a2) {
+      if (!a1 && !a2) return true; // both missing = can't confirm different
+      if (!a1 || !a2) return false; // one missing = don't assume match
+      const tolerance = Math.max(a1, a2) * 0.10;
+      return Math.abs(a1 - a2) <= tolerance;
+    }
+
+    function namesMatch(n1, n2) {
+      return normalizeName(n1) === normalizeName(n2);
+    }
+
+    function isDuplicateCandidate(inc1, inc2) {
+      return namesMatch(inc1.incident_name, inc2.incident_name) ||
+             acresMatch(inc1.acres_burned, inc2.acres_burned);
+    }
+
     // Group by normalized name + state, then cluster by date proximity
     const nameGroups = {};
     all.forEach(inc => {
@@ -76,7 +94,7 @@ Deno.serve(async (req) => {
     for (let i = 0; i < ungrouped.length; i++) {
       for (let j = i + 1; j < ungrouped.length; j++) {
         const dist = haversine(ungrouped[i].latitude, ungrouped[i].longitude, ungrouped[j].latitude, ungrouped[j].longitude);
-        if (dist <= 10 && datesWithinDays(ungrouped[i].start_date, ungrouped[j].start_date)) {
+        if (dist <= 10 && datesWithinDays(ungrouped[i].start_date, ungrouped[j].start_date) && isDuplicateCandidate(ungrouped[i], ungrouped[j])) {
           let group = geoGroups.find(g => g.some(inc => inc.id === ungrouped[i].id || inc.id === ungrouped[j].id));
           if (!group) { group = []; geoGroups.push(group); }
           if (!group.find(inc => inc.id === ungrouped[i].id)) group.push(ungrouped[i]);

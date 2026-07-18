@@ -31,6 +31,21 @@ Deno.serve(async (req) => {
     // Safety guard: refuse to merge fires with start dates >7 days apart — they are
     // separate fires in different time frames, even if co-located.
     const DATE_PROXIMITY_DAYS = 7;
+
+    function normalizeName(name) {
+      return (name || '').toLowerCase()
+        .replace(/\s*fire\s*$/i, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function acresMatch(a1, a2) {
+      if (!a1 && !a2) return true;
+      if (!a1 || !a2) return false;
+      const tolerance = Math.max(a1, a2) * 0.10;
+      return Math.abs(a1 - a2) <= tolerance;
+    }
     for (const rec of deleteRecords) {
       if (keepRecord.start_date && rec.start_date) {
         const diff = Math.abs(new Date(keepRecord.start_date).getTime() - new Date(rec.start_date).getTime());
@@ -39,6 +54,14 @@ Deno.serve(async (req) => {
             error: `Refused to merge: "${rec.incident_name}" (start ${rec.start_date}) and "${keepRecord.incident_name}" (start ${keepRecord.start_date}) are more than ${DATE_PROXIMITY_DAYS} days apart — these are likely separate fires, not duplicates.`,
           }, { status: 400 });
         }
+      }
+      // Refuse to merge if BOTH name and acres differ — these are separate fires.
+      const namesSame = normalizeName(keepRecord.incident_name) === normalizeName(rec.incident_name);
+      const acresSame = acresMatch(keepRecord.acres_burned, rec.acres_burned);
+      if (!namesSame && !acresSame) {
+        return Response.json({
+          error: `Refused to merge: "${rec.incident_name}" (${rec.acres_burned || '?'} acres) and "${keepRecord.incident_name}" (${keepRecord.acres_burned || '?'} acres) differ in both name and acreage — these are likely separate fires, not duplicates.`,
+        }, { status: 400 });
       }
     }
 
