@@ -70,6 +70,32 @@ Deno.serve(async (req) => {
       base44.entities.Notification.list()
     ]);
 
+    // Snapshot all user data to DeletionQueue (90-day retention for recovery)
+    const now = new Date();
+    const purgeAfter = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+    try {
+      await base44.asServiceRole.entities.DeletionQueue.create({
+        deleted_user_email: user.email,
+        deleted_user_id: user.id,
+        deleted_user_name: user.full_name || user.email,
+        data_snapshot: {
+          user_profile: profiles[0] || null,
+          family_members: familyMembers,
+          pets: pets,
+          emergency_caches: caches,
+          cache_items: cacheItems,
+          meet_spots: meetSpots,
+          first_aid_items: firstAidItems,
+          notifications: notifications,
+        },
+        deleted_at: now.toISOString(),
+        purge_after: purgeAfter.toISOString(),
+        restored: false,
+      });
+    } catch (snapshotError) {
+      console.error("Failed to create deletion queue entry:", snapshotError);
+    }
+
     // Delete all records
     await Promise.all([
       ...profiles.map(p => base44.asServiceRole.entities.UserProfile.delete(p.id)),

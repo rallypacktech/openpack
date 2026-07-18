@@ -1,10 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
 // 2026 annual operating goal — transparent breakdown of real costs
-const ANNUAL_GOAL_CENTS = 85000 * 100;
+const ANNUAL_GOAL_CENTS = 125000 * 100;
 
 const OPERATING_COSTS = [
-  { label: "Founder & Developer Salary", amount: 80000, description: "Full-time development, maintenance, and user support" },
+  { label: "Founder & Developer Salary", amount: 120000, description: "Full-time development, maintenance, and user support" },
   { label: "Base44 Builder Subscription", amount: 2400, description: "App hosting, database, backend functions, and integrations (~$200/mo)" },
   { label: "Domain Registration (Name.com)", amount: 50, description: "Annual domain renewal" },
   { label: "Email & Communication Tools", amount: 350, description: "Resend, Telegram Bot infrastructure, and notification delivery" },

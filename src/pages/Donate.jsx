@@ -100,7 +100,7 @@ export default function Donate() {
               <p className="text-[10px] uppercase tracking-[0.3em] text-[#8A8577] font-sans mb-1">2026 Operating Goal</p>
               <p className="font-serif text-3xl font-bold text-[#1C1C1A]">
                 {progressLoading ? "—" : progress?.total_raised_display || "$0"}
-                <span className="text-base text-[#1C1C1A]/40 font-sans font-normal"> / {progress?.goal_display || "$85,000"}</span>
+                <span className="text-base text-[#1C1C1A]/40 font-sans font-normal"> / {progress?.goal_display || "$125,000"}</span>
               </p>
             </div>
             <div className="text-right">
@@ -143,7 +143,7 @@ export default function Donate() {
           })}
           <div className="bg-[#1C1C1A] p-5 flex items-center justify-between">
             <span className="font-sans font-semibold text-sm text-white uppercase tracking-widest">Total Annual Goal</span>
-            <span className="font-serif text-2xl font-bold text-[#D64A2E]">${(progress?.total_costs || 85000).toLocaleString()}</span>
+            <span className="font-serif text-2xl font-bold text-[#D64A2E]">${(progress?.total_costs || 125000).toLocaleString()}</span>
           </div>
         </div>
       </div>

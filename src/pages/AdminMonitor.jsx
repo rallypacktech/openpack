@@ -7,8 +7,7 @@ import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Bu
 import QuizResultsTable from "../components/admin/QuizResultsTable";
 import IncidentsPanel from "../components/admin/IncidentsPanel";
 import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
-import AlertDelegationsPanel from "../components/admin/AlertDelegationsPanel";
-import AlertSubmissionsPanel from "../components/admin/AlertSubmissionsPanel";
+import AlertsPanel from "../components/admin/AlertsPanel";
 import GrantLOIWorkflow from "../components/admin/GrantLOIWorkflow";
 import CleanupPanel from "../components/admin/CleanupPanel";
 
@@ -102,11 +101,8 @@ export default function AdminMonitor() {
             <TabsTrigger value="quiz" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" /> Quiz Results
             </TabsTrigger>
-            <TabsTrigger value="delegations" className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4" /> Alert Delegations
-            </TabsTrigger>
-            <TabsTrigger value="submissions" className="flex items-center gap-2">
-              <ClipboardList className="w-4 h-4" /> Alert Submissions
+            <TabsTrigger value="alerts" className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4" /> Alerts
             </TabsTrigger>
             <TabsTrigger value="referrals" className="flex items-center gap-2">
               <Building2 className="w-4 h-4" /> Referrals
@@ -132,15 +128,9 @@ export default function AdminMonitor() {
             <BusinessReferralsPanel />
           </TabsContent>
 
-          <TabsContent value="delegations">
-            <AlertDelegationsPanel />
+          <TabsContent value="alerts">
+            <AlertsPanel />
           </TabsContent>
-
-          <TabsContent value="submissions">
-            <AlertSubmissionsPanel />
-          </TabsContent>
-
-
 
           <TabsContent value="grants">
             <GrantLOIWorkflow />

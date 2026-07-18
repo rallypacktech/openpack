@@ -1,0 +1,71 @@
+{
+  "name": "DeletionQueue",
+  "type": "object",
+  "properties": {
+    "deleted_user_email": {
+      "type": "string",
+      "description": "Email of the user whose account was deleted"
+    },
+    "deleted_user_id": {
+      "type": "string",
+      "description": "Original user ID of the deleted account"
+    },
+    "deleted_user_name": {
+      "type": "string",
+      "description": "Display name of the deleted user"
+    },
+    "data_snapshot": {
+      "type": "object",
+      "description": "JSON snapshot of all user-owned records at time of deletion, keyed by entity name"
+    },
+    "deleted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "purge_after": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date after which this snapshot is permanently purged (deleted_at + 90 days)"
+    },
+    "restored": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this deletion has been restored from the queue"
+    },
+    "restored_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "restored_by": {
+      "type": "string",
+      "description": "Email of the admin who restored this deletion"
+    }
+  },
+  "required": [
+    "deleted_user_email",
+    "deleted_user_id",
+    "data_snapshot",
+    "deleted_at",
+    "purge_after"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
