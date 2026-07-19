@@ -31,8 +31,8 @@ Deno.serve(async (req) => {
     const hashedUserId = await hashData(user.id);
     const hashedEmail = await hashData(user.email);
 
-    // Fetch pets before deletion
-    const pets = await base44.entities.Pet.list();
+    // Fetch pets before deletion (scoped to this user only — prevents admin mass-delete)
+    const pets = await base44.entities.Pet.filter({ created_by: user.email });
 
     // Update Supabase pet records to mark as orphaned (owner deleted account)
     // Keep microchip info and last known owner data
@@ -59,15 +59,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Delete all user entities from Base44
+    // Fetch ONLY this user's data (scoped to prevent admin RLS from returning all users' records)
+    const userFilter = { created_by: user.email };
     const [profiles, familyMembers, caches, cacheItems, meetSpots, firstAidItems, notifications] = await Promise.all([
-      base44.entities.UserProfile.list(),
-      base44.entities.FamilyMember.list(),
-      base44.entities.EmergencyCache.list(),
-      base44.entities.CacheItem.list(),
-      base44.entities.MeetSpot.list(),
-      base44.entities.FirstAidItem.list(),
-      base44.entities.Notification.list()
+      base44.entities.UserProfile.filter(userFilter),
+      base44.entities.FamilyMember.filter(userFilter),
+      base44.entities.EmergencyCache.filter(userFilter),
+      base44.entities.CacheItem.filter(userFilter),
+      base44.entities.MeetSpot.filter(userFilter),
+      base44.entities.FirstAidItem.filter(userFilter),
+      base44.entities.Notification.filter(userFilter)
     ]);
 
     // Snapshot all user data to DeletionQueue (90-day retention for recovery)
