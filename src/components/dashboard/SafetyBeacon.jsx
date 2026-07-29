@@ -3,7 +3,13 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, AlertTriangle, MapPin, Clock, Users, Share2 } from "lucide-react";
+import {
+  CheckCircle,
+  AlertTriangle,
+  MapPin,
+  Users,
+  Share2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 /**
@@ -53,7 +59,9 @@ export default function SafetyBeacon() {
   const postStatus = async (status, rallySpotId = null) => {
     setPosting(true);
     try {
-      const spot = rallySpotId ? meetSpots.find((s) => s.id === rallySpotId) : null;
+      const spot = rallySpotId
+        ? meetSpots.find((s) => s.id === rallySpotId)
+        : null;
       const profileData = {
         current_status: status,
         status_updated_at: new Date().toISOString(),
@@ -71,17 +79,35 @@ export default function SafetyBeacon() {
         rally_spot_name: spot?.name || null,
       });
       const alertResults = resp.data?.results;
-      if (alertResults?.share_links && Object.keys(alertResults.share_links).length > 0) {
+      if (
+        alertResults?.share_links &&
+        Object.keys(alertResults.share_links).length > 0
+      ) {
         setShareLinks(alertResults.share_links);
       } else {
         setShareLinks(null);
       }
 
       const channelsUsed = profile?.status_alert_channels || ["email"];
-      const channelSummary = channelsUsed.filter(c => c !== "threads" && c !== "signal").join(", ");
+      if (typeof pendo !== "undefined") {
+        pendo.track("safety_status_posted", {
+          status,
+          rally_spot_name: spot?.name || "",
+          alert_channels: channelsUsed.join(", "),
+        });
+      }
+      const channelSummary = channelsUsed
+        .filter((c) => c !== "threads" && c !== "signal")
+        .join(", ");
       toast.success(
-        status === "safe" ? "Status posted: Safe" : "Status posted: Needs Assistance",
-        { description: channelSummary ? `Alerted via: ${channelSummary}` : undefined }
+        status === "safe"
+          ? "Status posted: Safe"
+          : "Status posted: Needs Assistance",
+        {
+          description: channelSummary
+            ? `Alerted via: ${channelSummary}`
+            : undefined,
+        },
       );
       setShowRallyPicker(false);
       setSelectedRallySpot(null);
@@ -112,15 +138,29 @@ export default function SafetyBeacon() {
       <CardContent className="space-y-4">
         {/* My current status */}
         {myStatus && myStatus !== "unknown" && (
-          <div className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-sans ${
-            myStatus === "safe" ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"
-          }`}>
-            {myStatus === "safe"
-              ? <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
-              : <AlertTriangle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />}
-            <span className={myStatus === "safe" ? "text-green-800" : "text-red-800"}>
-              Your status: <strong>{myStatus === "safe" ? "Safe" : "Needs Assistance"}</strong>
-              {myStatusAge !== null && ` · ${myStatusAge < 1 ? "just now" : `${myStatusAge}m ago`}`}
+          <div
+            className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-sans ${
+              myStatus === "safe"
+                ? "bg-green-50 border border-green-200"
+                : "bg-red-50 border border-red-200"
+            }`}
+          >
+            {myStatus === "safe" ? (
+              <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+            ) : (
+              <AlertTriangle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
+            )}
+            <span
+              className={
+                myStatus === "safe" ? "text-green-800" : "text-red-800"
+              }
+            >
+              Your status:{" "}
+              <strong>
+                {myStatus === "safe" ? "Safe" : "Needs Assistance"}
+              </strong>
+              {myStatusAge !== null &&
+                ` · ${myStatusAge < 1 ? "just now" : `${myStatusAge}m ago`}`}
             </span>
           </div>
         )}
@@ -153,15 +193,27 @@ export default function SafetyBeacon() {
             <p className="text-xs font-sans font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-1">
               <Share2 className="w-3 h-3" /> Share your status
             </p>
-            <p className="text-xs text-muted-foreground font-sans">Email/Telegram/Discord alerts sent. Tap to share on your app:</p>
+            <p className="text-xs text-muted-foreground font-sans">
+              Email/Telegram/Discord alerts sent. Tap to share on your app:
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {shareLinks.threads && (
-                <a href={shareLinks.threads} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border hover:border-primary/50 text-xs font-sans font-medium text-foreground transition-colors">
+                <a
+                  href={shareLinks.threads}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border hover:border-primary/50 text-xs font-sans font-medium text-foreground transition-colors"
+                >
                   <Share2 className="w-3 h-3" /> Threads
                 </a>
               )}
               {shareLinks.signal && (
-                <a href={shareLinks.signal} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border hover:border-primary/50 text-xs font-sans font-medium text-foreground transition-colors">
+                <a
+                  href={shareLinks.signal}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border hover:border-primary/50 text-xs font-sans font-medium text-foreground transition-colors"
+                >
                   <Share2 className="w-3 h-3" /> Signal
                 </a>
               )}
@@ -185,7 +237,11 @@ export default function SafetyBeacon() {
                 {meetSpots.map((spot) => (
                   <button
                     key={spot.id}
-                    onClick={() => setSelectedRallySpot(spot.id === selectedRallySpot ? null : spot.id)}
+                    onClick={() =>
+                      setSelectedRallySpot(
+                        spot.id === selectedRallySpot ? null : spot.id,
+                      )
+                    }
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded border text-left text-xs font-sans transition-colors ${
                       selectedRallySpot === spot.id
                         ? "border-primary bg-primary/5 text-foreground"
@@ -195,13 +251,17 @@ export default function SafetyBeacon() {
                     <MapPin className="w-3 h-3 flex-shrink-0" />
                     <span>{spot.name}</span>
                     {spot.is_primary && (
-                      <Badge className="ml-auto text-[10px] py-0 h-4 bg-primary/10 text-primary">Primary</Badge>
+                      <Badge className="ml-auto text-[10px] py-0 h-4 bg-primary/10 text-primary">
+                        Primary
+                      </Badge>
                     )}
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground italic font-sans">No rally points set yet</p>
+              <p className="text-xs text-muted-foreground italic font-sans">
+                No rally points set yet
+              </p>
             )}
             <div className="grid grid-cols-2 gap-2 pt-1">
               <Button
@@ -216,7 +276,10 @@ export default function SafetyBeacon() {
                 size="sm"
                 variant="outline"
                 className="font-sans text-xs"
-                onClick={() => { setShowRallyPicker(false); setSelectedRallySpot(null); }}
+                onClick={() => {
+                  setShowRallyPicker(false);
+                  setSelectedRallySpot(null);
+                }}
               >
                 Cancel
               </Button>
@@ -232,7 +295,10 @@ export default function SafetyBeacon() {
             </p>
             <div className="space-y-1.5">
               {familyStatuses.slice(0, 4).map((s, i) => (
-                <div key={i} className="flex items-center justify-between text-xs font-sans">
+                <div
+                  key={i}
+                  className="flex items-center justify-between text-xs font-sans"
+                >
                   <span className="text-foreground font-medium">{s.name}</span>
                   <div className="flex items-center gap-1.5">
                     {s.status === "safe" ? (
@@ -242,12 +308,20 @@ export default function SafetyBeacon() {
                     ) : (
                       <span className="w-3 h-3 rounded-full bg-gray-300 inline-block" />
                     )}
-                    <span className={
-                      s.status === "safe" ? "text-green-700" :
-                      s.status === "needs_assistance" ? "text-red-700" :
-                      "text-muted-foreground"
-                    }>
-                      {s.status === "safe" ? "Safe" : s.status === "needs_assistance" ? "Needs help" : "Unknown"}
+                    <span
+                      className={
+                        s.status === "safe"
+                          ? "text-green-700"
+                          : s.status === "needs_assistance"
+                            ? "text-red-700"
+                            : "text-muted-foreground"
+                      }
+                    >
+                      {s.status === "safe"
+                        ? "Safe"
+                        : s.status === "needs_assistance"
+                          ? "Needs help"
+                          : "Unknown"}
                     </span>
                   </div>
                 </div>

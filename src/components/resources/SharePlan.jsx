@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, Copy, Mail, Users, Link, CheckCircle, Download, FileText } from "lucide-react";
+import {
+  Copy,
+  Mail,
+  Users,
+  Link,
+  CheckCircle,
+  Download,
+  FileText,
+} from "lucide-react";
 
 export default function SharePlan() {
   const [user, setUser] = useState(null);
@@ -24,13 +31,14 @@ export default function SharePlan() {
       try {
         const u = await base44.auth.me();
         setUser(u);
-        const [profileData, cachesResp, spotsResp, membersData, petsData] = await Promise.all([
-          base44.entities.UserProfile.filter({ created_by: u.email }),
-          base44.functions.invoke("getCaches"),
-          base44.functions.invoke("getMeetSpots"),
-          base44.entities.FamilyMember.filter({ created_by: u.email }),
-          base44.entities.Pet.filter({ created_by: u.email }),
-        ]);
+        const [profileData, cachesResp, spotsResp, membersData, petsData] =
+          await Promise.all([
+            base44.entities.UserProfile.filter({ created_by: u.email }),
+            base44.functions.invoke("getCaches"),
+            base44.functions.invoke("getMeetSpots"),
+            base44.entities.FamilyMember.filter({ created_by: u.email }),
+            base44.entities.Pet.filter({ created_by: u.email }),
+          ]);
         const p = profileData[0] || null;
         setProfile(p);
         setCaches(cachesResp.data.caches || []);
@@ -48,7 +56,9 @@ export default function SharePlan() {
         if (spotsResp.data.spots?.length) {
           lines.push("--- MEETING SPOTS ---");
           spotsResp.data.spots.forEach((s) => {
-            lines.push(`• ${s.is_primary ? "[PRIMARY] " : ""}${s.name}${s.address ? " — " + s.address : ""}`);
+            lines.push(
+              `• ${s.is_primary ? "[PRIMARY] " : ""}${s.name}${s.address ? " — " + s.address : ""}`,
+            );
             if (s.description) lines.push(`  ${s.description}`);
           });
           lines.push("");
@@ -57,7 +67,9 @@ export default function SharePlan() {
         if (cachesResp.data.caches?.length) {
           lines.push("--- EMERGENCY CACHES ---");
           cachesResp.data.caches.forEach((c) => {
-            lines.push(`• ${c.name} (${c.cache_type?.replace("_", " ")}) — Location: ${c.location}`);
+            lines.push(
+              `• ${c.name} (${c.cache_type?.replace("_", " ")}) — Location: ${c.location}`,
+            );
           });
           lines.push("");
         }
@@ -65,8 +77,11 @@ export default function SharePlan() {
         if (membersData.length) {
           lines.push("--- HOUSEHOLD MEMBERS ---");
           membersData.forEach((m) => {
-            lines.push(`• ${m.name} (${m.relationship})${m.emergency_contact ? " — Contact: " + m.emergency_contact : ""}`);
-            if (m.medical_conditions) lines.push(`  Medical: ${m.medical_conditions}`);
+            lines.push(
+              `• ${m.name} (${m.relationship})${m.emergency_contact ? " — Contact: " + m.emergency_contact : ""}`,
+            );
+            if (m.medical_conditions)
+              lines.push(`  Medical: ${m.medical_conditions}`);
           });
           lines.push("");
         }
@@ -74,8 +89,11 @@ export default function SharePlan() {
         if (petsData.length) {
           lines.push("--- PETS ---");
           petsData.forEach((pet) => {
-            lines.push(`• ${pet.name} (${pet.species}${pet.breed ? ", " + pet.breed : ""})${pet.microchip_number ? " — Chip: " + pet.microchip_number : ""}`);
-            if (pet.medical_conditions) lines.push(`  Medical: ${pet.medical_conditions}`);
+            lines.push(
+              `• ${pet.name} (${pet.species}${pet.breed ? ", " + pet.breed : ""})${pet.microchip_number ? " — Chip: " + pet.microchip_number : ""}`,
+            );
+            if (pet.medical_conditions)
+              lines.push(`  Medical: ${pet.medical_conditions}`);
           });
           lines.push("");
         }
@@ -111,6 +129,14 @@ export default function SharePlan() {
     a.download = "rallypack-emergency-plan.txt";
     a.click();
     URL.revokeObjectURL(url);
+    if (typeof pendo !== "undefined") {
+      pendo.track("emergency_plan_downloaded", {
+        meet_spot_count: meetSpots.length,
+        cache_count: caches.length,
+        family_member_count: familyMembers.length,
+        pet_count: pets.length,
+      });
+    }
   };
 
   const handleEmailShare = async () => {
@@ -122,6 +148,15 @@ export default function SharePlan() {
         subject: `${user?.full_name || "Someone"} shared their RallyPack Emergency Plan with you`,
         body: `Hi,\n\n${user?.full_name || "A RallyPack user"} has shared their emergency preparedness plan with you.\n\n${planText}\n\nYou can create your own free plan at ${window.location.origin}\n\nStay safe,\nRallyPack`,
       });
+      if (typeof pendo !== "undefined") {
+        pendo.track("emergency_plan_shared", {
+          share_method: "email",
+          meet_spot_count: meetSpots.length,
+          cache_count: caches.length,
+          family_member_count: familyMembers.length,
+          pet_count: pets.length,
+        });
+      }
       setEmailSent(true);
       setEmailInput("");
       setTimeout(() => setEmailSent(false), 4000);
@@ -134,9 +169,12 @@ export default function SharePlan() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h2 className="font-serif text-2xl font-semibold text-foreground mb-1">Share Your Emergency Plan</h2>
+        <h2 className="font-serif text-2xl font-semibold text-foreground mb-1">
+          Share Your Emergency Plan
+        </h2>
         <p className="text-muted-foreground font-sans text-sm">
-          Share your plan with family, friends, or neighbors — whether they have a RallyPack account or not.
+          Share your plan with family, friends, or neighbors — whether they have
+          a RallyPack account or not.
         </p>
       </div>
 
@@ -149,7 +187,8 @@ export default function SharePlan() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-xs text-muted-foreground font-sans">
-            Send a full copy of your emergency plan — meet spots, caches, and household info — to anyone. No account required to receive it.
+            Send a full copy of your emergency plan — meet spots, caches, and
+            household info — to anyone. No account required to receive it.
           </p>
           <div className="flex gap-2">
             <Input
@@ -160,7 +199,11 @@ export default function SharePlan() {
               onKeyDown={(e) => e.key === "Enter" && handleEmailShare()}
               className="flex-1"
             />
-            <Button onClick={handleEmailShare} disabled={sending || !emailInput.trim()} className="bg-foreground text-background hover:bg-foreground/90">
+            <Button
+              onClick={handleEmailShare}
+              disabled={sending || !emailInput.trim()}
+              className="bg-foreground text-background hover:bg-foreground/90"
+            >
               {sending ? "Sending…" : "Send"}
             </Button>
           </div>
@@ -176,22 +219,36 @@ export default function SharePlan() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <FileText className="w-4 h-4 text-primary" /> Copy or Download Your Plan
+            <FileText className="w-4 h-4 text-primary" /> Copy or Download Your
+            Plan
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-xs text-muted-foreground font-sans">
-            Great for printing and posting at home, in a go-bag, or sharing via text message.
+            Great for printing and posting at home, in a go-bag, or sharing via
+            text message.
           </p>
           <pre className="bg-secondary/50 rounded p-4 text-xs font-mono text-foreground whitespace-pre-wrap max-h-52 overflow-y-auto border border-border">
             {planText || "Loading plan…"}
           </pre>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" onClick={handleCopyPlan} className="flex items-center gap-2 text-sm">
-              {copied ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+            <Button
+              variant="outline"
+              onClick={handleCopyPlan}
+              className="flex items-center gap-2 text-sm"
+            >
+              {copied ? (
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
               {copied ? "Copied!" : "Copy Plan"}
             </Button>
-            <Button variant="outline" onClick={handleDownload} className="flex items-center gap-2 text-sm">
+            <Button
+              variant="outline"
+              onClick={handleDownload}
+              className="flex items-center gap-2 text-sm"
+            >
               <Download className="w-4 h-4" /> Download .txt
             </Button>
           </div>
@@ -207,12 +264,25 @@ export default function SharePlan() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-xs text-muted-foreground font-sans">
-            Invite family members or neighbors to create their own free RallyPack account so they can build their own plan.
+            Invite family members or neighbors to create their own free
+            RallyPack account so they can build their own plan.
           </p>
           <div className="flex gap-2">
-            <Input readOnly value={`${window.location.origin}`} className="flex-1 bg-secondary/40 text-sm" />
-            <Button variant="outline" onClick={handleCopyLink} className="flex items-center gap-2 text-sm">
-              {copied ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Link className="w-4 h-4" />}
+            <Input
+              readOnly
+              value={`${window.location.origin}`}
+              className="flex-1 bg-secondary/40 text-sm"
+            />
+            <Button
+              variant="outline"
+              onClick={handleCopyLink}
+              className="flex items-center gap-2 text-sm"
+            >
+              {copied ? (
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              ) : (
+                <Link className="w-4 h-4" />
+              )}
               {copied ? "Copied!" : "Copy Link"}
             </Button>
           </div>
@@ -220,7 +290,8 @@ export default function SharePlan() {
       </Card>
 
       <p className="text-xs text-muted-foreground font-sans">
-        <strong>Tip:</strong> Print a copy and keep it in your go-bag, car, and somewhere at home — cell service fails during most major emergencies.
+        <strong>Tip:</strong> Print a copy and keep it in your go-bag, car, and
+        somewhere at home — cell service fails during most major emergencies.
       </p>
     </div>
   );

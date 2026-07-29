@@ -26,7 +26,10 @@ function formatPrice(price) {
   return amount;
 }
 
-export default function ProfessionalUpgradeCard({ organizationName, onSubscribed }) {
+export default function ProfessionalUpgradeCard({
+  organizationName,
+  onSubscribed,
+}) {
   const [stripePrice, setStripePrice] = useState(null);
   const [priceLoading, setPriceLoading] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -41,7 +44,7 @@ export default function ProfessionalUpgradeCard({ organizationName, onSubscribed
           const price = res.data.prices.find(
             (p) =>
               p.product?.metadata?.tier === "professional" ||
-              p.product?.name?.toLowerCase().includes("professional")
+              p.product?.name?.toLowerCase().includes("professional"),
           );
           setStripePrice(price || null);
         }
@@ -64,16 +67,25 @@ export default function ProfessionalUpgradeCard({ organizationName, onSubscribed
     }
     setLoading(true);
     try {
-      const response = await base44.functions.invoke("createSubscriptionSession", {
-        price_id: stripePrice.id,
-        success_url: `${window.location.origin}/BusinessDashboard?sub_success=true`,
-        cancel_url: `${window.location.origin}/BusinessDashboard`,
-        metadata: {
-          tier: "professional",
-          organization_name: organizationName || "",
+      const response = await base44.functions.invoke(
+        "createSubscriptionSession",
+        {
+          price_id: stripePrice.id,
+          success_url: `${window.location.origin}/BusinessDashboard?sub_success=true`,
+          cancel_url: `${window.location.origin}/BusinessDashboard`,
+          metadata: {
+            tier: "professional",
+            organization_name: organizationName || "",
+          },
         },
-      });
+      );
       if (response.data?.url) {
+        if (typeof pendo !== "undefined") {
+          pendo.track("professional_upgrade_initiated", {
+            organization_name: organizationName || "",
+            price_display: formatPrice(stripePrice) || "",
+          });
+        }
         window.location.href = response.data.url;
       } else {
         setError("Unable to start checkout. Please try again.");
@@ -99,25 +111,37 @@ export default function ProfessionalUpgradeCard({ organizationName, onSubscribed
         </span>
       </div>
       <CardContent className="p-6">
-        <h3 className="font-serif text-xl font-bold text-foreground">Professional Plan</h3>
+        <h3 className="font-serif text-xl font-bold text-foreground">
+          Professional Plan
+        </h3>
         <div className="flex items-baseline gap-1 mt-1 mb-1">
           {displayPrice ? (
-            <span className="text-3xl font-serif font-bold text-primary">{displayPrice}</span>
+            <span className="text-3xl font-serif font-bold text-primary">
+              {displayPrice}
+            </span>
           ) : !priceLoading ? (
-            <span className="text-lg font-semibold text-muted-foreground">Contact for pricing</span>
+            <span className="text-lg font-semibold text-muted-foreground">
+              Contact for pricing
+            </span>
           ) : (
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           )}
           {stripePrice?.recurring?.interval && (
             <span className="text-xs text-muted-foreground">
-              billed {stripePrice.recurring.interval === "year" ? "annually" : "monthly"}
+              billed{" "}
+              {stripePrice.recurring.interval === "year"
+                ? "annually"
+                : "monthly"}
             </span>
           )}
         </div>
 
         <ul className="space-y-2 my-5 text-left">
           {PROFESSIONAL_FEATURES.map((f) => (
-            <li key={f} className="flex items-start gap-2 text-sm text-foreground">
+            <li
+              key={f}
+              className="flex items-start gap-2 text-sm text-foreground"
+            >
               <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
               <span>{f}</span>
             </li>
@@ -139,7 +163,8 @@ export default function ProfessionalUpgradeCard({ organizationName, onSubscribed
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin mr-2" /> Redirecting to checkout…
+              <Loader2 className="w-4 h-4 animate-spin mr-2" /> Redirecting to
+              checkout…
             </>
           ) : (
             "Upgrade to Professional"

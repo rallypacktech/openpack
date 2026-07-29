@@ -6,10 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Send, AlertTriangle, CheckCircle2, Clock, XCircle, Mail } from "lucide-react";
 import {
-  INCIDENT_TYPES, EVENT_LEVELS, getAvailableIncidentTypes,
-  generateAlertMessage, getIncidentType, getEventLevel,
+  Send,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  XCircle,
+} from "lucide-react";
+import {
+  INCIDENT_TYPES,
+  EVENT_LEVELS,
+  getAvailableIncidentTypes,
+  generateAlertMessage,
+  getIncidentType,
+  getEventLevel,
 } from "@/lib/alertTemplates";
 
 export default function AlertSubmissionForm() {
@@ -39,7 +49,10 @@ export default function AlertSubmissionForm() {
         const available = getAvailableIncidentTypes(delegations[0]);
         if (available.length > 0) setIncidentType(available[0]);
       }
-      const subs = await base44.entities.AlertSubmission.list("-created_date", 20);
+      const subs = await base44.entities.AlertSubmission.list(
+        "-created_date",
+        20,
+      );
       setSubmissions(subs);
     } catch (e) {
       console.error("Failed to load data:", e);
@@ -48,9 +61,11 @@ export default function AlertSubmissionForm() {
     }
   };
 
-  const availableTypes = delegation ? getAvailableIncidentTypes(delegation) : [];
+  const availableTypes = delegation
+    ? getAvailableIncidentTypes(delegation)
+    : [];
   const availableTypeObjects = availableTypes
-    .map(id => INCIDENT_TYPES.find(t => t.id === id))
+    .map((id) => INCIDENT_TYPES.find((t) => t.id === id))
     .filter(Boolean);
 
   // Generate live preview
@@ -79,6 +94,15 @@ export default function AlertSubmissionForm() {
         generated_body: preview.body,
       });
       setResult(res.data || res);
+      if (typeof pendo !== "undefined") {
+        pendo.track("emergency_alert_submitted", {
+          incident_type: incidentType,
+          event_level: eventLevel,
+          target_area: targetArea.trim(),
+          has_custom_message: !!customMessage.trim(),
+          organization_name: delegation?.organization_name || "",
+        });
+      }
       // Reset form
       setTargetArea("");
       setInstructions("");
@@ -94,8 +118,15 @@ export default function AlertSubmissionForm() {
   const handleDispatch = async (submissionId) => {
     setDispatching(submissionId);
     try {
-      const res = await base44.functions.invoke("sendApprovedAlert", { submission_id: submissionId });
+      const res = await base44.functions.invoke("sendApprovedAlert", {
+        submission_id: submissionId,
+      });
       setResult(res.data || res);
+      if (typeof pendo !== "undefined") {
+        pendo.track("emergency_alert_dispatched", {
+          submission_id: submissionId,
+        });
+      }
       await loadData();
     } catch (e) {
       setResult({ error: e.message || "Failed to dispatch alert" });
@@ -117,9 +148,12 @@ export default function AlertSubmissionForm() {
       <Card className="border-amber-200 bg-amber-50/50">
         <CardContent className="pt-6 text-center">
           <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-          <p className="font-semibold text-foreground mb-1">No Alert Authorization</p>
+          <p className="font-semibold text-foreground mb-1">
+            No Alert Authorization
+          </p>
           <p className="text-sm text-muted-foreground">
-            Your organization is not authorized to send emergency alerts. An admin must grant alert delegation access first.
+            Your organization is not authorized to send emergency alerts. An
+            admin must grant alert delegation access first.
           </p>
         </CardContent>
       </Card>
@@ -136,14 +170,21 @@ export default function AlertSubmissionForm() {
             Submit Emergency Alert — {delegation.organization_name}
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Select the incident type and severity level. Your alert will be reviewed by an admin before it can be dispatched.
+            Select the incident type and severity level. Your alert will be
+            reviewed by an admin before it can be dispatched.
             {delegation.is_contracted && (
-              <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 border-blue-300">
+              <Badge
+                variant="outline"
+                className="ml-2 bg-blue-50 text-blue-700 border-blue-300"
+              >
                 Contracted: {delegation.contracted_type || "Verified"}
               </Badge>
             )}
             {delegation.provides_shelters && !delegation.is_contracted && (
-              <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-300">
+              <Badge
+                variant="outline"
+                className="ml-2 bg-green-50 text-green-700 border-green-300"
+              >
                 Shelter Provider
               </Badge>
             )}
@@ -154,7 +195,7 @@ export default function AlertSubmissionForm() {
           <div className="space-y-2">
             <Label>Incident Type</Label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {availableTypeObjects.map(t => (
+              {availableTypeObjects.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setIncidentType(t.id)}
@@ -175,7 +216,7 @@ export default function AlertSubmissionForm() {
           <div className="space-y-2">
             <Label>Severity Level</Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {EVENT_LEVELS.map(l => (
+              {EVENT_LEVELS.map((l) => (
                 <button
                   key={l.id}
                   onClick={() => setEventLevel(l.id)}
@@ -189,7 +230,9 @@ export default function AlertSubmissionForm() {
                 </button>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">{getEventLevel(eventLevel)?.description}</p>
+            <p className="text-xs text-muted-foreground">
+              {getEventLevel(eventLevel)?.description}
+            </p>
           </div>
 
           {/* Target Area */}
@@ -220,7 +263,9 @@ export default function AlertSubmissionForm() {
           {/* Instructions (not for custom type) */}
           {incidentType !== "custom" && (
             <div className="space-y-2">
-              <Label htmlFor="instructions">Additional Instructions (optional)</Label>
+              <Label htmlFor="instructions">
+                Additional Instructions (optional)
+              </Label>
               <Textarea
                 id="instructions"
                 placeholder="e.g. Proceed to the main shelter at the fairgrounds..."
@@ -234,24 +279,33 @@ export default function AlertSubmissionForm() {
           {/* Live Preview */}
           {preview && (
             <div className="border rounded-lg p-4 bg-white">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Message Preview (sent to both email &amp; Telegram)</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                Message Preview (sent to both email &amp; Telegram)
+              </p>
               <div className="flex items-center gap-2 mb-2">
                 <Badge className={getEventLevel(eventLevel)?.badgeClass}>
                   {getEventLevel(eventLevel)?.label}
                 </Badge>
-                <span className="font-sans font-bold text-foreground text-sm">{preview.title}</span>
+                <span className="font-sans font-bold text-foreground text-sm">
+                  {preview.title}
+                </span>
               </div>
-              <p className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">{preview.body}</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">
+                {preview.body}
+              </p>
               {(eventLevel === "critical" || incidentType === "custom") && (
                 <p className="text-xs text-amber-700 mt-3 bg-amber-50 border border-amber-200 rounded px-2 py-1">
-                  ⚠️ Critical and custom alerts are sent to BOTH email and Telegram regardless of recipient settings.
+                  ⚠️ Critical and custom alerts are sent to BOTH email and
+                  Telegram regardless of recipient settings.
                 </p>
               )}
             </div>
           )}
 
           {result && (
-            <div className={`rounded-lg p-3 text-sm ${result.error ? "bg-red-50 text-red-800" : "bg-green-50 text-green-800"}`}>
+            <div
+              className={`rounded-lg p-3 text-sm ${result.error ? "bg-red-50 text-red-800" : "bg-green-50 text-green-800"}`}
+            >
               {result.error ? (
                 <p>Error: {result.error}</p>
               ) : (
@@ -265,7 +319,12 @@ export default function AlertSubmissionForm() {
 
           <Button
             onClick={handleSubmit}
-            disabled={!incidentType || !preview || submitting || (incidentType === "custom" && !customMessage.trim())}
+            disabled={
+              !incidentType ||
+              !preview ||
+              submitting ||
+              (incidentType === "custom" && !customMessage.trim())
+            }
             className="w-full"
           >
             {submitting ? (
@@ -290,7 +349,7 @@ export default function AlertSubmissionForm() {
             <CardTitle className="text-base">Your Alert Submissions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {submissions.map(s => {
+            {submissions.map((s) => {
               const it = getIncidentType(s.incident_type);
               const el = getEventLevel(s.event_level);
               return (
@@ -299,13 +358,19 @@ export default function AlertSubmissionForm() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-lg">{it?.icon}</span>
                       <Badge className={el?.badgeClass}>{el?.label}</Badge>
-                      <span className="font-sans font-semibold text-foreground text-sm">{s.generated_title}</span>
+                      <span className="font-sans font-semibold text-foreground text-sm">
+                        {s.generated_title}
+                      </span>
                     </div>
                     <StatusBadge status={s.status} />
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{s.generated_body}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                    {s.generated_body}
+                  </p>
                   {s.target_area && (
-                    <p className="text-xs text-muted-foreground">Area: {s.target_area}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Area: {s.target_area}
+                    </p>
                   )}
                   {s.admin_notes && (
                     <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 mt-2">
@@ -318,7 +383,9 @@ export default function AlertSubmissionForm() {
                         try {
                           const d = JSON.parse(s.delivery_summary);
                           return `Sent: ${d.email_delivered || 0} email · ${d.telegram_delivered || 0} Telegram · ${d.in_app_created || 0} in-app`;
-                        } catch { return s.delivery_summary; }
+                        } catch {
+                          return s.delivery_summary;
+                        }
                       })()}
                     </p>
                   )}
@@ -354,10 +421,26 @@ export default function AlertSubmissionForm() {
 
 function StatusBadge({ status }) {
   const map = {
-    pending_review: { icon: Clock, label: "Pending Review", class: "bg-yellow-100 text-yellow-800" },
-    approved: { icon: CheckCircle2, label: "Approved", class: "bg-green-100 text-green-800" },
-    rejected: { icon: XCircle, label: "Rejected", class: "bg-red-100 text-red-800" },
-    sent: { icon: CheckCircle2, label: "Sent", class: "bg-blue-100 text-blue-800" },
+    pending_review: {
+      icon: Clock,
+      label: "Pending Review",
+      class: "bg-yellow-100 text-yellow-800",
+    },
+    approved: {
+      icon: CheckCircle2,
+      label: "Approved",
+      class: "bg-green-100 text-green-800",
+    },
+    rejected: {
+      icon: XCircle,
+      label: "Rejected",
+      class: "bg-red-100 text-red-800",
+    },
+    sent: {
+      icon: CheckCircle2,
+      label: "Sent",
+      class: "bg-blue-100 text-blue-800",
+    },
   };
   const m = map[status] || map.pending_review;
   const Icon = m.icon;

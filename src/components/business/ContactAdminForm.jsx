@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Send, CheckCircle2, Bug, Lightbulb, MessageSquare } from "lucide-react";
+import {
+  Mail,
+  Send,
+  CheckCircle2,
+  Bug,
+  Lightbulb,
+  MessageSquare,
+} from "lucide-react";
 
 const REQUEST_TYPES = [
   { id: "bug_report", label: "Bug Report", icon: Bug },
@@ -14,7 +21,11 @@ const REQUEST_TYPES = [
 ];
 
 export default function ContactAdminForm({ organizationName }) {
-  const [form, setForm] = useState({ subject: "", message: "", request_type: "improvement" });
+  const [form, setForm] = useState({
+    subject: "",
+    message: "",
+    request_type: "improvement",
+  });
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -31,6 +42,12 @@ export default function ContactAdminForm({ organizationName }) {
         organization_name: organizationName || "",
       });
       setResult(res.data || res);
+      if (typeof pendo !== "undefined") {
+        pendo.track("business_contact_admin_submitted", {
+          request_type: form.request_type,
+          organization_name: organizationName || "",
+        });
+      }
       setForm({ subject: "", message: "", request_type: "improvement" });
     } catch (err) {
       setResult({ error: err.message || "Failed to send message" });
@@ -47,7 +64,8 @@ export default function ContactAdminForm({ organizationName }) {
           Contact RallyPack Admin
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Send a bug report, improvement request, or feedback directly to the RallyPack team.
+          Send a bug report, improvement request, or feedback directly to the
+          RallyPack team.
         </p>
       </CardHeader>
       <CardContent>
@@ -55,7 +73,9 @@ export default function ContactAdminForm({ organizationName }) {
           <div className="text-center py-6">
             <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-3" />
             <p className="font-semibold text-foreground mb-1">Message Sent</p>
-            <p className="text-sm text-muted-foreground mb-4">{result.message}</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              {result.message}
+            </p>
             <Button variant="outline" size="sm" onClick={() => setResult(null)}>
               Send Another
             </Button>
@@ -65,7 +85,7 @@ export default function ContactAdminForm({ organizationName }) {
             <div className="space-y-2">
               <Label>Request Type</Label>
               <div className="grid grid-cols-3 gap-2">
-                {REQUEST_TYPES.map(t => {
+                {REQUEST_TYPES.map((t) => {
                   const Icon = t.icon;
                   return (
                     <button
@@ -107,9 +127,15 @@ export default function ContactAdminForm({ organizationName }) {
               />
             </div>
             {result?.error && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{result.error}</p>
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+                {result.error}
+              </p>
             )}
-            <Button type="submit" disabled={sending || !form.subject.trim() || !form.message.trim()} className="w-full">
+            <Button
+              type="submit"
+              disabled={sending || !form.subject.trim() || !form.message.trim()}
+              className="w-full"
+            >
               {sending ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />

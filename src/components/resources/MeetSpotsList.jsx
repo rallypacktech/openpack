@@ -6,10 +6,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, MapPin, Navigation, Star, Info } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  MapPin,
+  Navigation,
+  Star,
+  Info,
+} from "lucide-react";
 import AiMeetSpotSuggestions from "./AiMeetSpotSuggestions";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { base44 } from "@/api/base44Client";
 import StructuredAddressInput from "../settings/StructuredAddressInput";
 
@@ -33,25 +52,29 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     latitude: "",
     longitude: "",
     description: "",
-    is_primary: false
+    is_primary: false,
   });
 
-
-  
   useEffect(() => {
     const loadUser = async () => {
       const user = await base44.auth.me();
       setCurrentUserEmail(user.email);
-      
+
       // Get current user's home coordinates only
-      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      if (profiles.length > 0 && profiles[0].latitude && profiles[0].longitude) {
+      const profiles = await base44.entities.UserProfile.filter({
+        created_by: user.email,
+      });
+      if (
+        profiles.length > 0 &&
+        profiles[0].latitude &&
+        profiles[0].longitude
+      ) {
         setUserHomeCoords({
           lat: profiles[0].latitude,
-          lon: profiles[0].longitude
+          lon: profiles[0].longitude,
         });
       }
-      
+
       // Load recommendations and rally points in background (don't block rendering)
       loadRecommendations();
       loadRallyPoints();
@@ -61,37 +84,44 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
 
   const loadRecommendations = async () => {
     try {
-      const response = await base44.functions.invoke('recommendMeetSpots');
+      const response = await base44.functions.invoke("recommendMeetSpots");
       if (response.data.recommendations) {
         setRecommendations(response.data.recommendations);
       }
     } catch (error) {
-      console.error('Error loading recommendations:', error);
+      console.error("Error loading recommendations:", error);
     } finally {
       setLoadingRecs(false);
     }
   };
 
-  
-
   const loadRallyPoints = async () => {
     try {
       const user = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      
-      if (profiles.length > 0 && profiles[0].latitude && profiles[0].longitude) {
-        const response = await base44.functions.invoke('getCommunityRallyPoints', {
-          latitude: profiles[0].latitude,
-          longitude: profiles[0].longitude,
-          radius: 25
-        });
-        
+      const profiles = await base44.entities.UserProfile.filter({
+        created_by: user.email,
+      });
+
+      if (
+        profiles.length > 0 &&
+        profiles[0].latitude &&
+        profiles[0].longitude
+      ) {
+        const response = await base44.functions.invoke(
+          "getCommunityRallyPoints",
+          {
+            latitude: profiles[0].latitude,
+            longitude: profiles[0].longitude,
+            radius: 25,
+          },
+        );
+
         if (response.data.rallyPoints) {
           setRallyPoints(response.data.rallyPoints);
         }
       }
     } catch (error) {
-      console.error('Error loading rally points:', error);
+      console.error("Error loading rally points:", error);
     }
   };
 
@@ -101,10 +131,19 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       address: rallyPoint.address,
       latitude: rallyPoint.latitude,
       longitude: rallyPoint.longitude,
-      description: rallyPoint.description || "Recommended rally point from FEMA",
-      is_primary: false
+      description:
+        rallyPoint.description || "Recommended rally point from FEMA",
+      is_primary: false,
     };
     await onAdd(data);
+    if (typeof pendo !== "undefined") {
+      pendo.track("meet_spot_created", {
+        name: data.name,
+        is_primary: false,
+        has_coordinates: !!(data.latitude && data.longitude),
+        source: "rally_point",
+      });
+    }
   };
 
   const resetForm = () => {
@@ -119,7 +158,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       latitude: "",
       longitude: "",
       description: "",
-      is_primary: false
+      is_primary: false,
     });
     setEditingSpot(null);
   };
@@ -134,7 +173,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     setFormData({
       name: spot.name || "",
       address: spot.address || "",
-      street_address: spot.address?.split(',')[0]?.trim() || "",
+      street_address: spot.address?.split(",")[0]?.trim() || "",
       city: "",
       state_province: "",
       postal_code: "",
@@ -142,7 +181,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       latitude: spot.latitude?.toString() || "",
       longitude: spot.longitude?.toString() || "",
       description: spot.description || "",
-      is_primary: spot.is_primary || false
+      is_primary: spot.is_primary || false,
     });
     setDialogOpen(true);
   };
@@ -151,13 +190,21 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
     const data = {
       ...formData,
       latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-      longitude: formData.longitude ? parseFloat(formData.longitude) : null
+      longitude: formData.longitude ? parseFloat(formData.longitude) : null,
     };
-    
+
     if (editingSpot) {
       await onUpdate(editingSpot.id, data);
     } else {
       await onAdd(data);
+      if (typeof pendo !== "undefined") {
+        pendo.track("meet_spot_created", {
+          name: data.name,
+          is_primary: !!data.is_primary,
+          has_coordinates: !!(data.latitude && data.longitude),
+          source: "manual",
+        });
+      }
     }
     setDialogOpen(false);
     resetForm();
@@ -166,7 +213,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const handleMeetSpotFieldChange = (field, value) => {
     setFormData({
       ...formData,
-      [field]: value
+      [field]: value,
     });
   };
 
@@ -176,9 +223,11 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       addressData.city,
       addressData.state_province,
       addressData.postal_code,
-      addressData.country
-    ].filter(Boolean).join(', ');
-    setFormData(prev => ({
+      addressData.country,
+    ]
+      .filter(Boolean)
+      .join(", ");
+    setFormData((prev) => ({
       ...prev,
       address: fullAddress,
       street_address: addressData.street_address || "",
@@ -187,24 +236,26 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
       postal_code: addressData.postal_code || "",
       country: addressData.country || "",
       latitude: addressData.latitude?.toString() || "",
-      longitude: addressData.longitude?.toString() || ""
+      longitude: addressData.longitude?.toString() || "",
     }));
   };
 
   // Calculate cardinal direction from home to a spot
   const getDirection = (spotLat, spotLon) => {
     if (!userHomeCoords || !spotLat || !spotLon) return null;
-    
-    const lat1 = userHomeCoords.lat * Math.PI / 180;
-    const lat2 = spotLat * Math.PI / 180;
-    const lon1 = userHomeCoords.lon * Math.PI / 180;
-    const lon2 = spotLon * Math.PI / 180;
-    
+
+    const lat1 = (userHomeCoords.lat * Math.PI) / 180;
+    const lat2 = (spotLat * Math.PI) / 180;
+    const lon1 = (userHomeCoords.lon * Math.PI) / 180;
+    const lon2 = (spotLon * Math.PI) / 180;
+
     const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
-    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
-    const bearing = Math.atan2(y, x) * 180 / Math.PI;
+    const x =
+      Math.cos(lat1) * Math.sin(lat2) -
+      Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+    const bearing = (Math.atan2(y, x) * 180) / Math.PI;
     const normalizedBearing = (bearing + 360) % 360;
-    
+
     if (normalizedBearing >= 315 || normalizedBearing < 45) return "North";
     if (normalizedBearing >= 45 && normalizedBearing < 135) return "East";
     if (normalizedBearing >= 135 && normalizedBearing < 225) return "South";
@@ -214,7 +265,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   // Get covered directions
   const getCoveredDirections = () => {
     const directions = new Set();
-    spots.forEach(spot => {
+    spots.forEach((spot) => {
       const dir = getDirection(spot.latitude, spot.longitude);
       if (dir) directions.add(dir);
     });
@@ -223,18 +274,22 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
 
   const coveredDirections = getCoveredDirections();
   const allDirections = ["North", "East", "South", "West"];
-  const missingDirections = allDirections.filter(dir => !coveredDirections.has(dir));
+  const missingDirections = allDirections.filter(
+    (dir) => !coveredDirections.has(dir),
+  );
 
   return (
     <div>
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <h2 className="text-xl font-semibold text-foreground">Meeting Spots</h2>
+          <h2 className="text-xl font-semibold text-foreground">
+            Meeting Spots
+          </h2>
           <TooltipProvider>
             <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
               <TooltipTrigger asChild>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setTooltipOpen(!tooltipOpen)}
                   className="text-blue-600 hover:text-blue-800 focus:outline-none"
                 >
@@ -243,51 +298,84 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-lg p-4">
                 <div className="space-y-3 text-sm">
-                  <p className="font-semibold text-base">FEMA Recommendations:</p>
-                  
+                  <p className="font-semibold text-base">
+                    FEMA Recommendations:
+                  </p>
+
                   <div>
-                    <p className="font-medium mb-1">Set waypoints in each direction (N, S, E, W)</p>
-                    <p className="text-gray-600">Establish at least 4 spots in different cardinal directions from your home to ensure options regardless of the emergency's origin.</p>
+                    <p className="font-medium mb-1">
+                      Set waypoints in each direction (N, S, E, W)
+                    </p>
+                    <p className="text-gray-600">
+                      Establish at least 4 spots in different cardinal
+                      directions from your home to ensure options regardless of
+                      the emergency's origin.
+                    </p>
                   </div>
 
                   <div>
-                    <p className="font-medium mb-1">Near Home (for quick exits):</p>
-                    <p className="text-gray-600">• Neighbor's yard, street corner, nearby park</p>
-                    <p className="text-gray-600">• Parking lot, gas station, convenience store</p>
+                    <p className="font-medium mb-1">
+                      Near Home (for quick exits):
+                    </p>
+                    <p className="text-gray-600">
+                      • Neighbor's yard, street corner, nearby park
+                    </p>
+                    <p className="text-gray-600">
+                      • Parking lot, gas station, convenience store
+                    </p>
                   </div>
 
                   <div>
-                    <p className="font-medium mb-1">Out-of-Town (for evacuations):</p>
-                    <p className="text-gray-600">• Friend/relative's home, hotel, rest area</p>
-                    <p className="text-gray-600">• Community center, library, place of worship</p>
+                    <p className="font-medium mb-1">
+                      Out-of-Town (for evacuations):
+                    </p>
+                    <p className="text-gray-600">
+                      • Friend/relative's home, hotel, rest area
+                    </p>
+                    <p className="text-gray-600">
+                      • Community center, library, place of worship
+                    </p>
                   </div>
 
                   <div>
                     <p className="font-medium mb-1">Pet-Friendly Options:</p>
-                    <p className="text-gray-600">• Pet-friendly hotels, veterinary clinics</p>
-                    <p className="text-gray-600">• Friends/family who welcome pets, outdoor areas</p>
+                    <p className="text-gray-600">
+                      • Pet-friendly hotels, veterinary clinics
+                    </p>
+                    <p className="text-gray-600">
+                      • Friends/family who welcome pets, outdoor areas
+                    </p>
                   </div>
 
-                  <p className="text-xs text-gray-500 mt-3 pt-2 border-t">Source: FEMA Basic Preparedness Guidelines</p>
+                  <p className="text-xs text-gray-500 mt-3 pt-2 border-t">
+                    Source: FEMA Basic Preparedness Guidelines
+                  </p>
                 </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
-        
+
         <p className="text-sm text-gray-600 mb-4">
-          Designate meeting locations in each cardinal direction from your home. Choose accessible, safe spots that all family members know.
+          Designate meeting locations in each cardinal direction from your home.
+          Choose accessible, safe spots that all family members know.
         </p>
 
         {userHomeCoords && spots.length > 0 && (
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-sm font-medium text-gray-700">Covered Directions:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Covered Directions:
+            </span>
             <div className="flex gap-2">
-              {allDirections.map(dir => (
-                <Badge 
-                  key={dir} 
+              {allDirections.map((dir) => (
+                <Badge
+                  key={dir}
                   variant={coveredDirections.has(dir) ? "default" : "outline"}
-                  className={coveredDirections.has(dir) ? "bg-green-600" : "bg-gray-100 text-gray-400"}
+                  className={
+                    coveredDirections.has(dir)
+                      ? "bg-green-600"
+                      : "bg-gray-100 text-gray-400"
+                  }
                 >
                   {dir}
                 </Badge>
@@ -298,25 +386,32 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openAddDialog} className="bg-blue-600 hover:bg-blue-700 mt-2">
+            <Button
+              onClick={openAddDialog}
+              className="bg-blue-600 hover:bg-blue-700 mt-2"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Meeting Spot
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingSpot ? "Edit" : "Add"} Meeting Spot</DialogTitle>
+              <DialogTitle>
+                {editingSpot ? "Edit" : "Add"} Meeting Spot
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               <div>
                 <Label>Name</Label>
                 <Input
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="e.g., Community Center"
                 />
               </div>
-              
+
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
                 <StructuredAddressInput
                   formData={{
@@ -324,23 +419,29 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                     city: formData.city || "",
                     state_province: formData.state_province || "",
                     postal_code: formData.postal_code || "",
-                    country: formData.country || ""
+                    country: formData.country || "",
                   }}
                   onFieldChange={(field, value) => {
-                    setFormData(prev => ({
+                    setFormData((prev) => ({
                       ...prev,
                       [field]: value,
                       address: [
-                        field === 'street_address' ? value : prev.street_address,
-                        field === 'city' ? value : prev.city,
-                        field === 'state_province' ? value : prev.state_province,
-                        field === 'postal_code' ? value : prev.postal_code,
-                      ].filter(Boolean).join(', ')
+                        field === "street_address"
+                          ? value
+                          : prev.street_address,
+                        field === "city" ? value : prev.city,
+                        field === "state_province"
+                          ? value
+                          : prev.state_province,
+                        field === "postal_code" ? value : prev.postal_code,
+                      ]
+                        .filter(Boolean)
+                        .join(", "),
                     }));
                   }}
                   onAddressSelect={handleMeetSpotAddressSelect}
                 />
-                
+
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                   <div>
                     <Label className="text-xs text-gray-500">Latitude</Label>
@@ -366,7 +467,9 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                 <Label>Description</Label>
                 <Textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Notes about this location"
                 />
               </div>
@@ -374,10 +477,15 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
                 <Label>Primary Location</Label>
                 <Switch
                   checked={formData.is_primary}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_primary: checked })}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, is_primary: checked })
+                  }
                 />
               </div>
-              <Button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button
+                onClick={handleSave}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
                 {editingSpot ? "Update" : "Add"} Meeting Spot
               </Button>
             </div>
@@ -388,32 +496,48 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         {loadingRecs && (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">Loading recommendations...</span>
+            <span className="ml-3 text-gray-600">
+              Loading recommendations...
+            </span>
           </div>
         )}
-        
+
         {!loadingRecs && rallyPoints.length > 0 && (
           <div className="space-y-4 mb-6 mt-6">
-            <h3 className="text-lg font-semibold text-gray-900">Community Rally Points Near You</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Community Rally Points Near You
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {rallyPoints.map((point, idx) => (
-                <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div
+                  key={idx}
+                  className="bg-blue-50 border border-blue-200 rounded-lg p-4"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <p className="font-medium text-blue-900 mb-1">{point.name}</p>
+                      <p className="font-medium text-blue-900 mb-1">
+                        {point.name}
+                      </p>
                       {point.address && (
-                        <p className="text-sm text-blue-700 mb-1">{point.address}</p>
+                        <p className="text-sm text-blue-700 mb-1">
+                          {point.address}
+                        </p>
                       )}
                       {point.distance && (
                         <p className="text-xs text-blue-600">
                           {point.distance.toFixed(1)} km away
                           {userHomeCoords && point.latitude && (
-                            <> • {getDirection(point.latitude, point.longitude)}</>
+                            <>
+                              {" "}
+                              • {getDirection(point.latitude, point.longitude)}
+                            </>
                           )}
                         </p>
                       )}
                       {point.description && (
-                        <p className="text-xs text-blue-600 mt-1">{point.description}</p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          {point.description}
+                        </p>
                       )}
                     </div>
                     <Button
@@ -433,36 +557,63 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
         {/* Personalized Recommendations */}
         {!loadingRecs && recommendations.length > 0 && (
           <div className="space-y-4 mb-6 mt-6">
-            <h3 className="text-lg font-semibold text-gray-900">Recommendations for You</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Recommendations for You
+            </h3>
             {recommendations.map((rec, idx) => (
-              <div key={idx} className={`rounded-lg p-4 border ${
-                rec.type === 'coverage' ? 'bg-orange-50 border-orange-200' :
-                rec.type === 'regional' ? 'bg-blue-50 border-blue-200' :
-                'bg-green-50 border-green-200'
-              }`}>
+              <div
+                key={idx}
+                className={`rounded-lg p-4 border ${
+                  rec.type === "coverage"
+                    ? "bg-orange-50 border-orange-200"
+                    : rec.type === "regional"
+                      ? "bg-blue-50 border-blue-200"
+                      : "bg-green-50 border-green-200"
+                }`}
+              >
                 <div className="flex items-start gap-3">
-                  <Navigation className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                    rec.type === 'coverage' ? 'text-orange-600' :
-                    rec.type === 'regional' ? 'text-blue-600' :
-                    'text-green-600'
-                  }`} />
+                  <Navigation
+                    className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                      rec.type === "coverage"
+                        ? "text-orange-600"
+                        : rec.type === "regional"
+                          ? "text-blue-600"
+                          : "text-green-600"
+                    }`}
+                  />
                   <div>
-                    <p className={`font-medium mb-1 ${
-                      rec.type === 'coverage' ? 'text-orange-900' :
-                      rec.type === 'regional' ? 'text-blue-900' :
-                      'text-green-900'
-                    }`}>{rec.title}</p>
-                    <p className={`text-sm mb-2 ${
-                      rec.type === 'coverage' ? 'text-orange-700' :
-                      rec.type === 'regional' ? 'text-blue-700' :
-                      'text-green-700'
-                    }`}>{rec.description}</p>
+                    <p
+                      className={`font-medium mb-1 ${
+                        rec.type === "coverage"
+                          ? "text-orange-900"
+                          : rec.type === "regional"
+                            ? "text-blue-900"
+                            : "text-green-900"
+                      }`}
+                    >
+                      {rec.title}
+                    </p>
+                    <p
+                      className={`text-sm mb-2 ${
+                        rec.type === "coverage"
+                          ? "text-orange-700"
+                          : rec.type === "regional"
+                            ? "text-blue-700"
+                            : "text-green-700"
+                      }`}
+                    >
+                      {rec.description}
+                    </p>
                     {rec.suggestions && rec.suggestions.length > 0 && (
-                      <ul className={`text-sm space-y-1 ${
-                        rec.type === 'coverage' ? 'text-orange-600' :
-                        rec.type === 'regional' ? 'text-blue-600' :
-                        'text-green-600'
-                      }`}>
+                      <ul
+                        className={`text-sm space-y-1 ${
+                          rec.type === "coverage"
+                            ? "text-orange-600"
+                            : rec.type === "regional"
+                              ? "text-blue-600"
+                              : "text-green-600"
+                        }`}
+                      >
                         {rec.suggestions.map((suggestion, i) => (
                           <li key={i}>• {suggestion}</li>
                         ))}
@@ -502,15 +653,25 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
             <div className="flex items-start gap-3">
               <Navigation className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium text-blue-900 mb-1">Set waypoints in each direction</p>
+                <p className="font-medium text-blue-900 mb-1">
+                  Set waypoints in each direction
+                </p>
                 <p className="text-sm text-blue-700">
                   {missingDirections.length > 0 ? (
-                    <>Missing directions: <strong>{missingDirections.join(", ")}</strong>. </>
+                    <>
+                      Missing directions:{" "}
+                      <strong>{missingDirections.join(", ")}</strong>.{" "}
+                    </>
                   ) : (
-                    <>Establish at least 4 meeting spots: <strong>North, South, East, and West</strong> from your home. </>
+                    <>
+                      Establish at least 4 meeting spots:{" "}
+                      <strong>North, South, East, and West</strong> from your
+                      home.{" "}
+                    </>
                   )}
-                  Include both near-home locations (quick exits) and out-of-town spots (evacuations). 
-                  <button 
+                  Include both near-home locations (quick exits) and out-of-town
+                  spots (evacuations).
+                  <button
                     type="button"
                     onClick={() => setTooltipOpen(true)}
                     className="text-blue-600 underline hover:text-blue-800 ml-1"
@@ -529,62 +690,89 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           {spots.map((spot) => {
             const isOwner = spot.created_by === currentUserEmail;
             return (
-            <Card key={spot.id} className={`hover:shadow-md transition-shadow ${spot.is_primary ? 'ring-2 ring-blue-500' : ''}`}>
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-gray-900">{spot.name}</h3>
-                    {spot.is_primary && (
-                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                    )}
-                    {!isOwner && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                        Pack Member
-                      </Badge>
+              <Card
+                key={spot.id}
+                className={`hover:shadow-md transition-shadow ${spot.is_primary ? "ring-2 ring-blue-500" : ""}`}
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-900">
+                        {spot.name}
+                      </h3>
+                      {spot.is_primary && (
+                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                      )}
+                      {!isOwner && (
+                        <Badge
+                          variant="outline"
+                          className="bg-blue-50 text-blue-700 border-blue-200"
+                        >
+                          Pack Member
+                        </Badge>
+                      )}
+                    </div>
+                    {isOwner && (
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEditDialog(spot)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onDelete(spot.id)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     )}
                   </div>
-                  {isOwner && (
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(spot)}>
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => onDelete(spot.id)} className="text-red-500 hover:text-red-600">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                  {spot.address && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{spot.address}</span>
                     </div>
                   )}
-                </div>
-                {spot.address && (
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <MapPin className="w-4 h-4" />
-                    <span>{spot.address}</span>
-                  </div>
-                )}
-                {spot.latitude && spot.longitude && (
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                    <Navigation className="w-4 h-4" />
-                    <span>{spot.latitude.toFixed(4)}°, {spot.longitude.toFixed(4)}°</span>
-                    {userHomeCoords && (
-                      <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
-                        {getDirection(spot.latitude, spot.longitude)}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-                {spot.description && (
-                  <p className="text-sm text-gray-600">{spot.description}</p>
-                )}
-              </CardContent>
-            </Card>
-          );
+                  {spot.latitude && spot.longitude && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                      <Navigation className="w-4 h-4" />
+                      <span>
+                        {spot.latitude.toFixed(4)}°, {spot.longitude.toFixed(4)}
+                        °
+                      </span>
+                      {userHomeCoords && (
+                        <Badge
+                          variant="outline"
+                          className="ml-2 bg-blue-50 text-blue-700"
+                        >
+                          {getDirection(spot.latitude, spot.longitude)}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                  {spot.description && (
+                    <p className="text-sm text-gray-600">{spot.description}</p>
+                  )}
+                </CardContent>
+              </Card>
+            );
           })}
         </div>
       ) : (
         <Card>
           <CardContent className="py-12 text-center">
             <Navigation className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-600 font-medium mb-2">No meeting spots yet</p>
-            <p className="text-gray-500 text-sm">Add locations in each direction (N, S, E, W) from your home</p>
+            <p className="text-gray-600 font-medium mb-2">
+              No meeting spots yet
+            </p>
+            <p className="text-gray-500 text-sm">
+              Add locations in each direction (N, S, E, W) from your home
+            </p>
           </CardContent>
         </Card>
       )}
