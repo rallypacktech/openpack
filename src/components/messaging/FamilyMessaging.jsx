@@ -1,24 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Send, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  MessageCircle,
+  Send,
+  CheckCircle,
+  AlertTriangle,
+} from "lucide-react";
+import { toast } from "sonner";
 
 export default function FamilyMessaging() {
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
     loadMessages();
-    
+
     // Subscribe to new messages
     const unsubscribe = base44.entities.FamilyMessage.subscribe((event) => {
-      if (event.type === 'create') {
+      if (event.type === "create") {
         loadMessages();
       }
     });
@@ -28,39 +33,46 @@ export default function FamilyMessaging() {
 
   const loadMessages = async () => {
     try {
-      const response = await base44.functions.invoke('getFamilyMessages', {});
+      const response = await base44.functions.invoke("getFamilyMessages", {});
       setMessages(response.data.messages || []);
     } catch (error) {
-      console.error('Error loading messages:', error);
-      toast.error('Failed to load messages');
+      console.error("Error loading messages:", error);
+      toast.error("Failed to load messages");
     } finally {
       setLoading(false);
     }
   };
 
-  const sendMessage = async (messageType = 'general') => {
-    if (!newMessage.trim() && messageType === 'general') return;
+  const sendMessage = async (messageType = "general") => {
+    if (!newMessage.trim() && messageType === "general") return;
 
     setSending(true);
     try {
       let content = newMessage;
-      if (messageType === 'status_safe') {
-        content = '✅ I am safe and secure';
-      } else if (messageType === 'status_needs_assistance') {
-        content = '🆘 I need assistance';
+      if (messageType === "status_safe") {
+        content = "✅ I am safe and secure";
+      } else if (messageType === "status_needs_assistance") {
+        content = "🆘 I need assistance";
       }
 
-      await base44.functions.invoke('sendFamilyMessage', {
+      await base44.functions.invoke("sendFamilyMessage", {
         content,
-        message_type: messageType
+        message_type: messageType,
       });
+      if (typeof pendo !== "undefined") {
+        pendo.track("family_message_sent", {
+          message_type: messageType,
+        });
+      }
 
-      setNewMessage('');
-      toast.success(messageType === 'general' ? 'Message sent' : 'Status updated');
+      setNewMessage("");
+      toast.success(
+        messageType === "general" ? "Message sent" : "Status updated",
+      );
       loadMessages();
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message');
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
     } finally {
       setSending(false);
     }
@@ -68,18 +80,20 @@ export default function FamilyMessaging() {
 
   const markAsRead = async (messageId) => {
     try {
-      await base44.functions.invoke('markMessageRead', { message_id: messageId });
+      await base44.functions.invoke("markMessageRead", {
+        message_id: messageId,
+      });
       loadMessages();
     } catch (error) {
-      console.error('Error marking as read:', error);
+      console.error("Error marking as read:", error);
     }
   };
 
   const getMessageIcon = (type) => {
     switch (type) {
-      case 'status_safe':
+      case "status_safe":
         return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'status_needs_assistance':
+      case "status_needs_assistance":
         return <AlertTriangle className="w-4 h-4 text-red-600" />;
       default:
         return <MessageCircle className="w-4 h-4 text-blue-600" />;
@@ -88,12 +102,12 @@ export default function FamilyMessaging() {
 
   const getMessageStyle = (type) => {
     switch (type) {
-      case 'status_safe':
-        return 'bg-green-50 border-green-200';
-      case 'status_needs_assistance':
-        return 'bg-red-50 border-red-200';
+      case "status_safe":
+        return "bg-green-50 border-green-200";
+      case "status_needs_assistance":
+        return "bg-red-50 border-red-200";
       default:
-        return 'bg-white border-gray-200';
+        return "bg-white border-gray-200";
     }
   };
 
@@ -123,7 +137,7 @@ export default function FamilyMessaging() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => sendMessage('status_safe')}
+            onClick={() => sendMessage("status_safe")}
             disabled={sending}
             className="flex-1 border-green-600 text-green-600 hover:bg-green-50"
           >
@@ -133,7 +147,7 @@ export default function FamilyMessaging() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => sendMessage('status_needs_assistance')}
+            onClick={() => sendMessage("status_needs_assistance")}
             disabled={sending}
             className="flex-1 border-red-600 text-red-600 hover:bg-red-50"
           >
@@ -151,7 +165,7 @@ export default function FamilyMessaging() {
             rows={3}
           />
           <Button
-            onClick={() => sendMessage('general')}
+            onClick={() => sendMessage("general")}
             disabled={!newMessage.trim() || sending}
             className="w-full"
           >
@@ -176,7 +190,9 @@ export default function FamilyMessaging() {
                     {getMessageIcon(msg.message_type)}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm">{msg.sender_name}</span>
+                        <span className="font-semibold text-sm">
+                          {msg.sender_name}
+                        </span>
                         <span className="text-xs text-gray-500">
                           {new Date(msg.created_date).toLocaleString()}
                         </span>

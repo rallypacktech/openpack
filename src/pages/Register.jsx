@@ -9,7 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import AuthLayout from "@/components/AuthLayout";
 import { toast } from "@/components/ui/use-toast";
 
@@ -48,7 +52,17 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
         // Fire-and-forget: if signup shows bot-like indicators, send data safety education email
-        base44.functions.invoke("notifySuspiciousSignup", { email }).catch(() => {});
+        base44.functions
+          .invoke("notifySuspiciousSignup", { email })
+          .catch(() => {});
+      }
+      if (typeof pendo !== "undefined") {
+        pendo.track("user_registered", {
+          registration_method: "email",
+          has_next_url: !!new URLSearchParams(window.location.search).get(
+            "next",
+          ),
+        });
       }
       window.location.href = getNextUrl();
     } catch (err) {
@@ -117,7 +131,10 @@ export default function Register() {
         </Button>
         <p className="text-center text-sm text-muted-foreground mt-4">
           Didn't receive the code?{" "}
-          <button onClick={handleResend} className="text-primary font-medium hover:underline">
+          <button
+            onClick={handleResend}
+            className="text-primary font-medium hover:underline"
+          >
             Resend
           </button>
         </p>
@@ -133,7 +150,10 @@ export default function Register() {
       footer={
         <>
           Already have an account?{" "}
-          <Link to={`/login${window.location.search}`} className="text-primary font-medium hover:underline">
+          <Link
+            to={`/login${window.location.search}`}
+            className="text-primary font-medium hover:underline"
+          >
             Log in
           </Link>
         </>
@@ -149,7 +169,10 @@ export default function Register() {
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+            <Mail
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+              aria-hidden="true"
+            />
             <Input
               id="email"
               type="email"
@@ -166,7 +189,10 @@ export default function Register() {
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+            <Lock
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+              aria-hidden="true"
+            />
             <Input
               id="password"
               type="password"
@@ -182,7 +208,10 @@ export default function Register() {
         <div className="space-y-2">
           <Label htmlFor="confirm">Confirm Password</Label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+            <Lock
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+              aria-hidden="true"
+            />
             <Input
               id="confirm"
               type="password"
@@ -195,7 +224,11 @@ export default function Register() {
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full h-12 font-medium"
+          disabled={loading}
+        >
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

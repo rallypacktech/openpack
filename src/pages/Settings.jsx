@@ -50,7 +50,7 @@ export default function Settings() {
         setTimeout(() => {
           const element = document.querySelector(hash);
           if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
           }
         }, 300);
       }
@@ -60,11 +60,11 @@ export default function Settings() {
   const loadData = async () => {
     try {
       const userData = await base44.auth.me();
-      
+
       const [profileData, membersData, petsData] = await Promise.all([
         base44.entities.UserProfile.filter({ created_by: userData.email }),
         base44.entities.FamilyMember.filter({ created_by: userData.email }),
-        base44.entities.Pet.filter({ created_by: userData.email })
+        base44.entities.Pet.filter({ created_by: userData.email }),
       ]);
 
       setUser(userData);
@@ -81,42 +81,58 @@ export default function Settings() {
   const handleProfileSave = async (data) => {
     // Check if region changed
     const oldRegion = profile?.fema_region;
-    
+
     // Determine FEMA region if state changed
     if (data.state_province) {
-      const regionResponse = await base44.functions.invoke('determineFemaRegion', {
-        state: data.state_province
-      });
+      const regionResponse = await base44.functions.invoke(
+        "determineFemaRegion",
+        {
+          state: data.state_province,
+        },
+      );
       data.fema_region = regionResponse.data.fema_region;
-      
+
       // Generate notifications if region changed
       if (oldRegion && oldRegion !== data.fema_region) {
-        await base44.functions.invoke('generateFamilyNeedsNotifications', {
-          type: 'region_change',
+        await base44.functions.invoke("generateFamilyNeedsNotifications", {
+          type: "region_change",
           memberName: data.fema_region,
           newRegion: data.fema_region,
-          disasterTypes: regionResponse.data.disaster_types
+          disasterTypes: regionResponse.data.disaster_types,
         });
       }
     }
-    
+
     if (profile) {
       await base44.entities.UserProfile.update(profile.id, data);
     } else {
       await base44.entities.UserProfile.create(data);
+    }
+    if (typeof pendo !== "undefined") {
+      pendo.track("profile_updated", {
+        fema_region: data.fema_region || "",
+        region_changed: !!(oldRegion && oldRegion !== data.fema_region),
+        state_province: data.state_province || "",
+        country: data.country || "",
+      });
     }
     loadData();
   };
 
   const handleAddFamilyMember = async (data) => {
     await base44.entities.FamilyMember.create(data);
-    
+
     // Generate notifications for new family member
-    await base44.functions.invoke('generateFamilyNeedsNotifications', {
-      type: 'family_member',
-      memberName: data.name
+    await base44.functions.invoke("generateFamilyNeedsNotifications", {
+      type: "family_member",
+      memberName: data.name,
     });
-    
+    if (typeof pendo !== "undefined") {
+      pendo.track("family_member_added", {
+        relationship: data.relationship || "",
+      });
+    }
+
     loadData();
   };
 
@@ -132,13 +148,19 @@ export default function Settings() {
 
   const handleAddPet = async (data) => {
     await base44.entities.Pet.create(data);
-    
+
     // Generate notifications for new pet
-    await base44.functions.invoke('generateFamilyNeedsNotifications', {
-      type: 'pet',
-      memberName: `${data.name} (${data.species})`
+    await base44.functions.invoke("generateFamilyNeedsNotifications", {
+      type: "pet",
+      memberName: `${data.name} (${data.species})`,
     });
-    
+    if (typeof pendo !== "undefined") {
+      pendo.track("pet_added", {
+        species: data.species || "",
+        has_microchip: !!data.microchip_number,
+      });
+    }
+
     loadData();
   };
 
@@ -156,12 +178,15 @@ export default function Settings() {
     if (deleteConfirmText !== "DELETE MY ACCOUNT") {
       return;
     }
-    
+
     setIsDeleting(true);
     try {
+      if (typeof pendo !== "undefined") {
+        pendo.track("account_deleted");
+      }
       // Call backend function to handle account deletion with pet data retention
-      await base44.functions.invoke('deleteAccount');
-      
+      await base44.functions.invoke("deleteAccount");
+
       // Logout and redirect
       base44.auth.logout();
     } catch (error) {
@@ -174,7 +199,11 @@ export default function Settings() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" role="status" aria-label="Loading settings"></div>
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+          role="status"
+          aria-label="Loading settings"
+        ></div>
       </div>
     );
   }
@@ -185,7 +214,9 @@ export default function Settings() {
       <div className="bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-2xl font-bold">Settings & Profile</h1>
-          <p className="text-blue-100 mt-1">Manage your account, family members, pets, and preferences</p>
+          <p className="text-blue-100 mt-1">
+            Manage your account, family members, pets, and preferences
+          </p>
         </div>
       </div>
 
@@ -197,7 +228,9 @@ export default function Settings() {
         <NotificationPreferences
           profile={profile}
           onSave={handleProfileSave}
-          hasLargeAnimals={pets.some(p => ['equine', 'livestock'].includes(p.species))}
+          hasLargeAnimals={pets.some((p) =>
+            ["equine", "livestock"].includes(p.species),
+          )}
         />
 
         {/* Profile Section */}
@@ -246,28 +279,46 @@ export default function Settings() {
         {/* Security Settings */}
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-semibold">Security Settings</CardTitle>
+            <CardTitle className="text-xl font-semibold">
+              Security Settings
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-gray-600" aria-hidden="true" />
                 <div>
-                  <Label htmlFor="cloudflare-security" className="font-medium">Cloudflare Security</Label>
-                  <p className="text-sm text-gray-500">Enhanced protection against threats and attacks</p>
+                  <Label htmlFor="cloudflare-security" className="font-medium">
+                    Cloudflare Security
+                  </Label>
+                  <p className="text-sm text-gray-500">
+                    Enhanced protection against threats and attacks
+                  </p>
                 </div>
               </div>
-              <Switch id="cloudflare-security" defaultChecked aria-label="Toggle Cloudflare security" />
+              <Switch
+                id="cloudflare-security"
+                defaultChecked
+                aria-label="Toggle Cloudflare security"
+              />
             </div>
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
                 <Lock className="w-5 h-5 text-gray-600" aria-hidden="true" />
                 <div>
-                  <Label htmlFor="human-auth" className="font-medium">Human Authentication</Label>
-                  <p className="text-sm text-gray-500">Verify that users are human before accessing sensitive data</p>
+                  <Label htmlFor="human-auth" className="font-medium">
+                    Human Authentication
+                  </Label>
+                  <p className="text-sm text-gray-500">
+                    Verify that users are human before accessing sensitive data
+                  </p>
                 </div>
               </div>
-              <Switch id="human-auth" defaultChecked aria-label="Toggle human authentication" />
+              <Switch
+                id="human-auth"
+                defaultChecked
+                aria-label="Toggle human authentication"
+              />
             </div>
             <Button className="w-full bg-blue-600 hover:bg-blue-700">
               Save Security Settings
@@ -278,20 +329,37 @@ export default function Settings() {
         {/* Change Password */}
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-semibold">Change Password</CardTitle>
+            <CardTitle className="text-xl font-semibold">
+              Change Password
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="current-password">Current Password</Label>
-              <Input id="current-password" type="password" placeholder="Enter your current password" className="mt-1" />
+              <Input
+                id="current-password"
+                type="password"
+                placeholder="Enter your current password"
+                className="mt-1"
+              />
             </div>
             <div>
               <Label htmlFor="new-password">New Password</Label>
-              <Input id="new-password" type="password" placeholder="Enter your new password" className="mt-1" />
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Enter your new password"
+                className="mt-1"
+              />
             </div>
             <div>
               <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <Input id="confirm-password" type="password" placeholder="Confirm your new password" className="mt-1" />
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Confirm your new password"
+                className="mt-1"
+              />
             </div>
             <Button className="w-full bg-blue-600 hover:bg-blue-700">
               Change Password
@@ -303,24 +371,42 @@ export default function Settings() {
         <Card className="border-red-200">
           <CardHeader className="pb-4 bg-red-50">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
-              <CardTitle className="text-xl font-semibold text-red-900">Danger Zone</CardTitle>
+              <AlertTriangle
+                className="w-5 h-5 text-red-600"
+                aria-hidden="true"
+              />
+              <CardTitle className="text-xl font-semibold text-red-900">
+                Danger Zone
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4" role="note">
-              <h3 className="font-semibold text-gray-900 mb-2">Important: Pet Microchip Data Retention</h3>
+            <div
+              className="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
+              role="note"
+            >
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Important: Pet Microchip Data Retention
+              </h3>
               <p className="text-sm text-gray-700 mb-2">
-                If you delete your account, your personal information will be permanently removed. However, for pet safety and emergency recovery purposes:
+                If you delete your account, your personal information will be
+                permanently removed. However, for pet safety and emergency
+                recovery purposes:
               </p>
               <ul className="text-sm text-gray-700 space-y-1 ml-4 list-disc">
                 <li>Pet microchip numbers will be retained</li>
                 <li>Last known owner name and address will be preserved</li>
-                <li>This helps reunite lost pets with owners during emergencies</li>
-                <li>Data is anonymized and only accessible to authorized microchip companies</li>
+                <li>
+                  This helps reunite lost pets with owners during emergencies
+                </li>
+                <li>
+                  Data is anonymized and only accessible to authorized microchip
+                  companies
+                </li>
               </ul>
               <p className="text-sm text-gray-600 mt-3 italic">
-                This retention complies with animal welfare and ownership laws. If you need complete pet data removal, please contact support.
+                This retention complies with animal welfare and ownership laws.
+                If you need complete pet data removal, please contact support.
               </p>
             </div>
 
@@ -335,13 +421,18 @@ export default function Settings() {
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription className="space-y-3">
                     <p>
-                      This action cannot be undone. This will permanently delete your account and remove your personal data from our servers.
+                      This action cannot be undone. This will permanently delete
+                      your account and remove your personal data from our
+                      servers.
                     </p>
                     <p className="font-semibold text-gray-900">
-                      Pet microchip information will be retained for emergency pet recovery purposes.
+                      Pet microchip information will be retained for emergency
+                      pet recovery purposes.
                     </p>
                     <div className="mt-4">
-                      <Label htmlFor="delete-confirm">Type "DELETE MY ACCOUNT" to confirm:</Label>
+                      <Label htmlFor="delete-confirm">
+                        Type "DELETE MY ACCOUNT" to confirm:
+                      </Label>
                       <Input
                         id="delete-confirm"
                         className="mt-2"
@@ -358,7 +449,9 @@ export default function Settings() {
                   </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteAccount}
-                    disabled={deleteConfirmText !== "DELETE MY ACCOUNT" || isDeleting}
+                    disabled={
+                      deleteConfirmText !== "DELETE MY ACCOUNT" || isDeleting
+                    }
                     className="bg-red-600 hover:bg-red-700"
                   >
                     {isDeleting ? "Deleting..." : "Delete Account"}
