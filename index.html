@@ -2,52 +2,125 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https://base44.com/logo_v2.svg"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="description" content="RallyPack — Free emergency preparedness tools, go-bag checklists, first aid kit supplies, and family disaster planning resources. FEMA-recommended items for wildfire, hurricane, flood, and more." />
-    <meta name="keywords" content="emergency preparedness, go bag, first aid kit, disaster preparedness, emergency supply kit, emergency food and water, evacuation checklist, FEMA emergency kit, hurricane preparedness, wildfire evacuation, flood supplies, family emergency plan, pet emergency kit, first aid supplies, emergency water storage, emergency food storage, survival kit, 72 hour kit, bug out bag" />
-    <meta property="og:title" content="RallyPack — Emergency Supply Checklists & First Aid Kits" />
-    <meta property="og:description" content="Build your go-bag, first aid kit, and emergency supply cache with FEMA-recommended products. Free personalized checklists for families, pets, and livestock." />
+    <meta
+      name="description"
+      content="RallyPack — Free emergency preparedness tools, go-bag checklists, first aid kit supplies, and family disaster planning resources. FEMA-recommended items for wildfire, hurricane, flood, and more."
+    />
+    <meta
+      name="keywords"
+      content="emergency preparedness, go bag, first aid kit, disaster preparedness, emergency supply kit, emergency food and water, evacuation checklist, FEMA emergency kit, hurricane preparedness, wildfire evacuation, flood supplies, family emergency plan, pet emergency kit, first aid supplies, emergency water storage, emergency food storage, survival kit, 72 hour kit, bug out bag"
+    />
+    <meta
+      property="og:title"
+      content="RallyPack — Emergency Supply Checklists & First Aid Kits"
+    />
+    <meta
+      property="og:description"
+      content="Build your go-bag, first aid kit, and emergency supply cache with FEMA-recommended products. Free personalized checklists for families, pets, and livestock."
+    />
     <meta property="og:type" content="website" />
     <meta name="robots" content="index, follow" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="RallyPack — Emergency Supply Checklists & First Aid Kits" />
-    <meta name="twitter:description" content="Build your go-bag, first aid kit, and emergency supply cache with FEMA-recommended products. Free checklists for families, pets, and livestock." />
+    <meta
+      name="twitter:title"
+      content="RallyPack — Emergency Supply Checklists & First Aid Kits"
+    />
+    <meta
+      name="twitter:description"
+      content="Build your go-bag, first aid kit, and emergency supply cache with FEMA-recommended products. Free checklists for families, pets, and livestock."
+    />
     <title>RallyPack — Family Emergency Preparedness</title>
-  <!-- Google tag (gtag.js) — load async, non-blocking -->
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'AW-18119233563');
-    // Defer external GTM script load so a network block never white-screens the app
-    window.addEventListener('load', function() {
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18119233563';
-      document.head.appendChild(s);
-    });
-  </script>
+    <script>
+      (function (apiKey) {
+        (function (p, e, n, d, o) {
+          var v, w, x, y, z;
+          o = p[d] = p[d] || {};
+          o._q = o._q || [];
+          v = [
+            "initialize",
+            "identify",
+            "updateOptions",
+            "pageLoad",
+            "track",
+            "trackAgent",
+          ];
+          for (w = 0, x = v.length; w < x; ++w)
+            (function (m) {
+              o[m] =
+                o[m] ||
+                function () {
+                  o._q[m === v[0] ? "unshift" : "push"](
+                    [m].concat([].slice.call(arguments, 0)),
+                  );
+                };
+            })(v[w]);
+          y = e.createElement(n);
+          y.async = !0;
+          y.src = "https://cdn.pendo.io/agent/static/" + apiKey + "/pendo.js";
+          z = e.getElementsByTagName(n)[0];
+          z.parentNode.insertBefore(y, z);
+        })(window, document, "script", "pendo");
+      })("c1cad5c6-bd19-46d4-9ea8-71cc6575faa7");
+    </script>
+    <!-- Google tag (gtag.js) — load async, non-blocking -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "AW-18119233563");
+      // Defer external GTM script load so a network block never white-screens the app
+      window.addEventListener("load", function () {
+        var s = document.createElement("script");
+        s.async = true;
+        s.src = "https://www.googletagmanager.com/gtag/js?id=AW-18119233563";
+        document.head.appendChild(s);
+      });
+    </script>
   </head>
   <body>
     <script>
       // Must run before any bundle — patches localStorage/sessionStorage for Safari Private Browsing
-      (function() {
+      (function () {
         var mem = {};
         var safe = {
-          getItem: function(k) { return k in mem ? mem[k] : null; },
-          setItem: function(k, v) { mem[k] = String(v); },
-          removeItem: function(k) { delete mem[k]; },
-          clear: function() { mem = {}; },
-          key: function(i) { return Object.keys(mem)[i] || null; },
-          get length() { return Object.keys(mem).length; }
+          getItem: function (k) {
+            return k in mem ? mem[k] : null;
+          },
+          setItem: function (k, v) {
+            mem[k] = String(v);
+          },
+          removeItem: function (k) {
+            delete mem[k];
+          },
+          clear: function () {
+            mem = {};
+          },
+          key: function (i) {
+            return Object.keys(mem)[i] || null;
+          },
+          get length() {
+            return Object.keys(mem).length;
+          },
         };
-        ['localStorage', 'sessionStorage'].forEach(function(name) {
-          try { window[name].getItem('__t__'); }
-          catch(e) {
-            try { Object.defineProperty(window, name, { value: safe, configurable: true }); }
-            catch(e2) {}
+        ["localStorage", "sessionStorage"].forEach(function (name) {
+          try {
+            window[name].getItem("__t__");
+          } catch (e) {
+            try {
+              Object.defineProperty(window, name, {
+                value: safe,
+                configurable: true,
+              });
+            } catch (e2) {}
           }
         });
       })();
