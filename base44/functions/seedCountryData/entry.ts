@@ -10,6 +10,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const countryCode = body.country_code;
     const admin1Filter = body.admin1_name;
+    const useInternet = body.use_internet === true; // default false — LLM knows geography without web search, saving ~30s latency
+    const skipNullAgencies = body.skip_null_agencies === true; // skip placeholder agency creation to halve write time
     if (!countryCode) return Response.json({ error: 'country_code is required' }, { status: 400 });
 
     const scopeDesc = admin1Filter
@@ -18,7 +20,7 @@ Deno.serve(async (req) => {
 
     const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `List ${scopeDesc}. For each division provide: admin1_name (state/province/region), admin2_name (county/district name), admin2_type (one of: county, parish, borough, district, municipality, province, department, prefecture, canton, shire, region, other), latitude, longitude, population, area_sq_km, and timezone (IANA format). Return as many as you can find — do not summarize or truncate.`,
-      add_context_from_internet: true,
+      add_context_from_internet: useInternet,
       model: 'gemini_3_flash',
       response_json_schema: {
         type: 'object',
@@ -64,22 +66,32 @@ Deno.serve(async (req) => {
       timezone: d.timezone
     }));
 
-    const createdCounties = await base44.asServiceRole.entities.CountyTerritory.bulkCreate(countyRecords);
-
-    // Create NULL reporting agency entries for each county so they are accounted for
-    const nullAgencyRecords = (Array.isArray(createdCounties) ? createdCounties : []).map((c) => ({
-      county_territory_id: c.id,
-      country_code: countryCode,
-      agency_name: 'Unknown — Placeholder',
-      agency_type: 'other',
-      is_null_entry: true,
-      jurisdiction_level: 'county',
-      notes: 'NULL entry — agency not yet identified. County is accounted for in the chain of command.'
-    }));
+    // Chunk bulkCreate in batches of 50 to avoid large-payload timeouts
+    const BATCH = 50;
+    const createdCounties = [];
+    for (let i = 0; i < countyRecords.length; i += BATCH) {
+      const batch = countyRecords.slice(i, i + BATCH);
+      const res = await base44.asServiceRole.entities.CountyTerritory.bulkCreate(batch);
+      if (Array.isArray(res)) createdCounties.push(...res);
+    }
 
     let nullAgenciesCreated = 0;
-    if (nullAgencyRecords.length > 0) {
-      await base44.asServiceRole.entities.ReportingAgency.bulkCreate(nullAgencyRecords);
+    if (!skipNullAgencies && createdCounties.length > 0) {
+      // Create NULL reporting agency entries for each county so they are accounted for
+      const nullAgencyRecords = createdCounties.map((c) => ({
+        county_territory_id: c.id,
+        country_code: countryCode,
+        agency_name: 'Unknown — Placeholder',
+        agency_type: 'other',
+        is_null_entry: true,
+        jurisdiction_level: 'county',
+        notes: 'NULL entry — agency not yet identified. County is accounted for in the chain of command.'
+      }));
+
+      for (let i = 0; i < nullAgencyRecords.length; i += BATCH) {
+        const batch = nullAgencyRecords.slice(i, i + BATCH);
+        await base44.asServiceRole.entities.ReportingAgency.bulkCreate(batch);
+      }
       nullAgenciesCreated = nullAgencyRecords.length;
     }
 

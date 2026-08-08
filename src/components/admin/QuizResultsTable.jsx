@@ -55,7 +55,7 @@ export default function QuizResultsTable() {
       setError(null);
       // Admin RLS allows reading all quiz results. Request a high limit to get
       // the true total rather than the default 500 cap that made the count plateau.
-      const data = await base44.entities.QuizResult.list("-created_date", 5000);
+      const data = await base44.asServiceRole.entities.QuizResult.list("-created_date", 5000);
       setResults(data);
     } catch (e) {
       console.error("Error loading quiz results:", e);

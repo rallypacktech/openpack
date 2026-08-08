@@ -1,0 +1,19 @@
+{
+  "name": "RallyPack — Emergency Preparedness",
+  "short_name": "RallyPack",
+  "description": "Free emergency preparedness for families worldwide. Wildfire evacuation checklists, go-bag tracking, and family disaster planning.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#8b1a1a",
+  "background_color": "#faf8f3",
+  "icons": [
+    {
+      "src": "https://base44.com/logo_v2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
