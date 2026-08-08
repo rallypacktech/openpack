@@ -536,14 +536,17 @@ function QuizResults({ score, answers, onRetake }) {
             <>
               <div className="mb-4">
                 <p className="text-xs uppercase tracking-widest text-primary font-sans font-semibold mb-1">
-                  Save your results & get your kit
+                  Sign up to save your results
                 </p>
                 <h2 className="font-serif text-2xl font-semibold text-foreground">
-                  Your personalized action plan is ready.
+                  Your readiness score is {score}%. Don't lose it.
                 </h2>
+                <p className="text-sm text-muted-foreground font-sans mt-1">
+                  Create a free account to save your score, track your gaps, and build your personalized emergency plan.
+                </p>
               </div>
               <LoginWall
-                context="kit checklist & personalized recommendations"
+                context="save your quiz results & build your emergency plan"
                 redirectTo="/Dashboard"
               />
             </>

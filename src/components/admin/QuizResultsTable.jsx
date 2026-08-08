@@ -53,8 +53,22 @@ export default function QuizResultsTable() {
   const loadResults = async () => {
     try {
       setError(null);
-      const data = await base44.entities.QuizResult.list("-created_date", 500);
-      setResults(data);
+      // Paginate via asServiceRole to get the true total count — the user-scoped
+      // .list() caps at 500 records, which made the admin count plateau despite
+      // growing traffic.
+      let all = [];
+      let batch = await base44.asServiceRole.entities.QuizResult.list("-created_date", 500);
+      all = all.concat(batch);
+      while (batch.length === 500 && all.length < 5000) {
+        const oldest = batch[batch.length - 1].created_date;
+        batch = await base44.asServiceRole.entities.QuizResult.filter(
+          { created_date: { $lt: oldest } },
+          "-created_date",
+          500
+        );
+        all = all.concat(batch);
+      }
+      setResults(all);
     } catch (e) {
       console.error("Error loading quiz results:", e);
       setError(e.message || "Failed to load quiz results");

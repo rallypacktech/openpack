@@ -221,6 +221,27 @@ export default function Donate() {
         </div>
       </div>
 
+      {/* Sustainability & Stripe Climate */}
+      <div className="max-w-3xl mx-auto px-4 mb-12">
+        <div className="bg-[#1C1C1A] text-white p-8">
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="w-12 h-12 rounded-full bg-[#D64A2E]/20 flex items-center justify-center flex-shrink-0">
+              <Globe className="w-6 h-6 text-[#D64A2E]" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-2">Minimal footprint</p>
+              <h2 className="font-serif text-xl font-bold mb-2">Built lean. Giving back.</h2>
+              <p className="text-sm text-white/60 font-sans leading-relaxed">
+                RallyPack is engineered for minimal energy use — no bloated tracking scripts, no AI running on every page load,
+                no unnecessary server calls. We participate in the{" "}
+                <a href="https://stripe.com/climate" target="_blank" rel="noopener noreferrer" className="text-[#D64A2E] underline underline-offset-2">Stripe Climate</a>{" "}
+                program, directing a portion of every payment toward carbon removal. Your donation supports sustainable, accessible safety tools.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Donation box */}
       <div className="max-w-lg mx-auto px-4 py-12">
         <div className="bg-white border border-[#D8D2C6] p-8">

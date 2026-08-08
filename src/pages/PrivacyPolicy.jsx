@@ -30,8 +30,9 @@ export default function PrivacyPolicy() {
             <Shield className="w-10 h-10 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
           </div>
+          <p className="text-gray-500">Version: 2.0</p>
           <p className="text-gray-500">Effective Date: December 27, 2025</p>
-          <p className="text-gray-500">Last Updated: March 11, 2026</p>
+          <p className="text-gray-500">Last Updated: August 8, 2026</p>
         </div>
 
         <div className="space-y-6">
@@ -227,6 +228,14 @@ export default function PrivacyPolicy() {
 
               <p className="font-semibold mt-4">Legal Disclosure:</p>
               <p>We may disclose information if required by law, court order, or to protect rights, safety, and property.</p>
+
+              <p className="font-semibold mt-4">Automated Access & AI Agents:</p>
+              <ul>
+                <li><strong>Bot Detection:</strong> We detect and classify automated traffic (search crawlers, AI agents, scrapers) using User-Agent analysis and session behavior. No personal data is collected for this purpose beyond standard request metadata (IP, UA, timestamp).</li>
+                <li><strong>AI Agent Access:</strong> AI agents and chatbots that access RallyPack must comply with our Terms and this Privacy Policy. We do not share user personal data with AI systems. Any AI agent processing public RallyPack content must respect robots.txt and must not republish user-generated data.</li>
+                <li><strong>Training Data:</strong> User personal data and user-generated content are never shared with, sold to, or made available to AI model training systems. Using RallyPack content to train AI models without written authorization is prohibited.</li>
+                <li><strong>Analytics:</strong> Anonymous, aggregate usage statistics (page views, quiz completions, preparedness scores by region) may be collected to improve the service. These statistics cannot be traced back to individual users.</li>
+              </ul>
             </CardContent>
           </Card>
 

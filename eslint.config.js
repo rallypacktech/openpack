@@ -6,6 +6,12 @@ import pluginUnusedImports from "eslint-plugin-unused-imports";
 
 export default [
   {
+    files: ["src/**/*.{js,mjs,cjs,jsx}"],
+    languageOptions: {
+      globals: { pendo: "readonly" },
+    },
+  },
+  {
     files: [
       "src/components/**/*.{js,mjs,cjs,jsx}",
       "src/pages/**/*.{js,mjs,cjs,jsx}",

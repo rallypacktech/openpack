@@ -30,8 +30,9 @@ export default function TermsAndConditions() {
             <FileText className="w-10 h-10 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-900">Terms and Conditions</h1>
           </div>
+          <p className="text-gray-500">Version: 2.0</p>
           <p className="text-gray-500">Effective Date: December 27, 2025</p>
-          <p className="text-gray-500">Last Updated: March 11, 2026</p>
+          <p className="text-gray-500">Last Updated: August 8, 2026</p>
         </div>
 
         <div className="space-y-6">
@@ -256,6 +257,7 @@ export default function TermsAndConditions() {
               <h3 className="font-semibold">Payment Processing:</h3>
               <ul>
                 <li>All payments are processed securely through Stripe, a third-party payment processor</li>
+                <li>We participate in the <a href="https://stripe.com/climate" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Stripe Climate</a> program — a portion of every payment is directed toward carbon removal projects, supporting sustainable operations</li>
                 <li>We do not store your full credit card information on our servers</li>
                 <li>Prices are listed in USD and are subject to change</li>
                 <li>You agree to pay all charges incurred by you or authorized users at the prices in effect when such charges are incurred</li>
@@ -296,6 +298,36 @@ export default function TermsAndConditions() {
                 <li>Make fraudulent purchases or chargebacks</li>
                 <li>Abuse the shopping cart or payment system</li>
               </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Automated Access & AI Agents
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <p>
+                RallyPack welcomes responsible automated access for indexing (e.g., search engine crawlers) and accessibility tools.
+                However, all automated systems, AI agents, scrapers, and bots must comply with these Terms and our{" "}
+                <a href="/PrivacyPolicy" className="text-blue-600 hover:underline">Privacy Policy</a>.
+              </p>
+              <h3 className="font-semibold mt-4">Requirements for Automated Access:</h3>
+              <ul>
+                <li>Respect our <code className="bg-gray-100 px-1 rounded">robots.txt</code> directives — pages disallowed there are off-limits to crawlers</li>
+                <li>Do not submit forms, create accounts, or trigger backend functions via automated means without explicit written permission</li>
+                <li>Do not scrape, store, or republish user-generated content or emergency resource data without authorization</li>
+                <li>Rate-limit requests to a reasonable volume — abusive scraping degrades service availability for families who need it</li>
+                <li>AI agents and chatbots must identify themselves accurately via User-Agent and must not present RallyPack content as their own</li>
+                <li>Any use of RallyPack data to train AI models requires prior written consent from legal@rallypack.tech</li>
+              </ul>
+              <p className="mt-4">
+                We actively monitor automated traffic. Bot traffic that violates these terms is blocked, and the originating
+                IP ranges may be permanently restricted. Legitimate crawlers (Googlebot, Bingbot, etc.) that respect robots.txt
+                are not affected.
+              </p>
             </CardContent>
           </Card>
 

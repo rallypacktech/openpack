@@ -171,6 +171,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Sustainability ── */}
+      <section className="py-12 bg-[#EDE7DC] border-y border-[#D8D2C6]">
+        <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center gap-6">
+          <div className="flex-1 text-center sm:text-left">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-2">Built to be light</p>
+            <h3 className="font-serif text-xl font-semibold text-[#1C1C1A] mb-2">Minimal footprint. Maximum access.</h3>
+            <p className="text-sm font-sans text-[#1C1C1A]/60 leading-relaxed">
+              RallyPack runs on lean infrastructure — no bloated scripts, no unnecessary data calls, no energy-hungry AI on every page load.
+              We participate in the <a href="https://stripe.com/climate" target="_blank" rel="noopener noreferrer" className="text-[#D64A2E] underline underline-offset-2">Stripe Climate</a> program, directing a portion of every payment toward carbon removal.
+              Free safety tools shouldn't cost the planet.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── Trust / Guidelines ── */}
       <section className="py-16 border-b border-[#D8D2C6]">
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
@@ -191,6 +206,14 @@ export default function Home() {
             <a href="https://bestfriends.org/network/issues/emergency-response" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Best Friends Animal Society</a>
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://www.sierraclub.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Sierra Club</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://www.humanesociety.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">HSUS</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://www.aspca.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">ASPCA</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://redrover.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">RedRover</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://nationalanimalrescue.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">NARS</a>
           </div>
         </div>
       </section>
