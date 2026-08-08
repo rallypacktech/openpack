@@ -29,6 +29,9 @@ const BusinessDashboard = lazy(() => import('./pages/BusinessDashboard'));
 const BusinessOnboarding = lazy(() => import('./pages/BusinessOnboarding'));
 const Wildfire = lazy(() => import('./pages/Wildfire'));
 const About = lazy(() => import('./pages/About'));
+const Hurricane = lazy(() => import('./pages/Hurricane'));
+const Flood = lazy(() => import('./pages/Flood'));
+const Tornado = lazy(() => import('./pages/Tornado'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -106,6 +109,9 @@ const AuthenticatedApp = () => {
       <Route path="/BusinessOnboarding" element={<LayoutWrapper currentPageName="BusinessOnboarding"><BusinessOnboarding /></LayoutWrapper>} />
       <Route path="/wildfire" element={<LayoutWrapper currentPageName="Wildfire"><Wildfire /></LayoutWrapper>} />
       <Route path="/about" element={<LayoutWrapper currentPageName="About"><About /></LayoutWrapper>} />
+      <Route path="/hurricane" element={<LayoutWrapper currentPageName="Hurricane"><Hurricane /></LayoutWrapper>} />
+      <Route path="/flood" element={<LayoutWrapper currentPageName="Flood"><Flood /></LayoutWrapper>} />
+      <Route path="/tornado" element={<LayoutWrapper currentPageName="Tornado"><Tornado /></LayoutWrapper>} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>

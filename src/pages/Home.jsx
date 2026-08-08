@@ -314,7 +314,10 @@ export default function Home() {
               <p className="text-[10px] uppercase tracking-[0.25em] font-sans font-semibold text-white/25 mb-4">Tools</p>
               <div className="flex flex-col gap-3 text-sm font-sans">
                 <Link to={createPageUrl("ReadinessQuiz")} className="hover:text-white transition-colors">Readiness Quiz</Link>
-                <Link to="/wildfire" className="hover:text-white transition-colors">Wildfire Preparedness</Link>
+                <Link to="/wildfire" className="hover:text-white transition-colors">Wildfire Prep</Link>
+                <Link to="/hurricane" className="hover:text-white transition-colors">Hurricane Prep</Link>
+                <Link to="/flood" className="hover:text-white transition-colors">Flood Prep</Link>
+                <Link to="/tornado" className="hover:text-white transition-colors">Tornado Prep</Link>
                 <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
                 <Link to={createPageUrl("Resources")} className="hover:text-white transition-colors">Resources</Link>
                 <Link to={createPageUrl("Dashboard")} className="hover:text-white transition-colors">My Plan</Link>
