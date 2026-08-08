@@ -90,7 +90,7 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <section className="relative h-screen min-h-[640px] flex items-end">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1619461129861-d0c1479c48b4?q=80&w=1376&auto=format&fit=crop')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1661177408809-4184b3b65f2c?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/80" />
 
         {/* Active season pills — overlaid on hero bottom */}
@@ -459,7 +459,7 @@ export default function Home() {
             </div>
 
             <div>
-              <p className="text-[10px] uppercase tracking-[0.25em] font-sans font-semibold text-white/25 mb-4">Disasters</p>
+              <p className="text-[10px] uppercase tracking-[0.25em] font-sans font-semibold text-white/25 mb-4">Climate</p>
               <div className="flex flex-col gap-3 text-sm font-sans">
                 <Link to="/wildfire" className="hover:text-white transition-colors">Wildfire</Link>
                 <Link to="/hurricane" className="hover:text-white transition-colors">Hurricane</Link>

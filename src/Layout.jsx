@@ -230,9 +230,8 @@ export default function Layout({ children, currentPageName }) {
                 </div>
 
                 <div>
-                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Resources</h3>
-                  <nav className="space-y-2" aria-label="Emergency resources">
-                    <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-2">Disasters</h3>
+                  <nav className="space-y-2" aria-label="Climate resources">
+                    <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2">Climate</h3>
                     <Link to="/wildfire" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire</Link>
                     <Link to="/hurricane" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Hurricane</Link>
                     <Link to="/flood" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Flood</Link>
@@ -245,7 +244,6 @@ export default function Layout({ children, currentPageName }) {
                     <Link to="/avian" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Avian</Link>
                     <Link to="/reptile" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Reptile</Link>
                     <Link to="/livestock" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Livestock</Link>
-                    <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">About Us</Link>
                   </nav>
                 </div>
 
@@ -262,6 +260,7 @@ export default function Layout({ children, currentPageName }) {
                 <div>
                   <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Contact</h3>
                   <nav className="space-y-2" aria-label="Contact navigation">
+                    <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">About Us</Link>
                     <Link to="/Feedback" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Send Feedback</Link>
                     <Link to="/AffiliatePartnerPolicy" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Affiliate & Partner Policy</Link>
                   </nav>

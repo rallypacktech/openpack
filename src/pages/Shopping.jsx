@@ -1,12 +1,11 @@
 /* global pendo */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -26,9 +25,6 @@ import {
   Search,
   Star,
   CheckCircle2,
-  AlertTriangle,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import {
   DownloadResourceButton,
@@ -67,18 +63,14 @@ const getStoreName = (url) => {
 export default function Shopping() {
   const [user, setUser] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [userProgress, setUserProgress] = useState([]); // UserCacheProgress records
-  const [caches, setCaches] = useState([]);
+  const [userProgress, setUserProgress] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Checklist state
-  const [checklistOpen, setChecklistOpen] = useState(true);
-  const [selected, setSelected] = useState(new Set()); // rec IDs selected in checklist
   const [markOwnedDialog, setMarkOwnedDialog] = useState(false);
-  const [expireDates, setExpireDates] = useState({}); // recId -> date string
+  const [singleMarkId, setSingleMarkId] = useState(null);
+  const [expireDates, setExpireDates] = useState({});
   const [saving, setSaving] = useState(false);
 
-  // Browse state
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [cacheTypeFilter, setCacheTypeFilter] = useState("all");
@@ -104,15 +96,13 @@ export default function Shopping() {
         const me = await base44.auth.me();
         setUser(me);
 
-        const [profiles, pets, progress, userCaches] = await Promise.all([
+        const [profiles, pets, progress] = await Promise.all([
           base44.entities.UserProfile.filter({ created_by: me.email }),
           base44.entities.Pet.filter({ created_by: me.email }),
           base44.entities.UserCacheProgress.filter({ created_by: me.email }),
-          base44.entities.EmergencyCache.filter({ created_by: me.email }),
         ]);
 
         setUserProgress(progress);
-        setCaches(userCaches);
 
         const userProfile = profiles[0];
         const familyTypes = ["person"];
@@ -155,11 +145,13 @@ export default function Shopping() {
     }
   };
 
-  // --- helpers ---
-  const progressMap = {}; // recId -> UserCacheProgress record
-  userProgress.forEach((p) => {
-    progressMap[p.recommendation_id] = p;
-  });
+  const progressMap = useMemo(() => {
+    const map = {};
+    userProgress.forEach((p) => {
+      map[p.recommendation_id] = p;
+    });
+    return map;
+  }, [userProgress]);
 
   const isOwned = (recId) => {
     const p = progressMap[recId];
@@ -176,95 +168,6 @@ export default function Shopping() {
   const isExpired = (recId) => {
     const p = progressMap[recId];
     return p?.expiration_date && new Date(p.expiration_date) < new Date();
-  };
-
-  // Completed items clear from checklist — only show what's still needed or expired
-  const visibleChecklistItems = requiredItems.filter(
-    (r) => !isOwned(r.id) || isExpired(r.id),
-  );
-
-  // When all essentials done OR user has a custom cache, show general + low priority items
-  const hasCustomCache = caches.some(
-    (c) => !(c.name || "").toUpperCase().includes("SAMPLE"),
-  );
-  const allRequiredDone =
-    requiredItems.length > 0 &&
-    requiredItems.every((r) => isOwned(r.id) && !isExpired(r.id));
-  const additionalItems =
-    allRequiredDone || hasCustomCache
-      ? recommendations.filter(
-          (r) =>
-            !r.is_required &&
-            !isOwned(r.id) &&
-            (r.cache_type === "general" || (r.priority || 0) <= 0),
-        )
-      : [];
-
-  const toggleSelected = (id) => {
-    const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelected(next);
-  };
-
-  const selectAllMissing = () => {
-    if (!user) {
-      base44.auth.redirectToLogin(window.location.pathname);
-      return;
-    }
-    const missing = visibleChecklistItems
-      .filter((r) => !isOwned(r.id))
-      .map((r) => r.id);
-    setSelected(new Set(missing));
-  };
-
-  const openMarkOwned = () => {
-    const initial = {};
-    selected.forEach((id) => {
-      initial[id] = "";
-    });
-    setExpireDates(initial);
-    setMarkOwnedDialog(true);
-  };
-
-  const confirmMarkOwned = async () => {
-    setSaving(true);
-    try {
-      for (const recId of Array.from(selected)) {
-        const existing = progressMap[recId];
-        const data = {
-          recommendation_id: recId,
-          status: "manually_added",
-          purchased_at: new Date().toISOString(),
-          ...(expireDates[recId]
-            ? { expiration_date: expireDates[recId] }
-            : {}),
-        };
-        if (existing) {
-          await base44.entities.UserCacheProgress.update(existing.id, data);
-        } else {
-          await base44.entities.UserCacheProgress.create(data);
-        }
-      }
-      if (typeof pendo !== "undefined") {
-        const itemsWithExpiry = Array.from(selected).filter(
-          (id) => !!expireDates[id],
-        );
-        pendo.track("supply_items_marked_owned", {
-          item_count: selected.size,
-          items_with_expiry_count: itemsWithExpiry.length,
-          total_essential_items: requiredItems.length,
-          owned_count_after: ownedCount + selected.size,
-        });
-      }
-      setMarkOwnedDialog(false);
-      setSelected(new Set());
-      await loadData();
-    } catch (e) {
-      console.error("Error marking owned:", e);
-    } finally {
-      setSaving(false);
-    }
   };
 
   const handleAffiliateClick = async (rec) => {
@@ -290,497 +193,312 @@ export default function Shopping() {
     window.open(rec.affiliate_link, "_blank");
   };
 
-  // Browse filters
-  const browsed = recommendations.filter((rec) => {
-    const q = searchTerm.toLowerCase();
-    const matchSearch =
-      !q ||
-      rec.item_name.toLowerCase().includes(q) ||
-      rec.description?.toLowerCase().includes(q);
-    const matchCat =
-      categoryFilter === "all" || rec.category === categoryFilter;
-    const matchType =
-      cacheTypeFilter === "all" || rec.cache_type === cacheTypeFilter;
-    return matchSearch && matchCat && matchType;
-  });
+  const openMarkOwned = (recId) => {
+    if (!user) {
+      base44.auth.redirectToLogin(window.location.pathname);
+      return;
+    }
+    setSingleMarkId(recId);
+    setExpireDates({ [recId]: "" });
+    setMarkOwnedDialog(true);
+  };
+
+  const confirmMarkOwned = async () => {
+    setSaving(true);
+    try {
+      const recId = singleMarkId;
+      const existing = progressMap[recId];
+      const data = {
+        recommendation_id: recId,
+        status: "manually_added",
+        purchased_at: new Date().toISOString(),
+        ...(expireDates[recId]
+          ? { expiration_date: expireDates[recId] }
+          : {}),
+      };
+      if (existing) {
+        await base44.entities.UserCacheProgress.update(existing.id, data);
+      } else {
+        await base44.entities.UserCacheProgress.create(data);
+      }
+      if (typeof pendo !== "undefined") {
+        pendo.track("supply_items_marked_owned", {
+          item_count: 1,
+          items_with_expiry_count: expireDates[recId] ? 1 : 0,
+        });
+      }
+      setMarkOwnedDialog(false);
+      setSingleMarkId(null);
+      await loadData();
+    } catch (e) {
+      console.error("Error marking owned:", e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Single gallery: essential items first, then by priority, then click_count
+  const gallery = useMemo(() => {
+    const filtered = recommendations.filter((rec) => {
+      const q = searchTerm.toLowerCase();
+      const matchSearch =
+        !q ||
+        rec.item_name.toLowerCase().includes(q) ||
+        rec.description?.toLowerCase().includes(q);
+      const matchCat =
+        categoryFilter === "all" || rec.category === categoryFilter;
+      const matchType =
+        cacheTypeFilter === "all" || rec.cache_type === cacheTypeFilter;
+      return matchSearch && matchCat && matchType;
+    });
+
+    filtered.sort((a, b) => {
+      if (a.is_required !== b.is_required) return b.is_required ? 1 : -1;
+      return (
+        (b.priority || 0) - (a.priority || 0) ||
+        (b.click_count || 0) - (a.click_count || 0)
+      );
+    });
+    return filtered;
+  }, [recommendations, searchTerm, categoryFilter, cacheTypeFilter]);
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" role="status" aria-label="Loading"></div>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream font-sans">
       {/* Header */}
-      <div className="bg-blue-700 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          <h1 className="text-2xl font-bold">Emergency Supply Checklist</h1>
-          <p className="text-blue-200 mt-1">
-            Build your go-bag one step at a time
+      <div className="bg-white border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+          <h1 className="font-serif text-3xl font-bold text-foreground">Emergency Supplies</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Essential items shown first — tap any card to buy or mark as owned.
           </p>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-8">
-        {/* ── Required Items Checklist ─────────────────────────────────── */}
-        {(visibleChecklistItems.length > 0 || additionalItems.length > 0) && (
-          <section>
-            {/* Progress */}
-            <div className="bg-white rounded-xl shadow-sm p-5 mb-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-400" />
-                  <span className="font-semibold text-gray-900">
-                    Essential Items ({ownedCount}/{requiredItems.length}{" "}
-                    covered)
-                  </span>
-                </div>
-                <button
-                  onClick={() => setChecklistOpen((o) => !o)}
-                  className="text-sm text-blue-600 flex items-center gap-1"
-                >
-                  {checklistOpen ? (
-                    <>
-                      <ChevronUp className="w-4 h-4" /> Collapse
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4" /> Expand
-                    </>
-                  )}
-                </button>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        {/* Slim essentials progress */}
+        {user && requiredItems.length > 0 && (
+          <div className="bg-white border border-border rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" />
+                <span className="text-sm font-semibold text-foreground">
+                  Essentials coverage
+                </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className={`h-3 rounded-full transition-all ${progressPct === 100 ? "bg-green-500" : "bg-blue-500"}`}
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              {progressPct === 100 && (
-                <p className="text-green-700 text-sm mt-2 font-medium">
-                  ✓ All essential items covered — great work!
-                </p>
-              )}
+              <span className="text-sm text-muted-foreground">
+                {ownedCount}/{requiredItems.length}
+              </span>
             </div>
+            <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+              <div
+                className={`h-2 rounded-full transition-all ${progressPct === 100 ? "bg-green-500" : "bg-crimson"}`}
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          </div>
+        )}
 
-            {/* Checklist rows */}
-            {checklistOpen && (
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                {/* Toolbar */}
-                <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={selectAllMissing}
-                    >
-                      Select all missing
-                    </Button>
-                    {selected.size > 0 && (
+        {/* Filters */}
+        <div className="bg-white border border-border rounded-lg p-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search supplies..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {[
+                  "water", "food", "medical", "tools", "clothing",
+                  "documents", "communication", "hygiene", "other",
+                ].map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c.charAt(0).toUpperCase() + c.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={cacheTypeFilter} onValueChange={setCacheTypeFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="go_bag">Go Bag</SelectItem>
+                <SelectItem value="automobile">Automobile</SelectItem>
+                <SelectItem value="general">General</SelectItem>
+                <SelectItem value="first_aid_kit">First Aid Kit</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Single gallery */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {gallery.map((rec) => {
+            const owned = isOwned(rec.id);
+            const expired = isExpired(rec.id);
+            return (
+              <Card
+                key={rec.id}
+                className={`relative ${owned ? "ring-2 ring-green-400" : ""}`}
+              >
+                {rec.is_required && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" />
+                  </div>
+                )}
+                {owned && (
+                  <div className="absolute top-2 right-2 z-10">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  </div>
+                )}
+                <CardContent className="p-4">
+                  {rec.image_url && (
+                    <div className="aspect-square w-full mb-3 overflow-hidden rounded-lg bg-secondary">
+                      <img
+                        src={rec.image_url}
+                        alt={rec.item_name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <h3 className="font-semibold text-foreground mb-2 pr-6">
+                    {rec.item_name}
+                  </h3>
+                  <div className="flex gap-1 mb-2 flex-wrap">
+                    <Badge className={`text-xs ${CATEGORY_COLORS[rec.category]}`}>
+                      {rec.category}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {rec.cache_type}
+                    </Badge>
+                    {expired && (
+                      <Badge className="text-xs bg-red-100 text-red-700">
+                        Expired
+                      </Badge>
+                    )}
+                  </div>
+                  {rec.description && (
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {rec.description}
+                    </p>
+                  )}
+                  {rec.price_cents > 0 && (
+                    <p className="text-xl font-bold text-foreground mb-3">
+                      ${(rec.price_cents / 100).toFixed(2)}
+                    </p>
+                  )}
+                  <div className="space-y-2">
+                    {getPrintableResource(rec.item_name) && (
+                      <DownloadResourceButton
+                        itemName={rec.item_name}
+                        fullWidth
+                      />
+                    )}
+                    {!owned && user && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-green-700 border-green-300 hover:bg-green-50"
+                        onClick={() => openMarkOwned(rec.id)}
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-1" /> I already have this
+                      </Button>
+                    )}
+                    {rec.affiliate_link && (
                       <Button
                         size="sm"
-                        onClick={openMarkOwned}
-                        className="bg-green-600 hover:bg-green-700 text-white"
+                        className="w-full bg-crimson hover:bg-crimson/90 text-white"
+                        onClick={() => handleAffiliateClick(rec)}
                       >
-                        <CheckCircle2 className="w-4 h-4 mr-1" /> I have{" "}
-                        {selected.size} item{selected.size !== 1 ? "s" : ""}
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        {getStoreName(rec.affiliate_link)}
                       </Button>
                     )}
                   </div>
-                  {selected.size > 0 && (
-                    <button
-                      onClick={() => setSelected(new Set())}
-                      className="text-sm text-gray-400 hover:text-gray-600"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
-                {visibleChecklistItems.map((rec, i) => {
-                  const owned = isOwned(rec.id);
-                  const progress = progressMap[rec.id];
-                  const isChecked = selected.has(rec.id);
-                  const isExpired =
-                    progress?.expiration_date &&
-                    new Date(progress.expiration_date) < new Date();
-                  const isExpiringSoon =
-                    progress?.expiration_date &&
-                    !isExpired &&
-                    new Date(progress.expiration_date) <
-                      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-
-                  return (
-                    <div
-                      key={rec.id}
-                      className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 ${
-                        owned ? "bg-green-50" : "hover:bg-gray-50"
-                      } ${i % 2 === 0 && !owned ? "bg-white" : ""}`}
-                    >
-                      {/* Checkbox */}
-                      {!owned && (
-                        <Checkbox
-                          checked={isChecked}
-                          onCheckedChange={() => toggleSelected(rec.id)}
-                          className="flex-shrink-0"
-                        />
-                      )}
-                      {owned && (
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      )}
-
-                      {/* Item info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className={`font-medium ${owned ? "text-gray-500 line-through" : "text-gray-900"}`}
-                          >
-                            {rec.item_name}
-                          </span>
-                          <Badge
-                            className={`text-xs ${CATEGORY_COLORS[rec.category]}`}
-                          >
-                            {rec.category}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {rec.cache_type}
-                          </Badge>
-                          {isExpired && (
-                            <Badge className="text-xs bg-red-100 text-red-700">
-                              <AlertTriangle className="w-3 h-3 mr-1" />
-                              Expired
-                            </Badge>
-                          )}
-                          {isExpiringSoon && !isExpired && (
-                            <Badge className="text-xs bg-orange-100 text-orange-700">
-                              Expiring soon
-                            </Badge>
-                          )}
-                        </div>
-                        {progress?.expiration_date && (
-                          <p className="text-xs text-gray-400 mt-0.5">
-                            Expires:{" "}
-                            {new Date(
-                              progress.expiration_date,
-                            ).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {getPrintableResource(rec.item_name) && (
-                          <DownloadResourceButton
-                            itemName={rec.item_name}
-                            className="text-xs h-8"
-                          />
-                        )}
-                        {rec.affiliate_link && !owned && (
-                          <button
-                            onClick={() => handleAffiliateClick(rec)}
-                            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">
-                              {getStoreName(rec.affiliate_link)}
-                            </span>
-                          </button>
-                        )}
-                        {rec.price_cents > 0 && (
-                          <span className="text-sm font-semibold text-gray-700">
-                            ${(rec.price_cents / 100).toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {/* Additional recommendations when all essentials done or custom cache exists */}
-                {additionalItems.length > 0 && (
-                  <div className="border-t">
-                    <div className="px-4 py-3 bg-blue-50 border-b">
-                      <p className="text-sm font-medium text-blue-900">
-                        {allRequiredDone
-                          ? "✓ All essentials covered! Here are more items to consider:"
-                          : "Additional items for your cache:"}
-                      </p>
-                    </div>
-                    {additionalItems.map((rec, i) => {
-                      const isChecked = selected.has(rec.id);
-                      return (
-                        <div
-                          key={rec.id}
-                          className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-                        >
-                          <Checkbox
-                            checked={isChecked}
-                            onCheckedChange={() => toggleSelected(rec.id)}
-                            className="flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-medium text-gray-900">
-                                {rec.item_name}
-                              </span>
-                              <Badge
-                                className={`text-xs ${CATEGORY_COLORS[rec.category]}`}
-                              >
-                                {rec.category}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">
-                                {rec.cache_type}
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {getPrintableResource(rec.item_name) && (
-                              <DownloadResourceButton
-                                itemName={rec.item_name}
-                                className="text-xs h-8"
-                              />
-                            )}
-                            {rec.affiliate_link && (
-                              <button
-                                onClick={() => handleAffiliateClick(rec)}
-                                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">
-                                  {getStoreName(rec.affiliate_link)}
-                                </span>
-                              </button>
-                            )}
-                            {rec.price_cents > 0 && (
-                              <span className="text-sm font-semibold text-gray-700">
-                                ${(rec.price_cents / 100).toFixed(2)}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
+        {gallery.length === 0 && (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Package className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
+              <p className="text-muted-foreground">No products match your filters</p>
+            </CardContent>
+          </Card>
         )}
-
-        {/* ── Browse All Products ──────────────────────────────────────── */}
-        <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">
-            Browse All Products
-          </h2>
-
-          {/* Filters */}
-          <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {[
-                    "water",
-                    "food",
-                    "medical",
-                    "tools",
-                    "clothing",
-                    "documents",
-                    "communication",
-                    "hygiene",
-                    "other",
-                  ].map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c.charAt(0).toUpperCase() + c.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={cacheTypeFilter}
-                onValueChange={setCacheTypeFilter}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="go_bag">Go Bag</SelectItem>
-                  <SelectItem value="automobile">Automobile</SelectItem>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="first_aid_kit">First Aid Kit</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {browsed.map((rec) => {
-              const owned = isOwned(rec.id);
-              return (
-                <Card
-                  key={rec.id}
-                  className={`relative ${owned ? "ring-2 ring-green-400" : ""}`}
-                >
-                  {rec.is_required && (
-                    <div className="absolute top-2 left-2 z-10">
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" />
-                    </div>
-                  )}
-                  {owned && (
-                    <div className="absolute top-2 right-2 z-10">
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    </div>
-                  )}
-                  <CardContent className="p-4">
-                    {rec.image_url && (
-                      <div className="aspect-square w-full mb-3 overflow-hidden rounded-lg">
-                        <img
-                          src={rec.image_url}
-                          alt={rec.item_name}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <h3 className="font-semibold text-gray-900 mb-2 pr-6">
-                      {rec.item_name}
-                    </h3>
-                    <div className="flex gap-1 mb-2 flex-wrap">
-                      <Badge
-                        className={`text-xs ${CATEGORY_COLORS[rec.category]}`}
-                      >
-                        {rec.category}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {rec.cache_type}
-                      </Badge>
-                    </div>
-                    {rec.description && (
-                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                        {rec.description}
-                      </p>
-                    )}
-                    {rec.price_cents > 0 && (
-                      <p className="text-xl font-bold text-gray-900 mb-3">
-                        ${(rec.price_cents / 100).toFixed(2)}
-                      </p>
-                    )}
-                    <div className="space-y-2">
-                      {getPrintableResource(rec.item_name) && (
-                        <DownloadResourceButton
-                          itemName={rec.item_name}
-                          fullWidth
-                        />
-                      )}
-                      {!owned && user && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full text-green-700 border-green-300 hover:bg-green-50"
-                          onClick={() => {
-                            setSelected(new Set([rec.id]));
-                            setExpireDates({ [rec.id]: "" });
-                            setMarkOwnedDialog(true);
-                          }}
-                        >
-                          <CheckCircle2 className="w-4 h-4 mr-1" /> I already
-                          have this
-                        </Button>
-                      )}
-                      {rec.affiliate_link && (
-                        <Button
-                          size="sm"
-                          className="w-full bg-blue-600 hover:bg-blue-700"
-                          onClick={() => handleAffiliateClick(rec)}
-                        >
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          {getStoreName(rec.affiliate_link)}
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          {browsed.length === 0 && (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-gray-500">No products match your filters</p>
-              </CardContent>
-            </Card>
-          )}
-        </section>
       </div>
 
       {/* ── Mark Owned Dialog ──────────────────────────────────────────── */}
       <Dialog open={markOwnedDialog} onOpenChange={setMarkOwnedDialog}>
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Mark items as owned</DialogTitle>
+            <DialogTitle>Mark as owned</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-500 mb-4">
-            Optionally add an expiration date for perishable items so we can
-            remind you before they expire.
-          </p>
-          <div className="space-y-4">
-            {Array.from(selected).map((recId) => {
-              const rec = recommendations.find((r) => r.id === recId);
-              if (!rec) return null;
-              return (
-                <div key={recId} className="border rounded-lg p-3">
-                  <p className="font-medium text-sm text-gray-900 mb-2">
-                    {rec.item_name}
-                  </p>
-                  <Label className="text-xs text-gray-500">
-                    Expiration date (optional)
-                  </Label>
-                  <Input
-                    type="date"
-                    value={expireDates[recId] || ""}
-                    onChange={(e) =>
-                      setExpireDates((p) => ({ ...p, [recId]: e.target.value }))
-                    }
-                    className="mt-1"
-                  />
+          {singleMarkId && (() => {
+            const rec = recommendations.find((r) => r.id === singleMarkId);
+            return rec ? (
+              <>
+                <p className="text-sm text-muted-foreground mb-4 font-sans">
+                  <span className="font-semibold text-foreground">{rec.item_name}</span>
+                  <br />
+                  Optionally add an expiration date so we can remind you before it expires.
+                </p>
+                <div className="space-y-4">
+                  <div className="border border-border rounded-lg p-3">
+                    <Label className="text-xs text-muted-foreground">
+                      Expiration date (optional)
+                    </Label>
+                    <Input
+                      type="date"
+                      value={expireDates[singleMarkId] || ""}
+                      onChange={(e) =>
+                        setExpireDates((p) => ({ ...p, [singleMarkId]: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-          <div className="flex gap-2 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setMarkOwnedDialog(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={confirmMarkOwned}
-              disabled={saving}
-              className="flex-1 bg-green-600 hover:bg-green-700"
-            >
-              {saving ? "Saving..." : "Confirm — I have these"}
-            </Button>
-          </div>
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setMarkOwnedDialog(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={confirmMarkOwned}
+                    disabled={saving}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    {saving ? "Saving..." : "Confirm — I have this"}
+                  </Button>
+                </div>
+              </>
+            ) : null;
+          })()}
         </DialogContent>
       </Dialog>
     </div>
