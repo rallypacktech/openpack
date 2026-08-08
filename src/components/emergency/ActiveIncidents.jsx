@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 const CURATED_INCIDENTS = [
   {
     id: "ga-wildfires-2026",
-    active: true,
+    active: false,
     type: "wildfire",
     severity: "major",
     title: "South Georgia Wildfires",

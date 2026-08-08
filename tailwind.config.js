@@ -8,19 +8,17 @@ module.exports = {
   			serif: ['Playfair Display', 'Georgia', 'serif'],
   			sans: ['Inter', 'DM Sans', 'system-ui', 'sans-serif'],
   		},
-  		colors: {
-  			crimson: 'hsl(var(--crimson))',
-  			navy: 'hsl(var(--navy))',
-  			cream: 'hsl(var(--cream))',
-  			gold: 'hsl(var(--gold))',
-  			sage: 'hsl(var(--sage))',
-  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			crimson: 'hsl(var(--crimson))',
+  			navy: 'hsl(var(--navy))',
+  			cream: 'hsl(var(--cream))',
+  			gold: 'hsl(var(--gold))',
+  			sage: 'hsl(var(--sage))',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

@@ -50,6 +50,29 @@ function haversineKm(lat1, lon1, lat2, lon2) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
+// Generates a quick, actionable 5-10 minute prep task based on alert type.
+// For evacuation alerts, adds urgency and meeting-spot guidance.
+function getPrepAction(event) {
+  const ev = (event || "").toLowerCase();
+  if (ev.includes("evacuation") || ev.includes("evacuate")) {
+    return "🚨 EVACUATION — This is serious. Grab your go-bag now and head to your designated meeting spot. If you haven't set one, do it at rallypack.tech/Resources before you leave. Text your family where you're going (texts use less bandwidth than calls). Follow official evacuation routes — do not take shortcuts through fire or flood zones.";
+  }
+  if (ev.includes("tornado")) {
+    return "⚡ 5-minute prep: Move to your lowest interior room (no windows). Bring your go-bag, flashlight, and sturdy shoes. Keep your phone charged and on loud.";
+  }
+  if (ev.includes("flood")) {
+    return "⚡ 5-minute prep: Move valuables and electronics to a higher floor. Keep your go-bag and shoes by the door. Never drive through floodwater — turn around.";
+  }
+  if (ev.includes("fire") || ev.includes("red flag")) {
+    return "⚡ 5-minute prep: Move your go-bag to the car. Clear dry leaves and debris within 30 ft of your home. Park facing your exit route. Know where your designated meeting spot is.";
+  }
+  if (ev.includes("hurricane") || ev.includes("tropical")) {
+    return "⚡ 10-minute prep: Bring in outdoor furniture and anything that could become airborne. Fill bathtubs with water. Check flashlights, batteries, and your go-bag.";
+  }
+  // Default severe weather
+  return "⚡ 5-minute prep: Check your go-bag is by the door. Test your flashlights. Charge your phone. Fill a few water bottles.";
+}
+
 /**
  * Scheduled function: checks NWS weather alerts and supply expiration for all users.
  * Creates in-app Notification records always.
@@ -108,45 +131,61 @@ Deno.serve(async (req) => {
         const itemNames = alreadyExpired.map(i => i.item_name || i.name).slice(0, 3).join(", ");
         const msg = `${alreadyExpired.length} item(s) have expired: ${itemNames}${alreadyExpired.length > 3 ? " and more" : ""}. Replace them to keep your cache ready.`;
 
-        await base44.asServiceRole.entities.Notification.create({
-          title: "⚠️ Expired Supplies",
-          message: msg,
-          type: "alert",
-          read: false,
+        // Dedup: only notify once per 7 days to prevent repeat notifications
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const existingExpired = await base44.asServiceRole.entities.Notification.filter({
           created_by: userEmail,
+          title: "⚠️ Expired Supplies",
         });
-        notificationsCreated++;
-
-        if (wantsEmail) {
-          await base44.asServiceRole.integrations.Core.SendEmail({
-            to: userEmail,
-            subject: "RallyPack: You have expired emergency supplies",
-            body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#9888; Expired Emergency Supplies</h2><p>${msg}</p><p><a href="https://rallypack.tech/Resources" style="color:#222;">Log in to RallyPack to update your cache.</a></p><p>Stay prepared,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
-            is_html: true,
+        if (!existingExpired.some(n => new Date(n.created_date) > sevenDaysAgo)) {
+          await base44.asServiceRole.entities.Notification.create({
+            title: "⚠️ Expired Supplies",
+            message: msg,
+            type: "alert",
+            read: false,
+            created_by: userEmail,
           });
-          emailsSent++;
+          notificationsCreated++;
+
+          if (wantsEmail) {
+            await base44.asServiceRole.integrations.Core.SendEmail({
+              to: userEmail,
+              subject: "RallyPack: You have expired emergency supplies",
+              body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#9888; Expired Emergency Supplies</h2><p>${msg}</p><p><strong>5-minute fix:</strong> Log in, review the expired items, and swap them out today — a go-bag with expired food or medication won't help when you need it.</p><p><a href="https://rallypack.tech/Resources" style="background:#D64A2E;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;">Open RallyPack →</a></p><p>Stay prepared,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
+              is_html: true,
+            });
+            emailsSent++;
+          }
         }
       } else if (expiringSoon.length > 0) {
         const itemNames = expiringSoon.map(i => i.item_name || i.name).slice(0, 3).join(", ");
         const msg = `${expiringSoon.length} item(s) expire within 30 days: ${itemNames}${expiringSoon.length > 3 ? " and more" : ""}. Plan to restock soon.`;
 
-        await base44.asServiceRole.entities.Notification.create({
-          title: "🕐 Supplies Expiring Soon",
-          message: msg,
-          type: "warning",
-          read: false,
+        // Dedup: only notify once per 7 days
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const existingExpiring = await base44.asServiceRole.entities.Notification.filter({
           created_by: userEmail,
+          title: "🕐 Supplies Expiring Soon",
         });
-        notificationsCreated++;
-
-        if (wantsEmail) {
-          await base44.asServiceRole.integrations.Core.SendEmail({
-            to: userEmail,
-            subject: "RallyPack: Some emergency supplies are expiring soon",
-            body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#128336; Supplies Expiring Soon</h2><p>${msg}</p><p><a href="https://rallypack.tech/Resources" style="color:#222;">Log in to RallyPack to review and restock.</a></p><p>Stay prepared,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
-            is_html: true,
+        if (!existingExpiring.some(n => new Date(n.created_date) > sevenDaysAgo)) {
+          await base44.asServiceRole.entities.Notification.create({
+            title: "🕐 Supplies Expiring Soon",
+            message: msg,
+            type: "warning",
+            read: false,
+            created_by: userEmail,
           });
-          emailsSent++;
+          notificationsCreated++;
+
+          if (wantsEmail) {
+            await base44.asServiceRole.integrations.Core.SendEmail({
+              to: userEmail,
+              subject: "RallyPack: Some emergency supplies are expiring soon",
+              body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#128336; Supplies Expiring Soon</h2><p>${msg}</p><p><strong>Quick task:</strong> Add replacement items to your next grocery run so you're ready before they expire.</p><p><a href="https://rallypack.tech/Resources" style="background:#D64A2E;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;">Review your cache →</a></p><p>Stay prepared,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
+              is_html: true,
+            });
+            emailsSent++;
+          }
         }
       }
 
@@ -172,7 +211,8 @@ Deno.serve(async (req) => {
               `National Preparedness Level: ${NIFC_META.preparednessLevel}/5. ` +
               `${NIFC_META.acresBurned.toLocaleString()} acres burned so far (${NIFC_META.acresVsAverage} of 10-yr average); ` +
               `${NIFC_META.wildfiresReported.toLocaleString()} wildfires reported (${NIFC_META.wildfiresVsAverage} of average).\n\n` +
-              `Resources:\n• NIFC Outlook: ${NIFC_META.sourceUrl}\n• National VOAD: https://www.nvoad.org\n• Find a local COAD: https://www.nvoad.org/local-affiliates/`;
+              `⚡ 5-minute prep: Move your go-bag to the car. Clear dry leaves and debris within 30 ft of your home. Park facing your exit route. Review your meeting spot at rallypack.tech/Resources.\n\n` +
+  `Resources:\n• NIFC Outlook: ${NIFC_META.sourceUrl}\n• National VOAD: https://www.nvoad.org\n• Find a local COAD: https://www.nvoad.org/local-affiliates/`;
 
             await base44.asServiceRole.entities.Notification.create({
               title: fireTitle,
@@ -257,16 +297,17 @@ Deno.serve(async (req) => {
           const resourceFooter = isFireAlert
             ? "\n\nResources: NIFC Outlook — https://www.nifc.gov/nicc-files/predictive/outlooks/monthly_seasonal_outlook.pdf | National VOAD — https://www.nvoad.org | Find a COAD — https://www.nvoad.org/local-affiliates/"
             : "";
-          const alertMessage = headline + (desc ? "\n\n" + desc : "") + resourceFooter;
+          const prepAction = getPrepAction(props.event);
+          const alertMessage = headline + (desc ? "\n\n" + desc : "") + "\n\n" + prepAction + resourceFooter;
 
           // Avoid duplicate notifications (check if we created one for this alert recently)
           const existing = await base44.asServiceRole.entities.Notification.filter({
             created_by: userEmail,
             title: `🌩️ ${props.event}`,
           });
-          // Simple dedup: skip if a notification with same title was created in last 4h
-          const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
-          const recentDuplicate = existing.some(n => new Date(n.created_date) > fourHoursAgo);
+          // Dedup: skip if a notification with same title was created in last 12h
+          const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+          const recentDuplicate = existing.some(n => new Date(n.created_date) > twelveHoursAgo);
           if (recentDuplicate) continue;
 
           await base44.asServiceRole.entities.Notification.create({
@@ -282,7 +323,7 @@ Deno.serve(async (req) => {
             await base44.asServiceRole.integrations.Core.SendEmail({
               to: userEmail,
               subject: `RallyPack Weather Alert: ${props.event}`,
-              body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#127785; Weather Alert for Your Area</h2><p><strong>${headline}</strong></p><p>${desc}</p><p>Stay safe,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
+              body: `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">&#127785; Weather Alert for Your Area</h2><p><strong>${headline}</strong></p><p>${desc}</p><div style="background:#FFF8E7;border-left:4px solid #D64A2E;padding:12px 16px;margin:16px 0;border-radius:4px;"><p style="margin:0;">${prepAction}</p></div><p><a href="https://rallypack.tech/Emergency" style="background:#D64A2E;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;">Open RallyPack Emergency →</a></p><p>Stay safe,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. Update your notification settings to stop these alerts.</p></body></html>`,
               is_html: true,
             });
             emailsSent++;

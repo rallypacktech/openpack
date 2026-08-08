@@ -289,7 +289,7 @@ export default function Shopping() {
               <h2 className="font-serif text-lg font-bold text-foreground mb-1">Track your inventory</h2>
               <p className="text-sm text-muted-foreground font-sans">Sign in to mark items as owned, track expiration dates, and monitor your readiness progress over time.</p>
             </div>
-            <Button onClick={() => base44.auth.redirectToLogin(window.location.pathname)} className="bg-crimson hover:bg-crimson/90 text-white flex-shrink-0">
+            <Button onClick={() => base44.auth.redirectToLogin(window.location.pathname)} className="bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0">
               Sign in to track
             </Button>
           </div>

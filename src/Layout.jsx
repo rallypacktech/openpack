@@ -221,7 +221,7 @@ export default function Layout({ children, currentPageName }) {
         {authChecked && (
           <footer className="bg-white border-t border-border mt-auto" role="contentinfo">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div>
                   <span className="font-serif text-lg font-bold text-foreground block mb-2">RallyPack</span>
                   <p className="text-muted-foreground text-sm font-sans">
@@ -259,11 +259,8 @@ export default function Layout({ children, currentPageName }) {
                     <Link to="/Feedback" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Send Feedback</Link>
                     <Link to="/AffiliatePartnerPolicy" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Affiliate & Partner Policy</Link>
                   </nav>
-                </div>
-
-                <div>
-                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Follow Us</h3>
-                  <div className="flex items-center gap-4 mt-1">
+                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3 mt-6">Follow Us</h3>
+                  <div className="flex items-center gap-4">
                     <a href="https://instagram.com/rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Instagram @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -285,7 +282,7 @@ export default function Layout({ children, currentPageName }) {
                 </div>
               </div>
 
-              <div className="border-t border-border mt-8 pt-6 text-center">
+              <div className="border-t border-border mt-12 pt-8 text-center">
                 <div className="inline-flex items-center gap-2 bg-secondary text-foreground px-3 py-1.5 rounded text-xs font-sans font-medium mb-4">
                   <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
                   BETA — Features may change

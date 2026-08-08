@@ -13,6 +13,18 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+// Convert bearing in degrees to a 16-point compass direction (north, northeast, etc.)
+function getCompassBearing(lat1, lon1, lat2, lon2) {
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+  const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+    Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+  let bearing = Math.atan2(y, x) * 180 / Math.PI;
+  bearing = (bearing + 360) % 360;
+  const dirs = ['north', 'north-northeast', 'northeast', 'east-northeast', 'east', 'east-southeast', 'southeast', 'south-southeast', 'south', 'south-southwest', 'southwest', 'west-southwest', 'west', 'west-northwest', 'northwest', 'north-northwest'];
+  return dirs[Math.round(bearing / 22.5) % 16];
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -76,10 +88,26 @@ Deno.serve(async (req) => {
           });
 
           if (existingAlerts.length === 0) {
+            // Look up nearest meet spot for evacuation direction guidance
+            let meetSpotGuidance = '';
+            try {
+              const spots = await base44.asServiceRole.entities.MeetSpot.filter({ created_by: profile.created_by });
+              if (spots.length > 0 && profile.latitude && profile.longitude) {
+                const nearest = spots
+                  .filter(s => s.latitude && s.longitude)
+                  .map(s => ({ ...s, dist: calculateDistance(profile.latitude, profile.longitude, s.latitude, s.longitude) }))
+                  .sort((a, b) => a.dist - b.dist)[0];
+                if (nearest) {
+                  const dir = getCompassBearing(profile.latitude, profile.longitude, nearest.latitude, nearest.longitude);
+                  meetSpotGuidance = ` Head ${Math.round(nearest.dist)} km ${dir} to "${nearest.name || 'your meeting spot'}".`;
+                }
+              }
+            } catch (e) { /* best effort */ }
+
             alertsToCreate.push({
               created_by: profile.created_by,
               title: `Wildfire Alert: ${fire.name}`,
-              message: `Active wildfire ${Math.round(distance)} km from your location in ${fire.county} County. ${Math.round((Number(fire.acres) || 0) * 0.4047)} hectares, ${fire.containment}% contained. Stay alert and follow local authorities.`,
+              message: `Active wildfire ${Math.round(distance)} km from your location in ${fire.county} County. ${Math.round((Number(fire.acres) || 0) * 0.4047)} hectares, ${fire.containment}% contained.\n\nIf local authorities issue an evacuation order, this is serious — grab your go-bag and leave immediately. Head to your designated meeting spot${meetSpotGuidance}. If you haven't set one up yet, do it now at rallypack.tech/Resources. Text your family where you're going (texts use less bandwidth than calls). Follow official evacuation routes only.`,
               type: 'alert',
               read: false,
               metadata: {
