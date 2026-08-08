@@ -8,6 +8,7 @@ import { Plus, Mail, Building2, Clock, RefreshCw, Loader2, Send } from "lucide-r
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import AdminReferralForm from "./AdminReferralForm";
 import EmailTemplatesEditor from "./EmailTemplatesEditor";
+import BulkReferralUpload from "./BulkReferralUpload";
 
 const AUDIENCE_LABELS = {
   general: 'General',
@@ -149,6 +150,7 @@ export default function BusinessReferralsPanel() {
           </Button>
         </div>
       </div>
+      <BulkReferralUpload onSuccess={loadReferrals} />
 
       <div className="grid grid-cols-3 gap-4">
         <Card>

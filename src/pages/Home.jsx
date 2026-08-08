@@ -368,7 +368,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="relative min-h-[380px]">
-          <img src="https://media.base44.com/images/public/69dc170f0871ac017d79debb/a9c9d2263_generated_image.png" alt="Community resilience" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&q=80" alt="Community resilience" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-[#1C1C1A]/30" />
         </div>
       </section>

@@ -12,7 +12,11 @@
         "infant",
         "avian",
         "reptile",
-        "livestock"
+        "livestock",
+        "wildfire",
+        "flood",
+        "hurricane",
+        "tornado"
       ],
       "description": "Audience key matching BusinessReferral.audience_type"
     },

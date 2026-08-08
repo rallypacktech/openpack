@@ -16,6 +16,7 @@ import WildfireTimeline from "@/components/admin/WildfireTimeline";
 import HolidayFireworkCorrelation from "@/components/admin/HolidayFireworkCorrelation";
 import ProfessionalUpgradeCard from "@/components/business/ProfessionalUpgradeCard";
 import NeedsBoard from "@/components/business/NeedsBoard";
+import CommunityOneSheet from "@/components/business/CommunityOneSheet";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -211,6 +212,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="needs">Needs Board</TabsTrigger>
           <TabsTrigger value="wildfire">Wildfire History</TabsTrigger>
           <TabsTrigger value="contact">Contact Admin</TabsTrigger>
+          <TabsTrigger value="onesheet">Community Guide</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members">
@@ -232,6 +234,9 @@ export default function BusinessDashboard() {
         </TabsContent>
         <TabsContent value="contact">
           <ContactAdminForm organizationName={subscription?.organization_name} />
+        </TabsContent>
+        <TabsContent value="onesheet">
+          <CommunityOneSheet organizationName={subscription?.organization_name} />
         </TabsContent>
         <TabsContent value="needs">
           <NeedsBoard subscription={subscription} />
