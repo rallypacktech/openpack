@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -11,14 +11,29 @@ Deno.serve(async (req) => {
     const country_code = body?.country_code;
     const admin1_name = body?.admin1_name;
     const years_back = body?.years_back || 10;
+    // batch: 1 = first half of years, 2 = second half (more recent)
+    const batch = body?.batch || 1;
+
     if (!country_code) return Response.json({ error: 'country_code is required' }, { status: 400 });
 
     const currentYear = new Date().getFullYear();
-    const startYear = currentYear - years_back;
+    const totalYears = years_back;
+    const halfYears = Math.ceil(totalYears / 2);
+
+    // Batch 1: older half. Batch 2: recent half.
+    let batchStartYear, batchEndYear;
+    if (batch === 1) {
+      batchStartYear = currentYear - totalYears;
+      batchEndYear = currentYear - halfYears;
+    } else {
+      batchStartYear = currentYear - halfYears;
+      batchEndYear = currentYear;
+    }
+
     const regionText = admin1_name ? `${admin1_name}, ${country_code}` : `the country with ISO code ${country_code}`;
 
     const llmResponse = await base44.integrations.Core.InvokeLLM({
-      prompt: `List up to 10 most significant wildfires in ${regionText} from ${startYear} to ${currentYear}. For each fire provide: incident_name, admin1_name, admin2_name, start_date (YYYY-MM-DD), containment_date or null, hectares_burned, acres_burned, responding_organizations (array), latitude, longitude, cause, structures_destroyed, fatalities, severity (minor/moderate/major/catastrophic), and a brief notes field. Focus on fires that burned more than 1,000 hectares or had structural damage or fatalities.`,
+      prompt: `List up to 10 most significant wildfires in ${regionText} from ${batchStartYear} to ${batchEndYear}. For each fire provide: incident_name, admin1_name, admin2_name, start_date (YYYY-MM-DD), containment_date or null, hectares_burned, acres_burned, responding_organizations (array), latitude, longitude, cause, structures_destroyed, fatalities, severity (minor/moderate/major/catastrophic), and a brief notes field. Focus on fires that burned more than 1,000 hectares or had structural damage or fatalities.`,
       add_context_from_internet: true,
       model: 'gemini_3_flash',
       response_json_schema: {
@@ -53,7 +68,7 @@ Deno.serve(async (req) => {
 
     const incidents = llmResponse.incidents || [];
     if (incidents.length === 0) {
-      return Response.json({ success: false, error: 'No incidents returned by LLM' });
+      return Response.json({ success: false, error: 'No incidents returned by LLM', batch, years: `${batchStartYear}-${batchEndYear}` });
     }
 
     const counties = await base44.asServiceRole.entities.CountyTerritory.filter({ country_code });
@@ -92,6 +107,8 @@ Deno.serve(async (req) => {
 
     return Response.json({
       success: true,
+      batch,
+      years: `${batchStartYear}-${batchEndYear}`,
       incidents_fetched: incidents.length,
       incidents_created: created.length,
       counties_matched: incidentRecords.filter(r => r.county_territory_id).length
@@ -100,4 +117,4 @@ Deno.serve(async (req) => {
     console.error('fetchWildfireHistory error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

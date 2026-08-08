@@ -230,19 +230,21 @@ export default function Layout({ children, currentPageName }) {
                 </div>
 
                 <div>
-                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Preparedness</h3>
-                  <nav className="space-y-2" aria-label="Preparedness guides">
-                    <Link to="/wildfire" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire Prep</Link>
-                    <Link to="/hurricane" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Hurricane Prep</Link>
-                    <Link to="/flood" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Flood Prep</Link>
-                    <Link to="/tornado" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Tornado Prep</Link>
-                    <Link to="/equine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Equine Prep</Link>
-                    <Link to="/canine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Canine Prep</Link>
-                    <Link to="/feline" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Feline Prep</Link>
-                    <Link to="/infant" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Infant Prep</Link>
-                    <Link to="/avian" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Avian Prep</Link>
-                    <Link to="/reptile" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Reptile Prep</Link>
-                    <Link to="/livestock" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Livestock Prep</Link>
+                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Resources</h3>
+                  <nav className="space-y-2" aria-label="Emergency resources">
+                    <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-2">Disasters</h3>
+                    <Link to="/wildfire" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire</Link>
+                    <Link to="/hurricane" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Hurricane</Link>
+                    <Link to="/flood" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Flood</Link>
+                    <Link to="/tornado" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Tornado</Link>
+                    <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-4">By Species</h3>
+                    <Link to="/equine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Equine</Link>
+                    <Link to="/canine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Canine</Link>
+                    <Link to="/feline" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Feline</Link>
+                    <Link to="/infant" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Infant</Link>
+                    <Link to="/avian" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Avian</Link>
+                    <Link to="/reptile" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Reptile</Link>
+                    <Link to="/livestock" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Livestock</Link>
                     <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">About Us</Link>
                   </nav>
                 </div>

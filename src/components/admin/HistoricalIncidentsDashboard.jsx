@@ -105,13 +105,22 @@ export default function HistoricalIncidentsDashboard() {
     setFetchSource("nifc");
     setFetchResult(null);
     try {
-      const res = await base44.functions.invoke("fetchWildfireHistory", {
-        country_code: "US",
-        admin1_name: null,
-        years_back: 10
+      // Batch 1: older half of years
+      const res1 = await base44.functions.invoke("fetchWildfireHistory", {
+        country_code: "US", admin1_name: null, years_back: 10, batch: 1
       });
-      setFetchResult(res.data);
-      if (res.data?.success) await loadIncidents();
+      // Batch 2: recent half of years
+      const res2 = await base44.functions.invoke("fetchWildfireHistory", {
+        country_code: "US", admin1_name: null, years_back: 10, batch: 2
+      });
+      const combined = {
+        success: res1.data?.success || res2.data?.success,
+        batch1: res1.data,
+        batch2: res2.data,
+        incidents_created: (res1.data?.incidents_created || 0) + (res2.data?.incidents_created || 0),
+      };
+      setFetchResult(combined);
+      if (combined.success) await loadIncidents();
     } catch (e) {
       setFetchResult({ error: e.response?.data?.error || e.message || "Failed to fetch NIFC data" });
     } finally {
