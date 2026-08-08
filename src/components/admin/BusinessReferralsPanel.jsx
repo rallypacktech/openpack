@@ -33,7 +33,7 @@ export default function BusinessReferralsPanel() {
 
   const loadReferrals = useCallback(async () => {
     try {
-      const data = await base44.asServiceRole.entities.BusinessReferral.list('-created_date', 5000);
+      const data = await base44.entities.BusinessReferral.list('-created_date', 5000);
       setReferrals(data);
     } catch (error) {
       console.error("Error loading referrals:", error);
