@@ -37,7 +37,20 @@ RallyPack's mission areas:
 - Keeping families together and connected during emergencies
 - Emergency preparedness, disaster relief, and community resilience
 
-Search for CURRENT, REAL grant and award opportunities with UPCOMING deadlines (after ${today}) that RallyPack could qualify for. Focus on:
+Search the following grant discovery sources for CURRENT, REAL grant and award opportunities with UPCOMING deadlines (after ${today}) that RallyPack could qualify for:
+
+GRANT DISCOVERY SOURCES TO CHECK:
+1. Candid / Foundation Maps — https://candid.org/ and https://maps.foundationcenter.org/
+2. HumanePro Grant Listings — https://humanepro.org/grant-listings
+3. Grants.gov (Simpler) — https://simpler.grants.gov/
+4. Pedigree Foundation — https://www.pedigreefoundation.org/shelters-grant/
+5. FEMA Grants — https://www.fema.gov/grants
+6. Animal Welfare Funding (UW Madison) — https://www.library.wisc.edu/memorial/collections/grants-information-collection/resources/animal-welfare-funding-and-fundraising/
+7. Chronicle of Philanthropy — https://www.philanthropy.com/fundraising/
+8. GrantInterface — https://www.grantinterface.com
+9. Petco Love Shelter Partner Grants — https://petcolove.org/shelter-partners/grants/
+
+Focus on:
 - Federal agencies (FEMA, DHS, CDC, NSF, etc.)
 - Tech company philanthropy programs (Google.org, Microsoft AI for Good, AWS, etc.)
 - Foundations focused on disaster relief, community resilience, family safety, or tech-for-good

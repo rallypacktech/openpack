@@ -221,7 +221,7 @@ export default function Layout({ children, currentPageName }) {
         {authChecked && (
           <footer className="bg-white border-t border-border mt-auto" role="contentinfo">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                   <span className="font-serif text-lg font-bold text-foreground block mb-2">RallyPack</span>
                   <p className="text-muted-foreground text-sm font-sans">

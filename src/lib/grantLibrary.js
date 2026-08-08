@@ -180,7 +180,36 @@ export const GRANT_LIBRARY = [
       budget_summary: "Recognition + integration funding: CAP feed expansion (40%), multilingual alert delivery (35%), community partnerships (25%).",
       org_capacity: "Global CAP alert ingestion pipeline, multi-channel delivery (Telegram, email, Discord), and country-aware emergency number directory already supporting 20+ countries."
     }
+  },
+  {
+    grant_name: "Petco Love Shelter Partner Grants",
+    funder_name: "Petco Love",
+    grant_category: "community_resilience",
+    grant_url: "https://petcolove.org/shelter-partners/grants/",
+    amount_requested: 50000,
+    priority: "medium",
+    loi_sections: {
+      need: "Animal shelters and rescue organizations need funding to maintain disaster preparedness and emergency response capabilities for pets and their families.",
+      approach: "RallyPack's species-aware preparedness platform supports shelters with emergency planning resources, pet evacuation coordination, and community preparedness education.",
+      impact: "Expand animal-inclusive preparedness to 20 partner shelters, reaching 30,000 pet-owning households with disaster readiness tools.",
+      budget_summary: "$50K over 12 months: shelter partner onboarding (40%), emergency planning tools (35%), evaluation (25%).",
+      org_capacity: "Species-specific preparedness pages (equine, canine, feline, livestock), pet-friendly shelter mapping, and a disaster referral pipeline connecting businesses to animal welfare resources."
+    }
   }
+];
+
+// Grant discovery sources used by the refresh pool to find new opportunities.
+export const GRANT_SOURCES = [
+  { name: "Candid (Foundation Directory)", url: "https://candid.org/", description: "Comprehensive foundation and grantmaker directory" },
+  { name: "Candid Foundation Maps", url: "https://maps.foundationcenter.org/", description: "Interactive map of grantmakers and grants worldwide" },
+  { name: "HumanePro Grant Listings", url: "https://humanepro.org/grant-listings", description: "Animal welfare grant opportunities" },
+  { name: "Grants.gov (Simpler)", url: "https://simpler.grants.gov/", description: "Federal grant opportunities database" },
+  { name: "Pedigree Foundation Grants", url: "https://www.pedigreefoundation.org/shelters-grant/", description: "Shelter and rescue organization grants" },
+  { name: "FEMA Grants", url: "https://www.fema.gov/grants", description: "Federal Emergency Management Agency grant programs" },
+  { name: "Animal Welfare Funding (UW Madison)", url: "https://www.library.wisc.edu/memorial/collections/grants-information-collection/resources/animal-welfare-funding-and-fundraising/", description: "Academic resource list for animal welfare funding" },
+  { name: "Chronicle of Philanthropy — Fundraising", url: "https://www.philanthropy.com/fundraising/", description: "Fundraising resources and nonprofit funding news" },
+  { name: "GrantInterface", url: "https://www.grantinterface.com", description: "Grant management platform — eligible opportunities" },
+  { name: "Petco Love Shelter Partner Grants", url: "https://petcolove.org/shelter-partners/grants/", description: "Petco Love grants for shelter partners" },
 ];
 
 // Recognition awards RallyPack qualifies for, across all categories.

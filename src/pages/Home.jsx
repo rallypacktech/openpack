@@ -287,7 +287,7 @@ export default function Home() {
       {!user && (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-0">
           <div className="relative min-h-[380px]">
-            <img src="https://images.unsplash.com/photo-1591451204579-d1b6e3a72e7d?w=1600&q=80" alt="Emergency planning app" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1661177408809-4184b3b65f2c?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Emergency planning app" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
           </div>
           <div className="bg-[#1C1C1A] text-white px-8 md:px-16 py-16 md:py-20 flex flex-col justify-center">
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-4">Free account</p>
@@ -391,16 +391,16 @@ export default function Home() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#8A8577] font-sans flex-shrink-0">Built on guidance from</p>
           <div className="flex flex-wrap items-center gap-4 text-sm font-sans font-semibold text-[#1C1C1A]">
             {[
-              { label: "FEMA Ready.gov", href: "https://www.ready.gov" },
-              { label: "IFRC", href: "https://www.ifrc.org" },
-              { label: "NOAA / NWS", href: "https://www.weather.gov" },
-              { label: "Public Safety Canada", href: "https://www.publicsafety.gc.ca/cnt/mrgnc-mngmnt/index-en.aspx" },
-              { label: "CDC Emergency", href: "https://emergency.cdc.gov" },
-              { label: "Best Friends Animal Society", href: "https://bestfriends.org/network/issues/emergency-response" },
-              { label: "ASPCA", href: "https://www.aspca.org" },
-              { label: "NARS", href: "https://www.narescue.com/" },
-              { label: "Oregon Humane Society", href: "https://www.oregonhumane.org" },
-            ].map((org, i, arr) => (
+                { label: "FEMA Ready.gov", href: "https://www.ready.gov" },
+                { label: "IFRC Volunteers", href: "https://www.ifrc.org/get-involved" },
+                { label: "NOAA / NWS Safety", href: "https://www.weather.gov/safety" },
+                { label: "Get Prepared (Canada)", href: "https://www.getprepared.gc.ca/index-en.aspx" },
+                { label: "CDC Preparedness", href: "https://emergency.cdc.gov/preparedness/index.asp" },
+                { label: "Best Friends Emergency Response", href: "https://bestfriends.org/network/issues/emergency-response" },
+                { label: "ASPCA Disaster Prep", href: "https://www.aspca.org/pet-care/pet-disaster-preparedness" },
+                { label: "NARS", href: "https://www.narescue.com/" },
+                { label: "Oregon Humane Volunteering", href: "https://www.oregonhumane.org/get-involved/volunteer/" },
+              ].map((org, i, arr) => (
               <React.Fragment key={org.label}>
                 <a href={org.href} target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">{org.label}</a>
                 {i < arr.length - 1 && <span className="text-[#D8D2C6]">·</span>}

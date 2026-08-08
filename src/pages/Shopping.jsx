@@ -282,6 +282,19 @@ export default function Shopping() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        {/* Sign-in CTA for non-authed users */}
+        {!user && (
+          <div className="bg-white border border-border rounded-lg p-5 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h2 className="font-serif text-lg font-bold text-foreground mb-1">Track your inventory</h2>
+              <p className="text-sm text-muted-foreground font-sans">Sign in to mark items as owned, track expiration dates, and monitor your readiness progress over time.</p>
+            </div>
+            <Button onClick={() => base44.auth.redirectToLogin(window.location.pathname)} className="bg-crimson hover:bg-crimson/90 text-white flex-shrink-0">
+              Sign in to track
+            </Button>
+          </div>
+        )}
+
         {/* Slim essentials progress */}
         {user && requiredItems.length > 0 && (
           <div className="bg-white border border-border rounded-lg p-4 mb-6">
