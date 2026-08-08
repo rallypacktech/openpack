@@ -45,6 +45,14 @@ Deno.serve(async (req) => {
             { item_name: 'Bleeding Control & Tourniquet Guide', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
             { item_name: 'Shelter in Place Guide', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
             { item_name: 'Go-Bag Evacuation Checklist', quantity: 1, category: 'documents', notes: 'RallyPack reference manual — available in Offline > Manuals' },
+            { item_name: 'Adhesive bandages (assorted)', quantity: 25, category: 'medical', notes: 'First aid — assorted sizes for cuts and blisters' },
+            { item_name: 'Gauze pads (4x4)', quantity: 10, category: 'medical', notes: 'First aid — for larger wounds' },
+            { item_name: 'Antiseptic wipes', quantity: 15, category: 'medical', notes: 'First aid — wound cleaning' },
+            { item_name: 'Medical tape', quantity: 1, category: 'medical', notes: 'First aid — secure gauze' },
+            { item_name: 'Disposable gloves (nitrile)', quantity: 4, category: 'medical', notes: 'First aid — infection protection' },
+            { item_name: 'Pain relievers (ibuprofen)', quantity: 1, category: 'medical', notes: 'First aid — pain and fever relief' },
+            { item_name: 'Tweezers', quantity: 1, category: 'tools', notes: 'First aid — splinter and tick removal' },
+            { item_name: 'CPR face shield', quantity: 1, category: 'medical', notes: 'First aid — barrier for CPR' },
         ];
 
         const automobileItems = [

@@ -15,6 +15,7 @@ import ContactAdminForm from "@/components/business/ContactAdminForm";
 import WildfireTimeline from "@/components/admin/WildfireTimeline";
 import HolidayFireworkCorrelation from "@/components/admin/HolidayFireworkCorrelation";
 import ProfessionalUpgradeCard from "@/components/business/ProfessionalUpgradeCard";
+import NeedsBoard from "@/components/business/NeedsBoard";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -207,6 +208,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="evacuation">Evacuation Plans</TabsTrigger>
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
           {hasDelegation && <TabsTrigger value="alerts">Emergency Alerts</TabsTrigger>}
+          <TabsTrigger value="needs">Needs Board</TabsTrigger>
           <TabsTrigger value="wildfire">Wildfire History</TabsTrigger>
           <TabsTrigger value="contact">Contact Admin</TabsTrigger>
         </TabsList>
@@ -230,6 +232,9 @@ export default function BusinessDashboard() {
         </TabsContent>
         <TabsContent value="contact">
           <ContactAdminForm organizationName={subscription?.organization_name} />
+        </TabsContent>
+        <TabsContent value="needs">
+          <NeedsBoard subscription={subscription} />
         </TabsContent>
         <TabsContent value="wildfire">
           <div className="space-y-6">

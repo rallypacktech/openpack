@@ -156,7 +156,7 @@ export default function Home() {
             </div>
           </div>
           <div className="relative min-h-[360px] md:min-h-0">
-            <img src="https://images.unsplash.com/photo-1571168364604-9a30a04e2cdc?w=1200&q=80" alt="Wildfire approaching homes" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1661177408809-4184b3b65f2c?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Wildfire approaching homes" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#F0EBE0]/40 to-transparent" />
           </div>
         </div>
@@ -264,17 +264,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Quiz CTA (full-bleed image) ── */}
+      {/* ── Quiz CTA (urgent, full-bleed) ── */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-0">
-        <div className="bg-[#F5F0E8] px-8 md:px-16 py-16 md:py-20 flex flex-col justify-center order-2 md:order-1">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-4">3 minutes</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1C1C1A] mb-4 leading-tight">How ready are you, really?</h2>
-          <p className="text-sm text-[#1C1C1A]/60 font-sans leading-relaxed mb-8">
-            Answer a few questions about your household's supplies, plans, and documents. Get a clear score with specific gaps to fix — no account required.
+        <div className="bg-[#D64A2E] text-white px-8 md:px-16 py-16 md:py-20 flex flex-col justify-center order-2 md:order-1">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-white/60 font-sans mb-4">3 minutes · free · no account</p>
+          <h2 className="font-serif text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">Do it now.<br />Before you forget.</h2>
+          <p className="text-sm text-white/75 font-sans leading-relaxed mb-8">
+            The next disaster won't wait for you to be ready. Take 3 minutes right now to find your gaps — supplies, plans, documents — and get a clear score with specific fixes.
           </p>
           <Link to={createPageUrl("ReadinessQuiz")}>
-            <button className="inline-flex items-center gap-2 bg-[#D64A2E] text-white font-sans font-semibold px-7 py-3.5 hover:bg-[#be3f25] transition-colors text-xs tracking-widest uppercase">
-              Take the quiz <ArrowRight className="w-4 h-4" />
+            <button className="self-start inline-flex items-center gap-2 bg-white text-[#D64A2E] font-sans font-bold px-8 py-4 hover:bg-white/90 transition-colors text-sm tracking-widest uppercase">
+              Start the quiz <ArrowRight className="w-5 h-5" />
             </button>
           </Link>
         </div>
@@ -368,7 +368,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="relative min-h-[380px]">
-          <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80" alt="Community resilience" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <img src="https://media.base44.com/images/public/69dc170f0871ac017d79debb/a9c9d2263_generated_image.png" alt="Community resilience" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-[#1C1C1A]/30" />
         </div>
       </section>

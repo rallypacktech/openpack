@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Shield, AlertTriangle, CheckCircle2, Package, Trash2, Edit } from "lucide-react";
+import { Plus, Shield, AlertTriangle, CheckCircle2, Package, Trash2, Edit, Building2 } from "lucide-react";
 
 export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
   const [kitItems, setKitItems] = useState({});
@@ -27,6 +27,36 @@ export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
       // Group items that might be associated with a cache via name matching
     });
     setKitItems(byKit);
+  };
+
+  const handleGenerateOfficeKit = async () => {
+    if (kits.length >= maxKits) { alert(`Your plan allows up to ${maxKits} kits. Upgrade to add more.`); return; }
+    try {
+      const cache = await base44.entities.EmergencyCache.create({
+        name: 'SAMPLE Office First Aid Kit',
+        location: 'Main Office — Reception',
+        cache_type: 'first_aid_kit',
+        description: 'Office-appropriate first aid kit sample — adjust quantities and locations to your workplace',
+      });
+      const items = [
+        { item_name: 'Adhesive bandages (assorted)', quantity: 50, category: 'medical', notes: 'Cuts, blisters', cache_id: cache.id },
+        { item_name: 'Gauze pads (4x4)', quantity: 20, category: 'medical', notes: 'Larger wounds', cache_id: cache.id },
+        { item_name: 'Burn gel packets', quantity: 10, category: 'medical', notes: 'Kitchen/coffee burn relief', cache_id: cache.id },
+        { item_name: 'Eye wash solution', quantity: 2, category: 'medical', notes: 'Eye flush for irritants', cache_id: cache.id },
+        { item_name: 'Triangular bandages', quantity: 4, category: 'medical', notes: 'Slings and splinting', cache_id: cache.id },
+        { item_name: 'Medical tape', quantity: 2, category: 'medical', notes: 'Secure dressings', cache_id: cache.id },
+        { item_name: 'Disposable gloves (nitrile)', quantity: 10, category: 'medical', notes: 'Infection protection', cache_id: cache.id },
+        { item_name: 'CPR mask / face shield', quantity: 2, category: 'medical', notes: 'Barrier for CPR', cache_id: cache.id },
+        { item_name: 'Antiseptic wipes', quantity: 25, category: 'medical', notes: 'Wound cleaning', cache_id: cache.id },
+        { item_name: 'Instant cold packs', quantity: 4, category: 'medical', notes: 'Reduce swelling', cache_id: cache.id },
+        { item_name: 'Scissors (blunt-nose)', quantity: 1, category: 'tools', notes: 'Cut tape and gauze', cache_id: cache.id },
+        { item_name: 'Tweezers', quantity: 1, category: 'tools', notes: 'Splinter removal', cache_id: cache.id },
+        { item_name: 'Emergency blanket', quantity: 2, category: 'other', notes: 'Shock / temperature', cache_id: cache.id },
+        { item_name: 'First aid reference guide', quantity: 1, category: 'documents', notes: 'Office first aid procedures', cache_id: cache.id },
+      ];
+      await base44.entities.CacheItem.bulkCreate(items);
+      onRefresh();
+    } catch (e) { alert('Error creating sample kit: ' + e.message); }
   };
 
   const openCreate = () => {
@@ -62,7 +92,10 @@ export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
           <h2 className="font-semibold text-foreground">First Aid Kits</h2>
           <p className="text-xs text-muted-foreground mt-0.5">{kits.length} of {maxKits} kits used</p>
         </div>
-        <Button size="sm" onClick={openCreate} className="gap-2" disabled={kits.length >= maxKits}><Plus className="w-3.5 h-3.5" /> Add Kit</Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={handleGenerateOfficeKit} className="gap-2"><Building2 className="w-3.5 h-3.5" /> Sample Office Kit</Button>
+          <Button size="sm" onClick={openCreate} className="gap-2" disabled={kits.length >= maxKits}><Plus className="w-3.5 h-3.5" /> Add Kit</Button>
+        </div>
       </div>
 
       {/* Usage bar */}

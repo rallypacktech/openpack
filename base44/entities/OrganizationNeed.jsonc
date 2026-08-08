@@ -1,0 +1,135 @@
+{
+  "name": "OrganizationNeed",
+  "type": "object",
+  "properties": {
+    "organization_name": {
+      "type": "string",
+      "description": "Name of the organization posting the need"
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to the BusinessSubscription"
+    },
+    "posted_by_email": {
+      "type": "string",
+      "description": "Email of the user who posted the need"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact email for organizations to reach out when claiming"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Optional contact phone"
+    },
+    "need_title": {
+      "type": "string",
+      "description": "Short title of the need"
+    },
+    "need_description": {
+      "type": "string",
+      "description": "Detailed description of what is needed"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "supplies",
+        "volunteers",
+        "equipment",
+        "space",
+        "transport",
+        "food",
+        "medical",
+        "other"
+      ],
+      "default": "supplies",
+      "description": "Category of the need"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Quantity needed"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measurement (e.g. boxes, people, meals)"
+    },
+    "location": {
+      "type": "string",
+      "description": "Geographic area or address where the need is"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Urgency level of the need"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "claimed",
+        "filled"
+      ],
+      "default": "open",
+      "description": "Status of the need \u2014 open (available to claim), claimed (someone is coordinating), filled (resolved)"
+    },
+    "claimed_by_org": {
+      "type": "string",
+      "description": "Name of the organization that claimed the need"
+    },
+    "claimed_by_email": {
+      "type": "string",
+      "description": "Email of the user who claimed the need"
+    },
+    "claimed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "filled_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "organization_name",
+    "need_title",
+    "need_description",
+    "posted_by_email",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

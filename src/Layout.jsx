@@ -254,12 +254,7 @@ export default function Layout({ children, currentPageName }) {
                     <Link to={createPageUrl("TermsAndConditions")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Terms & Conditions</Link>
                     <Link to={createPageUrl("EULA")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">End User License Agreement</Link>
                     <Link to={createPageUrl("ConfidentialityAgreement")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Confidentiality Agreement</Link>
-                  </nav>
-                </div>
-
-                <div>
-                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Contact</h3>
-                  <nav className="space-y-2" aria-label="Contact navigation">
+                    <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-4">Contact</h3>
                     <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">About Us</Link>
                     <Link to="/Feedback" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Send Feedback</Link>
                     <Link to="/AffiliatePartnerPolicy" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Affiliate & Partner Policy</Link>

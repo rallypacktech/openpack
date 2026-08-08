@@ -5,7 +5,6 @@ import { createPageUrl } from "../utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CachesList from "../components/resources/CachesList";
 import MeetSpotsList from "../components/resources/MeetSpotsList";
-import FirstAidTracker from "../components/resources/FirstAidTracker";
 import TrainingClasses from "../components/resources/TrainingClasses";
 import VolunteerOpportunities from "../components/resources/VolunteerOpportunities";
 import SharePlan from "../components/resources/SharePlan";
@@ -14,13 +13,12 @@ import EmergencyManuals from "../components/manuals/EmergencyManuals";
 import LocalShelters from "../components/resources/LocalShelters";
 import EvacuationAlertInfo from "../components/resources/EvacuationAlertInfo";
 import { Link } from "react-router-dom";
-import { Package, MapPin, Users, ChevronRight } from "lucide-react";
+import { Package, MapPin, Users, Share2, ChevronRight } from "lucide-react";
 
 export default function Resources() {
   const navigate = useNavigate();
   const [caches, setCaches] = useState([]);
   const [meetSpots, setMeetSpots] = useState([]);
-  const [firstAidItems, setFirstAidItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("supplies");
   const [samplesCreated, setSamplesCreated] = useState(false);
@@ -28,10 +26,10 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    const validTabs = ["supplies", "help", "community"];
+    const validTabs = ["supplies", "meetspots", "share", "help", "community"];
     const legacyMap = {
-      caches: "supplies", meetspots: "supplies", firstaid: "supplies",
-      training: "community", volunteer: "community", share: "community", tracking: "community",
+      caches: "supplies", firstaid: "supplies",
+      training: "community", volunteer: "community", tracking: "community",
       resources: "help", manuals: "help", shelters: "help",
     };
     if (tab && validTabs.includes(tab)) setActiveTab(tab);
@@ -45,15 +43,13 @@ export default function Resources() {
   const loadData = async () => {
     try {
       const user = await base44.auth.me();
-      const [cachesResponse, spotsResponse, firstAidData] = await Promise.all([
+      const [cachesResponse, spotsResponse] = await Promise.all([
         base44.functions.invoke('getCaches'),
         base44.functions.invoke('getMeetSpots'),
-        base44.entities.FirstAidItem.filter({ created_by: user.email })
       ]);
 
       setCaches(cachesResponse.data.caches);
       setMeetSpots(spotsResponse.data.spots);
-      setFirstAidItems(firstAidData);
       setLoading(false);
 
       const ownCaches = cachesResponse.data.caches.filter(c => c.created_by === user.email);
@@ -75,9 +71,6 @@ export default function Resources() {
   const handleAddSpot = async (data) => { await base44.entities.MeetSpot.create(data); loadData(); };
   const handleUpdateSpot = async (id, data) => { await base44.entities.MeetSpot.update(id, data); loadData(); };
   const handleDeleteSpot = async (id) => { await base44.entities.MeetSpot.delete(id); loadData(); };
-  const handleAddFirstAid = async (data) => { await base44.entities.FirstAidItem.create(data); loadData(); };
-  const handleUpdateFirstAid = async (id, data) => { await base44.entities.FirstAidItem.update(id, data); loadData(); };
-  const handleDeleteFirstAid = async (id) => { await base44.entities.FirstAidItem.delete(id); loadData(); };
 
   const handleViewCacheItems = (cache) => {
     navigate(createPageUrl("CacheDetail") + "?id=" + cache.id);
@@ -90,15 +83,6 @@ export default function Resources() {
       if (response.data.error) alert(response.data.error);
       await loadData();
     } catch (error) { console.error("Error generating sample caches:", error); }
-    finally { setLoading(false); }
-  };
-
-  const handleGenerateSampleFirstAid = async () => {
-    setLoading(true);
-    try {
-      await base44.functions.invoke('generateSampleFirstAidItems');
-      await loadData();
-    } catch (error) { console.error("Error generating sample first aid items:", error); }
     finally { setLoading(false); }
   };
 
@@ -118,7 +102,7 @@ export default function Resources() {
           <p className="text-xs uppercase tracking-widest font-sans text-muted-foreground mb-1">Emergency Planning</p>
           <h1 className="font-serif text-3xl font-bold text-foreground">Your Preparedness Hub</h1>
           <p className="font-sans text-sm mt-1 text-muted-foreground">
-            Supplies, find help, and get involved — all in one place.
+            Supplies, meeting spots, help, and community — all in one place.
           </p>
         </div>
       </div>
@@ -129,8 +113,14 @@ export default function Resources() {
             <TabsTrigger value="supplies">
               <Package className="w-4 h-4 mr-1.5" /> My Supplies
             </TabsTrigger>
+            <TabsTrigger value="meetspots">
+              <MapPin className="w-4 h-4 mr-1.5" /> Meet Spots
+            </TabsTrigger>
+            <TabsTrigger value="share">
+              <Share2 className="w-4 h-4 mr-1.5" /> Share Plan
+            </TabsTrigger>
             <TabsTrigger value="help">
-              <MapPin className="w-4 h-4 mr-1.5" /> Find Help
+              <Users className="w-4 h-4 mr-1.5" /> Find Help
             </TabsTrigger>
             <TabsTrigger value="community">
               <Users className="w-4 h-4 mr-1.5" /> Community
@@ -138,7 +128,7 @@ export default function Resources() {
           </TabsList>
 
           {/* ── My Supplies ── */}
-          <TabsContent value="supplies" className="space-y-6">
+          <TabsContent value="supplies">
             <CachesList
               caches={caches}
               onAdd={handleAddCache}
@@ -147,19 +137,21 @@ export default function Resources() {
               onViewItems={handleViewCacheItems}
               onGenerateSamples={handleGenerateSampleCaches}
             />
-            <FirstAidTracker
-              items={firstAidItems}
-              onAdd={handleAddFirstAid}
-              onUpdate={handleUpdateFirstAid}
-              onDelete={handleDeleteFirstAid}
-              onGenerateSamples={handleGenerateSampleFirstAid}
-            />
+          </TabsContent>
+
+          {/* ── Meet Spots ── */}
+          <TabsContent value="meetspots">
             <MeetSpotsList
               spots={meetSpots}
               onAdd={handleAddSpot}
               onUpdate={handleUpdateSpot}
               onDelete={handleDeleteSpot}
             />
+          </TabsContent>
+
+          {/* ── Share Plan ── */}
+          <TabsContent value="share">
+            <SharePlan />
           </TabsContent>
 
           {/* ── Find Help ── */}
@@ -184,7 +176,6 @@ export default function Resources() {
           <TabsContent value="community" className="space-y-6">
             <TrainingClasses />
             <VolunteerOpportunities />
-            <SharePlan />
             <div className="text-center py-8 border border-border rounded-lg bg-white">
               <p className="text-muted-foreground text-sm mb-4">Manage your tracked items — pets, valuables, vehicles, and more.</p>
               <Link
