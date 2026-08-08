@@ -26,6 +26,10 @@ export default function BusinessReferralsPanel() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [contacting, setContacting] = useState(false);
+  const [resendingId, setResendingId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   const loadReferrals = useCallback(async () => {
     try {
@@ -85,11 +89,6 @@ export default function BusinessReferralsPanel() {
       setContacting(false);
     }
   };
-
-  const [resendingId, setResendingId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 20;
 
   const handleResend = async (referralId) => {
     setResendingId(referralId);
