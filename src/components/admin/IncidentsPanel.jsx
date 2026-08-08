@@ -22,7 +22,7 @@ export default function IncidentsPanel() {
             <AlertTriangle className="w-4 h-4" /> Live Map
           </TabsTrigger>
           <TabsTrigger value="historical" className="flex items-center gap-2">
-            <Flame className="w-4 h-4" /> Historical
+            <Flame className="w-4 h-4" /> Wildfires
           </TabsTrigger>
         </TabsList>
 

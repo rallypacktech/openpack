@@ -57,8 +57,6 @@ export default function IncidentMap() {
   const [showFloodOutlook, setShowFloodOutlook] = useState(false);
   const [showHurricaneOutlook, setShowHurricaneOutlook] = useState(false);
   const [showTornadoOutlook, setShowTornadoOutlook] = useState(false);
-  const [showEffisFires, setShowEffisFires] = useState(false);
-
   const currentMonth = new Date().getMonth() + 1;
   const activeFireRegions = getActiveFireRegions(currentMonth);
   const activeFloodRegions = getActiveFloodRegions(currentMonth);
@@ -133,7 +131,7 @@ export default function IncidentMap() {
             size="sm"
             onClick={() => setShowOutlook(!showOutlook)}
             className="gap-2"
-            title="Toggle NIFC significant fire potential outlook overlay"
+            title="Toggle fire overlay — NIFC outlook + EFFIS satellite hotspots"
           >
             <Flame className="w-3.5 h-3.5" />
             Fire
@@ -167,16 +165,6 @@ export default function IncidentMap() {
           >
             <Zap className="w-3.5 h-3.5" />
             Tornado
-          </Button>
-          <Button
-            variant={showEffisFires ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowEffisFires(!showEffisFires)}
-            className="gap-2"
-            title="Toggle EFFIS (Copernicus) active fire detection overlay — satellite hotspots for Europe"
-          >
-            <Globe className="w-3.5 h-3.5" />
-            EFFIS
           </Button>
           <Button variant="outline" size="sm" onClick={fetchLiveAlerts} disabled={loading} className="gap-2">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -263,8 +251,8 @@ export default function IncidentMap() {
         </div>
       )}
 
-      {/* EFFIS active fires banner */}
-      {showEffisFires && (
+      {/* EFFIS active fires banner — shown when fire overlay is active */}
+      {showOutlook && (
         <div className="flex items-center gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3">
           <Globe className="w-5 h-5 text-red-600 shrink-0" />
           <div className="text-sm flex-1">
@@ -332,7 +320,7 @@ export default function IncidentMap() {
               sourceLabel="Source: NOAA Climate Prediction Center"
             />
           )}
-          {showEffisFires && (
+          {showOutlook && (
             <WMSTileLayer
               url="https://maps.effis.emergency.copernicus.eu/effis"
               layers="all.hs"

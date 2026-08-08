@@ -35,7 +35,9 @@ export default function HistoricalIncidentsDashboard() {
   const [filterYear, setFilterYear] = useState("all");
   const [filterCountry, setFilterCountry] = useState("all");
   const [fetchingData, setFetchingData] = useState(false);
+  const [fetchSource, setFetchSource] = useState(null);
   const [fetchResult, setFetchResult] = useState(null);
+  const [allCountries, setAllCountries] = useState([]);
 
   const loadIncidents = async () => {
     setLoading(true);
@@ -51,10 +53,23 @@ export default function HistoricalIncidentsDashboard() {
 
   useEffect(() => { loadIncidents(); }, []);
 
-  const countries = useMemo(() => {
-    const set = new Set(incidents.map(i => i.country_code).filter(Boolean));
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const territories = await base44.entities.CountyTerritory.list("-created_date", 500);
+        const set = new Set(territories.map(t => t.country_code).filter(Boolean));
+        setAllCountries(Array.from(set).sort());
+      } catch (e) {
+        console.error("Error fetching countries:", e);
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  const allCountryOptions = useMemo(() => {
+    const set = new Set([...allCountries, ...incidents.map(i => i.country_code).filter(Boolean)]);
     return Array.from(set).sort();
-  }, [incidents]);
+  }, [allCountries, incidents]);
 
   const years = useMemo(() => {
     const set = new Set(incidents.map(i => i.start_date?.substring(0, 4)).filter(Boolean));
@@ -85,21 +100,39 @@ export default function HistoricalIncidentsDashboard() {
 
   const mappedIncidents = filtered.filter(i => i.latitude && i.longitude);
 
-  const handleFetchHistory = async (countryCode, admin1Name) => {
+  const handleFetchNIFC = async () => {
     setFetchingData(true);
+    setFetchSource("nifc");
     setFetchResult(null);
     try {
       const res = await base44.functions.invoke("fetchWildfireHistory", {
-        country_code: countryCode || "US",
-        admin1_name: admin1Name || null,
+        country_code: "US",
+        admin1_name: null,
         years_back: 10
       });
       setFetchResult(res.data);
       if (res.data?.success) await loadIncidents();
     } catch (e) {
-      setFetchResult({ error: e.response?.data?.error || e.message || "Failed to fetch" });
+      setFetchResult({ error: e.response?.data?.error || e.message || "Failed to fetch NIFC data" });
     } finally {
       setFetchingData(false);
+      setFetchSource(null);
+    }
+  };
+
+  const handleFetchEFFIS = async () => {
+    setFetchingData(true);
+    setFetchSource("effis");
+    setFetchResult(null);
+    try {
+      const res = await base44.functions.invoke("fetchEFFISHistory", {});
+      setFetchResult(res.data);
+      if (res.data?.success) await loadIncidents();
+    } catch (e) {
+      setFetchResult({ error: e.response?.data?.error || e.message || "Failed to fetch EFFIS data" });
+    } finally {
+      setFetchingData(false);
+      setFetchSource(null);
     }
   };
 
@@ -152,27 +185,20 @@ export default function HistoricalIncidentsDashboard() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleFetchHistory("US", null)}
+            onClick={handleFetchNIFC}
             disabled={fetchingData}
           >
-            {fetchingData ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
-            Fetch US Wildfire History (10yr)
+            {fetchingData && fetchSource === "nifc" ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
+            Pull NIFC Data (US)
           </Button>
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleFetchHistory("ES", null)}
+            onClick={handleFetchEFFIS}
             disabled={fetchingData}
           >
-            Fetch Spain Wildfire History
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleFetchHistory("AU", null)}
-            disabled={fetchingData}
-          >
-            Fetch Australia Wildfire History
+            {fetchingData && fetchSource === "effis" ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
+            Pull EFFIS Data (Europe/Global)
           </Button>
           {fetchResult && (
             <span className={`text-xs ${fetchResult.error ? "text-red-600" : "text-green-600"}`}>
@@ -193,7 +219,7 @@ export default function HistoricalIncidentsDashboard() {
           className="text-sm border border-border rounded px-2 py-1 bg-white"
         >
           <option value="all">All Countries</option>
-          {countries.map(c => <option key={c} value={c}>{c}</option>)}
+          {allCountryOptions.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
         <select
           value={filterYear}

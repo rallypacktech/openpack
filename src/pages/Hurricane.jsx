@@ -37,7 +37,7 @@ export default function Hurricane() {
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       <section className="relative min-h-[80vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1527482797697-8795b05a13b4?w=1800&q=85')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1629203328214-415e41c4aba8?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGh1cnJpY2FuZXxlbnwwfHwwfHx8MA%3D%3D')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Hurricane Evacuation Preparedness · Free · Global</p>
@@ -140,7 +140,7 @@ export default function Hurricane() {
       </section>
 
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1527482797697-8795b05a13b4?w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1629203328214-415e41c4aba8?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGh1cnJpY2FuZXxlbnwwfHwwfHx8MA%3D%3D')" }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">Start today — it takes 3 minutes</p>
           <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-none mb-8">
