@@ -21,7 +21,7 @@ export default [
     ...pluginJs.configs.recommended,
     ...pluginReact.configs.flat.recommended,
     languageOptions: {
-      globals: globals.browser,
+      globals: { ...globals.browser, pendo: "readonly" },
       parserOptions: {
         ecmaVersion: 2022,
         sourceType: "module",
