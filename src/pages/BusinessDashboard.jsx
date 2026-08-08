@@ -28,6 +28,9 @@ export default function BusinessDashboard() {
 
   useEffect(() => {
     loadAll();
+    // Auto-refresh active incident data every 12 hours
+    const interval = setInterval(loadAll, 12 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadAll = async () => {

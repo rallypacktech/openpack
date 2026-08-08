@@ -10,6 +10,7 @@ import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
 import AlertsPanel from "../components/admin/AlertsPanel";
 import GrantLOIWorkflow from "../components/admin/GrantLOIWorkflow";
 import CleanupPanel from "../components/admin/CleanupPanel";
+import AdminProducts from "./AdminProducts";
 
 export default function AdminMonitor() {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -50,7 +51,7 @@ export default function AdminMonitor() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -66,14 +67,14 @@ export default function AdminMonitor() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="bg-foreground text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">System Monitor</h1>
-              <p className="text-blue-100 mt-1">Live user activity and emergency status</p>
+              <h1 className="text-3xl font-bold font-heading">System Monitor</h1>
+              <p className="text-white/60 mt-1">Live user activity and emergency status</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
@@ -90,13 +91,16 @@ export default function AdminMonitor() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="users">
+        <Tabs defaultValue="incidents">
           <TabsList className="mb-6">
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="w-4 h-4" /> User Monitor
-            </TabsTrigger>
             <TabsTrigger value="incidents" className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4" /> Incidents
+            </TabsTrigger>
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <Flame className="w-4 h-4" /> Products
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="w-4 h-4" /> User Monitor
             </TabsTrigger>
             <TabsTrigger value="quiz" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" /> Quiz Results
@@ -118,6 +122,10 @@ export default function AdminMonitor() {
 
           <TabsContent value="incidents">
             <IncidentsPanel />
+          </TabsContent>
+
+          <TabsContent value="products">
+            <AdminProducts />
           </TabsContent>
 
           <TabsContent value="quiz">

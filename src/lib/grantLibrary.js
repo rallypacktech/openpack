@@ -120,6 +120,66 @@ export const GRANT_LIBRARY = [
       budget_summary: "$120K in AWS credits over 24 months: compute scaling (50%), data storage (30%), CDN and edge delivery (20%).",
       org_capacity: "Production alert pipeline with secure automations, webhook-validated endpoints, and a multi-database architecture already deployed on cloud infrastructure."
     }
+  },
+  {
+    grant_name: "XPRIZE Wildfire Detection Challenge",
+    funder_name: "XPRIZE Foundation",
+    grant_category: "emergency_tech",
+    grant_url: "https://www.xprize.org/prizes/wildfire",
+    amount_requested: 0,
+    priority: "high",
+    loi_sections: {
+      need: "Early wildfire detection saves lives and property, but current satellite-based detection has latency of hours. Sub-minute detection from ground-based sensors and AI is needed.",
+      approach: "RallyPack's multi-source wildfire alert platform (NASA FIRMS, NIFC, Copernicus EFFIS, global CAP feeds) can integrate XPRIZE-winning detection models to deliver sub-minute alerts to households in fire-prone regions.",
+      impact: "Reduce wildfire alert latency from hours to minutes for 200,000+ users across the US, EU, and Australia, enabling earlier evacuation and saving lives.",
+      budget_summary: "Competition prize + integration funding: detection model integration (40%), alert pipeline scaling (35%), field validation (25%).",
+      org_capacity: "Production alert platform with 20+ country wildfire database, multi-channel delivery (Telegram, email, Discord), and active county emergency management partnerships."
+    }
+  },
+  {
+    grant_name: "XPRIZE Carbon Removal (Track B)",
+    funder_name: "XPRIZE Foundation / Elon Musk Foundation",
+    grant_category: "community_resilience",
+    grant_url: "https://www.xprize.org/prizes/carbonremoval",
+    amount_requested: 0,
+    priority: "medium",
+    loi_sections: {
+      need: "Disaster preparedness platforms must minimize their own carbon footprint while scaling to serve millions of families during climate-driven emergencies.",
+      approach: "RallyPack's lean infrastructure and participation in Stripe Climate align with XPRIZE Carbon Removal goals — demonstrating that life-saving tech can be energy-efficient and carbon-negative.",
+      impact: "Scale to 1M users while maintaining carbon-negative operations through Stripe Climate contributions and energy-optimized architecture.",
+      budget_summary: "Recognition + carbon removal credits: infrastructure optimization (50%), carbon offset scaling (50%).",
+      org_capacity: "Lean PWA with lazy-loaded pages, optimized automation frequencies, Stripe Climate participation, and open-source MIT-licensed codebase auditable for energy efficiency."
+    }
+  },
+  {
+    grant_name: "XPRIZE Feed the Next Billion",
+    funder_name: "XPRIZE Foundation",
+    grant_category: "public_health_prep",
+    grant_url: "https://www.xprize.org/prizes/feednextbillion",
+    amount_requested: 0,
+    priority: "low",
+    loi_sections: {
+      need: "Emergency food security is a critical preparedness gap — families displaced by disasters need accurate ration calculations and supply tracking tailored to household composition including pets and livestock.",
+      approach: "RallyPack's emergency ration calculator and go-bag tracker provide household-specific food supply planning, integrated with first-aid and medical supply tracking.",
+      impact: "Improve emergency food preparedness for 50,000 households with accurate, household-specific ration calculations and expiration tracking.",
+      budget_summary: "Recognition + integration funding: ration calculator expansion (40%), multilingual food guides (30%), partner deployments (30%).",
+      org_capacity: "Household-size-aware supply tracking, species-specific preparedness (equine, livestock, infant), and first-aid kit monitoring with automated expiration reminders."
+    }
+  },
+  {
+    grant_name: "XPRIZE Rainforest",
+    funder_name: "XPRIZE Foundation",
+    grant_category: "emergency_tech",
+    grant_url: "https://www.xprize.org/prizes/rainforest",
+    amount_requested: 0,
+    priority: "low",
+    loi_sections: {
+      need: "Wildfire monitoring in tropical and rainforest regions lacks accessible, real-time citizen-facing alert tools that reach Indigenous and local communities.",
+      approach: "RallyPack's global CAP feed ingestion and multi-language alert delivery can extend to rainforest-adjacent communities vulnerable to wildfires and deforestation-driven disasters.",
+      impact: "Extend wildfire and disaster alert coverage to 10 rainforest-adjacent regions, serving 100,000 residents with localized, multilingual alerts.",
+      budget_summary: "Recognition + integration funding: CAP feed expansion (40%), multilingual alert delivery (35%), community partnerships (25%).",
+      org_capacity: "Global CAP alert ingestion pipeline, multi-channel delivery (Telegram, email, Discord), and country-aware emergency number directory already supporting 20+ countries."
+    }
   }
 ];
 

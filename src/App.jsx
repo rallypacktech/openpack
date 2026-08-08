@@ -42,7 +42,7 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
 // Pages that do NOT require authentication
 const PUBLIC_PAGES = new Set([
   'Home', 'PrivacyPolicy', 'TermsAndConditions', 'ConfidentialityAgreement',
-  'EULA', 'LearnMore', 'ReadinessQuiz', 'Shopping'
+  'EULA', 'ReadinessQuiz', 'Shopping'
 ]);
 
 const PageLoader = () => (
@@ -76,6 +76,8 @@ const AuthenticatedApp = () => {
       {/* /home redirect → Home lives at / */}
       <Route path="/home" element={<Navigate to="/" replace />} />
       <Route path="/Home" element={<Navigate to="/" replace />} />
+      <Route path="/LearnMore" element={<Navigate to="/" replace />} />
+      <Route path="/learnmore" element={<Navigate to="/" replace />} />
 
       {/* Public pages from pagesConfig */}
       {Object.entries(Pages)

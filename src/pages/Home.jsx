@@ -3,8 +3,9 @@ import { Link, Navigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { ClipboardList, ArrowRight, Heart, X, Github } from "lucide-react";
+import { ClipboardList, ArrowRight, Heart, X, Github, AlertTriangle, Users, Clock, MapPin, Home as HomeIcon, Backpack, Mountain, Shield, DollarSign, CheckCircle, CloudRain, Wind, Zap, Flame } from "lucide-react";
 import AudienceStories from "../components/home/AudienceStories";
+import CurrentSeasons from "../components/home/CurrentSeasons";
 import FeedCard from "../components/home/FeedCard";
 import FooterContactForm from "../components/FooterContactForm";
 
@@ -82,7 +83,7 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <section className="relative h-screen min-h-[640px] flex items-end">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=1800&q=85')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1619461129861-d0c1479c48b4?q=80&w=1376&auto=format&fit=crop')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/75" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Emergency Preparedness · Free · Open Source</p>
@@ -121,6 +122,9 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      {/* ── Current Seasonal Risks ── */}
+      <CurrentSeasons />
 
       {/* ── Story circles: audience onboarding ── */}
       <AudienceStories />
@@ -170,19 +174,81 @@ export default function Home() {
 
       {/* ── Stats ── */}
       <section className="bg-[#1C1C1A] text-white py-20">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10">
-          {[
-            { n: "72", unit: "hrs", label: "Before federal aid typically reaches a community after disaster" },
-            { n: "60%", unit: "", label: "Of Americans don't have emergency supplies for even 3 days" },
-            { n: "$1B+", unit: "", label: "In FEMA disaster assistance goes unclaimed every year" },
-          ].map(s => (
-            <div key={s.label} className="py-10 md:py-0 md:px-14 first:pl-0 last:pr-0">
-              <div className="font-serif text-6xl md:text-7xl font-bold text-[#D64A2E] leading-none mb-3">
-                {s.n}<span className="text-3xl">{s.unit}</span>
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3 text-center">The reality of being unprepared</p>
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-4 text-center leading-tight">These numbers are families.</h2>
+          <p className="text-center text-white/50 mb-12 max-w-2xl mx-auto text-sm leading-relaxed">
+            Statistics from FEMA, American Red Cross, and NOAA paint a clear picture of why preparation isn't optional — it's essential.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 mb-12">
+            {[
+              { n: "60%", unit: "", label: "Of Americans have no emergency plan", icon: AlertTriangle },
+              { n: "40%", unit: "", label: "Of families get separated during disasters", icon: Users },
+              { n: "75%", unit: "", label: "Don't know their local relief organizations", icon: MapPin },
+              { n: "72hrs", unit: "", label: "Before federal aid typically reaches a community", icon: Clock },
+              { n: "1 in 5", unit: "", label: "Families turned away from full shelters", icon: HomeIcon },
+              { n: "28", unit: "", label: "Billion-dollar disasters in the US (2023 record)", icon: AlertTriangle },
+            ].map(s => {
+              const Icon = s.icon;
+              return (
+                <div key={s.label} className="bg-[#1C1C1A] p-8 text-center">
+                  <Icon className="w-6 h-6 text-[#D64A2E] mx-auto mb-4" />
+                  <div className="font-serif text-4xl md:text-5xl font-bold text-white mb-2 leading-none">{s.n}<span className="text-2xl">{s.unit}</span></div>
+                  <p className="text-xs text-white/50 leading-snug max-w-[180px] mx-auto">{s.label}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="bg-white/5 p-10 text-center">
+            <DollarSign className="w-8 h-8 text-[#D64A2E] mx-auto mb-4" />
+            <div className="font-serif text-4xl md:text-5xl font-bold text-[#D64A2E] mb-2 leading-none">$5K–$15K</div>
+            <div className="font-sans font-semibold text-base mb-2 text-white">Average family cost per disaster</div>
+            <p className="text-sm text-white/50 max-w-lg mx-auto leading-relaxed">
+              The financial impact of being unprepared extends far beyond immediate needs — lost wages, temporary housing, and replacing essential items add up quickly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Preparedness Scenarios ── */}
+      <section className="bg-[#1C1C1A] text-white py-24 border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Be ready for any scenario</p>
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">The right preparation brings peace of mind.</h2>
+          <p className="text-white/55 max-w-2xl mb-16 text-sm leading-relaxed">
+            Whether you're sheltering at home, evacuating in an emergency, or heading into the wilderness, the right preparation keeps necessities within reach.
+          </p>
+          <div className="space-y-8">
+            {[
+              { title: "Shelter in Place", desc: "When disasters strike, you may need to stay home for days without power, water, or supplies. Being prepared means having the essentials on hand.", icon: HomeIcon, image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80", items: ["Water & food for 72+ hours", "First aid supplies", "Battery-powered radio", "Emergency lighting"] },
+              { title: "Evacuation Ready", desc: "In emergencies like wildfires or floods, every second counts. A packed go-bag means you can leave immediately with everything critical.", icon: Backpack, image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80", items: ["Documents & medications", "Change of clothes", "Cash & phone charger", "Pet supplies"] },
+              { title: "Outdoor Adventures", desc: "Whether it's a weekend camping trip or a day hike, being prepared for the unexpected enhances your experience and keeps you safe.", icon: Mountain, image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1200&q=80", items: ["Navigation tools", "Weather protection", "Emergency shelter", "Extra food & water"] },
+            ].map((scenario, i) => (
+              <div key={i} className="grid md:grid-cols-2 gap-0 bg-white/5">
+                <div className={`relative h-64 md:h-auto min-h-[280px] ${i % 2 === 0 ? 'order-1' : 'order-2 md:order-1'}`}>
+                  <img src={scenario.image} alt={scenario.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                </div>
+                <div className={`p-10 flex flex-col justify-center ${i % 2 === 0 ? 'order-2 md:order-2' : 'order-1 md:order-2'}`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 border border-[#D64A2E]/40 flex items-center justify-center">
+                      <scenario.icon className="w-5 h-5 text-[#D64A2E]" />
+                    </div>
+                    <h3 className="font-serif text-2xl font-bold text-white">{scenario.title}</h3>
+                  </div>
+                  <p className="text-white/55 mb-6 leading-relaxed text-sm">{scenario.desc}</p>
+                  <div className="space-y-2">
+                    <p className="font-sans font-semibold text-white/80 text-xs uppercase tracking-widest mb-3">Essential items</p>
+                    {scenario.items.map((item, j) => (
+                      <div key={j} className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#D64A2E] flex-shrink-0" />
+                        <span className="text-white/70 text-sm">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <p className="text-sm font-sans text-white/50 leading-snug max-w-[220px]">{s.label}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -228,7 +294,9 @@ export default function Home() {
             <span className="text-[#D8D2C6]">·</span>
             <a href="https://redrover.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">RedRover</a>
             <span className="text-[#D8D2C6]">·</span>
-            <a href="https://nationalanimalrescue.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">NARS</a>
+            <a href="https://www.narescue.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">NARS</a>
+            <span className="text-[#D8D2C6]">·</span>
+            <a href="https://www.oregonhumane.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#D64A2E] transition-colors">Oregon Humane Society</a>
           </div>
         </div>
       </section>
@@ -253,7 +321,7 @@ export default function Home() {
             </div>
             <div className="flex-shrink-0">
               <img
-                src="https://images.unsplash.com/photo-1602491453631-e2a5ad90a131?w=800&q=80"
+                src="https://images.unsplash.com/photo-1619461129861-d0c1479c48b4?q=80&w=1376&auto=format&fit=crop"
                 alt="Wildfire evacuation preparedness"
                 loading="lazy"
                 className="w-full md:w-80 h-64 object-cover"

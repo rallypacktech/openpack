@@ -65,6 +65,9 @@ export default function IncidentMap() {
 
   useEffect(() => {
     fetchLiveAlerts();
+    // Auto-refresh active incident data every 12 hours
+    const interval = setInterval(fetchLiveAlerts, 12 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchLiveAlerts = async () => {
@@ -115,7 +118,13 @@ export default function IncidentMap() {
       };
     });
 
-  const allIncidents = liveIncidents;
+  const allIncidents = liveIncidents.filter(incident => {
+    if (incident.type === "wildfire") return showOutlook;
+    if (incident.type === "flood") return showFloodOutlook;
+    if (incident.type === "hurricane") return showHurricaneOutlook;
+    if (incident.type === "tornado") return showTornadoOutlook;
+    return true;
+  });
 
   return (
     <div className="space-y-4">

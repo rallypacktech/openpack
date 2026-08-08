@@ -77,7 +77,6 @@ export default function Layout({ children, currentPageName }) {
 
   if (isAdmin) {
     allNavItems.push(
-      { name: "Products", page: "AdminProducts", icon: Package, requiresAuth: true },
       { name: "Monitor", page: "AdminMonitor", icon: Users, requiresAuth: true }
     );
   }
@@ -228,6 +227,24 @@ export default function Layout({ children, currentPageName }) {
                   <p className="text-muted-foreground text-sm font-sans">
                     Free, open-source emergency preparedness.
                   </p>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Preparedness</h3>
+                  <nav className="space-y-2" aria-label="Preparedness guides">
+                    <Link to="/wildfire" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire Prep</Link>
+                    <Link to="/hurricane" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Hurricane Prep</Link>
+                    <Link to="/flood" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Flood Prep</Link>
+                    <Link to="/tornado" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Tornado Prep</Link>
+                    <Link to="/equine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Equine Prep</Link>
+                    <Link to="/canine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Canine Prep</Link>
+                    <Link to="/feline" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Feline Prep</Link>
+                    <Link to="/infant" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Infant Prep</Link>
+                    <Link to="/avian" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Avian Prep</Link>
+                    <Link to="/reptile" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Reptile Prep</Link>
+                    <Link to="/livestock" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Livestock Prep</Link>
+                    <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">About Us</Link>
+                  </nav>
                 </div>
 
                 <div>

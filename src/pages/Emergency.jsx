@@ -136,18 +136,18 @@ export default function Emergency() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
       {/* Header */}
-      <div className="bg-blue-600 text-white">
+      <div className="bg-foreground text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-2xl font-bold">Emergency Resources & Mapping</h1>
-          <p className="text-blue-100 mt-1">
+          <h1 className="text-2xl font-bold font-heading">Emergency Resources & Mapping</h1>
+          <p className="text-white/60 mt-1">
             Find nearby shelters, report lost persons or pets, and access tailored disaster resources based on your location
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function Emergency() {
                 />
               </div>
             </div>
-            <Button onClick={handleUpdateLocation} className="w-full bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleUpdateLocation} className="w-full bg-primary hover:bg-primary/90">
               Update Location
             </Button>
           </CardContent>
@@ -262,7 +262,7 @@ export default function Emergency() {
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center gap-2 text-gray-600">
                           <Phone className="w-4 h-4 flex-shrink-0" />
-                          <a href={`tel:${resource.phone}`} className="hover:text-blue-600 underline">
+                          <a href={`tel:${resource.phone}`} className="hover:text-primary underline">
                             {resource.phone}
                           </a>
                         </div>
@@ -274,7 +274,7 @@ export default function Emergency() {
                               href={resource.website} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="hover:text-blue-600 underline truncate"
+                              className="hover:text-primary underline truncate"
                             >
                               Visit Website
                             </a>
@@ -324,7 +324,7 @@ export default function Emergency() {
 
             {sheltersLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : shelters.length === 0 ? (
               <Card>
@@ -357,7 +357,7 @@ export default function Emergency() {
                             <div>{shelter.address}</div>
                             <div>{shelter.city}, {shelter.state} {shelter.zip_code}</div>
                             {shelter.distance && (
-                              <div className="text-xs text-blue-600 mt-1">{shelter.distance} km away</div>
+                              <div className="text-xs text-primary mt-1">{shelter.distance} km away</div>
                             )}
                           </div>
                         </div>
@@ -385,7 +385,7 @@ export default function Emergency() {
                         {shelter.phone && (
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Phone className="w-4 h-4" />
-                            <a href={`tel:${shelter.phone}`} className="hover:text-blue-600 underline">
+                            <a href={`tel:${shelter.phone}`} className="hover:text-primary underline">
                               {shelter.phone}
                             </a>
                           </div>
@@ -431,7 +431,7 @@ export default function Emergency() {
               <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Lost Persons Registry</h3>
               <p className="text-gray-500 mb-4">Report or search for missing persons during emergencies</p>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-primary hover:bg-primary/90">
                 Report Missing Person
               </Button>
             </div>
@@ -442,7 +442,7 @@ export default function Emergency() {
               <PawPrint className="w-16 h-16 mx-auto mb-4 text-gray-300" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Lost Pets Registry</h3>
               <p className="text-gray-500 mb-4">Report or search for missing pets during emergencies</p>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-primary hover:bg-primary/90">
                 Report Missing Pet
               </Button>
             </div>

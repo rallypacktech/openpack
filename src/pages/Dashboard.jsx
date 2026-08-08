@@ -760,7 +760,7 @@ export default function Dashboard() {
                   <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
                     Why it's essential:
                   </h3>
-                  <ul className="text-sm text-gray-700 space-y-1">
+                  <ul className="text-sm text-muted-foreground space-y-1">
                     <li>
                       • Receive critical local weather and disaster alerts
                     </li>
@@ -769,7 +769,7 @@ export default function Dashboard() {
                   </ul>
                 </div>
 
-                <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+                <div className="p-6 bg-muted rounded-lg space-y-4">
                   <div>
                     <Label>Your Name</Label>
                     <Input
@@ -836,7 +836,7 @@ export default function Dashboard() {
                   <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
                     Why this matters:
                   </h3>
-                  <ul className="text-sm text-gray-700 space-y-1">
+                  <ul className="text-sm text-muted-foreground space-y-1">
                     <li>
                       • <strong>Share emergency plans:</strong> Family members
                       with emails can access your caches and meet spots
@@ -1004,7 +1004,7 @@ export default function Dashboard() {
                   <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
                     Why it's essential:
                   </h3>
-                  <ul className="text-sm text-gray-700 space-y-1">
+                  <ul className="text-sm text-muted-foreground space-y-1">
                     <li>
                       • <strong>Cell service goes down</strong> in
                       emergencies—you can't rely on phones
@@ -1071,7 +1071,7 @@ export default function Dashboard() {
                     <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
                       Why it's essential:
                     </h3>
-                    <ul className="text-sm text-gray-700 space-y-1">
+                    <ul className="text-sm text-muted-foreground space-y-1">
                       <li>
                         • <strong>Many shelters require</strong> proof of
                         medication and pet supplies
