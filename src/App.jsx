@@ -68,6 +68,10 @@ const AuthenticatedApp = () => {
       <Route path="/Feedback" element={<Feedback />} />
       <Route path="/Donate" element={<LayoutWrapper currentPageName="Donate"><Donate /></LayoutWrapper>} />
 
+      {/* /home redirect → Home lives at / */}
+      <Route path="/home" element={<Navigate to="/" replace />} />
+      <Route path="/Home" element={<Navigate to="/" replace />} />
+
       {/* Public pages from pagesConfig */}
       {Object.entries(Pages)
         .filter(([name]) => PUBLIC_PAGES.has(name))
