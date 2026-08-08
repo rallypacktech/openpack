@@ -4,44 +4,28 @@ import { ClipboardList, ArrowRight, Flame, MapPin, Phone, AlertTriangle, Wind, D
 
 const REGIONS = [
   {
-    region: "United States & Canada",
-    flag: "🇺🇸",
+    region: "Americas",
+    flag: "🌎",
     emergency: "911",
-    fire_specific: "Fire emergencies: 911",
-    hotspots: "California · Oregon · Washington · Utah · British Columbia · Alberta",
-    note: "Western US and Canadian provinces face record-breaking wildfire seasons. CalFire and Natural Resources Canada track thousands of incidents annually.",
+    fire_specific: "911 (US, Canada, Mexico) · 123 (Colombia, Chile) · 911 (Argentina, Brazil)",
+    hotspots: "California · Oregon · Washington · Utah · British Columbia · Alberta · Mexico · Brazil · Chile · Argentina · Colombia",
+    note: "North, Central, and South America face record-breaking wildfire seasons. CalFire, Natural Resources Canada, and CONAFOR (Mexico) track thousands of incidents annually.",
   },
   {
-    region: "Australia",
-    flag: "🇦🇺",
+    region: "Australia & Oceania",
+    flag: "🌏",
     emergency: "000",
-    fire_specific: "Bushfire info: 1800 679 737",
-    hotspots: "New South Wales · Victoria · Queensland · Western Australia",
+    fire_specific: "Australia: 000 · New Zealand: 111 · Bushfire info AU: 1800 679 737",
+    hotspots: "New South Wales · Victoria · Queensland · Western Australia · New Zealand",
     note: "Bushfire seasons intensify during Southern Hemisphere summer. The Rural Fire Service issues warnings and Total Fire Bans.",
   },
   {
-    region: "Spain",
-    flag: "🇪🇸",
+    region: "Eastern Europe & Mediterranean",
+    flag: "🌍",
     emergency: "112",
-    fire_specific: "Emergencias 112 · INFO INCENDIOS",
-    hotspots: "Andalucía · Castilla y León · Galicia · Comunidad Valenciana",
-    note: "Los incendios forestales son una amenaza grave durante los meses secos de verano. Protección Civil emite alertas a través del 112.",
-  },
-  {
-    region: "France",
-    flag: "🇫🇷",
-    emergency: "112",
-    fire_specific: "Pompiers: 18 · SAMU: 15 · Police: 17",
-    hotspots: "Provence-Alpes-Côte d'Azur · Occitanie · Nouvelle-Aquitaine · Corse",
-    note: "Les feux de forêt ravagent le sud de la France chaque été. La sécurité civile et les pompiers interviennent sur tous les incendies.",
-  },
-  {
-    region: "Eastern Europe",
-    flag: "🇪🇺",
-    emergency: "112",
-    fire_specific: "EU-wide emergency: 112",
-    hotspots: "Greece · Bulgaria · Romania · Croatia · Türkiye",
-    note: "Southeastern Europe faces severe wildfire seasons worsened by heatwaves. Each country routes civil protection alerts through 112.",
+    fire_specific: "EU-wide emergency: 112 · Greece: 112 · Türkiye: 112",
+    hotspots: "Greece · Bulgaria · Romania · Croatia · Türkiye · Portugal · Italy · Cyprus",
+    note: "Southern and Eastern Europe face severe wildfire seasons worsened by heatwaves. Each country routes civil protection alerts through 112.",
   },
 ];
 
@@ -63,7 +47,7 @@ export default function Wildfire() {
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       <section className="relative min-h-[80vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1602491453631-e2a5ad90a131?w=1800&q=85')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1619461129861-d0c1479c48b4?q=80&w=1376&auto=format&fit=crop')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Wildfire Evacuation Preparedness · Free · Global</p>
@@ -167,7 +151,7 @@ export default function Wildfire() {
       </section>
 
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1602491453631-e2a5ad90a131?w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1692364221415-654b20e6d1d2?w=900&auto=format&fit=crop&q=60')" }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">Start today — it takes 3 minutes</p>
           <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-none mb-8">

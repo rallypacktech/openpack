@@ -252,11 +252,20 @@ export default function Layout({ children, currentPageName }) {
                   <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Follow Us</h3>
                   <div className="flex items-center gap-4 mt-1">
                     <a href="https://instagram.com/rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Instagram @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
-                      {/* Instagram icon */}
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                         <circle cx="12" cy="12" r="4"/>
                         <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </a>
+                    <a href="https://facebook.com/rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Facebook @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9.198 21.5h4v-8.01h3.604l.396-3.98h-4V7.5a1 1 0 0 1 1-1h3v-4h-3a5 5 0 0 0-5 5v2.01h-2l-.396 3.98h2.396v8.01Z"/>
+                      </svg>
+                    </a>
+                    <a href="https://threads.net/@rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Threads @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16.3 11.3c-.1-.1-.2-.1-.3-.2-.2-2.3-1.4-3.6-3.5-3.7h-.3c-1.2 0-2.3.5-2.9 1.4l1.1.8c.5-.7 1.2-.8 1.8-.8h.2c1.4.1 2 .9 2.1 2.3-.6-.1-1.2-.2-1.9-.1-2 .1-3.3 1.3-3.2 2.9 0 .8.4 1.5 1.1 2 .6.4 1.4.6 2.2.5 1-.1 1.8-.6 2.3-1.3.5-.7.7-1.5.7-2.6.7.4 1.2.9 1.5 1.6.5 1.1.6 2.9-.9 4.4-1.3 1.3-2.9 1.9-5.3 1.9-2.6 0-4.6-.8-5.9-2.4C4.4 16 3.8 13.7 3.8 11c0-2.7.6-5 1.9-6.6C7 2.8 9 2 11.6 2c2.7 0 4.7.8 6 2.4.6.8 1.1 1.7 1.4 2.9l1.5-.4c-.3-1.4-1-2.6-1.7-3.5C17.1 1.3 14.7.4 11.6.4h-.1C8.5.4 6.2 1.4 4.5 3.4 3 5.3 2.2 7.9 2.2 11c0 3.1.8 5.7 2.3 7.6 1.7 2 4 3 6.9 3h.1c2.7 0 4.7-.7 6.3-2.3 2.1-2 2-4.6 1.3-6.1-.5-1.2-1.5-2-2.8-2.5-.1 0-.2-.1-.3-.1zM10.8 15c-.4 0-.8-.2-1-.4-.2-.2-.3-.4-.3-.7 0-.5.4-.8 1.1-.9h.4c.5 0 1 .1 1.5.2-.2 1.4-.9 1.8-1.7 1.8z"/>
                       </svg>
                     </a>
                   </div>

@@ -11,7 +11,7 @@ export default function About() {
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=1800&q=85')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://media.base44.com/images/public/69dc170f0871ac017d79debb/aa879fed8_StaffLoraMcGrath_Peanut_0430_bySonyaSellers.jpg')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/75" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Our Story · RallyPack</p>
@@ -107,7 +107,7 @@ export default function About() {
           <div className="flex flex-col md:flex-row gap-12 items-start">
             <div className="flex-shrink-0">
               <img
-                src="/StaffLoraMcGrath.jpg"
+                src="https://media.base44.com/images/public/69dc170f0871ac017d79debb/aa879fed8_StaffLoraMcGrath_Peanut_0430_bySonyaSellers.jpg"
                 alt="Llora McGrath, Founder of RallyPack"
                 loading="lazy"
                 className="w-48 h-48 object-cover bg-[#D8D2C6]"
