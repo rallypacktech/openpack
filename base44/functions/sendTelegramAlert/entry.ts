@@ -9,8 +9,10 @@ Deno.serve(async (req) => {
     // Internal/automated calls pass the AUTOMATION_SECRET; otherwise the caller
     // must be authenticated and may only send to themselves (useful for testing).
     let targetEmail = user_email;
+    let isInternalCall = false;
     if (secret && secret === Deno.env.get("AUTOMATION_SECRET")) {
       // internal call — use provided user_email
+      isInternalCall = true;
     } else {
       const user = await base44.auth.me();
       if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -36,6 +38,12 @@ Deno.serve(async (req) => {
         return Response.json({ delivered: false, reason: 'no_profile' });
       }
       telegramChatId = profiles[0].telegram_chat_id;
+    } else if (!isInternalCall) {
+      // Regular user supplied a chat_id — verify it matches their own connected Telegram account
+      const profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by: targetEmail });
+      if (profiles.length === 0 || profiles[0].telegram_chat_id !== chat_id) {
+        return Response.json({ error: 'Unauthorized: chat_id does not match your connected Telegram account' }, { status: 403 });
+      }
     }
 
     // If the user hasn't connected Telegram, record a failed delivery attempt and exit

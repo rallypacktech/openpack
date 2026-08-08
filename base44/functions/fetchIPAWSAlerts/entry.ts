@@ -86,6 +86,18 @@ const DEFAULT_RADII = { wildfire: 80, severe_weather: 120, hurricane: 300, torna
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+
+    // Auth: require AUTOMATION_SECRET (scheduled automations) or authenticated admin
+    const automationSecret = Deno.env.get("AUTOMATION_SECRET");
+    const headerSecret = req.headers.get("x-automation-secret") || req.headers.get("automation-secret");
+    if (!(headerSecret && automationSecret && headerSecret === automationSecret)) {
+      let user;
+      try { user = await base44.auth.me(); } catch (_) { user = null; }
+      if (!user || user.role !== 'admin') {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
     const sr = base44.asServiceRole;
 
     // 1. Load all user profiles

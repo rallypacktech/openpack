@@ -101,7 +101,12 @@ export default function CommunityOneSheet({ organizationName }) {
   );
 }
 
+function escapeHtml(text) {
+  return (text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function buildOneSheetHTML(stateName, disaster, emergencyNum, orgName) {
+  const safeOrgName = escapeHtml(orgName);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -212,7 +217,7 @@ function buildOneSheetHTML(stateName, disaster, emergencyNum, orgName) {
   <div>
     <p style="font-size:0.78rem;color:#555;">Questions? Contact us: <strong>beta@rallypack.org</strong></p>
     <p style="font-size:0.78rem;color:#555;">Learn more: <strong>rallypack.org</strong></p>
-    ${orgName ? `<p style="font-size:0.72rem;color:#888;margin-top:4px;">Shared by: ${orgName}</p>` : ""}
+    ${safeOrgName ? `<p style="font-size:0.72rem;color:#888;margin-top:4px;">Shared by: ${safeOrgName}</p>` : ""}
   </div>
   <div style="text-align:right;">
     <p style="font-size:1.3rem;font-weight:800;letter-spacing:-0.02em;">RallyPack</p>
