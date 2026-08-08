@@ -19,6 +19,10 @@ const AUDIENCE_LABELS = {
   avian: 'Avian',
   reptile: 'Reptile',
   livestock: 'Livestock',
+  wildfire: 'Wildfire',
+  flood: 'Flood',
+  hurricane: 'Hurricane',
+  tornado: 'Tornado',
 };
 
 export default function BusinessReferralsPanel() {
@@ -303,6 +307,10 @@ export default function BusinessReferralsPanel() {
                         <SelectItem value="avian">Avian</SelectItem>
                         <SelectItem value="reptile">Reptile</SelectItem>
                         <SelectItem value="livestock">Livestock</SelectItem>
+                        <SelectItem value="wildfire">Wildfire</SelectItem>
+                        <SelectItem value="flood">Flood</SelectItem>
+                        <SelectItem value="hurricane">Hurricane</SelectItem>
+                        <SelectItem value="tornado">Tornado</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select

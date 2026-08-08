@@ -23,6 +23,10 @@ const AUDIENCE_OPTIONS = [
   { value: "avian", label: "Avian / Birds", path: "/avian" },
   { value: "reptile", label: "Reptiles", path: "/reptile" },
   { value: "livestock", label: "Livestock", path: "/livestock" },
+  { value: "wildfire", label: "Wildfire", path: "/wildfire" },
+  { value: "flood", label: "Flood", path: "/flood" },
+  { value: "hurricane", label: "Hurricane", path: "/hurricane" },
+  { value: "tornado", label: "Tornado", path: "/tornado" },
 ];
 
 export default function AdminReferralForm({ onSuccess, onCancel }) {

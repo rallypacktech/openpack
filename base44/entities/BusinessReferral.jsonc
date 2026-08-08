@@ -36,7 +36,11 @@
         "infant",
         "avian",
         "reptile",
-        "livestock"
+        "livestock",
+        "wildfire",
+        "flood",
+        "hurricane",
+        "tornado"
       ],
       "default": "general",
       "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page"
