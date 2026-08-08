@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Mail, Building2, Clock, RefreshCw, Loader2, Send } from "lucide-react";
+import { Plus, Mail, Building2, Clock, RefreshCw, Loader2, Send, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import AdminReferralForm from "./AdminReferralForm";
 import EmailTemplatesEditor from "./EmailTemplatesEditor";
@@ -28,7 +29,7 @@ export default function BusinessReferralsPanel() {
 
   const loadReferrals = useCallback(async () => {
     try {
-      const data = await base44.entities.BusinessReferral.list('-created_date', 100);
+      const data = await base44.asServiceRole.entities.BusinessReferral.list('-created_date', 5000);
       setReferrals(data);
     } catch (error) {
       console.error("Error loading referrals:", error);
@@ -40,6 +41,10 @@ export default function BusinessReferralsPanel() {
   useEffect(() => {
     loadReferrals();
   }, [loadReferrals]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleStatusChange = async (referralId, newStatus) => {
     try {
@@ -82,6 +87,9 @@ export default function BusinessReferralsPanel() {
   };
 
   const [resendingId, setResendingId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   const handleResend = async (referralId) => {
     setResendingId(referralId);
@@ -116,6 +124,21 @@ export default function BusinessReferralsPanel() {
   const pendingCount = referrals.filter(r => r.status === 'pending').length;
   const contactedCount = referrals.filter(r => r.status === 'contacted').length;
   const convertedCount = referrals.filter(r => r.status === 'converted').length;
+
+  const filteredResults = useMemo(() => {
+    if (!searchQuery.trim()) return referrals;
+    const q = searchQuery.toLowerCase();
+    return referrals.filter(r =>
+      (r.organization_name || '').toLowerCase().includes(q) ||
+      (r.referee_email || '').toLowerCase().includes(q) ||
+      (r.referee_name || '').toLowerCase().includes(q) ||
+      (r.referrer_name || '').toLowerCase().includes(q) ||
+      (r.referrer_email || '').toLowerCase().includes(q)
+    );
+  }, [referrals, searchQuery]);
+
+  const totalPages = Math.ceil(filteredResults.length / PAGE_SIZE);
+  const paginatedResults = filteredResults.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <div className="space-y-6">
@@ -171,6 +194,21 @@ export default function BusinessReferralsPanel() {
         </Card>
       </div>
 
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name, email, or organization..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {filteredResults.length} result{filteredResults.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
       {showForm && (
         <Card>
           <CardHeader>
@@ -189,17 +227,17 @@ export default function BusinessReferralsPanel() {
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
-      ) : referrals.length === 0 ? (
+      ) : filteredResults.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
             <Mail className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p>No business referrals yet.</p>
-            <p className="text-sm mt-1">Click "Refer a Business" to send your first invite.</p>
+            <p>{searchQuery ? "No referrals match your search." : "No business referrals yet."}</p>
+            <p className="text-sm mt-1">{searchQuery ? "Try a different search term." : 'Click "Refer a Business" to send your first invite.'}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-3">
-          {referrals.map((ref) => (
+          {paginatedResults.map((ref) => (
             <Card key={ref.id}>
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -287,6 +325,32 @@ export default function BusinessReferralsPanel() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4">
+          <p className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
         </div>
       )}
         </TabsContent>
