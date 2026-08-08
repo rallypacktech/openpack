@@ -229,7 +229,7 @@ export default function Layout({ children, currentPageName }) {
                   </p>
                 </div>
 
-                <div>
+                <div className="pt-8 md:pt-0 border-t md:border-t-0 border-border">
                   <nav className="space-y-2" aria-label="Climate resources">
                     <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2">Climate</h3>
                     <Link to="/wildfire" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire</Link>
@@ -247,7 +247,7 @@ export default function Layout({ children, currentPageName }) {
                   </nav>
                 </div>
 
-                <div>
+                <div className="pt-8 md:pt-0 border-t md:border-t-0 border-border">
                   <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3">Legal</h3>
                   <nav className="space-y-2" aria-label="Legal navigation">
                     <Link to={createPageUrl("PrivacyPolicy")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Privacy Policy</Link>
