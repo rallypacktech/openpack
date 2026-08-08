@@ -107,6 +107,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Prominent quiz CTA strip ── */}
+      <section className="bg-[#D64A2E] py-5 md:py-6">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <p className="font-sans text-sm md:text-base text-white font-medium">
+            <ClipboardList className="w-4 h-4 inline mr-2 -mt-0.5" />
+            Not sure where you stand? Take the <strong>free 3-minute readiness quiz</strong> — no account needed.
+          </p>
+          <Link to={createPageUrl("ReadinessQuiz")} className="flex-shrink-0">
+            <button className="inline-flex items-center gap-2 bg-white text-[#D64A2E] font-sans font-semibold px-6 py-3 rounded-none hover:bg-[#FFF8E7] transition-colors text-xs tracking-widest uppercase whitespace-nowrap">
+              Start the quiz <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </Link>
+        </div>
+      </section>
+
       {/* ── Story circles: audience onboarding ── */}
       <AudienceStories />
 
@@ -218,6 +233,36 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Wildfire SEO section ── */}
+      <section className="bg-[#EDE7DC] border-y border-[#D8D2C6] py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Wildfire season is here</p>
+              <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-6 leading-tight">
+                In wildfire country,<br />you get hours — not days.
+              </h2>
+              <p className="text-sm text-[#1C1C1A]/60 leading-relaxed mb-8 max-w-lg">
+                Whether you're in California, Oregon, Washington, Utah, Spain, France, Australia, or Eastern Europe, RallyPack's free wildfire evacuation checklist covers defensible space, go-bags, two-route planning, and emergency numbers for every region.
+              </p>
+              <Link to="/wildfire">
+                <button className="inline-flex items-center gap-3 bg-[#1C1C1A] text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-[#2a2a25] transition-colors text-xs tracking-widest uppercase">
+                  Wildfire preparedness guide <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
+            </div>
+            <div className="flex-shrink-0">
+              <img
+                src="https://images.unsplash.com/photo-1602491453631-e2a5ad90a131?w=800&q=80"
+                alt="Wildfire evacuation preparedness"
+                loading="lazy"
+                className="w-full md:w-80 h-64 object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Final CTA ── */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
         <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80" alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-20" />
@@ -246,6 +291,15 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Sticky quiz bar ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#1C1C1A]/95 backdrop-blur-sm border-t border-[#D64A2E]/30 px-4 py-3 md:hidden">
+        <Link to={createPageUrl("ReadinessQuiz")}>
+          <button className="w-full inline-flex items-center justify-center gap-2 bg-[#D64A2E] text-white font-sans font-semibold px-5 py-3 rounded-none text-xs tracking-widest uppercase">
+            <ClipboardList className="w-4 h-4" /> Take the free quiz
+          </button>
+        </Link>
+      </div>
+
       {/* ── Footer ── */}
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-16">
@@ -260,6 +314,8 @@ export default function Home() {
               <p className="text-[10px] uppercase tracking-[0.25em] font-sans font-semibold text-white/25 mb-4">Tools</p>
               <div className="flex flex-col gap-3 text-sm font-sans">
                 <Link to={createPageUrl("ReadinessQuiz")} className="hover:text-white transition-colors">Readiness Quiz</Link>
+                <Link to="/wildfire" className="hover:text-white transition-colors">Wildfire Preparedness</Link>
+                <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
                 <Link to={createPageUrl("Resources")} className="hover:text-white transition-colors">Resources</Link>
                 <Link to={createPageUrl("Dashboard")} className="hover:text-white transition-colors">My Plan</Link>
               </div>
