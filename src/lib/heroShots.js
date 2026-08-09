@@ -80,4 +80,46 @@ export const HERO_SHOTS = [
     default_url:
       "https://media.base44.com/images/public/69dc170f0871ac017d79debb/aa879fed8_StaffLoraMcGrath_Peanut_0430_bySonyaSellers.jpg",
   },
+  {
+    page_key: "wildfire_cta",
+    label: "Wildfire — closing background",
+    default_url:
+      "https://images.unsplash.com/photo-1692364221415-654b20e6d1d2?w=900&auto=format&fit=crop&q=60",
+  },
+  {
+    page_key: "flood_cta",
+    label: "Flood — closing background",
+    default_url:
+      "https://images.unsplash.com/photo-1568438350562-2cae6d394ad0?w=1600&q=80",
+  },
+  {
+    page_key: "canine_editorial",
+    label: "Canine — editorial background",
+    default_url:
+      "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1600&q=80",
+  },
+  {
+    page_key: "feline_editorial",
+    label: "Feline — editorial background",
+    default_url:
+      "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=1600&q=80",
+  },
+  {
+    page_key: "infant_editorial",
+    label: "Infant — editorial background",
+    default_url:
+      "https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=1600&q=80",
+  },
+  {
+    page_key: "avian_editorial",
+    label: "Avian — editorial background",
+    default_url:
+      "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1600&q=80",
+  },
+  {
+    page_key: "livestock_cta",
+    label: "Livestock — closing background",
+    default_url:
+      "https://images.unsplash.com/photo-1605000797489-7b29f30f5d9b?w=1600&q=80",
+  },
 ];

@@ -99,8 +99,8 @@ export default function HeroShotsPanel() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Override the hero background image for the home page and each landing
-        page. Reset to restore the default. Changes appear immediately on the
+        Override the stock background images for the home page and landing
+        pages. Reset to restore the default. Changes appear immediately on the
         live pages.
       </p>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

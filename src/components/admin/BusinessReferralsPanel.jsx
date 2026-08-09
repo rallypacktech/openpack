@@ -33,6 +33,7 @@ export default function BusinessReferralsPanel() {
   const [resendingId, setResendingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("pending");
   const PAGE_SIZE = 20;
 
   const loadReferrals = useCallback(async () => {
@@ -52,7 +53,7 @@ export default function BusinessReferralsPanel() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, statusFilter]);
 
   const handleStatusChange = async (referralId, newStatus) => {
     try {
@@ -129,16 +130,19 @@ export default function BusinessReferralsPanel() {
   const convertedCount = referrals.filter(r => r.status === 'converted').length;
 
   const filteredResults = useMemo(() => {
-    if (!searchQuery.trim()) return referrals;
-    const q = searchQuery.toLowerCase();
-    return referrals.filter(r =>
-      (r.organization_name || '').toLowerCase().includes(q) ||
-      (r.referee_email || '').toLowerCase().includes(q) ||
-      (r.referee_name || '').toLowerCase().includes(q) ||
-      (r.referrer_name || '').toLowerCase().includes(q) ||
-      (r.referrer_email || '').toLowerCase().includes(q)
-    );
-  }, [referrals, searchQuery]);
+    let list = statusFilter === "all" ? referrals : referrals.filter(r => r.status === statusFilter);
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(r =>
+        (r.organization_name || '').toLowerCase().includes(q) ||
+        (r.referee_email || '').toLowerCase().includes(q) ||
+        (r.referee_name || '').toLowerCase().includes(q) ||
+        (r.referrer_name || '').toLowerCase().includes(q) ||
+        (r.referrer_email || '').toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [referrals, searchQuery, statusFilter]);
 
   const totalPages = Math.ceil(filteredResults.length / PAGE_SIZE);
   const paginatedResults = filteredResults.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -195,6 +199,28 @@ export default function BusinessReferralsPanel() {
             <p className="text-2xl font-bold text-green-700">{convertedCount}</p>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex items-center gap-2 flex-wrap">
+        {[
+          { key: "pending", label: "Pending" },
+          { key: "contacted", label: "Contacted" },
+          { key: "converted", label: "Converted" },
+          { key: "archived", label: "Archived" },
+          { key: "all", label: "All" },
+        ].map((s) => (
+          <button
+            key={s.key}
+            onClick={() => setStatusFilter(s.key)}
+            className={`px-3 py-1.5 text-xs font-sans font-semibold rounded-md transition-colors border ${
+              statusFilter === s.key
+                ? "bg-foreground text-background border-foreground"
+                : "bg-card text-muted-foreground border-border hover:text-foreground"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
       </div>
 
       <div className="flex items-center gap-2">

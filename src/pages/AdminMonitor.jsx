@@ -120,7 +120,7 @@ export default function AdminMonitor() {
               <Sparkles className="w-4 h-4" /> Cleanup
             </TabsTrigger>
             <TabsTrigger value="heroshots" className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" /> Hero Shots
+              <ImageIcon className="w-4 h-4" /> Stock Images
             </TabsTrigger>
           </TabsList>
 

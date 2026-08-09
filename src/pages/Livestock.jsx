@@ -24,6 +24,7 @@ export default function Livestock() {
   }, []);
 
   const heroUrl = useHeroShot("livestock");
+  const ctaUrl = useHeroShot("livestock_cta");
 
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
@@ -186,7 +187,7 @@ export default function Livestock() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605000797489-7b29f30f5d9b?w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: `url('${ctaUrl}')` }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">Start today — it takes 10 minutes</p>
           <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-none mb-8">

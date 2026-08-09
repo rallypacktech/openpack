@@ -18,6 +18,7 @@ export default function Canine() {
   }, []);
 
   const heroUrl = useHeroShot("canine");
+  const editorialUrl = useHeroShot("canine_editorial");
 
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
@@ -93,7 +94,7 @@ export default function Canine() {
 
       {/* Editorial */}
       <section className="relative h-[50vh] min-h-[340px] overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1600&q=80')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${editorialUrl}')` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1C1C1A]/80 to-transparent" />
         <div className="relative h-full flex items-center max-w-6xl mx-auto px-6">
           <div className="max-w-sm">

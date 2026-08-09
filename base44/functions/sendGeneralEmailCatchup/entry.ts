@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
         // Find referrals that haven't received the general email yet
         const allReferrals = await base44.asServiceRole.entities.BusinessReferral.filter({});
         const needsGeneral = allReferrals.filter(r =>
-            !r.general_email_sent && r.status !== 'archived' && r.referee_email
+            !r.general_email_sent && r.status !== 'archived' && r.referee_email && !r.bounced
         );
 
         if (needsGeneral.length === 0) {
@@ -243,6 +243,7 @@ Deno.serve(async (req) => {
             } catch (e) {
                 failed++;
                 errors.push({ email, error: e.message });
+                await base44.asServiceRole.entities.BusinessReferral.update(r.id, { bounced: true }).catch(() => {});
             }
         }
 

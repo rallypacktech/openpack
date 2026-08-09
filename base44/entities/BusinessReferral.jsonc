@@ -65,6 +65,11 @@
       "type": "boolean",
       "default": false,
       "description": "Whether the general (business) follow-up email has been sent to this referral"
+    },
+    "bounced": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether email delivery to this referral bounced \u2014 flagged for cleanup so it stops triggering follow-up messages"
     }
   },
   "required": [

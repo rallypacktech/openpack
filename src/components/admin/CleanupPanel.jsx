@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, GitCompare, Unlink, Database } from "lucide-react";
+import { Sparkles, GitCompare, Unlink, Database, MailX } from "lucide-react";
 import CauseCleanupPanel from "./CauseCleanupPanel";
 import IncidentDiscrepancies from "./IncidentDiscrepancies";
 import OrphanedDataPanel from "./OrphanedDataPanel";
 import DeletionQueuePanel from "./DeletionQueuePanel";
+import BouncedReferralsPanel from "./BouncedReferralsPanel";
 
 export default function CleanupPanel() {
   const [subTab, setSubTab] = useState("causes");
@@ -24,6 +25,9 @@ export default function CleanupPanel() {
         <TabsTrigger value="deletion-queue" className="flex items-center gap-2">
           <Database className="w-4 h-4" /> Deletion Queue
         </TabsTrigger>
+        <TabsTrigger value="bounced" className="flex items-center gap-2">
+          <MailX className="w-4 h-4" /> Bounced Referrals
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="causes" className="mt-4">
@@ -40,6 +44,10 @@ export default function CleanupPanel() {
 
       <TabsContent value="deletion-queue" className="mt-4">
         <DeletionQueuePanel />
+      </TabsContent>
+
+      <TabsContent value="bounced" className="mt-4">
+        <BouncedReferralsPanel />
       </TabsContent>
     </Tabs>
   );

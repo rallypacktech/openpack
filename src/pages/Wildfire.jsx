@@ -45,6 +45,7 @@ export default function Wildfire() {
   }, []);
 
   const heroUrl = useHeroShot("wildfire");
+  const ctaUrl = useHeroShot("wildfire_cta");
 
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
@@ -154,7 +155,7 @@ export default function Wildfire() {
       </section>
 
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1692364221415-654b20e6d1d2?w=900&auto=format&fit=crop&q=60')" }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: `url('${ctaUrl}')` }} />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">Start today — it takes 3 minutes</p>
           <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-none mb-8">
