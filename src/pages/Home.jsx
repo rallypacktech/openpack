@@ -13,6 +13,14 @@ export default function Home() {
   const [homeRedirect, setHomeRedirect] = useState(null);
   const [donationProgress, setDonationProgress] = useState(null);
   const heroUrl = useHeroShot("home");
+  const wildfireImg = useHeroShot("home_wildfire");
+  const petsImg = useHeroShot("home_pets");
+  const planningImg = useHeroShot("home_planning");
+  const shelterImg = useHeroShot("home_scenario_shelter");
+  const evacImg = useHeroShot("home_scenario_evac");
+  const outdoorImg = useHeroShot("home_scenario_outdoor");
+  const communityImg = useHeroShot("home_community");
+  const finalCtaImg = useHeroShot("home_final_cta");
 
   useEffect(() => {
     setSupportBannerDismissed(sessionStorage.getItem("supportBannerDismissed") === "true");
@@ -158,7 +166,7 @@ export default function Home() {
             </div>
           </div>
           <div className="relative min-h-[360px] md:min-h-0">
-            <img src="https://images.unsplash.com/photo-1661177408809-4184b3b65f2c?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Wildfire approaching homes" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={wildfireImg} alt="Wildfire approaching homes" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#F0EBE0]/40 to-transparent" />
           </div>
         </div>
@@ -238,7 +246,7 @@ export default function Home() {
       {/* ── Every plan includes them: pets & animals ── */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="relative min-h-[440px]">
-          <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200&q=80" alt="Family with dog during evacuation" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <img src={petsImg} alt="Family with dog during evacuation" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-[#1C1C1A]/40" />
         </div>
         <div className="bg-[#F0EBE0] px-8 md:px-16 py-16 md:py-20 flex flex-col justify-center">
@@ -281,7 +289,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="relative min-h-[380px] order-1 md:order-2">
-          <img src="https://images.unsplash.com/photo-1519750157634-b6d493a0f77c?w=1600&q=80" alt="Family emergency planning" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <img src={planningImg} alt="Family emergency planning" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
         </div>
       </section>
 
@@ -289,7 +297,7 @@ export default function Home() {
       {!user && (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-0">
           <div className="relative min-h-[380px]">
-            <img src="https://images.unsplash.com/photo-1661177408809-4184b3b65f2c?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Emergency planning app" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={wildfireImg} alt="Emergency planning app" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
           </div>
           <div className="bg-[#1C1C1A] text-white px-8 md:px-16 py-16 md:py-20 flex flex-col justify-center">
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-4">Free account</p>
@@ -311,9 +319,9 @@ export default function Home() {
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-16 leading-tight">The right plan brings peace of mind.</h2>
           <div className="space-y-0">
             {[
-              { title: "Shelter in Place", desc: "When disasters strike, you may need to stay home for days without power, water, or supplies. Being prepared means having the essentials on hand.", icon: HomeIcon, image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80", items: ["Water & food for 72+ hours", "First aid supplies", "Battery-powered radio", "Emergency lighting"] },
-              { title: "Evacuation Ready", desc: "In emergencies like wildfires or floods, every second counts. A packed go-bag means you can leave immediately with everything critical.", icon: Backpack, image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80", items: ["Documents & medications", "Change of clothes", "Cash & phone charger", "Pet supplies"] },
-              { title: "Outdoor Adventures", desc: "Whether it's a weekend camping trip or a day hike, being prepared for the unexpected enhances your experience and keeps you safe.", icon: Mountain, image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1200&q=80", items: ["Navigation tools", "Weather protection", "Emergency shelter", "Extra food & water"] },
+              { title: "Shelter in Place", desc: "When disasters strike, you may need to stay home for days without power, water, or supplies. Being prepared means having the essentials on hand.", icon: HomeIcon, image: shelterImg, items: ["Water & food for 72+ hours", "First aid supplies", "Battery-powered radio", "Emergency lighting"] },
+              { title: "Evacuation Ready", desc: "In emergencies like wildfires or floods, every second counts. A packed go-bag means you can leave immediately with everything critical.", icon: Backpack, image: evacImg, items: ["Documents & medications", "Change of clothes", "Cash & phone charger", "Pet supplies"] },
+              { title: "Outdoor Adventures", desc: "Whether it's a weekend camping trip or a day hike, being prepared for the unexpected enhances your experience and keeps you safe.", icon: Mountain, image: outdoorImg, items: ["Navigation tools", "Weather protection", "Emergency shelter", "Extra food & water"] },
             ].map((scenario, i) => (
               <div key={i} className={`grid md:grid-cols-2 gap-0 ${i > 0 ? 'border-t border-white/10' : ''}`}>
                 <div className={`relative h-64 md:h-auto min-h-[300px] ${i % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
@@ -370,7 +378,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="relative min-h-[380px]">
-          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&q=80" alt="Community resilience" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <img src={communityImg} alt="Community resilience" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-[#1C1C1A]/30" />
         </div>
       </section>
@@ -414,7 +422,7 @@ export default function Home() {
 
       {/* ── Final CTA ── */}
       <section className="relative overflow-hidden bg-[#1C1C1A]">
-        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80" alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-20" />
+        <img src={finalCtaImg} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-20" />
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-6">The next emergency won't wait</p>
           <h2 className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-white leading-none mb-8">

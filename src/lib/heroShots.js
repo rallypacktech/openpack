@@ -122,4 +122,45 @@ export const HERO_SHOTS = [
     default_url:
       "https://images.unsplash.com/photo-1605000797489-7b29f30f5d9b?w=1600&q=80",
   },
+  {
+    page_key: "home_wildfire",
+    label: "Home — wildfire (problem statement)",
+    default_url:
+      "https://images.unsplash.com/photo-1661177408809-4184b3b65f2c?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    page_key: "home_pets",
+    label: "Home — pets & animals",
+    default_url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200&q=80",
+  },
+  {
+    page_key: "home_planning",
+    label: "Home — emergency planning",
+    default_url: "https://images.unsplash.com/photo-1519750157634-b6d493a0f77c?w=1600&q=80",
+  },
+  {
+    page_key: "home_scenario_shelter",
+    label: "Home — Shelter in Place",
+    default_url: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80",
+  },
+  {
+    page_key: "home_scenario_evac",
+    label: "Home — Evacuation Ready",
+    default_url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80",
+  },
+  {
+    page_key: "home_scenario_outdoor",
+    label: "Home — Outdoor Adventures",
+    default_url: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1200&q=80",
+  },
+  {
+    page_key: "home_community",
+    label: "Home — community resilience",
+    default_url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&q=80",
+  },
+  {
+    page_key: "home_final_cta",
+    label: "Home — final CTA background",
+    default_url: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&q=80",
+  },
 ];

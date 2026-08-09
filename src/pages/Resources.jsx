@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
+import AgentAssistant from "./AgentAssistant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CachesList from "../components/resources/CachesList";
 import MeetSpotsList from "../components/resources/MeetSpotsList";
@@ -156,6 +157,7 @@ export default function Resources() {
 
           {/* ── Find Help ── */}
           <TabsContent value="help" className="space-y-6">
+            <AgentAssistant />
             <EvacuationAlertInfo />
             <div>
               <h2 className="font-serif text-lg font-bold text-foreground mb-3">External Resources</h2>

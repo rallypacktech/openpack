@@ -4,20 +4,19 @@ import { createPageUrl } from "./utils";
 import { base44 } from "@/api/base44Client";
 import { useActivityHeartbeat } from "@/hooks/useActivityHeartbeat";
 import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySettings";
-import { 
-  LayoutDashboard, 
-  Package, 
-  AlertTriangle, 
-  WifiOff, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Package,
+  AlertTriangle,
+  WifiOff,
+  Settings,
   LogOut,
   LogIn,
   Menu,
   X,
   Users,
   Building2,
-  Lock,
-  MessageSquare
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -74,7 +73,6 @@ export default function Layout({ children, currentPageName }) {
     { name: "Offline", page: "Offline", icon: WifiOff, requiresAuth: true },
     { name: "Settings", page: "Settings", icon: Settings, requiresAuth: true },
     { name: "Business", page: "BusinessDashboard", publicPage: "BusinessOnboarding", icon: Building2, requiresAuth: false },
-    { name: "Assistant", page: "AgentAssistant", icon: MessageSquare, requiresAuth: true },
   ];
 
   if (isAdmin) {
