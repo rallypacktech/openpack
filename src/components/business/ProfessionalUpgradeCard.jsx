@@ -35,6 +35,7 @@ export default function ProfessionalUpgradeCard({
   const [priceLoading, setPriceLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -60,8 +61,19 @@ export default function ProfessionalUpgradeCard({
     };
   }, []);
 
+  useEffect(() => {
+    base44.auth.me().then((u) => setUserEmail(u.email)).catch(() => {});
+  }, []);
+
   const handleCheckout = async () => {
     setError(null);
+    const inIframe = (() => {
+      try { return window.self !== window.top; } catch { return true; }
+    })();
+    if (inIframe) {
+      setError("Checkout works only from a published app. Open the app in its own tab to subscribe.");
+      return;
+    }
     if (!stripePrice?.id) {
       setError("Pricing is not available yet. Please try again in a moment.");
       return;
@@ -74,6 +86,7 @@ export default function ProfessionalUpgradeCard({
           price_id: stripePrice.id,
           success_url: `${window.location.origin}/BusinessDashboard?sub_success=true`,
           cancel_url: `${window.location.origin}/BusinessDashboard`,
+          customer_email: userEmail,
           metadata: {
             tier: "professional",
             organization_name: organizationName || "",
@@ -168,11 +181,11 @@ export default function ProfessionalUpgradeCard({
               checkout…
             </>
           ) : (
-            "Upgrade to Professional"
+            "Start 7-day free trial"
           )}
         </Button>
         <p className="text-xs text-muted-foreground text-center mt-3">
-          Secure checkout via Stripe. Cancel anytime.
+          7-day free trial, then billed monthly. Cancel anytime.
         </p>
       </CardContent>
     </Card>

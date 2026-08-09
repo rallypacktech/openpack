@@ -4,7 +4,7 @@ import Stripe from 'npm:stripe@17.5.0';
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
-        const stripe = new Stripe(Deno.env.get('Stripe'));
+        const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
         // Fetch all active prices with their product info
         const prices = await stripe.prices.list({

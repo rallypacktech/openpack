@@ -15,7 +15,7 @@ function getTierSettings(tier) {
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
-        const stripe = new Stripe(Deno.env.get('Stripe'));
+        const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
         const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
         const body = await req.text();
@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
                 if (existing.length > 0) {
                     const tierSettings = tier ? getTierSettings(tier) : {};
                     await base44.asServiceRole.entities.BusinessSubscription.update(existing[0].id, {
-                        status: 'active',
+                        status: sub.status === 'trialing' ? 'trialing' : 'active',
                         stripe_subscription_id: sub.id,
                         stripe_customer_id: sub.customer,
                         ...(tier ? { tier, ...tierSettings } : {}),
@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
                     await base44.asServiceRole.entities.BusinessSubscription.create({
                         owner_email: userEmail,
                         organization_name: session.metadata?.organization_name || userEmail,
-                        status: 'active',
+                        status: sub.status === 'trialing' ? 'trialing' : 'active',
                         tier: finalTier,
                         stripe_subscription_id: sub.id,
                         stripe_customer_id: sub.customer,
