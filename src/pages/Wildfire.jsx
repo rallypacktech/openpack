@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Flame, MapPin, Phone, AlertTriangle, Wind, Droplets, Shield, CheckCircle } from "lucide-react";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 const REGIONS = [
   {
@@ -43,11 +44,13 @@ export default function Wildfire() {
     document.title = "Wildfire Evacuation Preparedness | RallyPack — Free Global Checklist";
   }, []);
 
+  const heroUrl = useHeroShot("wildfire");
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       <section className="relative min-h-[80vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1619461129861-d0c1479c48b4?q=80&w=1376&auto=format&fit=crop')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${heroUrl}')` }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Wildfire Evacuation Preparedness · Free · Global</p>

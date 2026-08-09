@@ -2,6 +2,11 @@
   "name": "UserCacheProgress",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional free-form description (up to 1000 characters)"
+    },
     "cache_id": {
       "type": "string",
       "description": "Reference to EmergencyCache (optional \u2014 null for checklist-mode items not tied to a specific cache)"

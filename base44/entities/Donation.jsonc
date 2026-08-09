@@ -2,6 +2,11 @@
   "name": "Donation",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional free-form description (up to 1000 characters)"
+    },
     "amount_cents": {
       "type": "number",
       "description": "Donation amount in cents"

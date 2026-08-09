@@ -1,17 +1,20 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Heart, Github, Shield, Globe, Users } from "lucide-react";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 export default function About() {
   useEffect(() => {
     document.title = "About RallyPack | Free, Open-Source Emergency Preparedness";
   }, []);
 
+  const heroUrl = useHeroShot("about");
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       <section className="relative min-h-[60vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://media.base44.com/images/public/69dc170f0871ac017d79debb/aa879fed8_StaffLoraMcGrath_Peanut_0430_bySonyaSellers.jpg')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${heroUrl}')` }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/75" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Our Story · RallyPack</p>

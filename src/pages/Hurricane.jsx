@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Wind, MapPin, Phone, AlertTriangle, Droplets, Shield, Home } from "lucide-react";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 const REGIONS = [
   {
@@ -33,11 +34,13 @@ export default function Hurricane() {
     document.title = "Hurricane Evacuation Preparedness | RallyPack — Free Checklist";
   }, []);
 
+  const heroUrl = useHeroShot("hurricane");
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       <section className="relative min-h-[80vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1629203328214-415e41c4aba8?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGh1cnJpY2FuZXxlbnwwfHwwfHx8MA%3D%3D')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${heroUrl}')` }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Hurricane Evacuation Preparedness · Free · Global</p>

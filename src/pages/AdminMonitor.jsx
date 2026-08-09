@@ -3,13 +3,14 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck, Flame, FileText, Sparkles } from "lucide-react";
+import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck, Flame, FileText, Sparkles, Image as ImageIcon } from "lucide-react";
 import QuizResultsTable from "../components/admin/QuizResultsTable";
 import IncidentsPanel from "../components/admin/IncidentsPanel";
 import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
 import AlertsPanel from "../components/admin/AlertsPanel";
 import GrantLOIWorkflow from "../components/admin/GrantLOIWorkflow";
 import CleanupPanel from "../components/admin/CleanupPanel";
+import HeroShotsPanel from "../components/admin/HeroShotsPanel";
 import AdminProducts from "./AdminProducts";
 
 export default function AdminMonitor() {
@@ -118,6 +119,9 @@ export default function AdminMonitor() {
             <TabsTrigger value="causes" className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" /> Cleanup
             </TabsTrigger>
+            <TabsTrigger value="heroshots" className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" /> Hero Shots
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="incidents">
@@ -146,6 +150,10 @@ export default function AdminMonitor() {
 
           <TabsContent value="causes">
             <CleanupPanel />
+          </TabsContent>
+
+          <TabsContent value="heroshots">
+            <HeroShotsPanel />
           </TabsContent>
 
           <TabsContent value="users">

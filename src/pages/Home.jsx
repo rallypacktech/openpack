@@ -5,12 +5,14 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { ClipboardList, ArrowRight, Heart, X, Github, AlertTriangle, Users, Clock, MapPin, Home as HomeIcon, Backpack, Mountain, Shield, DollarSign, CheckCircle, Flame, Wind, CloudRain, Zap } from "lucide-react";
 import FooterContactForm from "../components/FooterContactForm";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 export default function Home() {
   const { user, isLoadingAuth } = useAuth();
   const [supportBannerDismissed, setSupportBannerDismissed] = useState(false);
   const [homeRedirect, setHomeRedirect] = useState(null);
   const [donationProgress, setDonationProgress] = useState(null);
+  const heroUrl = useHeroShot("home");
 
   useEffect(() => {
     setSupportBannerDismissed(sessionStorage.getItem("supportBannerDismissed") === "true");
@@ -90,7 +92,7 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <section className="relative h-screen min-h-[640px] flex items-end">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1594156596782-656c93e4d504?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${heroUrl}')` }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/80" />
 
         {/* Active season pills — overlaid on hero bottom */}

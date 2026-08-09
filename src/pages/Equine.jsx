@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets, Shield } from "lucide-react";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 const CHECKLIST = [
   { icon: FileText, title: "Coggins & Health Papers", desc: "Keep a current negative Coggins test and health certificate in a waterproof pouch in your trailer." },
@@ -22,6 +23,8 @@ export default function Equine() {
     document.title = "Equine Emergency Preparedness | RallyPack";
   }, []);
 
+  const heroUrl = useHeroShot("equine");
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
@@ -29,7 +32,7 @@ export default function Equine() {
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=1800&q=85')" }}
+          style={{ backgroundImage: `url('${heroUrl}')` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Droplets, MapPin, Phone, AlertTriangle, Shield, Home } from "lucide-react";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 const REGIONS = [
   {
@@ -33,11 +34,13 @@ export default function Flood() {
     document.title = "Flood Preparedness & Evacuation | RallyPack — Free Checklist";
   }, []);
 
+  const heroUrl = useHeroShot("flood");
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
       <section className="relative min-h-[80vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1568438350562-2cae6d394ad0?w=1800&q=85')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${heroUrl}')` }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">
           <p className="text-xs uppercase tracking-[0.25em] font-sans text-white/60 mb-5">Flood Preparedness · Free · Global</p>

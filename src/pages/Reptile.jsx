@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, AlertTriangle, FileText, MapPin, Heart, Thermometer, Package } from "lucide-react";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 const CHECKLIST = [
   { icon: Thermometer, title: "Temperature & Humidity Control", desc: "Reptiles are ectothermic — without their heat source they can go into shock within hours. Pack a portable heat mat and thermometer in your go-bag." },
@@ -16,6 +17,8 @@ export default function Reptile() {
     document.title = "Reptile Emergency Preparedness | RallyPack";
   }, []);
 
+  const heroUrl = useHeroShot("reptile");
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
@@ -23,7 +26,7 @@ export default function Reptile() {
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1504450874802-0ba2bcd9b5ae?w=1800&q=85')" }}
+          style={{ backgroundImage: `url('${heroUrl}')` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">

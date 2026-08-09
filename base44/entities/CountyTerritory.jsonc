@@ -2,6 +2,11 @@
   "name": "CountyTerritory",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional free-form description (up to 1000 characters)"
+    },
     "country_code": {
       "type": "string",
       "description": "ISO 3166-1 alpha-2 country code (e.g., US, ES, AU)"

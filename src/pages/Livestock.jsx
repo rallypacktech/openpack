@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets, Shield, Milk, Wheat, PiggyBank, Egg } from "lucide-react";
+import { useHeroShot } from "@/hooks/useHeroShot";
 
 const CHECKLIST = [
   { icon: FileText, title: "Brands, Tags & Health Papers", desc: "Brand inspections, scrapie tags, ear tag records, and health certificates in a waterproof pouch. Reunification and interstate movement both depend on documentation." },
@@ -22,6 +23,8 @@ export default function Livestock() {
     document.title = "Livestock Emergency Preparedness | RallyPack";
   }, []);
 
+  const heroUrl = useHeroShot("livestock");
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] font-sans text-[#1C1C1A]">
 
@@ -29,7 +32,7 @@ export default function Livestock() {
       <section className="relative h-[80vh] min-h-[560px] flex items-end">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1588152850700-c82ecb8ba9b1?w=1800&q=85')" }}
+          style={{ backgroundImage: `url('${heroUrl}')` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80" />
         <div className="relative w-full max-w-7xl mx-auto px-6 pb-20 md:pb-28">

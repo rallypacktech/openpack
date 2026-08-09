@@ -2,6 +2,11 @@
   "name": "BarcodeCorrection",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional free-form description (up to 1000 characters)"
+    },
     "barcode": {
       "type": "string",
       "description": "The UPC/barcode that was scanned"

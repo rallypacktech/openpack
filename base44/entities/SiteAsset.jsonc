@@ -1,0 +1,40 @@
+{
+  "name": "SiteAsset",
+  "type": "object",
+  "properties": {
+    "page_key": {
+      "type": "string",
+      "description": "Unique key identifying the page/section this asset belongs to (e.g. 'home', 'wildfire', 'equine')"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL of the hero image to display for this page"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for admin display"
+    }
+  },
+  "required": [
+    "page_key",
+    "image_url"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
