@@ -61,6 +61,10 @@ export default function PricingSection() {
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Plans scale with your team. Cancel anytime. All prices billed monthly.
         </p>
+        <div className="mt-5 inline-flex items-center gap-2 bg-[#D64A2E]/10 text-[#D64A2E] text-sm font-semibold px-4 py-2 rounded-full">
+          <span aria-hidden="true">✨</span>
+          <span>7-day free trial on every plan — try it before you pay.</span>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {Object.values(TIER_META).map(tier => {
@@ -89,7 +93,7 @@ export default function PricingSection() {
                   ))}
                 </ul>
                 <Button asChild className="w-full bg-[#D64A2E] hover:bg-[#be3f25] text-white">
-                  <Link to={createPageUrl("BusinessDashboard")}>Get Started</Link>
+                  <Link to={createPageUrl("BusinessDashboard")}>Start 7-day free trial</Link>
                 </Button>
               </CardContent>
             </Card>

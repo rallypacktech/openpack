@@ -7,7 +7,7 @@ const DEFAULT_GENERAL_CONFIG = {
     label: 'Workplace Preparedness',
     learnPath: '/BusinessOnboarding',
     subject: 'Fire marshal compliance & emergency tracking for your business',
-    intro: 'RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard.',
+    intro: 'RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard. Start with a 7-day free trial — try every feature with no charge for 7 days, then pick the plan that fits. Cancel anytime.',
 };
 
 async function loadGeneralTemplate(base44) {
@@ -83,6 +83,10 @@ function buildReferralEmailHtml(config, origin) {
                 </tr>
               </table>
 
+              <p style="margin:0 0 16px;padding:12px 16px;background-color:#f5f0e8;border-left:3px solid #d64a2e;font-size:14px;color:#1c1c1a;">
+                <strong>7-day free trial.</strong> Try every feature with no charge for 7 days, then pick the plan that fits. Cancel anytime.
+              </p>
+
               <p style="margin:0 0 16px;font-size:13px;color:#6b6b66;">
                 Business plans include multi-location kit tracking, expiry alerts, evacuation plan documentation, and emergency team notifications.
               </p>
@@ -126,6 +130,8 @@ function buildReferralEmailText(config, origin) {
         '',
         'Explore Business Accounts: ' + businessUrl,
         'Learn More: ' + learnUrl,
+        '',
+        '7-day free trial: try every feature with no charge for 7 days, then pick the plan that fits. Cancel anytime.',
         '',
         'Business plans include multi-location kit tracking, expiry alerts, evacuation plan documentation, and emergency team notifications.',
         '',
