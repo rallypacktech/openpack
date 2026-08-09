@@ -100,12 +100,17 @@ export default function BusinessReferralsPanel() {
     try {
       const res = await base44.functions.invoke('contactPendingReferrals', { referral_ids: [referralId] });
       const data = res.data || res;
+      const errors = data.per_audience?.flatMap(a => a.errors || []) || [];
+      const queued = (data.per_audience || []).reduce((sum, a) => sum + (a.queued_count || 0), 0);
       if (data.sent_automatically > 0) {
         window.alert(`Email sent from no-reply@rallypack.org. Referral marked as contacted.`);
-      } else {
-        const errors = data.per_audience?.flatMap(a => a.errors || []);
-        const errorDetail = errors.length > 0 ? errors.map(e => `${e.email}: ${e.error}`).join('\n') : 'Unknown error';
+      } else if (queued > 0) {
+        window.alert(`Email queued for delivery (Resend daily limit reached). It will be sent automatically shortly.`);
+      } else if (errors.length > 0) {
+        const errorDetail = errors.map(e => `${e.email}: ${e.error}`).join('\n');
         window.alert(`Email failed to send.\n\n${errorDetail}`);
+      } else {
+        window.alert(data.message || 'No email was sent.');
       }
       loadReferrals();
     } catch (error) {
