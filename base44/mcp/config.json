@@ -170,6 +170,10 @@
           "read"
         ],
         "description": null
+      },
+      "SiteAsset": {
+        "operations": [],
+        "description": null
       }
     },
     "functions": []
