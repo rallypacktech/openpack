@@ -51,6 +51,30 @@ const AUDIENCE_CONFIG = {
         subject: 'Livestock emergency preparedness — a free resource for your clients',
         intro: 'RallyPack offers free, species-specific emergency preparedness resources for livestock owners — including evacuation logistics, trailer capacity planning, and destination coordination. As a livestock-focused business, you can help your clients protect their animals during disasters.',
     },
+    wildfire: {
+        label: 'Wildfire Preparedness',
+        learnPath: '/wildfire',
+        subject: 'Is your community ready for wildfire season? A free resource from RallyPack',
+        intro: 'RallyPack provides free, real-time wildfire alerts, go-bag checklists, and evacuation planning tools for families in fire-prone areas. Whether you\'re a business in a high-risk region or serve clients who are, share this resource to help your community prepare before a fire starts.',
+    },
+    flood: {
+        label: 'Flood Preparedness',
+        learnPath: '/flood',
+        subject: 'Flood season is coming — free preparedness resources for your community',
+        intro: 'RallyPack provides free flood preparedness guides, emergency supply checklists, and shelter-in-place vs. evacuation guidance for families in flood-prone areas. Help your employees or clients know what to do before floodwaters rise.',
+    },
+    hurricane: {
+        label: 'Hurricane Preparedness',
+        learnPath: '/hurricane',
+        subject: 'Hurricane season preparedness — a free resource for your team and community',
+        intro: 'RallyPack offers free hurricane preparedness resources including evacuation planning, go-bag checklists, and real-time storm alerts. As a business in a coastal or storm-prone area, you can help your employees and clients plan ahead before the season peaks.',
+    },
+    tornado: {
+        label: 'Tornado Preparedness',
+        learnPath: '/tornado',
+        subject: 'Tornado season alert — free preparedness resources for your community',
+        intro: 'RallyPack provides free tornado preparedness guidance including shelter-in-place protocols, family communication plans, and emergency supply checklists. Share this resource with your team or community to help everyone know what to do when a tornado warning sounds.',
+    },
 };
 
 async function loadTemplates(base44) {
