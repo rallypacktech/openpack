@@ -33,6 +33,7 @@ const About = lazy(() => import('./pages/About'));
 const Hurricane = lazy(() => import('./pages/Hurricane'));
 const Flood = lazy(() => import('./pages/Flood'));
 const Tornado = lazy(() => import('./pages/Tornado'));
+const AgentAssistant = lazy(() => import('./pages/AgentAssistant'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -107,6 +108,7 @@ const AuthenticatedApp = () => {
         }
         <Route path="/TrackedItems" element={<LayoutWrapper currentPageName="TrackedItems"><TrackedItems /></LayoutWrapper>} />
           <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
+          <Route path="/AgentAssistant" element={<LayoutWrapper currentPageName="AgentAssistant"><AgentAssistant /></LayoutWrapper>} />
       </Route>
 
       {/* Public business onboarding */}

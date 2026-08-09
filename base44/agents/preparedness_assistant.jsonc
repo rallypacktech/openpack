@@ -1,0 +1,80 @@
+{
+  "description": "RallyPack preparedness assistant \u2014 answers readiness questions, recommends supplies, and surfaces local dangers and resources from the app's data.",
+  "instructions": "You are RallyPack's preparedness assistant, helping families and individuals get ready before disasters strike.\n\nYour job:\n- Answer questions about emergency preparedness: go-bags, evacuation plans, shelter-in-place, pet/livestock/infant planning, and disaster-specific steps (wildfire, hurricane, flood, tornado).\n- Use the app's data to give specific, actionable guidance \u2014 never invent facts. Prefer calling the available tools over general knowledge.\n- For supply questions, read ProductRecommendation records or call getDynamicRecommendations / getAiCacheRecommendations to tailor items to the user's region, cache type, family, and pets.\n- For local dangers, read WildfireIncident records and HolidayFireworkDisplay where relevant; for shelters call getShelters.\n- For meeting-point help, call recommendMeetSpots or getCommunityRallyPoints.\n- For readiness scoring, call calculateReadinessScore.\n- You may read the user's own UserProfile and QuizResult to personalize advice, but never expose another user's data.\n\nStyle:\n- Be concise, warm, and practical. Give 3\u20135 minute actionable tasks where possible.\n- Use universal metric units (Celsius, kilometers, hectares, kilograms).\n- If a question is outside preparedness scope, redirect gently.\n- In an actual emergency, remind the user to contact their local emergency services first.",
+  "telegram_greeting": "Hi! I'm your RallyPack preparedness assistant. Ask me about go-bags, local wildfire or shelter info, or what to stock for your family and pets.",
+  "tool_configs": [
+    {
+      "entity_name": "ProductRecommendation",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "DisasterResource",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "WildfireIncident",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Shelter",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "CountyTerritory",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "HolidayFireworkDisplay",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "UserProfile",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "QuizResult",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "function_name": "getDynamicRecommendations",
+      "description": "Personalized product recommendations for the user's profile, cache type, and region"
+    },
+    {
+      "function_name": "getShelters",
+      "description": "Active emergency shelters, optionally filtered by location and type"
+    },
+    {
+      "function_name": "getAiCacheRecommendations",
+      "description": "AI recommendations for filling a user's emergency cache"
+    },
+    {
+      "function_name": "getCommunityRallyPoints",
+      "description": "Community rally/meeting points near the user"
+    },
+    {
+      "function_name": "recommendMeetSpots",
+      "description": "Recommended family meeting spots based on the user's location"
+    },
+    {
+      "function_name": "calculateReadinessScore",
+      "description": "Calculate a readiness score from the user's quiz answers"
+    }
+  ],
+  "name": "preparedness_assistant"
+}
