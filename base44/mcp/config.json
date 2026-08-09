@@ -1,3 +1,177 @@
 {
-  "auth": "oauth"
+  "auth": "oauth",
+  "login_path": null,
+  "consent_path": null,
+  "tools": {
+    "excluded_agents": [],
+    "entity_overrides": {
+      "AlertDelegation": {
+        "operations": [],
+        "description": null
+      },
+      "AlertSubmission": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "BarcodeCorrection": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "BusinessReferral": {
+        "operations": [],
+        "description": null
+      },
+      "BusinessSubscription": {
+        "operations": [],
+        "description": null
+      },
+      "CacheItem": {
+        "operations": [],
+        "description": null
+      },
+      "CountyContact": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "CountyTerritory": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "DeletionQueue": {
+        "operations": [],
+        "description": null
+      },
+      "DisasterResource": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "Donation": {
+        "operations": [],
+        "description": null
+      },
+      "EmailQueue": {
+        "operations": [],
+        "description": null
+      },
+      "EmailTemplate": {
+        "operations": [],
+        "description": null
+      },
+      "EmergencyCache": {
+        "operations": [],
+        "description": null
+      },
+      "EvacuationDestination": {
+        "operations": [],
+        "description": null
+      },
+      "EvacuationPlan": {
+        "operations": [],
+        "description": null
+      },
+      "FamilyMember": {
+        "operations": [],
+        "description": null
+      },
+      "FamilyMessage": {
+        "operations": [],
+        "description": null
+      },
+      "FirstAidItem": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "FirstAidKitLocation": {
+        "operations": [],
+        "description": null
+      },
+      "GrantLOI": {
+        "operations": [],
+        "description": null
+      },
+      "HolidayFireworkDisplay": {
+        "operations": [],
+        "description": null
+      },
+      "LivestockLogistics": {
+        "operations": [],
+        "description": null
+      },
+      "MeetSpot": {
+        "operations": [],
+        "description": null
+      },
+      "Notification": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "OrganizationMember": {
+        "operations": [],
+        "description": null
+      },
+      "OrganizationNeed": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      },
+      "Pet": {
+        "operations": [],
+        "description": null
+      },
+      "ProductRecommendation": {
+        "operations": [],
+        "description": null
+      },
+      "ProductRecommendationSuggestion": {
+        "operations": [],
+        "description": null
+      },
+      "QuizResult": {
+        "operations": [],
+        "description": null
+      },
+      "ReportingAgency": {
+        "operations": [],
+        "description": null
+      },
+      "Shelter": {
+        "operations": [],
+        "description": null
+      },
+      "TrackedItem": {
+        "operations": [],
+        "description": null
+      },
+      "UserCacheProgress": {
+        "operations": [],
+        "description": null
+      },
+      "UserProfile": {
+        "operations": [],
+        "description": null
+      },
+      "WildfireIncident": {
+        "operations": [
+          "read"
+        ],
+        "description": null
+      }
+    },
+    "functions": []
+  }
 }
