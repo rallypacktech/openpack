@@ -1,10 +1,12 @@
 /* global pendo */
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-const getNextUrl = () => {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("next") || "/";
-};
+import { safeRedirectPath } from "@/lib/authReturnTo";
+const getNextUrl = () =>
+  safeRedirectPath(
+    new URLSearchParams(window.location.search).get("returnTo") ||
+      new URLSearchParams(window.location.search).get("next"),
+  );
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -14,7 +14,10 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const nextUrl = safeRedirectPath(new URLSearchParams(window.location.search).get("next"));
+  const nextUrl = safeRedirectPath(
+    new URLSearchParams(window.location.search).get("returnTo") ||
+      new URLSearchParams(window.location.search).get("next"),
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
