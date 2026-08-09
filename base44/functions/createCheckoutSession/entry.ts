@@ -13,22 +13,48 @@ Deno.serve(async (req) => {
 
         const { items, cache_id, success_url, cancel_url, metadata } = await req.json();
 
-        if (!items || items.length === 0) {
+        if (!Array.isArray(items) || items.length === 0) {
             return Response.json({ error: 'No items provided' }, { status: 400 });
         }
 
-        // Build line items for Stripe
-        const lineItems = items.map(item => ({
-            price_data: {
-                currency: 'usd',
-                product_data: {
-                    name: item.item_name,
-                    description: item.description || '',
+        // Resolve canonical prices and details server-side from ProductRecommendation
+        // to prevent client-side price tampering. Never trust client-supplied price_cents.
+        const productIds = items.map(i => i?.id).filter(Boolean);
+        const products = await Promise.all(
+            productIds.map(id =>
+                base44.entities.ProductRecommendation.get(id).catch(() => null)
+            )
+        );
+        const productMap = new Map(
+            products.filter(Boolean).map(p => [p.id, p])
+        );
+
+        const lineItems = [];
+        for (const item of items) {
+            const id = item?.id;
+            if (!id) {
+                return Response.json({ error: 'Each item requires a valid product id.' }, { status: 400 });
+            }
+            const product = productMap.get(id);
+            if (!product) {
+                return Response.json({ error: `Item ${id} not found.` }, { status: 400 });
+            }
+            if (product.active === false) {
+                return Response.json({ error: `Item "${product.item_name}" is no longer available.` }, { status: 400 });
+            }
+            const quantity = Math.max(1, Math.min(99, Math.floor(Number(item.quantity) || 1)));
+            lineItems.push({
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: product.item_name,
+                        description: product.description || '',
+                    },
+                    unit_amount: Math.max(0, Math.round(product.price_cents || 0)),
                 },
-                unit_amount: item.price_cents,
-            },
-            quantity: item.quantity || 1,
-        }));
+                quantity,
+            });
+        }
 
         // Create checkout session
         const session = await stripe.checkout.sessions.create({
