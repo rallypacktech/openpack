@@ -16,8 +16,8 @@ import {
   X,
   Users,
   Building2,
-  Lock
-} from "lucide-react";
+  Lock } from
+"lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import AccessibilityProvider from "./components/AccessibilityProvider";
@@ -61,19 +61,19 @@ export default function Layout({ children, currentPageName }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-cream">
         <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" role="status" aria-label="Loading"></div>
-      </div>
-    );
+      </div>);
+
   }
 
   const allNavItems = [
-    { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard, requiresAuth: true },
-    { name: "Resources", page: "Resources", icon: Package, requiresAuth: true },
-    { name: "Shopping", page: "Shopping", icon: Package, requiresAuth: false },
-    { name: "Emergency", page: "Emergency", icon: AlertTriangle, requiresAuth: true },
-    { name: "Offline", page: "Offline", icon: WifiOff, requiresAuth: true },
-    { name: "Settings", page: "Settings", icon: Settings, requiresAuth: true },
-    { name: "Business", page: "BusinessDashboard", publicPage: "BusinessOnboarding", icon: Building2, requiresAuth: false },
-  ];
+  { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard, requiresAuth: true },
+  { name: "Resources", page: "Resources", icon: Package, requiresAuth: true },
+  { name: "Shopping", page: "Shopping", icon: Package, requiresAuth: false },
+  { name: "Emergency", page: "Emergency", icon: AlertTriangle, requiresAuth: true },
+  { name: "Offline", page: "Offline", icon: WifiOff, requiresAuth: true },
+  { name: "Settings", page: "Settings", icon: Settings, requiresAuth: true },
+  { name: "Business", page: "BusinessDashboard", publicPage: "BusinessOnboarding", icon: Building2, requiresAuth: false }];
+
 
   if (isAdmin) {
     allNavItems.push(
@@ -85,45 +85,45 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.logout();
   };
 
-  const NavLinks = ({ onClick }) => (
-    <>
+  const NavLinks = ({ onClick }) =>
+  <>
       {allNavItems.map((item) => {
-        const isLocked = item.requiresAuth && !user;
-        if (isLocked) {
-          return (
-            <button
-              key={item.page}
-              onClick={() => { base44.auth.redirectToLogin(createPageUrl(item.page)); if (onClick) onClick(); }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded text-sm font-sans text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors"
-              title="Sign in to access this feature"
-            >
+      const isLocked = item.requiresAuth && !user;
+      if (isLocked) {
+        return (
+          <button
+            key={item.page}
+            onClick={() => {base44.auth.redirectToLogin(createPageUrl(item.page));if (onClick) onClick();}}
+            className="flex items-center gap-2 px-3 py-1.5 rounded text-sm font-sans text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors"
+            title="Sign in to access this feature">
+            
               <item.icon className="w-4 h-4" aria-hidden="true" />
               <span>{item.name}</span>
               <Lock className="w-3 h-3 ml-0.5 opacity-60" aria-hidden="true" />
-            </button>
-          );
-        }
-        const targetPage = !user && item.publicPage ? item.publicPage : item.page;
-        const isActive = currentPageName === item.page || currentPageName === item.publicPage;
-        return (
-          <Link
-            key={item.page}
-            to={createPageUrl(targetPage)}
-            onClick={onClick}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors font-sans ${
-              isActive
-                ? "bg-foreground/5 text-foreground font-medium"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            aria-current={isActive ? "page" : undefined}
-          >
+            </button>);
+
+      }
+      const targetPage = !user && item.publicPage ? item.publicPage : item.page;
+      const isActive = currentPageName === item.page || currentPageName === item.publicPage;
+      return (
+        <Link
+          key={item.page}
+          to={createPageUrl(targetPage)}
+          onClick={onClick}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors font-sans ${
+          isActive ?
+          "bg-foreground/5 text-foreground font-medium" :
+          "text-muted-foreground hover:text-foreground"}`
+          }
+          aria-current={isActive ? "page" : undefined}>
+          
             <item.icon className="w-4 h-4" aria-hidden="true" />
             <span>{item.name}</span>
-          </Link>
-        );
-      })}
-    </>
-  );
+          </Link>);
+
+    })}
+    </>;
+
 
   return (
     <AccessibilityProvider>
@@ -134,8 +134,8 @@ export default function Layout({ children, currentPageName }) {
         </a>
 
         {/* Header — always visible */}
-        {authChecked && (
-          <header className="bg-white border-b border-border sticky top-0 z-50" role="banner">
+        {authChecked &&
+        <header className="bg-white border-b border-border sticky top-0 z-50" role="banner">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-14">
                 {/* Logo */}
@@ -149,29 +149,29 @@ export default function Layout({ children, currentPageName }) {
 
                 {/* Right Section */}
                 <div className="flex items-center gap-4">
-                  {user ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleLogout}
-                      className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
-                      aria-label="Log out of your account"
-                    >
+                  {user ?
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
+                  aria-label="Log out of your account">
+                  
                       <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
                       Log out
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => base44.auth.redirectToLogin()}
-                      className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
-                      aria-label="Log in to your account"
-                    >
+                    </Button> :
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => base44.auth.redirectToLogin()}
+                  className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-sans"
+                  aria-label="Log in to your account">
+                  
                       <LogIn className="w-3.5 h-3.5" aria-hidden="true" />
                       Log in
                     </Button>
-                  )}
+                }
 
                   {/* Mobile Menu */}
                   <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -184,27 +184,27 @@ export default function Layout({ children, currentPageName }) {
                       <nav className="flex flex-col gap-2 mt-8">
                         <NavLinks onClick={() => setMobileMenuOpen(false)} />
                         <hr className="my-4" />
-                        {user ? (
-                          <Button
-                            variant="outline"
-                            onClick={handleLogout}
-                            className="flex items-center gap-2"
-                            aria-label="Log out of your account"
-                          >
+                        {user ?
+                      <Button
+                        variant="outline"
+                        onClick={handleLogout}
+                        className="flex items-center gap-2"
+                        aria-label="Log out of your account">
+                        
                             <LogOut className="w-4 h-4" aria-hidden="true" />
                             Log Out
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            onClick={() => base44.auth.redirectToLogin()}
-                            className="flex items-center gap-2"
-                            aria-label="Log in to your account"
-                          >
+                          </Button> :
+
+                      <Button
+                        variant="outline"
+                        onClick={() => base44.auth.redirectToLogin()}
+                        className="flex items-center gap-2"
+                        aria-label="Log in to your account">
+                        
                             <LogIn className="w-4 h-4" aria-hidden="true" />
                             Log In / Sign Up
                           </Button>
-                        )}
+                      }
                       </nav>
                     </SheetContent>
                   </Sheet>
@@ -212,14 +212,14 @@ export default function Layout({ children, currentPageName }) {
               </div>
             </div>
           </header>
-        )}
+        }
 
         {/* Main Content */}
         <main id="main-content" role="main">{children}</main>
 
         {/* Footer */}
-        {authChecked && (
-          <footer className="bg-white border-t border-border mt-auto" role="contentinfo">
+        {authChecked &&
+        <footer className="bg-white border-t border-border mt-auto" role="contentinfo">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div>
@@ -255,7 +255,7 @@ export default function Layout({ children, currentPageName }) {
                     <Link to={createPageUrl("EULA")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">End User License Agreement</Link>
                     <Link to={createPageUrl("ConfidentialityAgreement")} className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Confidentiality Agreement</Link>
                     <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-4">Contact</h3>
-                    <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">About Us</Link>
+                    <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors py-1">About Us</Link>
                     <Link to="/Feedback" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Send Feedback</Link>
                     <Link to="/AffiliatePartnerPolicy" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Affiliate & Partner Policy</Link>
                   </nav>
@@ -263,19 +263,19 @@ export default function Layout({ children, currentPageName }) {
                   <div className="flex items-center gap-4">
                     <a href="https://instagram.com/rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Instagram @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                        <circle cx="12" cy="12" r="4"/>
-                        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                        <circle cx="12" cy="12" r="4" />
+                        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
                       </svg>
                     </a>
                     <a href="https://facebook.com/rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Facebook @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9.198 21.5h4v-8.01h3.604l.396-3.98h-4V7.5a1 1 0 0 1 1-1h3v-4h-3a5 5 0 0 0-5 5v2.01h-2l-.396 3.98h2.396v8.01Z"/>
+                        <path d="M9.198 21.5h4v-8.01h3.604l.396-3.98h-4V7.5a1 1 0 0 1 1-1h3v-4h-3a5 5 0 0 0-5 5v2.01h-2l-.396 3.98h2.396v8.01Z" />
                       </svg>
                     </a>
                     <a href="https://threads.net/@rallypackgear" target="_blank" rel="noopener noreferrer" aria-label="Threads @rallypackgear" className="text-muted-foreground hover:text-foreground transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M16.3 11.3c-.1-.1-.2-.1-.3-.2-.2-2.3-1.4-3.6-3.5-3.7h-.3c-1.2 0-2.3.5-2.9 1.4l1.1.8c.5-.7 1.2-.8 1.8-.8h.2c1.4.1 2 .9 2.1 2.3-.6-.1-1.2-.2-1.9-.1-2 .1-3.3 1.3-3.2 2.9 0 .8.4 1.5 1.1 2 .6.4 1.4.6 2.2.5 1-.1 1.8-.6 2.3-1.3.5-.7.7-1.5.7-2.6.7.4 1.2.9 1.5 1.6.5 1.1.6 2.9-.9 4.4-1.3 1.3-2.9 1.9-5.3 1.9-2.6 0-4.6-.8-5.9-2.4C4.4 16 3.8 13.7 3.8 11c0-2.7.6-5 1.9-6.6C7 2.8 9 2 11.6 2c2.7 0 4.7.8 6 2.4.6.8 1.1 1.7 1.4 2.9l1.5-.4c-.3-1.4-1-2.6-1.7-3.5C17.1 1.3 14.7.4 11.6.4h-.1C8.5.4 6.2 1.4 4.5 3.4 3 5.3 2.2 7.9 2.2 11c0 3.1.8 5.7 2.3 7.6 1.7 2 4 3 6.9 3h.1c2.7 0 4.7-.7 6.3-2.3 2.1-2 2-4.6 1.3-6.1-.5-1.2-1.5-2-2.8-2.5-.1 0-.2-.1-.3-.1zM10.8 15c-.4 0-.8-.2-1-.4-.2-.2-.3-.4-.3-.7 0-.5.4-.8 1.1-.9h.4c.5 0 1 .1 1.5.2-.2 1.4-.9 1.8-1.7 1.8z"/>
+                        <path d="M16.3 11.3c-.1-.1-.2-.1-.3-.2-.2-2.3-1.4-3.6-3.5-3.7h-.3c-1.2 0-2.3.5-2.9 1.4l1.1.8c.5-.7 1.2-.8 1.8-.8h.2c1.4.1 2 .9 2.1 2.3-.6-.1-1.2-.2-1.9-.1-2 .1-3.3 1.3-3.2 2.9 0 .8.4 1.5 1.1 2 .6.4 1.4.6 2.2.5 1-.1 1.8-.6 2.3-1.3.5-.7.7-1.5.7-2.6.7.4 1.2.9 1.5 1.6.5 1.1.6 2.9-.9 4.4-1.3 1.3-2.9 1.9-5.3 1.9-2.6 0-4.6-.8-5.9-2.4C4.4 16 3.8 13.7 3.8 11c0-2.7.6-5 1.9-6.6C7 2.8 9 2 11.6 2c2.7 0 4.7.8 6 2.4.6.8 1.1 1.7 1.4 2.9l1.5-.4c-.3-1.4-1-2.6-1.7-3.5C17.1 1.3 14.7.4 11.6.4h-.1C8.5.4 6.2 1.4 4.5 3.4 3 5.3 2.2 7.9 2.2 11c0 3.1.8 5.7 2.3 7.6 1.7 2 4 3 6.9 3h.1c2.7 0 4.7-.7 6.3-2.3 2.1-2 2-4.6 1.3-6.1-.5-1.2-1.5-2-2.8-2.5-.1 0-.2-.1-.3-.1zM10.8 15c-.4 0-.8-.2-1-.4-.2-.2-.3-.4-.3-.7 0-.5.4-.8 1.1-.9h.4c.5 0 1 .1 1.5.2-.2 1.4-.9 1.8-1.7 1.8z" />
                       </svg>
                     </a>
                   </div>
@@ -290,32 +290,32 @@ export default function Layout({ children, currentPageName }) {
 
                 {/* Emergency services notice */}
                 {(() => {
-                  const countries = profile?.emergency_countries || [];
-                  if (countries.length === 0) {
-                    return (
-                      <p className="text-xs text-muted-foreground font-sans mb-3">
-                        🚨 In an emergency, <strong>contact your local emergency services</strong> immediately.
-                      </p>
-                    );
-                  }
+                const countries = profile?.emergency_countries || [];
+                if (countries.length === 0) {
                   return (
-                    <div className="mb-3 text-xs text-muted-foreground font-sans">
+                    <p className="text-xs text-muted-foreground font-sans mb-3">
+                        🚨 In an emergency, <strong>contact your local emergency services</strong> immediately.
+                      </p>);
+
+                }
+                return (
+                  <div className="mb-3 text-xs text-muted-foreground font-sans">
                       <p className="font-semibold text-foreground mb-1">🚨 Emergency numbers for your selected countries:</p>
                       {countries.map((code) => {
-                        const data = COUNTRY_EMERGENCY_DATA[code];
-                        if (!data) return null;
-                        return (
-                          <p key={code} className="mt-0.5">
+                      const data = COUNTRY_EMERGENCY_DATA[code];
+                      if (!data) return null;
+                      return (
+                        <p key={code} className="mt-0.5">
                             <strong>{data.name}:</strong> {data.combined}
                             {data.police !== data.combined && ` (Police: ${data.police})`}
                             {data.fire !== data.combined && ` (Fire: ${data.fire})`}
                             {data.ambulance !== data.combined && ` (Ambulance: ${data.ambulance})`}
-                          </p>
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
+                          </p>);
+
+                    })}
+                    </div>);
+
+              })()}
 
                 <p className="text-xs text-muted-foreground font-sans mb-1">
                   Feedback: <a href="mailto:beta@rallypack.tech" className="text-foreground hover:underline">beta@rallypack.tech</a>
@@ -324,8 +324,8 @@ export default function Layout({ children, currentPageName }) {
               </div>
             </div>
           </footer>
-        )}
+        }
       </div>
-    </AccessibilityProvider>
-  );
+    </AccessibilityProvider>);
+
 }
