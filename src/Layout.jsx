@@ -236,7 +236,7 @@ export default function Layout({ children, currentPageName }) {
                     <Link to="/hurricane" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Hurricane</Link>
                     <Link to="/flood" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Flood</Link>
                     <Link to="/tornado" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Tornado</Link>
-                    <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-4">By Species</h3>
+                    <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-5">By Species</h3>
                     <Link to="/equine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Equine</Link>
                     <Link to="/canine" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Canine</Link>
                     <Link to="/feline" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Feline</Link>
