@@ -1,0 +1,63 @@
+{
+  "name": "WildfireImportLog",
+  "type": "object",
+  "properties": {
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code imported"
+    },
+    "country_name": {
+      "type": "string",
+      "description": "Full country name for display"
+    },
+    "source": {
+      "type": "string",
+      "description": "Data source that produced this import (COPERNICUS_EFFIS, NIFC, MANUAL/LLM, etc.)"
+    },
+    "imported_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this import run completed"
+    },
+    "incidents_created": {
+      "type": "number",
+      "default": 0,
+      "description": "New incident records created by this run (0 = refresh returned no new data)"
+    },
+    "years_range": {
+      "type": "string",
+      "description": "Year range covered, e.g. '2016-2019' or 'active'"
+    },
+    "batch": {
+      "type": "number",
+      "description": "Batch number within a multi-batch import (1-3), or 0 for a whole-range run"
+    }
+  },
+  "required": [
+    "country_code",
+    "source",
+    "imported_at"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

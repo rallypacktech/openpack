@@ -120,6 +120,20 @@ Deno.serve(async (req) => {
       }
     }
 
+    try {
+      await base44.asServiceRole.entities.WildfireImportLog.create({
+        country_code: 'US',
+        country_name: 'United States',
+        source: 'NIFC',
+        imported_at: new Date().toISOString(),
+        incidents_created: created,
+        years_range: 'active',
+        batch: 0,
+      });
+    } catch (logErr) {
+      console.error('import log failed:', logErr);
+    }
+
     return Response.json({
       success: true,
       incidents_found: incidents.length,

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flame, Filter, Calendar, MapPin } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { COUNTRY_NAMES } from "@/lib/wildfireCountries";
 
 const SEVERITY_COLORS = {
   catastrophic: "#7f1d1d",
@@ -81,13 +82,9 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
   };
 
   const countries = useMemo(() => {
-    const map = new Map();
-    incidents.forEach(i => {
-      if (i.country_code && !map.has(i.country_code)) {
-        map.set(i.country_code, i.admin1_name ? `${i.country_code}` : i.country_code);
-      }
-    });
-    return Array.from(map.keys()).sort();
+    const set = new Set();
+    incidents.forEach(i => { if (i.country_code) set.add(i.country_code); });
+    return Array.from(set).sort();
   }, [incidents]);
 
   const filteredIncidents = useMemo(() => {
@@ -141,7 +138,7 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
             <SelectContent>
               <SelectItem value="all">All countries</SelectItem>
               {countries.map(c => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
+                <SelectItem key={c} value={c}>{COUNTRY_NAMES[c] || c}</SelectItem>
               ))}
             </SelectContent>
           </Select>
