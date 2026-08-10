@@ -1,22 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { COUNTRY_NAMES, COVERAGE_YEARS } from '../../shared/wildfireCountries.ts';
 
-// Union of all countries the admin dashboard can import wildfire history for.
-const COUNTRIES = {
-  ES: 'Spain', PT: 'Portugal', GR: 'Greece', IT: 'Italy', FR: 'France',
-  HR: 'Croatia', BG: 'Bulgaria', CY: 'Cyprus', CZ: 'Czech Republic', EE: 'Estonia',
-  FI: 'Finland', DE: 'Germany', HU: 'Hungary', LV: 'Latvia', LT: 'Lithuania',
-  PL: 'Poland', RO: 'Romania', SK: 'Slovakia', SE: 'Sweden', CH: 'Switzerland',
-  TR: 'Turkey', LB: 'Lebanon',
-  US: 'United States', AU: 'Australia', CA: 'Canada', BR: 'Brazil', AR: 'Argentina',
-  CL: 'Chile', ZA: 'South Africa', ID: 'Indonesia', RU: 'Russia', MX: 'Mexico',
-  CO: 'Colombia', BO: 'Bolivia', NZ: 'New Zealand', MN: 'Mongolia', KZ: 'Kazakhstan',
-  IN: 'India', CN: 'China', TH: 'Thailand', VN: 'Vietnam', PH: 'Philippines',
-  NG: 'Nigeria', KE: 'Kenya', TZ: 'Tanzania', PE: 'Peru', EC: 'Ecuador',
-  VE: 'Venezuela', PY: 'Paraguay', UY: 'Uruguay', MZ: 'Mozambique', AO: 'Angola',
-  ZM: 'Zambia', ZW: 'Zimbabwe', BW: 'Botswana', NA: 'Namibia',
-};
-
-const COVERAGE_YEARS = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+const COUNTRIES = COUNTRY_NAMES;
 
 export default async function (req) {
   try {
@@ -47,9 +32,11 @@ export default async function (req) {
         let count = 0;
         let hectares = 0;
         let lastDate = null;
+        const sourceSet = new Set();
         for (const inc of incs) {
           count++;
           hectares += inc.hectares_burned || 0;
+          if (inc.source) sourceSet.add(inc.source);
           if (inc.admin1_name) territoriesSet.add(inc.admin1_name);
           if (inc.start_date) {
             const y = parseInt(String(inc.start_date).substring(0, 4), 10);
@@ -63,6 +50,7 @@ export default async function (req) {
           hectares: Math.round(hectares),
           last_incident_date: lastDate,
           coverage,
+          sources: Array.from(sourceSet).sort(),
         };
         totalIncidents += count;
         totalHectares += hectares;

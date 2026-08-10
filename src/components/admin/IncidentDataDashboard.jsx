@@ -6,18 +6,7 @@ import { Flame, RefreshCw, TrendingUp, MapPin, Calendar, Database, Globe, Clock,
 import { MapContainer, TileLayer, Circle, Popup } from "react-leaflet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WildfireTimeline from "@/components/admin/WildfireTimeline";
-import { EFFIS_COUNTRIES, GLOBAL_COUNTRIES, ALL_COUNTRIES, COUNTRY_NAMES, isEffisCountry } from "@/lib/wildfireCountries";
-
-const SOURCE_LABELS = {
-  COPERNICUS_EFFIS: "EFFIS",
-  NIFC: "NIFC",
-  NASA_FIRMS: "NASA FIRMS",
-  CAL_FIRE: "CAL FIRE",
-  INCIWEB: "InciWeb",
-  GFW: "GFW",
-  MANUAL: "LLM",
-  OTHER: "Other",
-};
+import { EFFIS_COUNTRIES, GLOBAL_COUNTRIES, ALL_COUNTRIES, COUNTRY_NAMES, isEffisCountry, SOURCE_LABELS } from "@/lib/wildfireCountries";
 
 const SEVERITY_CONFIG = {
   catastrophic: { color: "#7f1d1d", fill: "rgba(127,29,29,0.35)", label: "Catastrophic" },
@@ -171,6 +160,7 @@ export default function IncidentDataDashboard() {
         count: entry?.count || 0,
         hectares: entry?.hectares || 0,
         coverage: entry?.coverage || {},
+        sources: entry?.sources || [],
         last_refresh: stats.last_refresh?.[c.code] || null,
       };
     });
@@ -325,6 +315,7 @@ export default function IncidentDataDashboard() {
                   <th className="py-2 pr-3 sticky left-0 bg-white">Country</th>
                   {coverageYears.map((y) => <th key={y} className="py-2 px-1.5 text-center">{y}</th>)}
                   <th className="py-2 px-2 text-right">Total</th>
+                  <th className="py-2 px-2">Source</th>
                   <th className="py-2 pl-3 pr-2">Last Refresh</th>
                   <th className="py-2 px-2"></th>
                 </tr>
@@ -341,7 +332,30 @@ export default function IncidentDataDashboard() {
                         </td>
                       );
                     })}
-                    <td className="py-1.5 px-2 text-right font-medium text-gray-900">{row.count}</td>
+                    <td className="py-1.5 px-2">
+                      <div className="flex flex-wrap gap-0.5 max-w-[140px]">
+                        {row.sources.length === 0 ? (
+                          <span className="text-gray-300 text-[10px]">—</span>
+                        ) : row.sources.map((src) => (
+                          <span
+                            key={src}
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                              src === "COPERNICUS_EFFIS" ? "bg-blue-100 text-blue-800"
+                              : src === "NIFC" ? "bg-amber-100 text-amber-800"
+                              : src === "NASA_FIRMS" ? "bg-purple-100 text-purple-800"
+                              : src === "CAL_FIRE" ? "bg-red-100 text-red-800"
+                              : src === "INCIWEB" ? "bg-green-100 text-green-800"
+                              : src === "GFW" ? "bg-emerald-100 text-emerald-800"
+                              : src === "MANUAL" || src === "LLM" ? "bg-fuchsia-100 text-fuchsia-800"
+                              : "bg-gray-100 text-gray-600"
+                            }`}
+                            title={SOURCE_LABELS[src] || src}
+                          >
+                            {SOURCE_LABELS[src] || src}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
                     <td className="py-1.5 pl-3 pr-2 text-gray-500 whitespace-nowrap" title={row.last_refresh || "Never imported"}>
                       <Clock className="w-3 h-3 inline mr-1 text-gray-400" />
                       {row.last_refresh ? timeAgo(row.last_refresh) : "never"}

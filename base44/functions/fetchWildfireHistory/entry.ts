@@ -1,14 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-
-const COUNTRY_NAMES = {
-  US: 'United States', AU: 'Australia', CA: 'Canada', BR: 'Brazil', AR: 'Argentina',
-  CL: 'Chile', ZA: 'South Africa', ID: 'Indonesia', RU: 'Russia', MX: 'Mexico',
-  CO: 'Colombia', BO: 'Bolivia', NZ: 'New Zealand', MN: 'Mongolia', KZ: 'Kazakhstan',
-  IN: 'India', CN: 'China', TH: 'Thailand', VN: 'Vietnam', PH: 'Philippines',
-  NG: 'Nigeria', KE: 'Kenya', TZ: 'Tanzania', PE: 'Peru', EC: 'Ecuador',
-  VE: 'Venezuela', PY: 'Paraguay', UY: 'Uruguay', MZ: 'Mozambique', AO: 'Angola',
-  ZM: 'Zambia', ZW: 'Zimbabwe', BW: 'Botswana', NA: 'Namibia',
-};
+import { COUNTRY_NAMES } from '../../shared/wildfireCountries.ts';
 
 export default async function (req) {
   try {

@@ -1,12 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { COUNTRY_NAMES, EFFIS_COUNTRY_CODES } from '../../shared/wildfireCountries.ts';
 
-const EFFIS_COUNTRIES = {
-  ES: 'Spain', PT: 'Portugal', GR: 'Greece', IT: 'Italy', FR: 'France',
-  HR: 'Croatia', BG: 'Bulgaria', CY: 'Cyprus', CZ: 'Czech Republic', EE: 'Estonia',
-  FI: 'Finland', DE: 'Germany', HU: 'Hungary', LV: 'Latvia', LT: 'Lithuania',
-  PL: 'Poland', RO: 'Romania', SK: 'Slovakia', SE: 'Sweden', CH: 'Switzerland',
-  TR: 'Turkey', LB: 'Lebanon',
-};
+const EFFIS_COUNTRIES = Object.fromEntries(
+  Object.entries(COUNTRY_NAMES).filter(([code]) => EFFIS_COUNTRY_CODES.has(code)),
+);
 
 export default async function (req) {
   try {
