@@ -12,8 +12,7 @@ import BusinessKitsPanel from "@/components/business/BusinessKitsPanel";
 import BusinessSubscriptionPanel from "@/components/business/BusinessSubscriptionPanel";
 import AlertSubmissionForm from "@/components/business/AlertSubmissionForm";
 import ContactAdminForm from "@/components/business/ContactAdminForm";
-import WildfireTimeline from "@/components/admin/WildfireTimeline";
-import HolidayFireworkCorrelation from "@/components/admin/HolidayFireworkCorrelation";
+import IncidentsHistory from "@/components/business/IncidentsHistory";
 import ProfessionalUpgradeCard from "@/components/business/ProfessionalUpgradeCard";
 import NeedsBoard from "@/components/business/NeedsBoard";
 import CommunityOneSheet from "@/components/business/CommunityOneSheet";
@@ -210,7 +209,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
           {hasDelegation && <TabsTrigger value="alerts">Emergency Alerts</TabsTrigger>}
           <TabsTrigger value="needs">Needs Board</TabsTrigger>
-          <TabsTrigger value="wildfire">Wildfire History</TabsTrigger>
+          <TabsTrigger value="wildfire">Incidents</TabsTrigger>
           <TabsTrigger value="contact">Contact Admin</TabsTrigger>
           <TabsTrigger value="onesheet">Community Guide</TabsTrigger>
         </TabsList>
@@ -242,10 +241,7 @@ export default function BusinessDashboard() {
           <NeedsBoard subscription={subscription} />
         </TabsContent>
         <TabsContent value="wildfire">
-          <div className="space-y-6">
-            <WildfireTimeline showIncidentList={true} />
-            <HolidayFireworkCorrelation />
-          </div>
+          <IncidentsHistory plans={plans} />
         </TabsContent>
       </Tabs>
 

@@ -158,15 +158,15 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={maxHeight}>
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+              <BarChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 28 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="dateLabel"
                   tick={{ fontSize: 10, fill: "#6b7280" }}
                   angle={-45}
                   textAnchor="end"
-                  height={60}
-                  interval="preserveStartEnd"
+                  height={72}
+                  interval={Math.max(0, Math.floor(chartData.length / 12))}
                 />
                 <YAxis
                   tick={{ fontSize: 11, fill: "#6b7280" }}
@@ -203,23 +203,29 @@ export default function WildfireTimeline({ showIncidentList = false, maxHeight =
               <CardTitle className="text-base">Causes</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={260}>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={causeData}
                     dataKey="value"
                     nameKey="name"
-                    cx="50%"
+                    cx="40%"
                     cy="50%"
-                    outerRadius={80}
-                    label={(e) => `${e.name}: ${e.value}`}
-                    labelLine={false}
+                    outerRadius={70}
+                    label={false}
                   >
                     {causeData.map((_, idx) => (
                       <Cell key={idx} fill={CAUSE_COLORS[idx % CAUSE_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
+                  <Legend
+                    layout="vertical"
+                    align="right"
+                    verticalAlign="middle"
+                    wrapperStyle={{ fontSize: 11, lineHeight: "16px" }}
+                    formatter={(value) => (value && value.length > 22 ? value.slice(0, 21) + "…" : value)}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>

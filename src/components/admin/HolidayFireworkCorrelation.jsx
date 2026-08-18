@@ -39,63 +39,61 @@ export default function HolidayFireworkCorrelation() {
   const analysis = useMemo(() => {
     if (!holidays.length || !incidents.length) return null;
 
-    const holidayDates = holidays
-      .filter(h => h.date)
-      .map(h => new Date(h.date).getTime());
+    // Only holidays with public fireworks, indexed by country. A fire only
+    // matches a holiday celebrated in that fire's country — so fires in
+    // countries without firework traditions are never counted.
+    const fireworkHolidays = holidays.filter(h => h.date && h.has_public_fireworks !== false && h.country_code);
+    const byCountry = new Map();
+    fireworkHolidays.forEach(h => {
+      const arr = byCountry.get(h.country_code) || [];
+      arr.push(h);
+      byCountry.set(h.country_code, arr);
+    });
 
     const within24h = [];
     const within7d = [];
-    const matchedHolidays = new Map();
+    const holidayMatchMap = new Map();
 
     incidents.forEach(inc => {
-      if (!inc.start_date) return;
+      if (!inc.start_date || !inc.country_code) return;
+      const countryHolidays = byCountry.get(inc.country_code);
+      if (!countryHolidays) return; // no firework holidays in this country
       const fireTime = new Date(inc.start_date).getTime();
       let bestHoliday = null;
       let bestDiff = Infinity;
-
-      holidayDates.forEach(hTime => {
-        const diff = Math.abs(fireTime - hTime);
-        if (diff <= MS_7D && diff < bestDiff) {
-          bestDiff = diff;
-          bestHoliday = hTime;
-        }
+      countryHolidays.forEach(h => {
+        const diff = Math.abs(fireTime - new Date(h.date).getTime());
+        if (diff <= MS_7D && diff < bestDiff) { bestDiff = diff; bestHoliday = h; }
       });
-
-      if (bestHoliday !== null) {
+      if (bestHoliday) {
         within7d.push(inc);
-        if (bestDiff <= MS_24H) {
-          within24h.push(inc);
-        }
-        const hKey = String(bestHoliday);
-        if (!matchedHolidays.has(hKey)) {
-          matchedHolidays.set(hKey, []);
-        }
-        matchedHolidays.get(hKey).push(inc);
+        if (bestDiff <= MS_24H) within24h.push(inc);
+        const key = `${bestHoliday.country_code}|${bestHoliday.holiday_name}|${bestHoliday.date}`;
+        if (!holidayMatchMap.has(key)) holidayMatchMap.set(key, { holiday: bestHoliday, matched: [] });
+        holidayMatchMap.get(key).matched.push(inc);
       }
     });
 
-    const totalWithDates = incidents.filter(i => i.start_date).length;
+    // Denominator: only incidents in countries that actually have firework holidays.
+    const scopedCountries = new Set(byCountry.keys());
+    const totalScoped = incidents.filter(i => i.start_date && scopedCountries.has(i.country_code)).length;
 
-    const holidayMatches = holidays
-      .filter(h => h.date)
-      .map(h => {
-        const hTime = new Date(h.date).getTime();
-        const matched = matchedHolidays.get(String(hTime)) || [];
-        return {
-          ...h,
-          matchedCount: matched.length,
-          hectaresTotal: matched.reduce((sum, i) => sum + (i.hectares_burned || 0), 0),
-        };
-      })
+    const holidayMatches = Array.from(holidayMatchMap.values())
+      .map(({ holiday, matched }) => ({
+        ...holiday,
+        matchedCount: matched.length,
+        hectaresTotal: matched.reduce((sum, i) => sum + (i.hectares_burned || 0), 0),
+      }))
       .filter(h => h.matchedCount > 0)
       .sort((a, b) => b.matchedCount - a.matchedCount);
 
     return {
-      totalIncidents: totalWithDates,
+      totalIncidents: totalScoped,
+      scopedCountries: Array.from(scopedCountries).sort(),
       within24hCount: within24h.length,
       within7dCount: within7d.length,
-      pct24h: totalWithDates > 0 ? (within24h.length / totalWithDates) * 100 : 0,
-      pct7d: totalWithDates > 0 ? (within7d.length / totalWithDates) * 100 : 0,
+      pct24h: totalScoped > 0 ? (within24h.length / totalScoped) * 100 : 0,
+      pct7d: totalScoped > 0 ? (within7d.length / totalScoped) * 100 : 0,
       holidayMatches,
     };
   }, [holidays, incidents]);
@@ -132,7 +130,7 @@ export default function HolidayFireworkCorrelation() {
           <Sparkles className="w-4 h-4 text-amber-500" /> Firework Holiday — Wildfire Correlation
         </h3>
         <p className="text-xs text-gray-500 mt-0.5">
-          Percentage of wildfire incidents that started within 24 hours or 7 days of a holiday with public firework displays.
+          Wildfires matched only to firework holidays celebrated in the same country — fires in countries without firework traditions aren't counted.
         </p>
       </div>
 
@@ -144,7 +142,7 @@ export default function HolidayFireworkCorrelation() {
               <Flame className="w-3.5 h-3.5" /> Total Wildfires
             </div>
             <div className="text-2xl font-bold text-gray-900">{analysis.totalIncidents}</div>
-            <div className="text-xs text-gray-400">with recorded start dates</div>
+            <div className="text-xs text-gray-400">in countries with firework holidays</div>
           </CardContent>
         </Card>
         <Card>
