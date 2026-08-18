@@ -96,6 +96,11 @@
     },
     "notes": {
       "type": "string"
+    },
+    "is_merged_away": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this record was merged into another WildfireIncident (soft-deleted). Excluded from public stats/totals but retained for audit and restore."
     }
   },
   "required": [

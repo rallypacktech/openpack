@@ -34,6 +34,7 @@ export default async function (req) {
         let lastDate = null;
         const sourceSet = new Set();
         for (const inc of incs) {
+          if (inc.is_merged_away) continue;
           count++;
           hectares += inc.hectares_burned || 0;
           if (inc.source) sourceSet.add(inc.source);

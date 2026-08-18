@@ -5,6 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GitCompare, RefreshCw, AlertTriangle, MapPin, Clock, Loader2, Copy, Trash2, CheckCircle2 } from "lucide-react";
 
+function fmtSigned(n) {
+  if (n == null) return "—";
+  const v = Math.round(n);
+  return v > 0 ? `+${v.toLocaleString()}` : v.toLocaleString();
+}
+
 export default function IncidentDiscrepancies() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -236,7 +242,7 @@ export default function IncidentDiscrepancies() {
                           </CardTitle>
                           {!isDone && (
                             <Button size="sm" onClick={() => handleMerge(gi)} disabled={isLoading || !keepSelections[gi]}>
-                              {isLoading ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Merging...</> : <><Copy className="w-3.5 h-3.5 mr-1" /> Merge & Delete Duplicates</>}
+                              {isLoading ? <><Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> Merging...</> : <><Copy className="w-3.5 h-3.5 mr-1" /> Merge & Soft-Delete</>}
                             </Button>
                           )}
                         </div>
@@ -245,7 +251,7 @@ export default function IncidentDiscrepancies() {
                         {isDone ? (
                           <div className="flex items-center gap-2 text-sm text-green-700">
                             <CheckCircle2 className="w-4 h-4" />
-                            {isDone.error ? `Error: ${isDone.error}` : `Merged into "${isDone.kept_name}". Copied fields: ${isDone.merged_fields?.join(", ") || "none"}. Deleted ${isDone.deleted_count} duplicate(s).`}
+                            {isDone.error ? `Error: ${isDone.error}` : `Merged into "${isDone.kept_name}". Updated fields: ${isDone.merged_fields?.join(", ") || "none"}. Soft-deleted ${isDone.soft_deleted_count} duplicate(s).${isDone.deltas?.hectares_delta ? ` Δ hectares: ${fmtSigned(isDone.deltas.hectares_delta)}.` : ""}${isDone.deltas?.containment_date_diff_days != null ? ` Containment moved ${isDone.deltas.containment_date_diff_days}d.` : ""}`}
                           </div>
                         ) : (
                           <div className="space-y-2">

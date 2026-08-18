@@ -1,0 +1,160 @@
+{
+  "name": "WildfireMergeLog",
+  "type": "object",
+  "properties": {
+    "kept_incident_id": {
+      "type": "string",
+      "description": "ID of the WildfireIncident record that was kept (updated) by the merge"
+    },
+    "kept_snapshot": {
+      "type": "object",
+      "description": "Snapshot of the kept record's fields before the merge",
+      "properties": {
+        "incident_name": {
+          "type": "string"
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "containment_date": {
+          "type": "string"
+        },
+        "end_date": {
+          "type": "string"
+        },
+        "hectares_burned": {
+          "type": "number"
+        },
+        "acres_burned": {
+          "type": "number"
+        },
+        "responding_organizations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "deleted_incident_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of WildfireIncident records soft-deleted (is_merged_away=true) by this merge, in index order matching deleted_snapshots"
+    },
+    "deleted_snapshots": {
+      "type": "array",
+      "description": "Pre-merge snapshots of each soft-deleted record (same shape as kept_snapshot), indexed to match deleted_incident_ids",
+      "items": {
+        "type": "object",
+        "properties": {
+          "incident_name": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "containment_date": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "hectares_burned": {
+            "type": "number"
+          },
+          "acres_burned": {
+            "type": "number"
+          },
+          "responding_organizations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "restored_incident_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "IDs of records later restored (un-soft-deleted) from this merge"
+    },
+    "merged_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "merged_by": {
+      "type": "string",
+      "description": "Email of the admin who performed the merge"
+    },
+    "merge_reason": {
+      "type": "string",
+      "description": "Why the merge was performed (e.g. 'name match', 'geo+acres match', 'admin manual')"
+    },
+    "containment_date_diff_days": {
+      "type": "number",
+      "description": "Days between the kept record's and the largest deleted record's containment date (positive = deleted was later \u2014 continuing incident)"
+    },
+    "end_date_diff_days": {
+      "type": "number",
+      "description": "Days between kept and largest-deleted end_date"
+    },
+    "hectares_delta": {
+      "type": "number",
+      "description": "Largest deleted record hectares minus kept record hectares (positive = deleted had more burned area \u2014 fire grew)"
+    },
+    "responding_orgs_added": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Responding orgs present in the largest deleted record but not in the kept record"
+    },
+    "responding_orgs_removed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Responding orgs in the kept record but not in the largest deleted record"
+    }
+  },
+  "required": [
+    "kept_incident_id",
+    "deleted_incident_ids",
+    "merged_at",
+    "merged_by"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
