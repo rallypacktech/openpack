@@ -225,7 +225,8 @@ export default function Layout({ children, currentPageName }) {
                 <div>
                   <span className="font-serif text-lg font-bold text-foreground block mb-2">RallyPack</span>
                   <p className="text-muted-foreground text-sm font-sans">
-                    Free, open-source emergency preparedness.
+                    Free, open-source emergency preparedness.<br>
+                    EIN 42-2957691
                   </p>
                 </div>
 
