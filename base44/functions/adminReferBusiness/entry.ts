@@ -207,7 +207,7 @@ Deno.serve(async (req) => {
         });
 
         // Hardcoded to prevent origin/host header spoofing — update if a custom domain is configured
-        const origin = 'https://rallypack.base44.com';
+        const origin = 'https://www.rallypack.org';
 
         const html = buildReferralEmailHtml(
             config, origin, safe_referee_name, safe_organization, adminName, safe_message

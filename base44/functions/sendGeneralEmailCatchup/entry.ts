@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
 const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
-const ORIGIN = 'https://rallypack.base44.com';
+const ORIGIN = 'https://www.rallypack.org';
 
 const DEFAULT_GENERAL_CONFIG = {
     label: 'Workplace Preparedness',

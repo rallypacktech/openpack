@@ -13,7 +13,7 @@ function buildEmailHtml(stats, milestone) {
     `<tr><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;font-size:14px;color:#1c1c1a;text-transform:capitalize;">${region}</td><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;text-align:right;font-size:14px;font-weight:600;color:#1c1c1a;">${count}</td></tr>`
   ).join('');
 
-  const socialBlurb = `🎉 RallyPack just hit ${milestone} readiness quiz results!\n\n📊 Average readiness score: ${avgScore}/100\n✅ ${levels['A Solid Foundation'] || 0} people have a solid emergency foundation\n⚠️ ${levels['Gaps That Put You at Risk'] || 0} have critical preparedness gaps\n📍 Top concern: ${topRegions[0] ? topRegions[0][0] : 'Various'}\n📋 Only ${documentedPct}% have a documented emergency plan\n\nHow prepared are YOU? Take the free quiz: https://rallypack.base44.com/ReadinessQuiz`;
+  const socialBlurb = `🎉 RallyPack just hit ${milestone} readiness quiz results!\n\n📊 Average readiness score: ${avgScore}/100\n✅ ${levels['A Solid Foundation'] || 0} people have a solid emergency foundation\n⚠️ ${levels['Gaps That Put You at Risk'] || 0} have critical preparedness gaps\n📍 Top concern: ${topRegions[0] ? topRegions[0][0] : 'Various'}\n📋 Only ${documentedPct}% have a documented emergency plan\n\nHow prepared are YOU? Take the free quiz: https://www.rallypack.org/ReadinessQuiz`;
 
   return `<!DOCTYPE html>
 <html lang="en">

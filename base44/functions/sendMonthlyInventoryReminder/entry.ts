@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
         body += `</p>`;
       }
 
-      body += `<p><a href="https://rallypack.tech/Shopping" style="color:#222;">Shop now and mark items as owned</a></p><p>Stay safe,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. To stop these reminders, update your notification settings.</p></body></html>`;
+      body += `<p><a href="https://www.rallypack.org/Shopping" style="color:#222;">Shop now and mark items as owned</a></p><p>Stay safe,<br>The RallyPack Team</p><hr style="margin-top:30px;border:1px solid #ccc;"><p style="font-size:0.85em;color:#555;">You received this because you have a RallyPack account. To stop these reminders, update your notification settings.</p></body></html>`;
 
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: user.email,

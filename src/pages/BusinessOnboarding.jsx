@@ -224,7 +224,7 @@ export default function BusinessOnboarding() {
                         `I thought your organization${sent.org ? " (" + sent.org + ")" : ""} would benefit from RallyPack — it tracks first aid kit inventory, expiry dates, and evacuation plans so you're always fire marshal ready.\n\n` +
                         `Features include:\n• Multi-location first aid kit tracking with expiry alerts\n• Evacuation plan documentation\n• Floor warden & chain-of-command roster\n\n` +
                         (sent.message ? `My note: ${sent.message}\n\n` : "") +
-                        `Check it out: https://rallypack.tech/BusinessOnboarding\n\nThanks!`,
+                        `Check it out: https://www.rallypack.org/BusinessOnboarding\n\nThanks!`,
                     )}`}
                     className="inline-flex items-center gap-2 bg-[#D64A2E] text-white font-semibold text-sm px-6 py-2.5 rounded hover:bg-[#be3f25] transition-colors"
                   >
