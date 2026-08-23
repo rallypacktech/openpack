@@ -54,6 +54,9 @@ export default function Register() {
       const result = await base44.auth.verifyOtp({ email, otpCode });
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
+        // Flag this session as a fresh signup so the Google Ads SIGNUP
+        // conversion fires on the first authenticated render (in Layout).
+        try { localStorage.setItem("__rallypack_pending_signup", email); } catch (_e) {}
         // Fire-and-forget: if signup shows bot-like indicators, send data safety education email
         base44.functions
           .invoke("notifySuspiciousSignup", { email })

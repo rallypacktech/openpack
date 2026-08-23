@@ -39,6 +39,22 @@ export default function Layout({ children, currentPageName }) {
         const profiles = await base44.entities.UserProfile.filter({ created_by: userData.email });
         if (profiles.length > 0) setProfile(profiles[0]);
         setAuthChecked(true);
+        // Fire Google Ads SIGNUP conversion once for a freshly-registered user
+        // (Register.jsx sets the pending flag right before the post-signup redirect).
+        try {
+          const pending = localStorage.getItem("__rallypack_pending_signup");
+          if (pending && userData.email && pending.toLowerCase() === userData.email.toLowerCase()) {
+            const firedKey = `rallypack_signup_fired_${userData.id}`;
+            if (!localStorage.getItem(firedKey) && typeof window !== "undefined" && window.gtag) {
+              window.gtag("event", "conversion", {
+                send_to: "AW-18405445520/hSWHCMLJl-YcEJCfs8hE",
+                transaction_id: userData.id,
+              });
+              localStorage.setItem(firedKey, "1");
+            }
+            localStorage.removeItem("__rallypack_pending_signup");
+          }
+        } catch (_e) { /* storage unavailable */ }
       } catch (e) {
         // Not logged in - redirect to Home if on protected page
         const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends"];

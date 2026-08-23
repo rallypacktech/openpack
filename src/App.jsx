@@ -5,7 +5,7 @@ import VisualEditAgent from '@/lib/VisualEditAgent'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -129,6 +129,38 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  // Google Ads gtag bootstrap (loads once; cross-origin relay for iframe previews).
+  useEffect(() => {
+    if (typeof window === "undefined" || window.__gads_loaded) return;
+    window.__gads_loaded = true;
+    window.dataLayer = window.dataLayer || [];
+    const inIframe = (() => { try { return window.self !== window.top; } catch { return true; } })();
+    window.gtag = function gtag() {
+      window.dataLayer.push(arguments);
+      if (inIframe) {
+        try {
+          const args = Array.prototype.slice.call(arguments);
+          const cmd = args[0];
+          window.parent.postMessage({
+            type: 'base44_gtag_event',
+            event: {
+              source: 'gtag',
+              timestamp: new Date().toLocaleTimeString(),
+              command: cmd,
+              params: args.slice(1),
+              type: cmd === 'event' ? (args[1] || 'event') : cmd,
+            },
+          }, '*');
+        } catch (_e) { /* relay must not break gtag */ }
+      }
+    };
+    const s = document.createElement('script');
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18405445520';
+    s.async = true;
+    document.head.appendChild(s);
+    window.gtag('js', new Date());
+    window.gtag('config', 'AW-18405445520', { send_page_view: false });
+  }, []);
 
   return (
     <AuthProvider>

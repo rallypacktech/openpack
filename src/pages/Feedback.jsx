@@ -44,6 +44,12 @@ export default function Feedback() {
       }
       setSubmitted(true);
       toast.success("Feedback sent! Thank you.");
+      // Google Ads SUBMIT_LEAD_FORM — feedback form submitted successfully.
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("event", "conversion", {
+          send_to: "AW-18405445520/qbs-CMnSo-YcEJCfs8hE",
+        });
+      }
     } catch {
       toast.error("Failed to send. Please try again.");
     } finally {

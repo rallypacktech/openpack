@@ -39,6 +39,25 @@ export default function Donate() {
     loadProgress();
   }, []);
 
+  // Fire donation-completed tracking (pendo + Google Ads PURCHASE) once on
+  // landing back from Stripe checkout with ?donated=true.
+  useEffect(() => {
+    if (!donated) return;
+    const key = window.location.search;
+    if (_trackedDonationComplete.has(key)) return;
+    _trackedDonationComplete.add(key);
+    if (typeof pendo !== "undefined") pendo.track("donation_completed");
+    const params = new URLSearchParams(window.location.search);
+    const amt = parseFloat(params.get("amt"));
+    const sid = params.get("sid");
+    if (typeof window !== "undefined" && window.gtag) {
+      const payload = { send_to: "AW-18405445520/mfsYCOvFl-YcEJCfs8hE", currency: "USD" };
+      if (amt && !isNaN(amt)) payload.value = amt;
+      if (sid) payload.transaction_id = sid;
+      window.gtag("event", "conversion", payload);
+    }
+  }, [donated]);
+
   const loadProgress = async () => {
     setProgressLoading(true);
     try {
@@ -64,7 +83,7 @@ export default function Donate() {
         },
       ],
       metadata: { donation: "true" },
-      success_url: `${window.location.origin}/Donate?donated=true`,
+      success_url: `${window.location.origin}/Donate?donated=true&amt=${amount}&sid={CHECKOUT_SESSION_ID}`,
       cancel_url: `${window.location.origin}/Donate`,
     };
 
@@ -77,20 +96,20 @@ export default function Donate() {
           preset_amount: custom ? "" : String(selected),
         });
       }
+      // Google Ads BEGIN_CHECKOUT — user is entering the Stripe checkout flow.
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("event", "conversion", {
+          send_to: "AW-18405445520/pploCPP6peYcEJCfs8hE",
+          value: amount,
+          currency: "USD",
+        });
+      }
       window.location.href = res.data.url;
     }
     setLoading(false);
   };
 
   if (donated) {
-    const donationKey = window.location.search;
-    if (
-      typeof pendo !== "undefined" &&
-      !_trackedDonationComplete.has(donationKey)
-    ) {
-      _trackedDonationComplete.add(donationKey);
-      pendo.track("donation_completed");
-    }
     return (
       <div className="min-h-screen bg-[#F5F0E8] flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">

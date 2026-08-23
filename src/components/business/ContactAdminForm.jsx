@@ -49,6 +49,12 @@ export default function ContactAdminForm({ organizationName }) {
           organization_name: organizationName || "",
         });
       }
+      // Google Ads CONTACT — contact request sent successfully.
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("event", "conversion", {
+          send_to: "AW-18405445520/F-NlCLOgpuYcEJCfs8hE",
+        });
+      }
       setForm({ subject: "", message: "", request_type: "improvement" });
     } catch (err) {
       setResult({ error: err.message || "Failed to send message" });

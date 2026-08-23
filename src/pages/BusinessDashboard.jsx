@@ -26,6 +26,7 @@ export default function BusinessDashboard() {
   const [user, setUser] = useState(null);
   const [hasDelegation, setHasDelegation] = useState(false);
   const [showProUpgrade, setShowProUpgrade] = useState(false);
+  const [subConversionFired, setSubConversionFired] = useState(false);
 
   useEffect(() => {
     loadAll();
@@ -33,6 +34,24 @@ export default function BusinessDashboard() {
     const interval = setInterval(loadAll, 12 * 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Google Ads SUBSCRIBE_PAID — fires once when a user lands here after
+  // completing a Stripe subscription checkout (sub_success=true).
+  useEffect(() => {
+    if (subConversionFired || !subscription) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("sub_success") !== "true") return;
+    const tierPrice = { basic: 29, professional: 99, enterprise: 299 }[subscription.tier] || 0;
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("event", "conversion", {
+        send_to: "AW-18405445520/2aiSCMmhpuYcEJCfs8hE",
+        value: tierPrice,
+        currency: "USD",
+        transaction_id: params.get("sid") || subscription.id,
+      });
+    }
+    setSubConversionFired(true);
+  }, [subscription, subConversionFired]);
 
   const loadAll = async () => {
     setLoading(true);

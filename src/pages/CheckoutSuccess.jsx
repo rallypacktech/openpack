@@ -56,6 +56,22 @@ export default function CheckoutSuccess() {
           cache_id: cacheId,
         });
       }
+      // Google Ads PURCHASE — product checkout completed.
+      const _urlParams = new URLSearchParams(window.location.search);
+      const _sessionId = _urlParams.get("session_id");
+      const _totalCents = recIds.reduce((sum, recId) => {
+        const rec = recs.find((r) => r.id === recId);
+        return sum + (rec ? (rec.price_cents || 0) * (rec.quantity || 1) : 0);
+      }, 0);
+      if (typeof window !== "undefined" && window.gtag) {
+        const payload = {
+          send_to: "AW-18405445520/mfsYCOvFl-YcEJCfs8hE",
+          value: _totalCents / 100,
+          currency: "USD",
+        };
+        if (_sessionId) payload.transaction_id = _sessionId;
+        window.gtag("event", "conversion", payload);
+      }
     } catch (error) {
       console.error("Error processing order:", error);
     } finally {

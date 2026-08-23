@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Share2, Mail, Info } from "lucide-react";
+import { Loader2, Share2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import KeyNumbersBand from "@/components/wildfire/KeyNumbersBand";
 import YearTrendChart from "@/components/wildfire/YearTrendChart";
 import CountryLeaders from "@/components/wildfire/CountryLeaders";
 import CauseDistribution from "@/components/wildfire/CauseDistribution";
 import HolidayProximity from "@/components/wildfire/HolidayProximity";
 import CountryActivityLists from "@/components/wildfire/CountryActivityLists";
-import PrLetterTool from "@/components/admin/PrLetterTool";
 
 function fmtDate(iso) {
   if (!iso) return "—";
@@ -43,7 +41,6 @@ export default function WildfireTrends() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -55,12 +52,6 @@ export default function WildfireTrends() {
         setError(e.response?.data?.error || e.message || "Failed to load report");
       } finally {
         setLoading(false);
-      }
-      try {
-        const me = await base44.auth.me();
-        setIsAdmin(me?.role === "admin");
-      } catch (e) {
-        setIsAdmin(false);
       }
     })();
   }, []);
@@ -133,6 +124,8 @@ export default function WildfireTrends() {
       {jsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       )}
+      {/* Full report as machine-readable JSON for AI/crawlers — not rendered for end users. */}
+      <script type="application/json" data-rallypack-wildfire-report dangerouslySetInnerHTML={{ __html: JSON.stringify(report) }} />
 
       {/* Hero */}
       <div className="bg-foreground text-cream">
@@ -193,29 +186,6 @@ export default function WildfireTrends() {
           </div>
         </div>
 
-        {/* Press & municipalities — PR letter tool for admins */}
-        <div className="border-t border-border pt-8">
-          <h2 className="text-2xl font-serif font-bold text-foreground mb-1">For press and municipalities</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            Generate a tailored letter to reporters or local government citing this report's figures.
-          </p>
-          {isAdmin ? (
-            <PrLetterTool report={report} />
-          ) : (
-            <Card>
-              <CardContent className="p-5 flex items-center gap-3">
-                <Mail className="w-5 h-5 text-crimson flex-shrink-0" />
-                <p className="text-sm text-muted-foreground">
-                  Letter generation is an admin tool.{" "}
-                  <button onClick={() => base44.auth.redirectToLogin(window.location.pathname)} className="text-crimson underline hover:no-underline">
-                    Sign in as an admin
-                  </button>{" "}
-                  to draft and send PR letters from this report.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
             line_items: [{ price: price_id, quantity: 1 }],
             mode: 'subscription',
             subscription_data: { trial_period_days: 7 },
-            success_url: success_url || `${new URL(req.url).origin}/BusinessDashboard?sub_success=true`,
+            success_url: success_url || `${new URL(req.url).origin}/BusinessDashboard?sub_success=true&sid={CHECKOUT_SESSION_ID}`,
             cancel_url: cancel_url || `${new URL(req.url).origin}/BusinessDashboard`,
             customer_email,
             metadata: {
