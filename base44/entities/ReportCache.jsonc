@@ -1,0 +1,42 @@
+{
+  "name": "ReportCache",
+  "type": "object",
+  "properties": {
+    "cache_key": {
+      "type": "string",
+      "description": "Stable key identifying which cached report this is (e.g. 'public_wildfire_report')"
+    },
+    "payload": {
+      "type": "object",
+      "description": "The full built report payload served to callers while the cache is fresh"
+    },
+    "built_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this cached snapshot was built; callers compare against a TTL to decide freshness"
+    }
+  },
+  "required": [
+    "cache_key",
+    "payload",
+    "built_at"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

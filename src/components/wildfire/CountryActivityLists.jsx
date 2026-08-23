@@ -12,7 +12,8 @@ export default function CountryActivityLists({ newlyActive, zeroActivity }) {
           <Sparkles className="w-4 h-4 text-gold" /> Newly active in 2024–2025
         </h3>
         <p className="text-xs text-muted-foreground mb-3">
-          Countries with no recorded fires before 2024 — first appearance in the dataset.
+          These countries recorded their first fires in 2024, after none on record since 2014 or
+          earlier — likely a sign of expanded data coverage rather than a sudden emergence of fire.
         </p>
         {newlyActive?.length ? (
           <div className="flex flex-wrap gap-2">

@@ -58,14 +58,30 @@ export function canonicalCause(raw) {
   return 'Other';
 }
 
+// Holidays are stored with a single representative date (e.g. 2026-07-04).
+// Treat them as recurring annual events: for each fire, compare its start
+// date to the holiday's occurrence in the fire's own year — and also the
+// year before/after to handle the December↔January wrap (New Year's Eve).
+function holidayMonthDay(h) {
+  const d = new Date(h.date);
+  if (isNaN(d.getTime())) return null;
+  return { month: d.getUTCMonth(), day: d.getUTCDate() };
+}
+function holidayOccurrenceMs(md, year) {
+  return Date.UTC(year, md.month, md.day);
+}
+
 export function computeHolidayProximity(incidents, holidays) {
   const firework = (holidays || []).filter(
     (h) => h.date && h.has_public_fireworks !== false && h.country_code
   );
+  // Precompute month-day for each holiday once.
   const byCountry = new Map();
   for (const h of firework) {
+    const md = holidayMonthDay(h);
+    if (!md) continue;
     const arr = byCountry.get(h.country_code) || [];
-    arr.push(h);
+    arr.push({ h, md });
     byCountry.set(h.country_code, arr);
   }
   const scopedCountries = new Set(byCountry.keys());
@@ -78,31 +94,53 @@ export function computeHolidayProximity(incidents, holidays) {
     if (!inc.start_date || !inc.country_code) continue;
     const countryHolidays = byCountry.get(inc.country_code);
     if (!countryHolidays) continue; // no firework holidays in this country
-    totalScoped++;
     const fireTime = new Date(inc.start_date).getTime();
+    if (isNaN(fireTime)) continue;
+    totalScoped++;
+    const fireYear = new Date(inc.start_date).getUTCFullYear();
     let bestHoliday = null;
     let bestDiff = Infinity;
-    for (const h of countryHolidays) {
-      const diff = Math.abs(fireTime - new Date(h.date).getTime());
-      if (diff <= MS_7D && diff < bestDiff) { bestDiff = diff; bestHoliday = h; }
+    let bestOccYear = null;
+    for (const { h, md } of countryHolidays) {
+      // Test the holiday in the fire's year and the adjacent years so a
+      // late-December holiday can match an early-January fire (and vice versa).
+      for (const y of [fireYear, fireYear - 1, fireYear + 1]) {
+        const occ = holidayOccurrenceMs(md, y);
+        const diff = Math.abs(fireTime - occ);
+        if (diff <= MS_7D && diff < bestDiff) {
+          bestDiff = diff;
+          bestHoliday = h;
+          bestOccYear = y;
+        }
+      }
     }
     if (bestHoliday) {
       within7d++;
       if (bestDiff <= MS_24H) within24h++;
-      const key = `${bestHoliday.country_code}|${bestHoliday.holiday_name}|${bestHoliday.date}`;
-      if (!holidayMatchMap.has(key)) holidayMatchMap.set(key, { holiday: bestHoliday, matched: [] });
+      // Key by country + holiday name + matched occurrence year, so the same
+      // holiday appears once per year it actually had nearby fires.
+      const key = `${bestHoliday.country_code}|${bestHoliday.holiday_name}|${bestOccYear}`;
+      if (!holidayMatchMap.has(key)) {
+        holidayMatchMap.set(key, { holiday: bestHoliday, occYear: bestOccYear, matched: [] });
+      }
       holidayMatchMap.get(key).matched.push(inc);
     }
   }
 
   const matches = Array.from(holidayMatchMap.values())
-    .map(({ holiday, matched }) => ({
-      holiday_name: holiday.holiday_name,
-      country_code: holiday.country_code,
-      date: holiday.date,
-      matched_count: matched.length,
-      hectares_total: Math.round(matched.reduce((s, i) => s + (i.hectares_burned || 0), 0)),
-    }))
+    .map(({ holiday, occYear, matched }) => {
+      const md = holidayMonthDay(holiday);
+      const dispDate = md
+        ? new Date(Date.UTC(occYear, md.month, md.day)).toISOString().substring(0, 10)
+        : holiday.date;
+      return {
+        holiday_name: holiday.holiday_name,
+        country_code: holiday.country_code,
+        date: dispDate,
+        matched_count: matched.length,
+        hectares_total: Math.round(matched.reduce((s, i) => s + (i.hectares_burned || 0), 0)),
+      };
+    })
     .filter((m) => m.matched_count > 0)
     .sort((a, b) => b.matched_count - a.matched_count)
     .slice(0, 20);

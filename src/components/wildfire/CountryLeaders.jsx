@@ -13,8 +13,20 @@ function LeaderChart({ data, dataKey, color, label }) {
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
           <XAxis type="number" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={fmt} />
-          <YAxis type="category" dataKey="name" width={104} tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }} />
-          <Tooltip formatter={fmt} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
+          <YAxis
+            type="category"
+            dataKey="name"
+            width={104}
+            tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
+            // Alternate labels by rank: #1, #3, #5… visible; #2, #4, #6… blank.
+            // #1 is always shown regardless (index 0 is even, but kept explicit).
+            tickFormatter={(value, index) => (index === 0 || index % 2 === 0 ? value : "")}
+          />
+          <Tooltip
+            // Label the tooltip with the country name so hidden-axis bars stay identifiable.
+            formatter={(value, _name, item) => [fmt(value), item?.payload?.name ?? label]}
+            cursor={{ fill: "rgba(0,0,0,0.03)" }}
+          />
           <Bar dataKey={dataKey} name={label} radius={[0, 3, 3, 0]}>
             {data.map((_, i) => (
               <Cell key={i} fill={color} />
