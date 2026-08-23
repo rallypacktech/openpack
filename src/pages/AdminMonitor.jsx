@@ -11,6 +11,8 @@ import AlertsPanel from "../components/admin/AlertsPanel";
 import GrantLOIWorkflow from "../components/admin/GrantLOIWorkflow";
 import CleanupPanel from "../components/admin/CleanupPanel";
 import HeroShotsPanel from "../components/admin/HeroShotsPanel";
+import WildfireValidationPanel from "../components/admin/WildfireValidationPanel";
+import PrLetterTool from "../components/admin/PrLetterTool";
 import AdminProducts from "./AdminProducts";
 
 export default function AdminMonitor() {
@@ -122,6 +124,12 @@ export default function AdminMonitor() {
             <TabsTrigger value="heroshots" className="flex items-center gap-2">
               <ImageIcon className="w-4 h-4" /> Stock Images
             </TabsTrigger>
+            <TabsTrigger value="validation" className="flex items-center gap-2">
+              <ClipboardList className="w-4 h-4" /> Data Validation
+            </TabsTrigger>
+            <TabsTrigger value="prletters" className="flex items-center gap-2">
+              <Mail className="w-4 h-4" /> PR Letters
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="incidents">
@@ -154,6 +162,14 @@ export default function AdminMonitor() {
 
           <TabsContent value="heroshots">
             <HeroShotsPanel />
+          </TabsContent>
+
+          <TabsContent value="validation">
+            <WildfireValidationPanel />
+          </TabsContent>
+
+          <TabsContent value="prletters">
+            <PrLetterTool />
           </TabsContent>
 
           <TabsContent value="users">

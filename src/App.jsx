@@ -34,6 +34,7 @@ const Hurricane = lazy(() => import('./pages/Hurricane'));
 const Flood = lazy(() => import('./pages/Flood'));
 const Tornado = lazy(() => import('./pages/Tornado'));
 const AgentAssistant = lazy(() => import('./pages/AgentAssistant'));
+const WildfireTrends = lazy(() => import('./pages/WildfireTrends'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -118,6 +119,7 @@ const AuthenticatedApp = () => {
       <Route path="/hurricane" element={<LayoutWrapper currentPageName="Hurricane"><Hurricane /></LayoutWrapper>} />
       <Route path="/flood" element={<LayoutWrapper currentPageName="Flood"><Flood /></LayoutWrapper>} />
       <Route path="/tornado" element={<LayoutWrapper currentPageName="Tornado"><Tornado /></LayoutWrapper>} />
+      <Route path="/wildfire-trends" element={<LayoutWrapper currentPageName="WildfireTrends"><WildfireTrends /></LayoutWrapper>} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>

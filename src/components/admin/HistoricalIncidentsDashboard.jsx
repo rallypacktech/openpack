@@ -38,12 +38,17 @@ export default function HistoricalIncidentsDashboard() {
   const [fetchSource, setFetchSource] = useState(null);
   const [fetchResult, setFetchResult] = useState(null);
   const [allCountries, setAllCountries] = useState([]);
+  const [report, setReport] = useState(null);
 
   const loadIncidents = async () => {
     setLoading(true);
     try {
-      const data = await base44.entities.WildfireIncident.list("-start_date", 500);
+      const [data, rep] = await Promise.all([
+        base44.entities.WildfireIncident.list("-start_date", 500),
+        base44.functions.invoke("getPublicWildfireReport", {}).catch(() => null),
+      ]);
       setIncidents(data);
+      if (rep?.data) setReport(rep.data);
     } catch (e) {
       console.error("Error loading incidents:", e);
     } finally {
@@ -154,7 +159,8 @@ export default function HistoricalIncidentsDashboard() {
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
               <Flame className="w-3.5 h-3.5" /> Total Incidents
             </div>
-            <div className="text-2xl font-bold">{filtered.length}</div>
+            <div className="text-2xl font-bold">{formatNumber(report?.totals?.total_incidents ?? filtered.length)}</div>
+            <p className="text-[11px] text-muted-foreground">full dataset</p>
           </CardContent>
         </Card>
         <Card>
@@ -162,7 +168,8 @@ export default function HistoricalIncidentsDashboard() {
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
               <Globe className="w-3.5 h-3.5" /> Hectares Burned
             </div>
-            <div className="text-2xl font-bold">{formatNumber(Math.round(stats.totalHectares))}</div>
+            <div className="text-2xl font-bold">{formatNumber(Math.round(report?.totals?.total_hectares ?? stats.totalHectares))}</div>
+            <p className="text-[11px] text-muted-foreground">full dataset</p>
           </CardContent>
         </Card>
         <Card>
@@ -170,7 +177,8 @@ export default function HistoricalIncidentsDashboard() {
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
               <AlertCircle className="w-3.5 h-3.5" /> Structures Lost
             </div>
-            <div className="text-2xl font-bold">{formatNumber(stats.totalStructures)}</div>
+            <div className="text-2xl font-bold">{formatNumber(report?.totals?.total_structures ?? stats.totalStructures)}</div>
+            <p className="text-[11px] text-muted-foreground">full dataset</p>
           </CardContent>
         </Card>
         <Card>
@@ -178,7 +186,8 @@ export default function HistoricalIncidentsDashboard() {
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
               <TrendingDown className="w-3.5 h-3.5" /> Fatalities
             </div>
-            <div className="text-2xl font-bold">{formatNumber(stats.totalFatalities)}</div>
+            <div className="text-2xl font-bold">{formatNumber(report?.totals?.total_fatalities ?? stats.totalFatalities)}</div>
+            <p className="text-[11px] text-muted-foreground">full dataset</p>
           </CardContent>
         </Card>
       </div>
