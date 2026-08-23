@@ -103,7 +103,11 @@ export default function Dashboard() {
         household_size: 1 + familyMembers.length,
       };
 
-      await base44.entities.UserProfile.create(cleanedData);
+      if (userProfile) {
+        await base44.entities.UserProfile.update(userProfile.id, cleanedData);
+      } else {
+        await base44.entities.UserProfile.create(cleanedData);
+      }
       console.log("Address saved successfully");
       if (typeof pendo !== "undefined") {
         pendo.track("onboarding_address_saved", {

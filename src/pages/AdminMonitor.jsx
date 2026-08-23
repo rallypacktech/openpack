@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck, Flame, FileText, Sparkles, Image as ImageIcon } from "lucide-react";
+import { AlertTriangle, Users, Circle, Clock, User, Mail, ClipboardList, Map, Building2, ShieldCheck, Package, FileText, Sparkles, Image as ImageIcon } from "lucide-react";
 import QuizResultsTable from "../components/admin/QuizResultsTable";
 import IncidentsPanel from "../components/admin/IncidentsPanel";
 import BusinessReferralsPanel from "../components/admin/BusinessReferralsPanel";
@@ -100,7 +100,7 @@ export default function AdminMonitor() {
               <AlertTriangle className="w-4 h-4" /> Incidents
             </TabsTrigger>
             <TabsTrigger value="products" className="flex items-center gap-2">
-              <Flame className="w-4 h-4" /> Products
+              <Package className="w-4 h-4" /> Products
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" /> User Monitor
@@ -127,9 +127,6 @@ export default function AdminMonitor() {
             <TabsTrigger value="validation" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" /> Data Validation
             </TabsTrigger>
-            <TabsTrigger value="prletters" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" /> PR Letters
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="incidents">
@@ -146,6 +143,12 @@ export default function AdminMonitor() {
 
           <TabsContent value="referrals">
             <BusinessReferralsPanel />
+            <div className="mt-8 pt-6 border-t border-border">
+              <h2 className="font-serif text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <Mail className="w-4 h-4" /> PR Letters
+              </h2>
+              <PrLetterTool />
+            </div>
           </TabsContent>
 
           <TabsContent value="alerts">
@@ -166,10 +169,6 @@ export default function AdminMonitor() {
 
           <TabsContent value="validation">
             <WildfireValidationPanel />
-          </TabsContent>
-
-          <TabsContent value="prletters">
-            <PrLetterTool />
           </TabsContent>
 
           <TabsContent value="users">
