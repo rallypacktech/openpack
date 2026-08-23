@@ -233,10 +233,13 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const email = body.email || user.email;
+    // Lock the recipient to the authenticated caller's verified email — never
+    // trust a caller-supplied address (would allow open-email-relay abuse).
+    const email = user.email;
     if (!email) {
       return Response.json({ error: 'No email address available' }, { status: 400 });
     }
+    void body;
 
     const { suspicious, reasons, botName, userAgent } = checkSuspicious(req);
 
