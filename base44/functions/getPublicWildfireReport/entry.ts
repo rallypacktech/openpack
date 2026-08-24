@@ -10,14 +10,17 @@ export default async function (req) {
 
     const CACHE_KEY = 'public_wildfire_report';
     const TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+    // Bump when the report's JSON shape changes (e.g. holiday_matches → holiday_groups)
+    // so a stale-shaped cached payload is auto-invalidated instead of served for up to 6h.
+    const REPORT_SCHEMA_VERSION = 2;
 
-    // Serve a cached snapshot if fresh, so public/crawler page loads never
-    // fan out into parallel DB queries on every hit (rate-limit safe).
+    // Serve a cached snapshot only if fresh AND matching the current schema version.
     try {
       const cached = await base44.asServiceRole.entities.ReportCache.filter({ cache_key: CACHE_KEY });
       if (cached.length > 0) {
         const age = Date.now() - new Date(cached[0].built_at).getTime();
-        if (age < TTL_MS) {
+        const cachedVersion = cached[0].payload?.schema_version;
+        if (age < TTL_MS && cachedVersion === REPORT_SCHEMA_VERSION) {
           return Response.json(cached[0].payload);
         }
       }
@@ -35,6 +38,7 @@ export default async function (req) {
     }
 
     const report = buildReport(incidents, holidays);
+    report.schema_version = REPORT_SCHEMA_VERSION;
 
     // Persist the rebuilt report (upsert) — non-fatal on failure.
     try {
