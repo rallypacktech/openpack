@@ -88,7 +88,9 @@ export function computeHolidayProximity(incidents, holidays) {
   let totalScoped = 0;
   let within24h = 0;
   let within7d = 0;
-  const holidayMatchMap = new Map();
+  // Group matched fires by holiday (across all years) instead of one row per
+  // holiday-year capped at 20. Every firework-tradition holiday renders.
+  const groupMap = new Map();
 
   for (const inc of incidents) {
     if (!inc.start_date || !inc.country_code) continue;
@@ -116,34 +118,39 @@ export function computeHolidayProximity(incidents, holidays) {
     }
     if (bestHoliday) {
       within7d++;
-      if (bestDiff <= MS_24H) within24h++;
-      // Key by country + holiday name + matched occurrence year, so the same
-      // holiday appears once per year it actually had nearby fires.
-      const key = `${bestHoliday.country_code}|${bestHoliday.holiday_name}|${bestOccYear}`;
-      if (!holidayMatchMap.has(key)) {
-        holidayMatchMap.set(key, { holiday: bestHoliday, occYear: bestOccYear, matched: [] });
+      const is24 = bestDiff <= MS_24H;
+      if (is24) within24h++;
+      const gkey = `${bestHoliday.country_code}|${bestHoliday.holiday_name}`;
+      if (!groupMap.has(gkey)) {
+        groupMap.set(gkey, {
+          holiday_name: bestHoliday.holiday_name,
+          country_code: bestHoliday.country_code,
+          total_fires: 0,
+          within_24h: 0,
+          within_7d: 0,
+          hectares_total: 0,
+          fires: [],
+        });
       }
-      holidayMatchMap.get(key).matched.push(inc);
+      const g = groupMap.get(gkey);
+      g.total_fires++;
+      g.within_7d++;
+      if (is24) g.within_24h++;
+      g.hectares_total += inc.hectares_burned || 0;
+      g.fires.push({
+        incident_name: inc.incident_name || 'Unnamed',
+        start_date: inc.start_date,
+        hectares_burned: inc.hectares_burned || 0,
+        occ_year: bestOccYear,
+        days_from_holiday: Math.round((bestDiff / MS_24H) * 10) / 10,
+        within_24h: is24,
+      });
     }
   }
 
-  const matches = Array.from(holidayMatchMap.values())
-    .map(({ holiday, occYear, matched }) => {
-      const md = holidayMonthDay(holiday);
-      const dispDate = md
-        ? new Date(Date.UTC(occYear, md.month, md.day)).toISOString().substring(0, 10)
-        : holiday.date;
-      return {
-        holiday_name: holiday.holiday_name,
-        country_code: holiday.country_code,
-        date: dispDate,
-        matched_count: matched.length,
-        hectares_total: Math.round(matched.reduce((s, i) => s + (i.hectares_burned || 0), 0)),
-      };
-    })
-    .filter((m) => m.matched_count > 0)
-    .sort((a, b) => b.matched_count - a.matched_count)
-    .slice(0, 20);
+  const holiday_groups = Array.from(groupMap.values())
+    .map((g) => ({ ...g, hectares_total: Math.round(g.hectares_total) }))
+    .sort((a, b) => b.total_fires - a.total_fires);
 
   return {
     scoped_countries: Array.from(scopedCountries).sort(),
@@ -152,7 +159,7 @@ export function computeHolidayProximity(incidents, holidays) {
     within_7d: within7d,
     pct_24h: totalScoped > 0 ? (within24h / totalScoped) * 100 : 0,
     pct_7d: totalScoped > 0 ? (within7d / totalScoped) * 100 : 0,
-    holiday_matches: matches,
+    holiday_groups,
   };
 }
 
