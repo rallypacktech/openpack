@@ -153,6 +153,9 @@ export default function WildfireTrends() {
           {report.spikes?.map((s, i) => (
             <p key={i} className="text-xs text-muted-foreground mt-3"><strong className="text-foreground">{s.years}:</strong> {s.note}</p>
           ))}
+          <p className="text-xs text-muted-foreground mt-3">
+            <strong className="text-foreground">Note:</strong> The earliest bar (1971) is a single long-burning industrial gas-field fire that has been active continuously since that year — it predates the 10-year window and is shown for completeness, not as a wildfire-season indicator.
+          </p>
         </Section>
 
         <Section title="Where fires concentrate" takeaway="The countries with the most recorded fires differ from those with the most hectares burned — a sign of data-source bias and differing fire regimes.">
@@ -181,7 +184,7 @@ export default function WildfireTrends() {
               for display; raw labels are preserved on each record. Fires that smoulder and re-ignite may be recorded as
               separate incidents, which can inflate counts — no records were modified to produce this report. Hectares
               represent burned area across recorded incidents, not a global total. Human-caused share is {humanPct}%.
-              Data as of {fmtDate(report.data_as_of)}.
+              Data as of {fmtDate(report.data_as_of)}. The 1971 data point reflects a single continuously burning industrial gas-field fire, included for completeness.
             </p>
           </div>
         </div>
