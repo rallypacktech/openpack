@@ -171,6 +171,7 @@ export function buildReport(incidents, holidays) {
   let totalHectares = 0;
   let totalStructures = 0;
   let totalFatalities = 0;
+  let missingHectares = 0;
   let mostRecent = null;
   const firstActivityByCountry = {};
 
@@ -179,6 +180,7 @@ export function buildReport(incidents, holidays) {
     const year = parseInt(String(inc.start_date).substring(0, 4), 10);
     totalIncidents++;
     const ha = inc.hectares_burned || 0;
+    if (!ha) missingHectares++;
     totalHectares += ha;
     totalStructures += inc.structures_destroyed || 0;
     totalFatalities += inc.fatalities || 0;
@@ -230,6 +232,8 @@ export function buildReport(incidents, holidays) {
       total_hectares: Math.round(totalHectares),
       total_structures: totalStructures,
       total_fatalities: totalFatalities,
+      fires_missing_hectares: missingHectares,
+      pct_missing_hectares: totalIncidents > 0 ? Math.round((missingHectares / totalIncidents) * 100) : 0,
       countries_affected: Object.keys(byCountry).length,
       most_recent_date: mostRecent,
     },

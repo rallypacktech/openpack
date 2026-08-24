@@ -12,7 +12,7 @@ export default async function (req) {
     const TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
     // Bump when the report's JSON shape changes (e.g. holiday_matches → holiday_groups)
     // so a stale-shaped cached payload is auto-invalidated instead of served for up to 6h.
-    const REPORT_SCHEMA_VERSION = 2;
+    const REPORT_SCHEMA_VERSION = 3;
 
     // Serve a cached snapshot only if fresh AND matching the current schema version.
     try {

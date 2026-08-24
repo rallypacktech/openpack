@@ -150,6 +150,11 @@ export default function WildfireTrends() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12">
         <Section title="Fires per year" takeaway={`${report.totals.total_incidents.toLocaleString()} recorded wildfires across ${report.totals.countries_affected} countries. Spikes in 2017–2018 and 2024–2025 align with major fire seasons and the 2023–2024 El Niño.`}>
           <YearTrendChart byYear={report.by_year} />
+          {report.totals.fires_missing_hectares > 0 && (
+            <p className="text-xs text-muted-foreground mt-3">
+              <strong className="text-foreground">Note:</strong> {report.totals.fires_missing_hectares.toLocaleString()} of {report.totals.total_incidents.toLocaleString()} recorded fires ({report.totals.pct_missing_hectares}%) have no reported burn area and are excluded from the hectares line — the area trend is therefore a conservative lower bound, not a complete total.
+            </p>
+          )}
           {report.spikes?.map((s, i) => (
             <p key={i} className="text-xs text-muted-foreground mt-3"><strong className="text-foreground">{s.years}:</strong> {s.note}</p>
           ))}
