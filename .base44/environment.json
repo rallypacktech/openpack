@@ -1,0 +1,17 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "VITE_BASE44_APP_ID",
+      "description": "Base44 app ID — identifies this app's backend on the Base44 platform. Found in the Base44 dashboard under your app's settings.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "VITE_BASE44_APP_BASE_URL",
+      "description": "Base44 backend base URL that the Vite dev server proxies /api requests to (e.g. https://api.base44.com or your app's Base44 backend URL). Found in the Base44 dashboard / app settings.",
+      "requiredAtBoot": false
+    }
+  ]
+}
