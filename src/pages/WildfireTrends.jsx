@@ -147,6 +147,20 @@ export default function WildfireTrends() {
 
       <KeyNumbersBand totals={report.totals} causeDistribution={report.cause_distribution} />
 
+      {/* Large-fires-only disclosure */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+        <div className="bg-secondary/60 border border-border rounded-md p-4 max-w-4xl">
+          <p className="text-xs text-foreground font-sans">
+            <strong>What this report counts:</strong> large and notable wildfire incidents reported by national and
+            state fire agencies (for example, fires tracked by the US National Interagency Fire Center and CAL FIRE) —
+            not every fire response. Official incident counts are far higher: in 2026, US firefighters alone have
+            responded to tens of thousands of wildfires, most of them small and contained quickly, while only the
+            largest ~100 appear here at any given time. Use this report to compare large-fire trends, causes, and
+            burned area — never as a total count of wildfires.
+          </p>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12">
         <Section title="Fires per year" takeaway={`${report.totals.total_incidents.toLocaleString()} recorded wildfires across ${report.totals.countries_affected} countries. Spikes in 2017–2018 and 2024–2025 align with major fire seasons and the 2023–2024 El Niño.`}>
           <YearTrendChart byYear={report.by_year} />
@@ -184,8 +198,10 @@ export default function WildfireTrends() {
           <div className="flex items-start gap-2 text-xs text-muted-foreground font-sans max-w-3xl">
             <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <p>
-              <strong className="text-foreground">Methodology.</strong> Figures reflect all active (non-merged) wildfire
-              incidents recorded by RallyPack across {report.totals.countries_affected} countries. Causes are canonicalized
+              <strong className="text-foreground">Methodology.</strong> Figures reflect large and notable wildfire
+              incidents recorded by RallyPack across {report.totals.countries_affected} countries, sourced from national
+              and state fire agencies — small, quickly contained fire responses are intentionally excluded, so counts
+              here are much lower than official all-incident totals. Causes are canonicalized
               for display; raw labels are preserved on each record. Fires that smoulder and re-ignite may be recorded as
               separate incidents, which can inflate counts — no records were modified to produce this report. Hectares
               represent burned area across recorded incidents, not a global total. Human-caused share is {humanPct}%.
