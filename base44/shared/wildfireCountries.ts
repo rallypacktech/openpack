@@ -1,8 +1,9 @@
 // =============================================================================
 // Master, single-source-of-truth country list for wildfire data imports.
 // Imported by backend functions (getWildfireStats, fetchWildfireHistory,
-// fetchEFFISHistory) AND the frontend admin dashboard
-// (src/lib/wildfireCountries.js re-exports from here) so the three can never drift.
+// fetchEFFISHistory). The frontend admin dashboard mirrors this list in
+// src/lib/wildfireCountries.js (browsers cannot import this backend module) —
+// keep the two in sync when adding countries or sources.
 // =============================================================================
 
 export const COVERAGE_YEARS = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
