@@ -21,7 +21,8 @@
         "wildfire",
         "flood",
         "hurricane",
-        "tornado"
+        "tornado",
+        "hoa"
       ],
       "description": "Audience key matching BusinessReferral.audience_type"
     },

@@ -49,6 +49,12 @@ const AUDIENCE_CONFIG = {
         subject: 'Livestock emergency preparedness — a free resource for your clients',
         intro: 'RallyPack offers free, species-specific emergency preparedness resources for livestock owners — including evacuation logistics, trailer capacity planning, and destination coordination. As a livestock-focused business, you can help your clients protect their animals during disasters.',
     },
+    hoa: {
+        label: 'Homeowner Association (HOA)',
+        learnPath: '/ReadinessQuiz',
+        subject: 'A free preparedness resource for your neighborhood — from RallyPack',
+        intro: 'RallyPack is a free, open-source emergency preparedness platform that helps families build go-bags, evacuation plans, and emergency supply caches — making it a great resource to share with your entire neighborhood. We\u2019d love to encourage you to add our free Readiness Quiz to your next HOA newsletter so every resident can quickly check how prepared they really are.',
+    },
 };
 
 function escapeHtml(str) {

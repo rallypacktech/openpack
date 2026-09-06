@@ -27,6 +27,7 @@ const AUDIENCE_OPTIONS = [
   { value: "flood", label: "Flood", path: "/flood" },
   { value: "hurricane", label: "Hurricane", path: "/hurricane" },
   { value: "tornado", label: "Tornado", path: "/tornado" },
+  { value: "hoa", label: "Homeowner Association (HOA)", path: "/ReadinessQuiz" },
 ];
 
 export default function AdminReferralForm({ onSuccess, onCancel }) {

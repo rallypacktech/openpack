@@ -93,6 +93,13 @@ const DEFAULT_TEMPLATES = [
     intro: "RallyPack provides free tornado preparedness guidance including shelter-in-place protocols, family communication plans, and emergency supply checklists. Share this resource with your team or community to help everyone know what to do when a tornado warning sounds.",
     learn_path: "/tornado",
   },
+  {
+    audience_key: "hoa",
+    label: "Homeowner Association (HOA)",
+    subject: "A free preparedness resource for your neighborhood — from RallyPack",
+    intro: "RallyPack is a free, open-source emergency preparedness platform that helps families build go-bags, evacuation plans, and emergency supply caches — making it a great resource to share with your entire neighborhood. We'd love to encourage you to add our free Readiness Quiz to your next HOA newsletter so every resident can quickly check how prepared they really are.",
+    learn_path: "/ReadinessQuiz",
+  },
 ];
 
 export default function EmailTemplatesEditor() {
