@@ -1,0 +1,45 @@
+{
+  "name": "Daily HOA Referral Outreach",
+  "description": "Each day finds up to 100 HOAs in the next US state, saves them as hoa referrals, and emails the HOA template. Cycles through all 50 states (pass 1), then repeats for states that hit 100 (pass 2).",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * *",
+      "one_time_date": null,
+      "timezone": "America/Chicago",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "after_count",
+      "ends_on_date": null,
+      "ends_after_count": 100
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_hoa_referral_outreach",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_outreach": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "seedDailyHoaReferrals",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Daily HOA outreach",
+            "description": "Find + email 100 HOAs in the next state"
+          }
+        }
+      }
+    ]
+  }
+}
