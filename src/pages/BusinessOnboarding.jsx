@@ -185,6 +185,57 @@ export default function BusinessOnboarding() {
         </div>
       </section>
 
+      {/* Who it's for — B2B audiences */}
+      <section className="py-16 max-w-5xl mx-auto px-6">
+        <div className="text-center mb-8">
+          <h2 className="font-serif text-3xl font-bold text-foreground mb-3">
+            Built for the people who keep buildings safe
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Whether you manage one office or an entire portfolio, RallyPack
+            keeps every property inspection-ready and every resident prepared.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          {[
+            {
+              icon: Building2,
+              title: "Commercial Landlords & Office Parks",
+              desc: "Track first aid kits, expiry dates, and evacuation plans across every building in your portfolio from one dashboard.",
+            },
+            {
+              icon: Shield,
+              title: "Commercial Insurance Brokers",
+              desc: "Give clients a free tool that keeps them compliant and inspection-ready — fewer claims, more value at every renewal.",
+            },
+            {
+              icon: Users,
+              title: "Property Managers",
+              desc: "Maintain floor warden rosters, assembly points, and chain-of-command notifications for every tenant.",
+            },
+            {
+              icon: MapPin,
+              title: "Homeowner Associations",
+              desc: "Share a free readiness quiz with residents so every household is prepared before disaster hits.",
+            },
+          ].map((a) => (
+            <Card key={a.title} className="border-border">
+              <CardContent className="pt-6 pb-5 px-6 flex items-start gap-4">
+                <a.icon className="w-7 h-7 text-[#D64A2E] shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-sans font-semibold text-foreground mb-1">
+                    {a.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {a.desc}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       {/* Pricing */}
       <PricingSection />
 

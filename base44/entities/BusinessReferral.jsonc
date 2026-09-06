@@ -46,7 +46,9 @@
         "flood",
         "hurricane",
         "tornado",
-        "hoa"
+        "hoa",
+        "commercial_property",
+        "insurance_broker"
       ],
       "default": "general",
       "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page"

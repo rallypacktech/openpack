@@ -81,6 +81,18 @@ const AUDIENCE_CONFIG = {
         subject: 'A free preparedness resource for your neighborhood — from RallyPack',
         intro: 'RallyPack is a free, open-source emergency preparedness platform that helps families build go-bags, evacuation plans, and emergency supply caches — making it a great resource to share with your entire neighborhood. We\u2019d love to encourage you to add our free Readiness Quiz to your next HOA newsletter so every resident can quickly check how prepared they really are.',
     },
+    commercial_property: {
+        label: 'Commercial Property Preparedness',
+        learnPath: '/BusinessOnboarding',
+        subject: 'Fire marshal readiness & emergency tracking for your properties',
+        intro: 'RallyPack helps commercial landlords and office park managers stay inspection-ready across every building — track first aid kits by floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to tenants and staff. One dashboard proves every property is compliant.',
+    },
+    insurance_broker: {
+        label: 'Commercial Insurance Broker Preparedness',
+        learnPath: '/BusinessOnboarding',
+        subject: 'A value-add preparedness tool for your commercial clients',
+        intro: 'RallyPack helps your commercial clients stay inspection-ready and disaster-prepared — tracking first aid kits and expiry dates across every floor, documenting evacuation plans and assembly points, and maintaining floor warden rosters. Clients who stay compliant file fewer claims. Share RallyPack as a free preparedness resource that adds value at every policy review.',
+    },
 };
 
 async function loadTemplates(base44) {

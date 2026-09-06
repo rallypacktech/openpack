@@ -22,7 +22,9 @@
         "flood",
         "hurricane",
         "tornado",
-        "hoa"
+        "hoa",
+        "commercial_property",
+        "insurance_broker"
       ],
       "description": "Audience key matching BusinessReferral.audience_type"
     },

@@ -16,6 +16,7 @@ import IncidentsHistory from "@/components/business/IncidentsHistory";
 import ProfessionalUpgradeCard from "@/components/business/ProfessionalUpgradeCard";
 import NeedsBoard from "@/components/business/NeedsBoard";
 import CommunityOneSheet from "@/components/business/CommunityOneSheet";
+import FireMarshalChecklist from "@/components/business/FireMarshalChecklist";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -231,6 +232,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="wildfire">Incidents</TabsTrigger>
           <TabsTrigger value="contact">Contact Admin</TabsTrigger>
           <TabsTrigger value="onesheet">Community Guide</TabsTrigger>
+          <TabsTrigger value="firemarshal">Fire Marshal</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members">
@@ -255,6 +257,9 @@ export default function BusinessDashboard() {
         </TabsContent>
         <TabsContent value="onesheet">
           <CommunityOneSheet organizationName={subscription?.organization_name} />
+        </TabsContent>
+        <TabsContent value="firemarshal">
+          <FireMarshalChecklist subscription={subscription} members={members} kits={kits} plans={plans} />
         </TabsContent>
         <TabsContent value="needs">
           <NeedsBoard subscription={subscription} />
