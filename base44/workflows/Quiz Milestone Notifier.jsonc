@@ -1,0 +1,44 @@
+{
+  "name": "Quiz Milestone Notifier",
+  "description": "Checks if QuizResult count has crossed 500 or 5000. When a milestone is hit, emails admins a preparedness summary (avg score, readiness levels, top regions, social media blurb) and creates a marker to prevent duplicate notifications.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 1,
+      "interval_unit": "days",
+      "interval_anchor": "2026-07-07T16:45:22.793000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "quiz_milestone_notifier",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "checkQuizMilestones",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "checkQuizMilestones"
+  }
+}

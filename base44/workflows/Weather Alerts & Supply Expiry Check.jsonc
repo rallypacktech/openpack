@@ -1,0 +1,46 @@
+{
+  "name": "Weather Alerts & Supply Expiry Check",
+  "description": "Checks NWS weather alerts and supply/first-aid expiration for all users. Creates in-app notifications always; sends emails based on user preference.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 6,
+      "interval_unit": "hours",
+      "interval_anchor": "2026-04-26T17:14:46.624000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weather_alerts_supply_expiry_check",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "checkWeatherAndExpiry",
+            "args": {
+              "automation_secret": "rp-auto-a7f3b2e9-1d4a-4b8c-9e2f-6a5b3c8d7e1f"
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "checkWeatherAndExpiry"
+  }
+}
