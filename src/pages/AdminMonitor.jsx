@@ -29,8 +29,9 @@ export default function AdminMonitor() {
 
   const loadData = async () => {
     try {
-      // Get all user profiles
-      const profiles = await base44.asServiceRole.entities.UserProfile.list();
+      // Get all user profiles (admin RLS allows reading all profiles without asServiceRole,
+      // which is a backend-only construct and throws on the frontend client)
+      const profiles = await base44.entities.UserProfile.list();
       setAllProfiles(profiles);
 
       // Filter users who need assistance
