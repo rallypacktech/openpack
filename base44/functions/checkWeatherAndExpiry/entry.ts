@@ -300,22 +300,22 @@ Deno.serve(async (req) => {
           const prepAction = getPrepAction(props.event);
           const alertMessage = headline + (desc ? "\n\n" + desc : "") + "\n\n" + prepAction + resourceFooter;
 
-          // Avoid duplicate notifications (check if we created one for this alert recently)
-          const existing = await base44.asServiceRole.entities.Notification.filter({
-            created_by: userEmail,
-            title: `🌩️ ${props.event}`,
-          });
-          // Dedup: skip if a notification with same title was created in last 12h
+          // Dedup by NWS alert ID — prevents duplicates across duplicate profiles and re-runs.
+          // (created_by filter doesn't work here because notifications are created by the service role.)
+          const alertId = alert.id || `nws-${props.event}-${zoneId}`;
           const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
-          const recentDuplicate = existing.some(n => new Date(n.created_date) > twelveHoursAgo);
-          if (recentDuplicate) continue;
+          const existing = await base44.asServiceRole.entities.Notification.filter({
+            alert_id: alertId,
+          });
+          if (existing.some(n => new Date(n.created_date) > twelveHoursAgo)) continue;
 
           await base44.asServiceRole.entities.Notification.create({
             title: `🌩️ ${props.event}`,
             message: alertMessage,
             type: "alert",
             read: false,
-            created_by: userEmail,
+            alert_id: alertId,
+            recipient_email: userEmail,
           });
           notificationsCreated++;
 
