@@ -41,6 +41,10 @@
       "type": "number",
       "description": "Area burned in acres (US units, kept for source data conversion)"
     },
+    "hectares_source": {
+      "type": "string",
+      "description": "Credited source for the hectares_burned figure (e.g. 'CAL FIRE \u2014 https://...'). Populated by the backfillMissingHectares automation when a figure is found from news/agency sources."
+    },
     "responding_organizations": {
       "type": "array",
       "items": {
