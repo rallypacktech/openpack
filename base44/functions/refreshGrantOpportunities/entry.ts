@@ -8,7 +8,7 @@ Deno.serve(async (req) => {
     if (user.role !== 'admin') return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
 
     const today = new Date().toISOString().slice(0, 10);
-    const result = { archived_overdue: 0, new_identified: 0, reactivated: 0, errors: [] };
+    const result = { archived_overdue: 0, new_identified: 0, reactivated: 0, archived_checked: 0, archived_remaining: 0, errors: [] };
 
     // ── STEP 1: Archive overdue "identified" grants ──
     const identified = await base44.asServiceRole.entities.GrantLOI.filter({ status: 'identified' });
@@ -127,46 +127,76 @@ Only include opportunities you can verify have upcoming deadlines. Do not includ
       result.new_identified = toCreate.length;
     }
 
-    // ── STEP 3: Check archived grants for new upcoming deadlines ──
-    const archived = await base44.asServiceRole.entities.GrantLOI.filter({ status: 'archived' });
+    // ── STEP 3: Check archived grants for new upcoming deadlines (batched) ──
+    const allArchived = await base44.asServiceRole.entities.GrantLOI.filter(
+      { status: 'archived' },
+      '-updated_date',
+      500
+    );
+
+    // Cap per-run to avoid timeouts — admin can re-run to process the rest
+    const ARCHIVED_BATCH_CAP = 30;
+    const archivedBatch = allArchived.slice(0, ARCHIVED_BATCH_CAP);
     const reactivations = [];
 
-    for (const grant of archived) {
+    if (archivedBatch.length > 0) {
+      const batchItems = archivedBatch.map((g, i) => ({
+        lookup_id: String(i),
+        name: g.grant_name,
+        funder: g.funder_name,
+        previous_deadline: g.deadline || 'unknown',
+        url: g.grant_url || 'N/A',
+      }));
+
+      const batchPrompt = `For each archived grant/award below, search the web for its current cycle. Does it have a NEW upcoming deadline (after ${today})? Only set has_upcoming_deadline=true if you can verify a specific new deadline date.
+
+Grants to check:
+${JSON.stringify(batchItems, null, 2)}
+
+Return ONLY a JSON object with a "results" array, one entry per lookup_id.`;
+
+      const batchSchema = {
+        type: 'object',
+        properties: {
+          results: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                lookup_id: { type: 'string' },
+                has_upcoming_deadline: { type: 'boolean' },
+                new_deadline: { type: 'string', description: 'YYYY-MM-DD or null' },
+                notes: { type: 'string' },
+              },
+            },
+          },
+        },
+      };
+
       try {
-        const checkPrompt = `Check the current status and deadline for this grant/award:
-Name: ${grant.grant_name}
-Funder: ${grant.funder_name}
-Previous deadline: ${grant.deadline || 'unknown'}
-URL: ${grant.grant_url || 'N/A'}
-
-Search for the current cycle of this program. Does it have a NEW upcoming deadline (after ${today})? If yes, provide the new deadline. If the program is discontinued, has no upcoming deadline, or you cannot find a new cycle, set has_upcoming_deadline to false.`;
-
-        const checkSchema = {
-          type: 'object',
-          properties: {
-            has_upcoming_deadline: { type: 'boolean' },
-            new_deadline: { type: 'string', description: 'YYYY-MM-DD or null' },
-            notes: { type: 'string' }
-          }
-        };
-
-        const checkRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
-          prompt: checkPrompt,
+        const batchRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+          prompt: batchPrompt,
           add_context_from_internet: true,
           model: 'gemini_3_flash',
-          response_json_schema: checkSchema,
+          response_json_schema: batchSchema,
         });
 
-        if (checkRes.has_upcoming_deadline && checkRes.new_deadline && checkRes.new_deadline >= today) {
-          reactivations.push({
-            id: grant.id,
-            status: 'identified',
-            deadline: checkRes.new_deadline,
-            review_notes: [grant.review_notes || '', `Reactivated: ${checkRes.notes || 'new deadline found'}`].filter(Boolean).join('\n'),
-          });
+        const batchResults = batchRes.results || [];
+        for (const r of batchResults) {
+          const idx = parseInt(r.lookup_id);
+          const grant = archivedBatch[idx];
+          if (!grant) continue;
+          if (r.has_upcoming_deadline && r.new_deadline && r.new_deadline >= today) {
+            reactivations.push({
+              id: grant.id,
+              status: 'identified',
+              deadline: r.new_deadline,
+              review_notes: [grant.review_notes || '', `Reactivated: ${r.notes || 'new deadline found'}`].filter(Boolean).join('\n'),
+            });
+          }
         }
       } catch (e) {
-        // Skip individual failures
+        result.errors.push(`Archived batch check failed: ${e.message}`);
       }
     }
 
@@ -174,6 +204,8 @@ Search for the current cycle of this program. Does it have a NEW upcoming deadli
       await base44.asServiceRole.entities.GrantLOI.bulkUpdate(reactivations);
       result.reactivated = reactivations.length;
     }
+    result.archived_checked = archivedBatch.length;
+    result.archived_remaining = Math.max(0, allArchived.length - ARCHIVED_BATCH_CAP);
 
     return Response.json({ success: true, ...result, checked_at: new Date().toISOString() });
   } catch (error) {
