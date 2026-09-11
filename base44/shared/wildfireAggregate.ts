@@ -11,26 +11,21 @@ const MS_24H = 24 * 60 * 60 * 1000;
 const MS_7D = 7 * 24 * 60 * 60 * 1000;
 const MS_30D = 30 * 24 * 60 * 60 * 1000;
 
-// Full active incident set, paged per-country so the global list cap never
-// truncates the dataset and zero-incident countries are representable.
+// Full active incident set. Paginated via skip/limit so the global list cap
+// never truncates the dataset, and uses only ~4 DB calls instead of 150+
+// per-country filter calls (which exceed the platform rate limit).
 export async function loadAllActiveIncidents(base44) {
-  const codes = Object.keys(COUNTRY_NAMES);
-  // Small serial-ish batches to stay under the platform rate limit.
-  const CHUNK = 5;
   const all = [];
-  for (let i = 0; i < codes.length; i += CHUNK) {
-    const chunk = codes.slice(i, i + CHUNK);
-    const results = await Promise.all(
-      chunk.map((code) => base44.asServiceRole.entities.WildfireIncident.filter({ country_code: code }))
-    );
-    for (const incs of results) {
-      for (const inc of incs) {
-        if (inc.is_merged_away) continue;
-        all.push(inc);
-      }
+  const LIMIT = 500;
+  let skip = 0;
+  while (true) {
+    const batch = await base44.asServiceRole.entities.WildfireIncident.list('-created_date', LIMIT, skip);
+    for (const inc of batch) {
+      if (inc.is_merged_away) continue;
+      all.push(inc);
     }
-    // Yield between batches to avoid bursts.
-    await new Promise((r) => setTimeout(r, 120));
+    if (batch.length < LIMIT) break;
+    skip += LIMIT;
   }
   return all;
 }
