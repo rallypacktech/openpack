@@ -3,8 +3,10 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 export default async function(req: Request): Promise<Response> {
   try {
     const base44 = createClientFromRequest(req);
-    let user = null;
-    try { user = await base44.auth.me(); } catch { /* not authenticated */ }
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) {
+      return Response.json({ error: 'Authentication required' }, { status: 401 });
+    }
 
     const body = await req.json().catch(() => ({}));
     const { handler_name, handler_email, pet_names, owner_name } = body;
