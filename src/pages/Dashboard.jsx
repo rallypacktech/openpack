@@ -16,6 +16,7 @@ import StructuredAddressInput from "../components/settings/StructuredAddressInpu
 import ReadinessScore from "../components/dashboard/ReadinessScore";
 import SafetyBeacon from "../components/dashboard/SafetyBeacon";
 import FamilyMemberForm from "../components/onboarding/FamilyMemberForm";
+import AuthorizedHandlersList from "../components/settings/AuthorizedHandlersList";
 import TermsAgreement, {
   TERMS_VERSION,
 } from "../components/onboarding/TermsAgreement";
@@ -35,8 +36,11 @@ export default function Dashboard() {
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
+  const [handlers, setHandlers] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [familyStepCompleted, setFamilyStepCompleted] = useState(false);
+  const [handlersStepCompleted, setHandlersStepCompleted] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [locationForm, setLocationForm] = useState({
     display_name: "",
     street_address: "",
@@ -53,6 +57,21 @@ export default function Dashboard() {
       ...locationForm,
       [field]: value,
     });
+  };
+
+  const handleAddHandler = async (data) => {
+    await base44.entities.AuthorizedHandler.create(data);
+    await loadData();
+  };
+
+  const handleUpdateHandler = async (id, data) => {
+    await base44.entities.AuthorizedHandler.update(id, data);
+    await loadData();
+  };
+
+  const handleDeleteHandler = async (id) => {
+    await base44.entities.AuthorizedHandler.delete(id);
+    await loadData();
   };
 
   const handleSaveAddress = async () => {
@@ -163,11 +182,15 @@ export default function Dashboard() {
       setUserEmail(user.email);
 
       // Load critical data for onboarding check
-      const [profileData, petsData, familyData] = await Promise.all([
+      const [profileData, petsData, familyData, handlersData] = await Promise.all([
         base44.entities.UserProfile.filter({ created_by: user.email }),
         base44.entities.Pet.filter({ created_by: user.email }),
         base44.entities.FamilyMember.filter({ created_by: user.email }),
+        base44.entities.AuthorizedHandler.filter({ created_by: user.email }),
       ]);
+
+      setCurrentUser(user);
+      setHandlers(handlersData);
 
       if (profileData.length > 0) {
         setUserProfile(profileData[0]);
@@ -634,9 +657,19 @@ export default function Dashboard() {
     !needsFamilySetup &&
     !needsMeetSpots &&
     !isEstablishedUser;
+  const needsHandlers =
+    dataLoaded &&
+    pets.length > 0 &&
+    handlers.length === 0 &&
+    !handlersStepCompleted &&
+    !needsAddress &&
+    !needsFamilySetup &&
+    !needsMeetSpots &&
+    !needsCaches &&
+    !isEstablishedUser;
   const isOnboarding =
     !needsTermsAgreement &&
-    (needsAddress || needsFamilySetup || needsMeetSpots || needsCaches);
+    (needsAddress || needsFamilySetup || needsMeetSpots || needsCaches || needsHandlers);
 
   if (needsTermsAgreement) {
     return (
@@ -680,8 +713,10 @@ export default function Dashboard() {
         ? 2
         : needsMeetSpots
           ? 3
-          : 4;
-    const progressPercent = (currentStep / 4) * 100;
+          : needsCaches
+            ? 4
+            : 5;
+    const progressPercent = (currentStep / 5) * 100;
 
     return (
       <div className="min-h-screen bg-cream font-sans">
@@ -691,7 +726,7 @@ export default function Dashboard() {
               RallyPack
             </span>
             <p className="text-muted-foreground text-sm font-sans mt-0.5">
-              Get prepared in 4 steps
+              Get prepared in 5 steps
             </p>
           </div>
         </div>
@@ -706,7 +741,7 @@ export default function Dashboard() {
               Onboarding Progress
             </h2>
             <div className="flex items-center justify-between mb-4" role="list">
-              {["Address", "Family", "Meet Spots", "Caches"].map((label, i) => {
+              {["Address", "Family", "Meet Spots", "Caches", "Handlers"].map((label, i) => {
                 const stepNum = i + 1;
                 const done = currentStep > stepNum;
                 const active = currentStep === stepNum;
@@ -739,7 +774,7 @@ export default function Dashboard() {
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <p className="sr-only">You are on step {currentStep} of 4</p>
+            <p className="sr-only">You are on step {currentStep} of 5</p>
           </section>
 
           {needsAddress && (
@@ -1108,6 +1143,75 @@ export default function Dashboard() {
                   </button>
                   <p className="text-xs text-muted-foreground text-center font-sans">
                     Manage in Resources → Caches
+                  </p>
+                </div>
+              </article>
+            )}
+
+          {/* Step 5 — Optional */}
+          {needsHandlers &&
+            !needsAddress &&
+            !needsFamilySetup &&
+            !needsMeetSpots &&
+            !needsCaches && (
+              <article className="bg-white border border-border rounded p-7">
+                <div className="text-center mb-6">
+                  <div
+                    className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3"
+                    aria-hidden="true"
+                  >
+                    <span className="text-2xl">🐾</span>
+                  </div>
+                  <h2 className="font-serif text-2xl font-semibold text-foreground mb-2">
+                    Step 5: Authorized Animal Handlers
+                  </h2>
+                  <p className="text-muted-foreground font-sans text-sm max-w-md mx-auto">
+                    Add people approved to handle or care for your pets at a
+                    shelter or during an emergency. They'll get an email invite.
+                  </p>
+                  <span className="inline-block mt-2 text-xs font-sans text-primary bg-primary/5 px-2 py-0.5 rounded">
+                    Optional — you can skip this
+                  </span>
+                </div>
+                <div className="space-y-4">
+                  <div className="bg-secondary/50 p-4 rounded">
+                    <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
+                      Why it matters:
+                    </h3>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>
+                        • Shelters and boarding facilities may only release
+                        animals to <strong>pre-approved contacts</strong>
+                      </li>
+                      <li>
+                        • If you're separated during an emergency, authorized
+                        handlers can step in immediately
+                      </li>
+                      <li>
+                        • Handlers you invite can view your pet's evacuation
+                        plan, medical notes, and meeting spots
+                      </li>
+                    </ul>
+                  </div>
+
+                  <AuthorizedHandlersList
+                    handlers={handlers}
+                    pets={pets}
+                    user={currentUser}
+                    onAdd={handleAddHandler}
+                    onUpdate={handleUpdateHandler}
+                    onDelete={handleDeleteHandler}
+                  />
+
+                  <Button
+                    onClick={() => setHandlersStepCompleted(true)}
+                    variant="outline"
+                    className="w-full font-sans font-semibold py-3"
+                  >
+                    Skip for now — I'll add handlers later
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center font-sans">
+                    Add or remove authorized handlers anytime in Settings
                   </p>
                 </div>
               </article>

@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import ProfileForm from "../components/settings/ProfileForm";
 import FamilyMembersList from "../components/settings/FamilyMembersList";
 import PetsList from "../components/settings/PetsList";
+import AuthorizedHandlersList from "../components/settings/AuthorizedHandlersList";
 import AccessibilitySettings from "../components/settings/AccessibilitySettings";
 import NotificationPreferences from "../components/settings/NotificationPreferences";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +36,7 @@ export default function Settings() {
   const [profile, setProfile] = useState(null);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
+  const [handlers, setHandlers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -62,16 +64,18 @@ export default function Settings() {
     try {
       const userData = await base44.auth.me();
 
-      const [profileData, membersData, petsData] = await Promise.all([
+      const [profileData, membersData, petsData, handlersData] = await Promise.all([
         base44.entities.UserProfile.filter({ created_by: userData.email }),
         base44.entities.FamilyMember.filter({ created_by: userData.email }),
         base44.entities.Pet.filter({ created_by: userData.email }),
+        base44.entities.AuthorizedHandler.filter({ created_by: userData.email }),
       ]);
 
       setUser(userData);
       setProfile(profileData.length > 0 ? profileData[0] : null);
       setFamilyMembers(membersData);
       setPets(petsData);
+      setHandlers(handlersData);
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -175,6 +179,21 @@ export default function Settings() {
     loadData();
   };
 
+  const handleAddHandler = async (data) => {
+    await base44.entities.AuthorizedHandler.create(data);
+    loadData();
+  };
+
+  const handleUpdateHandler = async (id, data) => {
+    await base44.entities.AuthorizedHandler.update(id, data);
+    loadData();
+  };
+
+  const handleDeleteHandler = async (id) => {
+    await base44.entities.AuthorizedHandler.delete(id);
+    loadData();
+  };
+
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== "DELETE MY ACCOUNT") {
       return;
@@ -259,6 +278,16 @@ export default function Settings() {
           onAdd={handleAddPet}
           onUpdate={handleUpdatePet}
           onDelete={handleDeletePet}
+        />
+
+        {/* Authorized Animal Handlers */}
+        <AuthorizedHandlersList
+          handlers={handlers}
+          pets={pets}
+          user={user}
+          onAdd={handleAddHandler}
+          onUpdate={handleUpdateHandler}
+          onDelete={handleDeleteHandler}
         />
 
         {/* Emergency Country Preferences */}

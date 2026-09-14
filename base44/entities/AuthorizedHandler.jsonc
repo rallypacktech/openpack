@@ -1,0 +1,115 @@
+{
+  "name": "AuthorizedHandler",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional free-form description (up to 1000 characters)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Full name of the authorized handler"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address of the authorized handler \u2014 used to invite them and match to their RallyPack account after signup"
+    },
+    "relationship_type": {
+      "type": "string",
+      "enum": [
+        "vet",
+        "boarding",
+        "trainer",
+        "neighbor",
+        "family",
+        "other"
+      ],
+      "default": "other",
+      "description": "The handler's relationship to the pet owner / role they play"
+    },
+    "pet_scope": {
+      "type": "string",
+      "enum": [
+        "all_pets",
+        "specific"
+      ],
+      "default": "all_pets",
+      "description": "Whether this handler is authorized for all of the owner's pets or only specific ones"
+    },
+    "pet_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Pet IDs this handler is authorized for \u2014 populated only when pet_scope is 'specific'"
+    },
+    "linked_user_id": {
+      "type": "string",
+      "description": "User ID of the handler once they register a RallyPack account \u2014 enables plan view access"
+    },
+    "invite_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "none"
+      ],
+      "default": "pending",
+      "description": "Status of the handler's invite: 'pending' until they register, 'accepted' once linked, 'none' if already a user"
+    },
+    "invited_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the invite email was sent to this handler"
+    }
+  },
+  "required": [
+    "name",
+    "email"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
