@@ -255,6 +255,7 @@ function QuizResults({ score, answers, onRetake }) {
   const regionRes =
     REGION_RESOURCES[answers.region] || REGION_RESOURCES.general;
   const [isAuthed, setIsAuthed] = React.useState(null);
+  const [avgScore, setAvgScore] = React.useState(null);
 
   React.useEffect(() => {
     base44.auth
@@ -323,6 +324,17 @@ function QuizResults({ score, answers, onRetake }) {
     save();
   }, []);
 
+  React.useEffect(() => {
+    base44.functions
+      .invoke("getReadinessAverages", { level: "global" })
+      .then((res) => {
+        if (res.data?.global_average !== undefined && res.data?.global_average !== null) {
+          setAvgScore(res.data.global_average);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const urgencyBorder = {
     medium: "border-blue-200",
     high: "border-amber-200",
@@ -372,6 +384,28 @@ function QuizResults({ score, answers, onRetake }) {
               <p className="font-sans text-sm text-muted-foreground leading-relaxed">
                 {result.body}
               </p>
+              {avgScore !== null && (
+                <div className="mt-4 pt-4 border-t border-border/50">
+                  <p className="text-sm font-sans text-muted-foreground">
+                    <strong className="text-foreground">
+                      Community average: {avgScore}%
+                    </strong>{" "}
+                    —{" "}
+                    {score > avgScore
+                      ? `you're ${score - avgScore} points above the RallyPack community.`
+                      : score < avgScore
+                      ? `you're ${avgScore - score} points below the RallyPack community.`
+                      : "you're right at the community average."}
+                  </p>
+                  <Link
+                    to="/readiness-map"
+                    className="inline-flex items-center gap-1 text-sm text-primary mt-2 hover:opacity-80 transition-opacity"
+                  >
+                    See how your neighborhood compares{" "}
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

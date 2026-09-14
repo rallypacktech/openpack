@@ -73,6 +73,34 @@
     "bot_name": {
       "type": "string",
       "description": "Name of the detected bot (e.g. Googlebot, Headless Chrome) \u2014 null for humans"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code resolved at save time from profile address or IP geolocation"
+    },
+    "country_name": {
+      "type": "string",
+      "description": "Full country name resolved at save time from profile address or IP geolocation"
+    },
+    "admin1_name": {
+      "type": "string",
+      "description": "State/territory/province name resolved at save time"
+    },
+    "admin2_name": {
+      "type": "string",
+      "description": "County/district/city name resolved at save time"
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "Postal code resolved at save time (from profile address; null for IP-geolocated anonymous results)"
+    },
+    "latitude": {
+      "type": "number",
+      "description": "Latitude of the resolved location for map marker placement"
+    },
+    "longitude": {
+      "type": "number",
+      "description": "Longitude of the resolved location for map marker placement"
     }
   },
   "required": [

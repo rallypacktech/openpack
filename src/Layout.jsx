@@ -57,7 +57,7 @@ export default function Layout({ children, currentPageName }) {
         } catch (_e) { /* storage unavailable */ }
       } catch (e) {
         // Not logged in - redirect to Home if on protected page
-        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends"];
+        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap"];
         if (!publicPages.includes(currentPageName)) {
           window.location.href = createPageUrl("Home");
         } else {
@@ -68,7 +68,7 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, [currentPageName]);
 
-  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends"];
+  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap"];
   const isPublicPage = publicPages.includes(currentPageName);
   const isAdmin = user?.role === "admin";
 

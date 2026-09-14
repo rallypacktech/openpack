@@ -496,6 +496,7 @@ export default function Home() {
               <div className="flex flex-col gap-3 text-sm font-sans">
                 <Link to="/about" className="hover:text-white transition-colors">About Us</Link>
                 <Link to={createPageUrl("ReadinessQuiz")} className="hover:text-white transition-colors">Readiness Quiz</Link>
+                <Link to="/readiness-map" className="hover:text-white transition-colors">Neighborhood Readiness</Link>
                 <Link to={createPageUrl("Resources")} className="hover:text-white transition-colors">Resources</Link>
                 <Link to={createPageUrl("Dashboard")} className="hover:text-white transition-colors">My Plan</Link>
                 <Link to="/Donate" className="hover:text-white transition-colors">Donate</Link>
