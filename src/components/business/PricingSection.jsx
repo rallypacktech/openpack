@@ -5,7 +5,6 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { VOUCHER_CODE, VOUCHER_LABEL, VOUCHER_BLURB } from "@/lib/fireMarshalVoucher";
 
 const TIER_META = {
   basic: {
@@ -65,18 +64,6 @@ export default function PricingSection() {
         <div className="mt-5 inline-flex items-center gap-2 bg-[#D64A2E]/10 text-[#D64A2E] text-sm font-semibold px-4 py-2 rounded-full">
           <span aria-hidden="true">✨</span>
           <span>7-day free trial on every plan — try it before you pay.</span>
-        </div>
-        <div className="mt-3 max-w-xl mx-auto border border-dashed border-[#D64A2E] bg-amber-50/60 rounded-lg px-5 py-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-[#a83a20] mb-1">
-            {VOUCHER_LABEL}
-          </p>
-          <p className="text-sm text-foreground">
-            {VOUCHER_BLURB} Enter it in the promo code box at checkout for a full year of
-            Professional, free.
-          </p>
-          <p className="mt-2 font-mono text-lg font-bold tracking-widest text-foreground">
-            {VOUCHER_CODE}
-          </p>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

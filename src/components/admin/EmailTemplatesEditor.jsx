@@ -72,6 +72,7 @@ const DEFAULT_TEMPLATES = [
     subject: "Is your community ready for wildfire season? A free resource from RallyPack",
     intro: "RallyPack provides free, real-time wildfire alerts, go-bag checklists, and evacuation planning tools for families in fire-prone areas. Whether you're a business in a high-risk region or serve clients who are, share this resource to help your community prepare before a fire starts.",
     learn_path: "/wildfire",
+    voucher_code: VOUCHER_CODE,
   },
   {
     audience_key: "flood",

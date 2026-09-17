@@ -20,7 +20,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import PricingSection from "@/components/business/PricingSection";
-import { VOUCHER_CODE } from "@/lib/fireMarshalVoucher";
 
 export default function BusinessOnboarding() {
   const [form, setForm] = useState({
@@ -96,10 +95,6 @@ export default function BusinessOnboarding() {
           <div className="mt-6 inline-flex items-center gap-2 bg-white/10 border border-white/15 text-white/90 text-sm font-medium px-4 py-2 rounded-full">
             <span aria-hidden="true">✨</span>
             <span>7-day free trial — no charge for 7 days, cancel anytime</span>
-          </div>
-          <div className="mt-3 inline-flex items-center gap-2 bg-[#D64A2E] text-white text-sm font-semibold px-4 py-2 rounded-full">
-            <span aria-hidden="true">🎟️</span>
-            <span>Fire marshals: a full year free with code {VOUCHER_CODE}</span>
           </div>
         </div>
       </section>
