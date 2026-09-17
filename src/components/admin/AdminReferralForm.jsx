@@ -28,6 +28,7 @@ const AUDIENCE_OPTIONS = [
   { value: "hurricane", label: "Hurricane", path: "/hurricane" },
   { value: "tornado", label: "Tornado", path: "/tornado" },
   { value: "hoa", label: "Homeowner Association (HOA)", path: "/ReadinessQuiz" },
+  { value: "fire_marshal", label: "Fire Marshal & Fire Prevention", path: "/BusinessOnboarding" },
 ];
 
 export default function AdminReferralForm({ onSuccess, onCancel }) {

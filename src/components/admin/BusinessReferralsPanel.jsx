@@ -24,6 +24,7 @@ const AUDIENCE_LABELS = {
   hurricane: 'Hurricane',
   tornado: 'Tornado',
   hoa: 'HOA',
+  fire_marshal: 'Fire Marshal',
 };
 
 export default function BusinessReferralsPanel() {
@@ -344,6 +345,7 @@ export default function BusinessReferralsPanel() {
                         <SelectItem value="hurricane">Hurricane</SelectItem>
                         <SelectItem value="tornado">Tornado</SelectItem>
                         <SelectItem value="hoa">HOA</SelectItem>
+                        <SelectItem value="fire_marshal">Fire Marshal</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select
