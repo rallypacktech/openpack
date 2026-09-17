@@ -15,6 +15,7 @@ Deno.serve(async (req) => {
             payment_method_types: ['card'],
             line_items: [{ price: price_id, quantity: 1 }],
             mode: 'subscription',
+            allow_promotion_codes: true,
             subscription_data: { trial_period_days: 7 },
             success_url: success_url || `${new URL(req.url).origin}/BusinessDashboard?sub_success=true&sid={CHECKOUT_SESSION_ID}`,
             cancel_url: cancel_url || `${new URL(req.url).origin}/BusinessDashboard`,

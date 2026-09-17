@@ -1,6 +1,5 @@
 {
-  "name": "Monthly Inventory Reminder Email",
-  "description": "Sends each user a personalized email listing missing required items, expiring items, and expired items. Skips users with nothing to report.",
+  "description": "Sends each user a personalized email listing missing required items, expiring items, and expired items. Skips users with nothing to report. Also sends each business organization a monthly expiration summary covering kit items, AEDs, staff certifications, and fire equipment inspections.",
   "trigger": {
     "condition": null,
     "config": {
@@ -18,6 +17,7 @@
       "ends_after_count": null
     }
   },
+  "name": "Monthly Inventory Reminder Email",
   "definition": {
     "document": {
       "dsl": "1.0.0",
@@ -27,13 +27,31 @@
     },
     "do": [
       {
-        "run_function": {
+        "send_personal_reminders": {
           "call": "invoke_backend_function",
           "with": {
             "function_name": "sendMonthlyInventoryReminder",
             "args": {}
           },
-          "then": "end"
+          "then": "send_business_expiry_reminders",
+          "x-base44": {
+            "title": "Send personal reminders",
+            "description": "Missing, expiring, and expired items"
+          }
+        }
+      },
+      {
+        "send_business_expiry_reminders": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendBusinessExpiryReminders",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send business expiry reminders",
+            "description": "Kits, AEDs, certifications, inspections"
+          }
         }
       }
     ]

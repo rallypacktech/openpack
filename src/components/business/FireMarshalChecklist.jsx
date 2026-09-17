@@ -1,19 +1,64 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, Printer, Flame } from "lucide-react";
+import { getExpiryStatus } from "@/lib/expiryStatus";
 
 // Fire marshal readiness checklist for the Business Dashboard.
-// Derives live status from the org's kits, plans, members, and subscription,
-// alongside a printable static compliance checklist.
+// Derives live status from the org's kits, expirations, plans, members, and
+// subscription, alongside a printable static compliance checklist.
 export default function FireMarshalChecklist({ subscription, members, kits, plans }) {
+  const [expiredCount, setExpiredCount] = useState(0);
+  const [expiringCount, setExpiringCount] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [items, records] = await Promise.all([
+          base44.entities.CacheItem.list(),
+          base44.entities.ComplianceRecord.list(),
+        ]);
+        const kitIds = new Set(kits.map((k) => k.id));
+        const dated = [
+          ...items.filter((i) => kitIds.has(i.cache_id)).map((i) => i.expiration_date),
+          ...records.map((r) => r.expiration_date),
+        ].filter(Boolean);
+        let expired = 0;
+        let expiring = 0;
+        dated.forEach((d) => {
+          const { state } = getExpiryStatus(d);
+          if (state === "expired") expired++;
+          else if (state === "expiring") expiring++;
+        });
+        setExpiredCount(expired);
+        setExpiringCount(expiring);
+      } catch (_e) {
+        /* checklist still renders without expiry data */
+      } finally {
+        setLoaded(true);
+      }
+    })();
+  }, [kits]);
+
   const wardens = members.filter(
     (m) => m.role === "safety_officer" || m.role === "team_lead"
   );
   const hasChain = members.some((m) => m.chain_of_command_order != null);
+  const expiriesOutstanding = expiredCount + expiringCount;
 
   const tracked = [
     { label: "First aid kits logged by floor/building", done: kits.length > 0, detail: `${kits.length} kit(s)` },
+    {
+      label: "AED, supply & certification expirations current",
+      done: loaded && expiriesOutstanding === 0,
+      detail: !loaded
+        ? "Checking…"
+        : expiriesOutstanding === 0
+          ? "All in date"
+          : `${expiredCount} expired, ${expiringCount} expiring`,
+    },
     { label: "Evacuation plan documented", done: plans.length > 0, detail: `${plans.length} plan(s)` },
     { label: "Floor wardens assigned", done: wardens.length > 0, detail: `${wardens.length} warden(s)` },
     { label: "Chain of command configured", done: hasChain, detail: hasChain ? "Set" : "Not set" },
@@ -25,6 +70,8 @@ export default function FireMarshalChecklist({ subscription, members, kits, plan
   ];
 
   const compliance = [
+    "AED units, batteries, and pads in date (check monthly)",
+    "Staff CPR / first aid / AED certifications current",
     "Fire extinguishers inspected and tagged (annual)",
     "Exit signs lit and emergency lighting tested monthly",
     "Egress paths clear and unobstructed at all times",

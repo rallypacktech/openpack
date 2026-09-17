@@ -15,9 +15,12 @@ import {
   Users,
   Shield,
   MapPin,
+  Package,
+  Flame,
   ArrowRight,
 } from "lucide-react";
 import PricingSection from "@/components/business/PricingSection";
+import { VOUCHER_CODE } from "@/lib/fireMarshalVoucher";
 
 export default function BusinessOnboarding() {
   const [form, setForm] = useState({
@@ -83,16 +86,20 @@ export default function BusinessOnboarding() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Building2 className="w-12 h-12 text-[#D64A2E] mx-auto mb-6" />
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4 leading-tight">
-            Fire Marshal Compliance, Simplified
+            Pass Your Fire Marshal Inspection
           </h1>
           <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto">
-            Track every first aid kit across every floor, keep supplies in date,
-            and document your evacuation plan — all in one place. Show the fire
-            marshal you're ready.
+            Warehouses, shelters, daycares, coworking spaces, and offices use RallyPack
+            to keep first aid kits, AEDs, and staff certifications in date, meet building
+            codes, and document their emergency plan — all in one place.
           </p>
           <div className="mt-6 inline-flex items-center gap-2 bg-white/10 border border-white/15 text-white/90 text-sm font-medium px-4 py-2 rounded-full">
             <span aria-hidden="true">✨</span>
             <span>7-day free trial — no charge for 7 days, cancel anytime</span>
+          </div>
+          <div className="mt-3 inline-flex items-center gap-2 bg-[#D64A2E] text-white text-sm font-semibold px-4 py-2 rounded-full">
+            <span aria-hidden="true">🎟️</span>
+            <span>Fire marshals: a full year free with code {VOUCHER_CODE}</span>
           </div>
         </div>
       </section>
@@ -103,18 +110,18 @@ export default function BusinessOnboarding() {
           {[
             {
               icon: Shield,
-              title: "Multi-Kit Inventory",
-              desc: "Track first aid kits across every floor, wing, and building. Get expiry alerts before supplies go out of date.",
+              title: "AED & Expiry Tracking",
+              desc: "AED units, batteries, pads, supplies, and staff CPR / first aid / AED certifications — each with an expiry date and an alert before it lapses.",
             },
             {
               icon: MapPin,
-              title: "Evacuation Plans",
-              desc: "Document evacuation routes, assembly points, and procedures — ready to show the fire marshal.",
+              title: "Building-Code Ready",
+              desc: "Document evacuation routes, assembly points, and floor wardens to satisfy fire and building codes.",
             },
             {
               icon: Users,
-              title: "Compliance Roster",
-              desc: "Maintain your chain of command and assigned floor wardens. Prove your team is trained and accounted for.",
+              title: "Certifications & Roster",
+              desc: "Track every team member's certification and your chain of command. Prove your people are trained and accounted for.",
             },
           ].map((f) => (
             <Card key={f.title} className="text-center border-border">
@@ -137,35 +144,34 @@ export default function BusinessOnboarding() {
         <div className="text-center mb-8">
           <CheckCircle2 className="w-10 h-10 text-[#D64A2E] mx-auto mb-4" />
           <h2 className="font-serif text-3xl font-bold text-foreground mb-3">
-            Audit-Ready in Four Steps
+            Inspection-Ready in Four Steps
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Whether the fire marshal walks in tomorrow or next quarter, your kit
-            inventory, expiry dates, and evacuation plan are all in one place
-            and up to date.
+            Whether the fire marshal walks in tomorrow or next quarter, your kits,
+            AEDs, certifications, and emergency plan are all in one place and in date.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
           {[
             {
               step: "1",
-              title: "Add Your Kits",
-              desc: "Log every first aid kit by building, floor, or room. Record contents and expiry dates.",
+              title: "Log Kits & AEDs",
+              desc: "Log every first aid kit and AED by building and floor. Record supplies, batteries, pads, and expiry dates.",
             },
             {
               step: "2",
-              title: "Document Your Plan",
-              desc: "Map evacuation routes, assembly points, and floor wardens. Assign chain-of-command.",
+              title: "Add Certifications",
+              desc: "Record staff CPR, first aid, and AED certifications plus extinguisher, exit-light, and alarm service dates.",
             },
             {
               step: "3",
-              title: "Stay Compliant",
-              desc: "Automatic expiry alerts keep supplies current. No more expired kits during an inspection.",
+              title: "Meet Building Codes",
+              desc: "Document evacuation routes, assembly points, and floor wardens to satisfy fire and building codes.",
             },
             {
               step: "4",
-              title: "Show the Marshal",
-              desc: "Pull up your dashboard — kits, plans, and trained personnel, all in one view.",
+              title: "Pass the Inspection",
+              desc: "Pull up your dashboard — kits, AEDs, certifications, and plans, all in date and in one view.",
             },
           ].map((s) => (
             <Card key={s.step} className="text-center border-border">
@@ -189,34 +195,45 @@ export default function BusinessOnboarding() {
       <section className="py-16 max-w-5xl mx-auto px-6">
         <div className="text-center mb-8">
           <h2 className="font-serif text-3xl font-bold text-foreground mb-3">
-            Built for the people who keep buildings safe
+            Built for the buildings that get inspected
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Whether you manage one office or an entire portfolio, RallyPack
-            keeps every property inspection-ready and every resident prepared.
+            From a single warehouse to a portfolio of properties, RallyPack keeps
+            every building code-compliant, every AED in date, and every inspection
+            predictable.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
           {[
             {
-              icon: Building2,
-              title: "Commercial Landlords & Office Parks",
-              desc: "Track first aid kits, expiry dates, and evacuation plans across every building in your portfolio from one dashboard.",
+              icon: Package,
+              title: "Warehouses & Distribution Centers",
+              desc: "High-occupancy, high-hazard spaces. Track kits and AEDs across the floor, keep egress clear, and document your plan before the inspector arrives.",
             },
             {
               icon: Shield,
-              title: "Commercial Insurance Brokers",
-              desc: "Give clients a free tool that keeps them compliant and inspection-ready — fewer claims, more value at every renewal.",
+              title: "Shelters & Community Centers",
+              desc: "You host people in an emergency. Keep supplies, AEDs, and staff certifications current so you can open your doors without hesitation.",
             },
             {
               icon: Users,
-              title: "Property Managers",
-              desc: "Maintain floor warden rosters, assembly points, and chain-of-command notifications for every tenant.",
+              title: "Daycares, Schools & Camps",
+              desc: "Track first aid supplies, AEDs, and staff CPR / first aid certifications — and show licensing and fire inspectors everything is in date.",
+            },
+            {
+              icon: Building2,
+              title: "Coworking & Offices",
+              desc: "Shared spaces, shared responsibility. Assign floor wardens, log kits and AEDs, and prove your building is ready for inspection.",
             },
             {
               icon: MapPin,
-              title: "Homeowner Associations",
-              desc: "Share a free readiness quiz with residents so every household is prepared before disaster hits.",
+              title: "Commercial Landlords & Property Managers",
+              desc: "Track first aid kits, AEDs, and expiry dates across every building in your portfolio, plus evacuation plans and assembly points.",
+            },
+            {
+              icon: Flame,
+              title: "Commercial Insurance Brokers",
+              desc: "Give clients a free tool that keeps them compliant and inspection-ready — fewer claims, more value at every renewal.",
             },
           ].map((a) => (
             <Card key={a.title} className="border-border">

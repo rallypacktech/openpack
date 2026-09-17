@@ -74,6 +74,11 @@
       "type": "boolean",
       "default": false,
       "description": "Whether this subscription tier allows submitting emergency alerts for admin review"
+    },
+    "last_expiry_reminder_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the monthly expiration reminder email was last sent to this organization \u2014 used to dedupe to one reminder per month"
     }
   },
   "required": [

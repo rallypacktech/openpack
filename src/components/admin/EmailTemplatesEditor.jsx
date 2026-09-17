@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Save, RefreshCw, Mail } from "lucide-react";
+import { VOUCHER_CODE } from "@/lib/fireMarshalVoucher";
 
 const DEFAULT_TEMPLATES = [
   {
@@ -100,6 +101,14 @@ const DEFAULT_TEMPLATES = [
     intro: "RallyPack is a free, open-source emergency preparedness platform that helps families build go-bags, evacuation plans, and emergency supply caches — making it a great resource to share with your entire neighborhood. We'd love to encourage you to add our free Readiness Quiz to your next HOA newsletter so every resident can quickly check how prepared they really are.",
     learn_path: "/ReadinessQuiz",
   },
+  {
+    audience_key: "fire_marshal",
+    label: "Fire Marshal & Fire Prevention",
+    subject: "A free year of RallyPack — and a request for your inspection expertise",
+    intro: "We built RallyPack with input from the fire service: a dashboard where a business logs its first aid kits, AED units, batteries, pads, staff CPR/first aid/AED certifications, and fire equipment inspections, and gets reminded before anything expires. The goal is that nothing lapses between inspections.\n\nWe would like your candid feedback on whether this actually helps a building prepare for an inspection. In return, your first year of the Professional plan is free.",
+    learn_path: "/BusinessOnboarding",
+    voucher_code: VOUCHER_CODE,
+  },
 ];
 
 export default function EmailTemplatesEditor() {
@@ -123,6 +132,7 @@ export default function EmailTemplatesEditor() {
             subject: existing.subject || def.subject,
             intro: existing.intro || def.intro,
             learn_path: existing.learn_path || def.learn_path,
+            voucher_code: existing.voucher_code || def.voucher_code || "",
           };
         }
         return { ...def };
@@ -158,6 +168,7 @@ export default function EmailTemplatesEditor() {
         subject: template.subject,
         intro: template.intro,
         learn_path: template.learn_path,
+        voucher_code: template.voucher_code || "",
       };
       if (template.id) {
         await base44.entities.EmailTemplate.update(template.id, payload);
@@ -243,6 +254,15 @@ export default function EmailTemplatesEditor() {
                 onChange={(e) => handleChange(tpl.audience_key, "learn_path", e.target.value)}
                 className="mt-1"
                 placeholder="/BusinessOnboarding"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Voucher Promo Code (optional)</Label>
+              <Input
+                value={tpl.voucher_code || ""}
+                onChange={(e) => handleChange(tpl.audience_key, "voucher_code", e.target.value)}
+                className="mt-1"
+                placeholder="Leave empty for no voucher"
               />
             </div>
             <div className="flex justify-end">

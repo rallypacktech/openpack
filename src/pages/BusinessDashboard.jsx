@@ -17,6 +17,7 @@ import ProfessionalUpgradeCard from "@/components/business/ProfessionalUpgradeCa
 import NeedsBoard from "@/components/business/NeedsBoard";
 import CommunityOneSheet from "@/components/business/CommunityOneSheet";
 import FireMarshalChecklist from "@/components/business/FireMarshalChecklist";
+import ExpiryTrackerPanel from "@/components/business/ExpiryTrackerPanel";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -225,6 +226,7 @@ export default function BusinessDashboard() {
         <TabsList className="mb-4">
           <TabsTrigger value="members">Members & Alerts</TabsTrigger>
           <TabsTrigger value="kits">First Aid Kits</TabsTrigger>
+          <TabsTrigger value="expiry">Expiry &amp; Compliance</TabsTrigger>
           <TabsTrigger value="evacuation">Evacuation Plans</TabsTrigger>
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
           {hasDelegation && <TabsTrigger value="alerts">Emergency Alerts</TabsTrigger>}
@@ -240,6 +242,9 @@ export default function BusinessDashboard() {
         </TabsContent>
         <TabsContent value="kits">
           <BusinessKitsPanel subscription={subscription} kits={kits} onRefresh={loadAll} />
+        </TabsContent>
+        <TabsContent value="expiry">
+          <ExpiryTrackerPanel subscription={subscription} kits={kits} />
         </TabsContent>
         <TabsContent value="evacuation">
           <EvacuationPlanPanel subscription={subscription} plans={plans} onRefresh={loadAll} />

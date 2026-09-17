@@ -38,6 +38,11 @@ export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
         cache_type: 'first_aid_kit',
         description: 'Office-appropriate first aid kit sample — adjust quantities and locations to your workplace',
       });
+      const plusYears = (y) => {
+        const d = new Date();
+        d.setFullYear(d.getFullYear() + y);
+        return d.toISOString().slice(0, 10);
+      };
       const items = [
         { item_name: 'Adhesive bandages (assorted)', quantity: 50, category: 'medical', notes: 'Cuts, blisters', cache_id: cache.id },
         { item_name: 'Gauze pads (4x4)', quantity: 20, category: 'medical', notes: 'Larger wounds', cache_id: cache.id },
@@ -53,6 +58,9 @@ export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
         { item_name: 'Tweezers', quantity: 1, category: 'tools', notes: 'Splinter removal', cache_id: cache.id },
         { item_name: 'Emergency blanket', quantity: 2, category: 'other', notes: 'Shock / temperature', cache_id: cache.id },
         { item_name: 'First aid reference guide', quantity: 1, category: 'documents', notes: 'Office first aid procedures', cache_id: cache.id },
+        { item_name: 'AED unit', quantity: 1, category: 'safety_equipment', expiration_date: plusYears(5), notes: 'Manufacturer service life — check the unit label', cache_id: cache.id },
+        { item_name: 'AED replacement battery', quantity: 1, category: 'safety_equipment', expiration_date: plusYears(2), notes: 'Replace before the printed battery date', cache_id: cache.id },
+        { item_name: 'AED replacement pads', quantity: 2, category: 'safety_equipment', expiration_date: plusYears(2), notes: 'Pads expire — check the sealed pouch date', cache_id: cache.id },
       ];
       await base44.entities.CacheItem.bulkCreate(items);
       onRefresh();

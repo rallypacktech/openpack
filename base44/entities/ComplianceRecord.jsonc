@@ -1,0 +1,115 @@
+{
+  "name": "ComplianceRecord",
+  "type": "object",
+  "properties": {
+    "record_type": {
+      "type": "string",
+      "enum": [
+        "staff_certification",
+        "fire_equipment"
+      ],
+      "description": "Whether this tracks a staff certification or a piece of fire/life-safety equipment"
+    },
+    "title": {
+      "type": "string",
+      "description": "What is being tracked (e.g. 'CPR / AED Certification', 'Fire extinguisher \u2014 Kitchen')"
+    },
+    "holder_name": {
+      "type": "string",
+      "description": "Staff member holding the certification (staff_certification only)"
+    },
+    "certification_type": {
+      "type": "string",
+      "enum": [
+        "cpr",
+        "first_aid",
+        "aed",
+        "cpr_aed",
+        "first_aid_cpr_aed",
+        "fire_safety",
+        "other"
+      ],
+      "description": "Certification type (staff_certification only)"
+    },
+    "equipment_type": {
+      "type": "string",
+      "enum": [
+        "fire_extinguisher",
+        "exit_sign",
+        "emergency_lighting",
+        "sprinkler_system",
+        "fire_alarm",
+        "aed",
+        "other"
+      ],
+      "description": "Equipment type (fire_equipment only)"
+    },
+    "location": {
+      "type": "string",
+      "description": "Building, floor, or room where the equipment lives"
+    },
+    "issued_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the certification was earned or the equipment last serviced"
+    },
+    "expiration_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the certification lapses or the next inspection is due"
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to the BusinessSubscription this record belongs to"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_type",
+    "title",
+    "expiration_date"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

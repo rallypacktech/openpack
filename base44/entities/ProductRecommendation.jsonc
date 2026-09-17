@@ -17,6 +17,7 @@
         "documents",
         "communication",
         "hygiene",
+        "safety_equipment",
         "other"
       ]
     },
@@ -120,6 +121,15 @@
         "type": "string"
       },
       "description": "Organizations recommending this item"
+    },
+    "replacement_interval_months": {
+      "type": "number",
+      "description": "Typical replacement interval in months \u2014 used to prompt businesses when the item comes due"
+    },
+    "for_business": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this item is recommended for business/workplace first aid kits"
     }
   },
   "required": [

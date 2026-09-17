@@ -93,6 +93,12 @@ const AUDIENCE_CONFIG = {
         subject: 'A value-add preparedness tool for your commercial clients',
         intro: 'RallyPack helps your commercial clients stay inspection-ready and disaster-prepared — tracking first aid kits and expiry dates across every floor, documenting evacuation plans and assembly points, and maintaining floor warden rosters. Clients who stay compliant file fewer claims. Share RallyPack as a free preparedness resource that adds value at every policy review.',
     },
+    fire_marshal: {
+        label: 'Fire Marshal & Fire Prevention',
+        learnPath: '/BusinessOnboarding',
+        subject: 'A free year of RallyPack — and a request for your inspection expertise',
+        intro: 'We built RallyPack with input from the fire service: a dashboard where a business logs its first aid kits, AED units, batteries, pads, staff CPR/first aid/AED certifications, and fire equipment inspections, and gets reminded before anything expires. The goal is that nothing lapses between inspections — no dead AED batteries, no out-of-date pads, no expired certifications.\n\nWe would like your candid feedback on whether this actually helps a building prepare for an inspection, and what you would want a business to have ready when you walk in. In return, your first year of the Professional plan is free.',
+    },
 };
 
 async function loadTemplates(base44) {
@@ -109,11 +115,22 @@ async function loadTemplates(base44) {
                     learnPath: t.learn_path || result[t.audience_key].learnPath,
                     subject: t.subject || result[t.audience_key].subject,
                     intro: t.intro || result[t.audience_key].intro,
+                    voucherCode: t.voucher_code || result[t.audience_key].voucherCode || '',
                 };
             }
         }
     } catch (e) { /* use defaults */ }
     return result;
+}
+
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 function buildReferralEmailHtml(config, origin) {
@@ -174,8 +191,19 @@ function buildReferralEmailHtml(config, origin) {
                 </tr>
               </table>
 
+              ${config.voucherCode ? `
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background-color:#fff8e7;border:1px dashed #d64a2e;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <p style="margin:0 0 6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#a83a20;">Free year voucher</p>
+                    <p style="margin:0 0 8px;font-size:14px;color:#1c1c1a;">Your first year of the Professional plan is on us. Enter this code in the promo code box at checkout:</p>
+                    <p style="margin:0;font-family:'Courier New',monospace;font-size:20px;font-weight:700;letter-spacing:2px;color:#1c1c1a;">${escapeHtml(config.voucherCode)}</p>
+                  </td>
+                </tr>
+              </table>` : ''}
+
               <p style="margin:0 0 16px;font-size:13px;color:#6b6b66;">
-                Business plans include multi-location kit tracking, expiry alerts, evacuation plan documentation, and emergency team notifications.
+                Business plans include multi-location kit tracking, AED and certification expiry alerts, evacuation plan documentation, and emergency team notifications.
               </p>
 
               <p style="margin:0;font-size:14px;color:#1c1c1a;">
@@ -219,7 +247,12 @@ function buildReferralEmailText(config, origin) {
         'Explore Business Accounts: ' + businessUrl,
         'Learn More: ' + learnUrl,
         '',
-        'Business plans include multi-location kit tracking, expiry alerts, evacuation plan documentation, and emergency team notifications.',
+        ...(config.voucherCode ? [
+            'FREE YEAR VOUCHER: Your first year of the Professional plan is on us.',
+            'Enter this code in the promo code box at checkout: ' + config.voucherCode,
+            '',
+        ] : []),
+        'Business plans include multi-location kit tracking, AED and certification expiry alerts, evacuation plan documentation, and emergency team notifications.',
         '',
         'Stay safe,',
         'RallyPack Team',

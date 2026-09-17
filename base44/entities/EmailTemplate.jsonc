@@ -24,7 +24,8 @@
         "tornado",
         "hoa",
         "commercial_property",
-        "insurance_broker"
+        "insurance_broker",
+        "fire_marshal"
       ],
       "description": "Audience key matching BusinessReferral.audience_type"
     },
@@ -43,6 +44,10 @@
     "learn_path": {
       "type": "string",
       "description": "Path for the Learn More button (e.g. /BusinessOnboarding, /equine)"
+    },
+    "voucher_code": {
+      "type": "string",
+      "description": "Promo code to include as a voucher in this email. Leave empty for no voucher."
     }
   },
   "required": [

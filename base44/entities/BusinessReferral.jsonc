@@ -48,14 +48,15 @@
         "tornado",
         "hoa",
         "commercial_property",
-        "insurance_broker"
+        "insurance_broker",
+        "fire_marshal"
       ],
       "default": "general",
       "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page"
     },
     "state": {
       "type": "string",
-      "description": "US state code (e.g. 'TX') this referral belongs to \u2014 used for HOA outreach per-state tracking"
+      "description": "US state code (e.g. 'TX') this referral belongs to \u2014 used for HOA and fire marshal per-state tracking"
     },
     "status": {
       "type": "string",
