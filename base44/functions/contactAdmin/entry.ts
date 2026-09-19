@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { escapeHtml } from '../../shared/reminderUtils.ts';
 
 // Allows a business org user to contact the RallyPack admin team.
 // Creates an in-app notification for admins and attempts to send an email.
@@ -45,7 +46,8 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: ADMIN_EMAIL,
         subject: fullSubject,
-        body: fullMessage.replace(/\n/g, '<br>'),
+        // `body` is rendered as HTML by the mail client — escape the user-controlled fields.
+        body: escapeHtml(fullMessage).replace(/\n/g, '<br>'),
       });
       emailSent = true;
     } catch (e) {

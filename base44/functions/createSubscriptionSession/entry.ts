@@ -1,14 +1,45 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@17.5.0';
 
+// Post-checkout redirects are restricted to the app's own origins, so a caller-supplied
+// success_url/cancel_url cannot turn checkout into an open redirect to a phishing site.
+function isAllowedRedirect(url) {
+    if (typeof url !== 'string' || url.length > 2048) return false;
+    try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:') return false;
+        const host = parsed.hostname.toLowerCase();
+        return host.endsWith('.base44.app') || host === 'rallypack.org' || host.endsWith('.rallypack.org');
+    } catch {
+        return false;
+    }
+}
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
+
+        // Business subscription checkout is only available to signed-in accounts.
+        const user = await base44.auth.me().catch(() => null);
+        if (!user?.email) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
-        const { price_id, success_url, cancel_url, customer_email, metadata } = await req.json();
+        const { price_id, success_url, cancel_url, metadata } = await req.json();
 
         if (!price_id) {
             return Response.json({ error: 'price_id is required' }, { status: 400 });
+        }
+
+        const appOrigin = new URL(req.url).origin;
+
+        // Only pass through the metadata fields the app actually uses. Caller-supplied
+        // values must never override platform-set keys such as base44_app_id or user_email.
+        const safeMetadata: Record<string, string> = {};
+        if (typeof metadata?.tier === 'string') safeMetadata.tier = metadata.tier.slice(0, 64);
+        if (typeof metadata?.organization_name === 'string') {
+            safeMetadata.organization_name = metadata.organization_name.slice(0, 200);
         }
 
         const session = await stripe.checkout.sessions.create({
@@ -16,14 +47,22 @@ Deno.serve(async (req) => {
             line_items: [{ price: price_id, quantity: 1 }],
             mode: 'subscription',
             allow_promotion_codes: true,
-            subscription_data: { trial_period_days: 7 },
-            success_url: success_url || `${new URL(req.url).origin}/BusinessDashboard?sub_success=true&sid={CHECKOUT_SESSION_ID}`,
-            cancel_url: cancel_url || `${new URL(req.url).origin}/BusinessDashboard`,
-            customer_email,
+            subscription_data: {
+                trial_period_days: 7,
+                metadata: { base44_app_id: Deno.env.get('BASE44_APP_ID') },
+            },
+            success_url: isAllowedRedirect(success_url)
+                ? success_url
+                : `${appOrigin}/BusinessDashboard?sub_success=true&sid={CHECKOUT_SESSION_ID}`,
+            cancel_url: isAllowedRedirect(cancel_url)
+                ? cancel_url
+                : `${appOrigin}/BusinessDashboard`,
+            // Always the authenticated account's email — never a caller-supplied value.
+            customer_email: user.email,
             metadata: {
                 base44_app_id: Deno.env.get('BASE44_APP_ID'),
-                user_email: customer_email,
-                ...metadata,
+                user_email: user.email,
+                ...safeMetadata,
             },
         });
 

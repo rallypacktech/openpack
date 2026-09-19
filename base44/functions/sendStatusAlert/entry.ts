@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { escapeHtml } from '../../shared/reminderUtils.ts';
 
 // Broadcasts a user's "I'm Safe" or "Need Help" status to family members
 // via the user's selected channels: email, Telegram, Discord webhook.
@@ -78,7 +79,7 @@ function buildStatusEmailHtml(emoji, userName, statusText, messageBody) {
         </tr>
         <tr>
           <td style="padding:32px 40px;">
-            <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">${messageBody.replace(/\n/g, '<br>')}</p>
+            <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">${escapeHtml(messageBody).replace(/\n/g, '<br>')}</p>
             <p style="margin:0;font-size:14px;color:#6b6b66;">This is an automated status alert from RallyPack.</p>
           </td>
         </tr>

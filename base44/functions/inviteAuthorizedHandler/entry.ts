@@ -15,6 +15,20 @@ export default async function(req: Request): Promise<Response> {
       return Response.json({ error: 'Handler email is required' }, { status: 400 });
     }
 
+    // Only invite handlers the caller has actually registered on their own account.
+    // Without this ownership check the function is an open relay for RallyPack-branded
+    // email to any arbitrary address.
+    const registered = await base44.entities.AuthorizedHandler.filter({
+      email: String(handler_email).trim().toLowerCase(),
+      created_by_id: user.id,
+    });
+    if (registered.length === 0) {
+      return Response.json(
+        { error: 'Handler is not in your authorized handlers list' },
+        { status: 403 },
+      );
+    }
+
     const safe = (str) => {
       if (str == null) return '';
       return String(str)
@@ -88,7 +102,8 @@ export default async function(req: Request): Promise<Response> {
 </html>`;
 
     await base44.integrations.Core.SendEmail({
-      to: handler_email,
+      // Send to the registered address, not the raw request value.
+      to: registered[0].email,
       subject,
       html: htmlBody,
       from_name: 'RallyPack'
