@@ -85,7 +85,7 @@ export default function BusinessOnboarding() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Building2 className="w-12 h-12 text-[#D64A2E] mx-auto mb-6" />
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4 leading-tight">
-            Pass Your Fire Marshal Inspection
+            Pass Your Fire Safety Inspection
           </h1>
           <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto">
             Warehouses, shelters, daycares, coworking spaces, and offices use RallyPack
@@ -142,7 +142,7 @@ export default function BusinessOnboarding() {
             Inspection-Ready in Four Steps
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Whether the fire marshal walks in tomorrow or next quarter, your kits,
+            Whether the fire inspector walks in tomorrow or next quarter, your kits,
             AEDs, certifications, and emergency plan are all in one place and in date.
           </p>
         </div>
@@ -284,7 +284,7 @@ export default function BusinessOnboarding() {
                         "Check out RallyPack for Business",
                     )}&body=${encodeURIComponent(
                       `Hi${sent.name ? " " + sent.name : ""},\n\n` +
-                        `I thought your organization${sent.org ? " (" + sent.org + ")" : ""} would benefit from RallyPack — it tracks first aid kit inventory, expiry dates, and evacuation plans so you're always fire marshal ready.\n\n` +
+                        `I thought your organization${sent.org ? " (" + sent.org + ")" : ""} would benefit from RallyPack — it tracks first aid kit inventory, expiry dates, and evacuation plans so you're always inspection ready.\n\n` +
                         `Features include:\n• Multi-location first aid kit tracking with expiry alerts\n• Evacuation plan documentation\n• Floor warden & chain-of-command roster\n\n` +
                         (sent.message ? `My note: ${sent.message}\n\n` : "") +
                         `Check it out: https://www.rallypack.org/BusinessOnboarding\n\nThanks!`,

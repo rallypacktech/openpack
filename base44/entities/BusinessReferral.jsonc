@@ -52,11 +52,11 @@
         "fire_marshal"
       ],
       "default": "general",
-      "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page"
+      "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page. The fire_marshal value covers all fire safety and prevention audiences; it is kept for existing records."
     },
     "state": {
       "type": "string",
-      "description": "US state code (e.g. 'TX') for US referrals, or the province/region (e.g. 'Ontario', 'Karnataka') for international referrals \u2014 used for HOA, fire marshal and regional tracking"
+      "description": "US state code (e.g. 'TX') for US referrals, or the province/region (e.g. 'Ontario', 'Karnataka') for international referrals \u2014 used for HOA, fire safety and regional tracking"
     },
     "country_code": {
       "type": "string",

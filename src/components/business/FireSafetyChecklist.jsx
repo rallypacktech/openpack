@@ -4,14 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, Printer, Flame } from "lucide-react";
 import { getExpiryStatus } from "@/lib/expiryStatus";
+import { getComplianceRegion } from "@/lib/complianceFrameworks";
 
-// Fire marshal readiness checklist for the Business Dashboard.
-// Derives live status from the org's kits, expirations, plans, members, and
-// subscription, alongside a printable static compliance checklist.
-export default function FireMarshalChecklist({ subscription, members, kits, plans }) {
+// Fire & life safety readiness checklist for the Business Dashboard.
+// Derives live status from the org's kits, expirations, plans and members,
+// alongside the printable on-site checklist for the org's country.
+export default function FireSafetyChecklist({ subscription, members, kits, plans, countryCode }) {
   const [expiredCount, setExpiredCount] = useState(0);
   const [expiringCount, setExpiringCount] = useState(0);
   const [loaded, setLoaded] = useState(false);
+
+  const region = getComplianceRegion(countryCode);
 
   useEffect(() => {
     (async () => {
@@ -60,26 +63,13 @@ export default function FireMarshalChecklist({ subscription, members, kits, plan
           : `${expiredCount} expired, ${expiringCount} expiring`,
     },
     { label: "Evacuation plan documented", done: plans.length > 0, detail: `${plans.length} plan(s)` },
-    { label: "Floor wardens assigned", done: wardens.length > 0, detail: `${wardens.length} warden(s)` },
+    { label: "Wardens assigned for each floor", done: wardens.length > 0, detail: `${wardens.length} warden(s)` },
     { label: "Chain of command configured", done: hasChain, detail: hasChain ? "Set" : "Not set" },
     {
       label: "Emergency alert sending enabled",
       done: !!subscription?.alert_sending_enabled,
       detail: subscription?.alert_sending_enabled ? "Enabled" : "Upgrade required",
     },
-  ];
-
-  const compliance = [
-    "AED units, batteries, and pads in date (check monthly)",
-    "Staff CPR / first aid / AED certifications current",
-    "Fire extinguishers inspected and tagged (annual)",
-    "Exit signs lit and emergency lighting tested monthly",
-    "Egress paths clear and unobstructed at all times",
-    "Posted evacuation maps on every floor",
-    "Annual fire drill conducted and logged",
-    "Hazardous materials stored per fire code",
-    "Sprinkler/alarm system inspection current",
-    "Trained floor wardens on each occupied floor",
   ];
 
   const completed = tracked.filter((i) => i.done).length;
@@ -90,7 +80,7 @@ export default function FireMarshalChecklist({ subscription, members, kits, plan
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-base">
             <span className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-primary" /> Fire Marshal Readiness
+              <Flame className="w-4 h-4 text-primary" /> Fire &amp; Life Safety Readiness
             </span>
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="w-3.5 h-3.5 mr-1" /> Print
@@ -120,8 +110,12 @@ export default function FireMarshalChecklist({ subscription, members, kits, plan
           <CardTitle className="text-base">On-Site Compliance Checklist</CardTitle>
         </CardHeader>
         <CardContent>
+          <p className="text-xs text-muted-foreground mb-3">
+            {region.label} — inspected against {region.framework}. Enforced by{" "}
+            {region.authority.charAt(0).toLowerCase() + region.authority.slice(1)}.
+          </p>
           <ul className="space-y-1.5 text-sm text-muted-foreground">
-            {compliance.map((c) => (
+            {region.checklist.map((c) => (
               <li key={c} className="flex items-start gap-2">
                 <Circle className="w-4 h-4 text-muted-foreground/40 mt-0.5 shrink-0" />
                 <span>{c}</span>

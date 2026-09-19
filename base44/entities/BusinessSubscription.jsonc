@@ -10,6 +10,10 @@
     "organization_name": {
       "type": "string"
     },
+    "country": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code where the organization operates (US, CA, AU, IE, GB). Drives which fire & life safety framework and on-site checklist apply."
+    },
     "owner_email": {
       "type": "string",
       "description": "Email of the account owner"

@@ -6,7 +6,7 @@ const AUDIENCE_CONFIG = {
     general: {
         label: 'Workplace Preparedness',
         learnPath: '/BusinessOnboarding',
-        subject: 'Fire marshal compliance & emergency tracking for your business',
+        subject: 'Fire safety compliance & emergency tracking for your business',
         intro: 'RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard.',
         voucherLabel: 'First month free',
         voucherNote: 'Your first month of the Professional plan is on us.',
@@ -86,7 +86,7 @@ const AUDIENCE_CONFIG = {
     commercial_property: {
         label: 'Commercial Property Preparedness',
         learnPath: '/BusinessOnboarding',
-        subject: 'Fire marshal readiness & emergency tracking for your properties',
+        subject: 'Fire safety readiness & emergency tracking for your properties',
         intro: 'RallyPack helps commercial landlords and office park managers stay inspection-ready across every building — track first aid kits by floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to tenants and staff. One dashboard proves every property is compliant.',
     },
     insurance_broker: {
@@ -96,7 +96,7 @@ const AUDIENCE_CONFIG = {
         intro: 'RallyPack helps your commercial clients stay inspection-ready and disaster-prepared — tracking first aid kits and expiry dates across every floor, documenting evacuation plans and assembly points, and maintaining floor warden rosters. Clients who stay compliant file fewer claims. Share RallyPack as a free preparedness resource that adds value at every policy review.',
     },
     fire_marshal: {
-        label: 'Fire Marshal & Fire Prevention',
+        label: 'Fire Safety & Prevention',
         learnPath: '/BusinessOnboarding',
         subject: 'A free year of RallyPack — and a request for your inspection expertise',
         intro: 'We built RallyPack with input from the fire service: a dashboard where a business logs its first aid kits, AED units, batteries, pads, staff CPR/first aid/AED certifications, and fire equipment inspections, and gets reminded before anything expires. The goal is that nothing lapses between inspections — no dead AED batteries, no out-of-date pads, no expired certifications.\n\nWe would like your candid feedback on whether this actually helps a building prepare for an inspection, and what you would want a business to have ready when you walk in. In return, your first year of the Professional plan is free.',

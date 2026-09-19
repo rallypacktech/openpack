@@ -8,6 +8,9 @@ import {
   CheckCircle,
   ExternalLink,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySettings";
 import LoginWall from "../components/LoginWall";
 import { detectBot, getStableBotId } from "@/lib/botDetection";
 import AdSlot from "../components/AdSlot";
@@ -133,6 +136,13 @@ const questions = [
       },
       { label: "No insurance or it's lapsed", value: "no" },
     ],
+  },
+  {
+    id: "location",
+    type: "postal",
+    question: "What's your postal code?",
+    subtext:
+      "We use it to map readiness where you live so your area gets the resources it needs. We never use it to identify you — and you can skip it.",
   },
 ];
 
@@ -268,11 +278,9 @@ function QuizResults({ score, answers, onRetake }) {
   React.useEffect(() => {
     const save = async () => {
       const sessionId = getSessionId();
-      let userEmail = null;
       let isRegistered = false;
       try {
         const user = await base44.auth.me();
-        userEmail = user?.email || null;
         isRegistered = !!user;
       } catch (_) {}
 
@@ -282,9 +290,9 @@ function QuizResults({ score, answers, onRetake }) {
 
       const { isBot, botName } = detectBot();
       try {
+        const location = answers.location || {};
         const res = await base44.functions.invoke("saveQuizResult", {
           session_id: sessionId,
-          user_email: userEmail,
           score,
           score_level: result.level,
           region: answers.region,
@@ -295,6 +303,8 @@ function QuizResults({ score, answers, onRetake }) {
           supplies: answers.supplies,
           plan_documented: answers.plan_documented,
           insurance: answers.insurance,
+          postal_code: location.postal_code || null,
+          country_code: location.country_code || null,
           is_registered_user: isRegistered,
           is_bot: isBot,
           bot_name: botName,
@@ -650,6 +660,8 @@ export default function ReadinessQuiz() {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [postal, setPostal] = useState("");
+  const [postalCountry, setPostalCountry] = useState("US");
 
   const handleAnswer = (value) => {
     const newAnswers = { ...answers, [questions[currentQ].id]: value };
@@ -688,6 +700,21 @@ export default function ReadinessQuiz() {
         setCurrentQ(prevQ);
       }
     }
+  };
+
+  // The location step is the only free-text question — it records the postal
+  // code used to map readiness by area.
+  const submitLocation = () => {
+    setAnswers({
+      ...answers,
+      location: { postal_code: postal.trim(), country_code: postalCountry },
+    });
+    setShowResults(true);
+  };
+
+  const skipLocation = () => {
+    setAnswers({ ...answers, location: null });
+    setShowResults(true);
   };
 
   if (showResults) {
@@ -752,18 +779,63 @@ export default function ReadinessQuiz() {
                 {q.subtext}
               </p>
             )}
-            <div className="space-y-3">
-              {q.options.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => handleAnswer(opt.value)}
-                  className="w-full text-left px-5 py-4 rounded border border-border hover:border-primary hover:bg-primary/5 transition-all duration-150 text-foreground font-sans font-medium text-sm flex items-center justify-between group"
-                >
-                  <span>{opt.label}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 transition-colors" />
-                </button>
-              ))}
-            </div>
+            {q.type === "postal" ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="quiz-country">Country</Label>
+                  <select
+                    id="quiz-country"
+                    value={postalCountry}
+                    onChange={(e) => setPostalCountry(e.target.value)}
+                    className="w-full h-11 px-3 rounded border border-input bg-background text-foreground font-sans text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    {Object.entries(COUNTRY_EMERGENCY_DATA).map(([code, data]) => (
+                      <option key={code} value={code}>
+                        {data.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="quiz-postal">Postal code</Label>
+                  <Input
+                    id="quiz-postal"
+                    value={postal}
+                    onChange={(e) => setPostal(e.target.value)}
+                    placeholder="e.g. 78701"
+                    autoComplete="postal-code"
+                  />
+                </div>
+                <div className="flex items-center gap-4 pt-1">
+                  <button
+                    onClick={submitLocation}
+                    disabled={!postal.trim()}
+                    className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-medium px-6 py-2.5 rounded hover:bg-primary/90 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    See my results <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={skipLocation}
+                    className="text-sm font-sans text-muted-foreground hover:text-foreground underline transition-colors"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {q.options.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleAnswer(opt.value)}
+                    className="w-full text-left px-5 py-4 rounded border border-border hover:border-primary hover:bg-primary/5 transition-all duration-150 text-foreground font-sans font-medium text-sm flex items-center justify-between group"
+                  >
+                    <span>{opt.label}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 transition-colors" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Back */}

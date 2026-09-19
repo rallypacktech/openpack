@@ -16,7 +16,7 @@ import IncidentsHistory from "@/components/business/IncidentsHistory";
 import ProfessionalUpgradeCard from "@/components/business/ProfessionalUpgradeCard";
 import NeedsBoard from "@/components/business/NeedsBoard";
 import CommunityOneSheet from "@/components/business/CommunityOneSheet";
-import FireMarshalChecklist from "@/components/business/FireMarshalChecklist";
+import FireSafetyChecklist from "@/components/business/FireSafetyChecklist";
 import ExpiryTrackerPanel from "@/components/business/ExpiryTrackerPanel";
 import IcsTerminologyPanel from "@/components/business/IcsTerminologyPanel";
 
@@ -28,6 +28,7 @@ export default function BusinessDashboard() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [hasDelegation, setHasDelegation] = useState(false);
+  const [country, setCountry] = useState(null);
   const [showProUpgrade, setShowProUpgrade] = useState(false);
   const [subConversionFired, setSubConversionFired] = useState(false);
 
@@ -92,6 +93,18 @@ export default function BusinessDashboard() {
     setMembers(membersData);
     setKits(caches);
     setPlans(plansData);
+
+    // Country drives which fire & life safety framework the org is checked against.
+    let countryCode = activeSub?.country || null;
+    if (!countryCode) {
+      try {
+        const profiles = await base44.entities.UserProfile.filter({ created_by_id: me.id });
+        if (profiles.length > 0) countryCode = profiles[0].country || null;
+      } catch (_e) {
+        /* falls back to the default region */
+      }
+    }
+    setCountry(countryCode);
 
     // Check if this user is authorized to send delegated alerts
     try {
@@ -235,7 +248,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="wildfire">Incidents</TabsTrigger>
           <TabsTrigger value="contact">Contact Admin</TabsTrigger>
           <TabsTrigger value="onesheet">Community Guide</TabsTrigger>
-          <TabsTrigger value="firemarshal">Fire Marshal</TabsTrigger>
+          <TabsTrigger value="firemarshal">Fire &amp; Life Safety</TabsTrigger>
           <TabsTrigger value="ics">ICS Reference</TabsTrigger>
         </TabsList>
 
@@ -266,7 +279,13 @@ export default function BusinessDashboard() {
           <CommunityOneSheet organizationName={subscription?.organization_name} />
         </TabsContent>
         <TabsContent value="firemarshal">
-          <FireMarshalChecklist subscription={subscription} members={members} kits={kits} plans={plans} />
+          <FireSafetyChecklist
+            subscription={subscription}
+            members={members}
+            kits={kits}
+            plans={plans}
+            countryCode={country}
+          />
         </TabsContent>
         <TabsContent value="ics">
           <IcsTerminologyPanel />

@@ -14,7 +14,7 @@ const DEFAULT_TEMPLATES = [
   {
     audience_key: "general",
     label: "Workplace Preparedness",
-    subject: "Fire marshal compliance & emergency tracking for your business",
+    subject: "Fire safety compliance & emergency tracking for your business",
     intro: "RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard.",
     learn_path: "/BusinessOnboarding",
     voucher_code: GENERAL_VOUCHER_CODE,
@@ -106,7 +106,7 @@ const DEFAULT_TEMPLATES = [
   },
   {
     audience_key: "fire_marshal",
-    label: "Fire Marshal & Fire Prevention",
+    label: "Fire Safety & Prevention",
     subject: "A free year of RallyPack — and a request for your inspection expertise",
     intro: "We built RallyPack with input from the fire service: a dashboard where a business logs its first aid kits, AED units, batteries, pads, staff CPR/first aid/AED certifications, and fire equipment inspections, and gets reminded before anything expires. The goal is that nothing lapses between inspections.\n\nWe would like your candid feedback on whether this actually helps a building prepare for an inspection. In return, your first year of the Professional plan is free.",
     learn_path: "/BusinessOnboarding",
@@ -115,7 +115,7 @@ const DEFAULT_TEMPLATES = [
   {
     audience_key: "commercial_property",
     label: "Commercial Property Preparedness",
-    subject: "Fire marshal readiness & emergency tracking for your properties",
+    subject: "Fire safety readiness & emergency tracking for your properties",
     intro: "RallyPack helps commercial landlords and office park managers stay inspection-ready across every building — track first aid kits by floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to tenants and staff. One dashboard proves every property is compliant.",
     learn_path: "/BusinessOnboarding",
   },

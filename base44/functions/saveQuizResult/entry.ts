@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
-import { getClientIp, geolocateByIp, geolocateByAddress } from '../../shared/readinessGeo.ts';
+import { geolocateByPostalCode } from '../../shared/readinessGeo.ts';
 
 export default async function(req) {
   try {
@@ -14,7 +14,7 @@ export default async function(req) {
       session_id, score, score_level, region,
       county_plan, experienced_disaster, felt_prepared,
       meeting_spot, supplies, plan_documented, insurance,
-      is_bot, bot_name
+      is_bot, bot_name, postal_code, country_code
     } = body;
 
     if (score === undefined || score === null) {
@@ -30,7 +30,8 @@ export default async function(req) {
       if (user?.email) {
         verifiedEmail = user.email;
         is_registered_user = true;
-        // Load the user's profile for address-based geolocation
+        // Load the user's profile so a saved postal code can stand in when the
+        // quiz taker skipped the location step.
         try {
           const profiles = await base44.asServiceRole.entities.UserProfile.filter({ created_by_id: user.id });
           if (profiles.length > 0) profile = profiles[0];
@@ -40,24 +41,35 @@ export default async function(req) {
       // Anonymous quiz taker (human or bot) — no email associated.
     }
 
-    // Dedup: if a result already exists for this session_id, skip creation.
+    // Dedup: if a result already exists for this session_id, don't create a second
+    // one. If the taker has since signed up, claim the existing record instead —
+    // that is what turns a pre-signup quiz into a tracked conversion.
     if (session_id) {
       const existing = await base44.asServiceRole.entities.QuizResult.filter({ session_id });
       if (existing.length > 0) {
-        return Response.json({ saved: false, reason: 'duplicate', existing_id: existing[0].id });
+        const prior = existing[0];
+        if (verifiedEmail && !prior.is_registered_user) {
+          await base44.asServiceRole.entities.QuizResult.update(prior.id, {
+            user_email: verifiedEmail,
+            is_registered_user: true,
+          });
+          return Response.json({ saved: false, reason: 'linked', existing_id: prior.id });
+        }
+        return Response.json({ saved: false, reason: 'duplicate', existing_id: prior.id });
       }
     }
 
-    // Geolocate: profile address for logged-in users, IP for anonymous.
-    // Bots are excluded from map aggregation so their geolocation is irrelevant.
+    // Geolocate from the postal code the taker entered, falling back to the
+    // signed-in user's saved postal code. Never from IP or a free-text address.
+    // Bots are excluded from map aggregation so their location is irrelevant.
     let geo = null;
     if (!is_bot) {
-      if (profile && (profile.country || profile.state_province || profile.city || profile.postal_code)) {
-        geo = await geolocateByAddress(profile);
+      let postal = (postal_code || '').toString().trim();
+      if (!postal && profile?.postal_code) {
+        postal = profile.postal_code.toString().trim();
       }
-      if (!geo || (!geo.latitude && !geo.country_name)) {
-        const ip = getClientIp(req);
-        geo = await geolocateByIp(ip);
+      if (postal) {
+        geo = await geolocateByPostalCode(postal, country_code || null);
       }
     }
 

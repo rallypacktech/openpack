@@ -39,6 +39,16 @@ export default function Layout({ children, currentPageName }) {
         const profiles = await base44.entities.UserProfile.filter({ created_by: userData.email });
         if (profiles.length > 0) setProfile(profiles[0]);
         setAuthChecked(true);
+        // Claim any readiness quiz this user took before they had an account —
+        // this is what makes the quiz → signup conversion measurable.
+        try {
+          const quizSession = localStorage.getItem("rp_quiz_session");
+          const claimedKey = `rallypack_quiz_claimed_${userData.id}`;
+          if (quizSession && !localStorage.getItem(claimedKey)) {
+            await base44.functions.invoke("linkQuizResults", { session_id: quizSession });
+            localStorage.setItem(claimedKey, "1");
+          }
+        } catch (_e) { /* non-fatal */ }
         // Fire Google Ads SIGNUP conversion once for a freshly-registered user
         // (Register.jsx sets the pending flag right before the post-signup redirect).
         try {

@@ -6,7 +6,7 @@ const ORIGIN = 'https://www.rallypack.org';
 const DEFAULT_GENERAL_CONFIG = {
     label: 'Workplace Preparedness',
     learnPath: '/BusinessOnboarding',
-    subject: 'Fire marshal compliance & emergency tracking for your business',
+    subject: 'Fire safety compliance & emergency tracking for your business',
     intro: 'RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard. Start with a 7-day free trial — try every feature with no charge for 7 days, then pick the plan that fits. Cancel anytime.',
 };
 
