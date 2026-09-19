@@ -112,6 +112,13 @@ const DEFAULT_TEMPLATES = [
     learn_path: "/BusinessOnboarding",
     voucher_code: VOUCHER_CODE,
   },
+  {
+    audience_key: "commercial_property",
+    label: "Commercial Property Preparedness",
+    subject: "Fire marshal readiness & emergency tracking for your properties",
+    intro: "RallyPack helps commercial landlords and office park managers stay inspection-ready across every building — track first aid kits by floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to tenants and staff. One dashboard proves every property is compliant.",
+    learn_path: "/BusinessOnboarding",
+  },
 ];
 
 export default function EmailTemplatesEditor() {
