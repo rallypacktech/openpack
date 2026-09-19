@@ -14,7 +14,8 @@ import EmergencyManuals from "../components/manuals/EmergencyManuals";
 import LocalShelters from "../components/resources/LocalShelters";
 import EvacuationAlertInfo from "../components/resources/EvacuationAlertInfo";
 import { Link } from "react-router-dom";
-import { Package, MapPin, Users, Share2, ChevronRight } from "lucide-react";
+import { Package, MapPin, Users, Share2, ChevronRight, ShieldCheck } from "lucide-react";
+import HomeSafetyPanel from "@/components/safety/HomeSafetyPanel";
 
 export default function Resources() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function Resources() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get("tab");
-    const validTabs = ["supplies", "meetspots", "share", "help", "community"];
+    const validTabs = ["supplies", "safety", "meetspots", "share", "help", "community"];
     const legacyMap = {
       caches: "supplies", firstaid: "supplies",
       training: "community", volunteer: "community", tracking: "community",
@@ -114,6 +115,9 @@ export default function Resources() {
             <TabsTrigger value="supplies">
               <Package className="w-4 h-4 mr-1.5" /> My Supplies
             </TabsTrigger>
+            <TabsTrigger value="safety">
+              <ShieldCheck className="w-4 h-4 mr-1.5" /> Home Safety
+            </TabsTrigger>
             <TabsTrigger value="meetspots">
               <MapPin className="w-4 h-4 mr-1.5" /> Meet Spots
             </TabsTrigger>
@@ -138,6 +142,11 @@ export default function Resources() {
               onViewItems={handleViewCacheItems}
               onGenerateSamples={handleGenerateSampleCaches}
             />
+          </TabsContent>
+
+          {/* ── Home Safety ── */}
+          <TabsContent value="safety">
+            <HomeSafetyPanel />
           </TabsContent>
 
           {/* ── Meet Spots ── */}

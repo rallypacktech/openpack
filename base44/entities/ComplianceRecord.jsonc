@@ -6,9 +6,10 @@
       "type": "string",
       "enum": [
         "staff_certification",
-        "fire_equipment"
+        "fire_equipment",
+        "home_device"
       ],
-      "description": "Whether this tracks a staff certification or a piece of fire/life-safety equipment"
+      "description": "Whether this tracks a staff certification, a workplace fire/life-safety asset, or a household safety device"
     },
     "title": {
       "type": "string",
@@ -34,6 +35,8 @@
     "equipment_type": {
       "type": "string",
       "enum": [
+        "smoke_alarm",
+        "carbon_monoxide_alarm",
         "fire_extinguisher",
         "exit_sign",
         "emergency_lighting",
@@ -42,7 +45,7 @@
         "aed",
         "other"
       ],
-      "description": "Equipment type (fire_equipment only)"
+      "description": "Device or equipment type (fire_equipment and home_device records)"
     },
     "location": {
       "type": "string",
@@ -51,16 +54,20 @@
     "issued_date": {
       "type": "string",
       "format": "date",
-      "description": "Date the certification was earned or the equipment last serviced"
+      "description": "Date the certification was earned, or the equipment was last checked / serviced"
     },
     "expiration_date": {
       "type": "string",
       "format": "date",
       "description": "Date the certification lapses or the next inspection is due"
     },
+    "interval_months": {
+      "type": "number",
+      "description": "How often this needs checking, in months. Drives the one-tap 'log check' action that advances the next due date automatically."
+    },
     "subscription_id": {
       "type": "string",
-      "description": "Reference to the BusinessSubscription this record belongs to"
+      "description": "Reference to the BusinessSubscription this record belongs to. Empty for household devices."
     },
     "notes": {
       "type": "string"

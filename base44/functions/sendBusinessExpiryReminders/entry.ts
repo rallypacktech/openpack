@@ -1,34 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
-
-function timingSafeEqual(a, b) {
-  const enc = new TextEncoder();
-  const bufA = enc.encode(String(a));
-  const bufB = enc.encode(String(b));
-  if (bufA.length !== bufB.length) return false;
-  let diff = 0;
-  for (let i = 0; i < bufA.length; i++) diff |= bufA[i] ^ bufB[i];
-  return diff === 0;
-}
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-function escapeHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function daysUntil(dateStr) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const target = new Date(dateStr);
-  target.setHours(0, 0, 0, 0);
-  return Math.round((target - today) / DAY_MS);
-}
+import { DAY_MS, escapeHtml, daysUntil, isAutomationRequest } from '../../shared/reminderUtils.ts';
 
 /**
  * Monthly scheduled job: emails each business organization a single summary of
@@ -39,12 +10,8 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    const AUTOMATION_SECRET = Deno.env.get('AUTOMATION_SECRET');
     const body = await req.json().catch(() => ({}));
-    const headerSecret = req.headers.get('x-automation-secret') || req.headers.get('automation-secret');
-    const isAutomation =
-      (AUTOMATION_SECRET && headerSecret && timingSafeEqual(headerSecret, AUTOMATION_SECRET)) ||
-      (AUTOMATION_SECRET && body.automation_secret && timingSafeEqual(body.automation_secret, AUTOMATION_SECRET));
+    const isAutomation = isAutomationRequest(req, body);
 
     if (!isAutomation) {
       let user;
@@ -81,7 +48,9 @@ Deno.serve(async (req) => {
 
       const items = allItems.filter((i) => cacheIds.has(i.cache_id) && i.expiration_date);
       const compliance = allCompliance.filter(
-        (r) => (r.subscription_id && r.subscription_id === sub.id) || r.created_by === owner
+        (r) =>
+          r.record_type !== 'home_device' &&
+          ((r.subscription_id && r.subscription_id === sub.id) || r.created_by === owner)
       );
 
       const expired = [];

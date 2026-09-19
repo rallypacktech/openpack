@@ -20,7 +20,8 @@ export default function ExpiryTrackerPanel({ subscription, kits }) {
     ]);
     const kitIds = new Set(kits.map((k) => k.id));
     setItems(allItems.filter((i) => kitIds.has(i.cache_id)));
-    setRecords(allRecords);
+    // Household safety devices live in the same entity but belong to the Home Safety tab.
+    setRecords(allRecords.filter((r) => r.record_type !== "home_device"));
     setLoading(false);
   }, [kits]);
 

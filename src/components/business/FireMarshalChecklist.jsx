@@ -23,7 +23,7 @@ export default function FireMarshalChecklist({ subscription, members, kits, plan
         const kitIds = new Set(kits.map((k) => k.id));
         const dated = [
           ...items.filter((i) => kitIds.has(i.cache_id)).map((i) => i.expiration_date),
-          ...records.map((r) => r.expiration_date),
+          ...records.filter((r) => r.record_type !== "home_device").map((r) => r.expiration_date),
         ].filter(Boolean);
         let expired = 0;
         let expiring = 0;

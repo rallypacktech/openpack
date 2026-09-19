@@ -9,7 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Edit, GraduationCap, Flame } from "lucide-react";
 import ExpiryStatusBadge from "@/components/business/ExpiryStatusBadge";
+import LogServiceButton from "@/components/safety/LogServiceButton";
 import { sortByExpiry } from "@/lib/expiryStatus";
+import { DEVICE_TYPES, defaultInterval, deviceHint } from "@/lib/safetyIntervals";
 
 const CERT_TYPES = [
   { value: "cpr", label: "CPR" },
@@ -18,16 +20,6 @@ const CERT_TYPES = [
   { value: "cpr_aed", label: "CPR + AED" },
   { value: "first_aid_cpr_aed", label: "First aid + CPR + AED" },
   { value: "fire_safety", label: "Fire safety" },
-  { value: "other", label: "Other" },
-];
-
-const EQUIPMENT_TYPES = [
-  { value: "fire_extinguisher", label: "Fire extinguisher" },
-  { value: "exit_sign", label: "Exit sign" },
-  { value: "emergency_lighting", label: "Emergency lighting" },
-  { value: "sprinkler_system", label: "Sprinkler system" },
-  { value: "fire_alarm", label: "Fire alarm" },
-  { value: "aed", label: "AED" },
   { value: "other", label: "Other" },
 ];
 
@@ -40,6 +32,7 @@ const emptyRecord = {
   location: "",
   issued_date: "",
   expiration_date: "",
+  interval_months: 12,
   notes: "",
 };
 
@@ -50,7 +43,7 @@ export default function ComplianceRecordsList({ records, subscriptionId, onChang
   const [form, setForm] = useState(emptyRecord);
 
   const openCreate = (type) => {
-    setForm({ ...emptyRecord, record_type: type });
+    setForm({ ...emptyRecord, record_type: type, interval_months: defaultInterval(emptyRecord.equipment_type) });
     setEditing(null);
     setShowForm(true);
   };
@@ -70,7 +63,12 @@ export default function ComplianceRecordsList({ records, subscriptionId, onChang
       expiration_date: form.expiration_date,
       notes: form.notes || "",
       subscription_id: subscriptionId || "",
-      ...(isCert ? { certification_type: form.certification_type } : { equipment_type: form.equipment_type }),
+      ...(isCert
+        ? { certification_type: form.certification_type }
+        : {
+            equipment_type: form.equipment_type,
+            interval_months: Number(form.interval_months) || defaultInterval(form.equipment_type),
+          }),
       ...(form.issued_date ? { issued_date: form.issued_date } : {}),
     };
     if (editing) await base44.entities.ComplianceRecord.update(editing.id, payload);
@@ -135,6 +133,9 @@ export default function ComplianceRecordsList({ records, subscriptionId, onChang
                 </div>
                 <div className="flex items-center gap-2">
                   <ExpiryStatusBadge expiration_date={rec.expiration_date} />
+                  {rec.record_type !== "staff_certification" && (
+                    <LogServiceButton record={rec} onLogged={onChanged} />
+                  )}
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(rec)}>
                     <Edit className="w-3.5 h-3.5" />
                   </Button>
@@ -185,12 +186,18 @@ export default function ComplianceRecordsList({ records, subscriptionId, onChang
               <>
                 <div>
                   <Label>Equipment</Label>
-                  <Select value={form.equipment_type} onValueChange={(v) => setForm((f) => ({ ...f, equipment_type: v }))}>
+                  <Select
+                    value={form.equipment_type}
+                    onValueChange={(v) => setForm((f) => ({ ...f, equipment_type: v, interval_months: defaultInterval(v) }))}
+                  >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {EQUIPMENT_TYPES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                      {DEVICE_TYPES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  {deviceHint(form.equipment_type) && (
+                    <p className="text-xs text-muted-foreground mt-1.5">{deviceHint(form.equipment_type)}</p>
+                  )}
                 </div>
                 <div>
                   <Label>Location</Label>
@@ -213,6 +220,15 @@ export default function ComplianceRecordsList({ records, subscriptionId, onChang
                 <Input type="date" value={form.expiration_date || ""} onChange={(e) => setForm((f) => ({ ...f, expiration_date: e.target.value }))} />
               </div>
             </div>
+            {!isCert && (
+              <div>
+                <Label>Check every (months)</Label>
+                <Input type="number" min="1" value={form.interval_months} onChange={(e) => setForm((f) => ({ ...f, interval_months: e.target.value }))} />
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  Used when you tap “Log check” — the next due date moves forward this many months.
+                </p>
+              </div>
+            )}
             <div className="flex gap-3 pt-1">
               <Button onClick={handleSave} className="flex-1" disabled={!form.title || !form.expiration_date}>
                 {editing ? "Save" : "Add"}
