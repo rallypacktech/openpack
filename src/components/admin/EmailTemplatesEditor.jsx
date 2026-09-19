@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Save, RefreshCw, Mail } from "lucide-react";
 import { VOUCHER_CODE } from "@/lib/fireMarshalVoucher";
+import { GENERAL_VOUCHER_CODE } from "@/lib/generalVoucher";
 
 const DEFAULT_TEMPLATES = [
   {
@@ -16,6 +17,7 @@ const DEFAULT_TEMPLATES = [
     subject: "Fire marshal compliance & emergency tracking for your business",
     intro: "RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard.",
     learn_path: "/BusinessOnboarding",
+    voucher_code: GENERAL_VOUCHER_CODE,
   },
   {
     audience_key: "equine",

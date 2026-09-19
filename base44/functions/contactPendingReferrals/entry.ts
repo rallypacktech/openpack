@@ -8,6 +8,8 @@ const AUDIENCE_CONFIG = {
         learnPath: '/BusinessOnboarding',
         subject: 'Fire marshal compliance & emergency tracking for your business',
         intro: 'RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard.',
+        voucherLabel: 'First month free',
+        voucherNote: 'Your first month of the Professional plan is on us.',
     },
     equine: {
         label: 'Equine Emergency Preparedness',
@@ -111,6 +113,7 @@ async function loadTemplates(base44) {
         for (const t of templates) {
             if (result[t.audience_key]) {
                 result[t.audience_key] = {
+                    ...result[t.audience_key],
                     label: t.label || result[t.audience_key].label,
                     learnPath: t.learn_path || result[t.audience_key].learnPath,
                     subject: t.subject || result[t.audience_key].subject,
@@ -195,8 +198,8 @@ function buildReferralEmailHtml(config, origin) {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background-color:#fff8e7;border:1px dashed #d64a2e;">
                 <tr>
                   <td style="padding:16px 20px;">
-                    <p style="margin:0 0 6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#a83a20;">Free year voucher</p>
-                    <p style="margin:0 0 8px;font-size:14px;color:#1c1c1a;">Your first year of the Professional plan is on us. Enter this code in the promo code box at checkout:</p>
+                    <p style="margin:0 0 6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#a83a20;">${config.voucherLabel || 'Free year voucher'}</p>
+                    <p style="margin:0 0 8px;font-size:14px;color:#1c1c1a;">${config.voucherNote || 'Your first year of the Professional plan is on us.'} Enter this code in the promo code box at checkout:</p>
                     <p style="margin:0;font-family:'Courier New',monospace;font-size:20px;font-weight:700;letter-spacing:2px;color:#1c1c1a;">${escapeHtml(config.voucherCode)}</p>
                   </td>
                 </tr>
@@ -248,7 +251,7 @@ function buildReferralEmailText(config, origin) {
         'Learn More: ' + learnUrl,
         '',
         ...(config.voucherCode ? [
-            'FREE YEAR VOUCHER: Your first year of the Professional plan is on us.',
+            (config.voucherLabel || 'Free year voucher').toUpperCase() + ': ' + (config.voucherNote || 'Your first year of the Professional plan is on us.'),
             'Enter this code in the promo code box at checkout: ' + config.voucherCode,
             '',
         ] : []),
