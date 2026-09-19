@@ -49,8 +49,8 @@ const VOLUNTEER_ORGS = [
     focus: "Animal emergency sheltering, rescue, and reunification during disasters",
     url: "https://bestfriends.org/volunteer",
     signupUrl: "https://bestfriends.org/volunteer",
-    description: "Best Friends Animal Society deploys emergency response teams to set up animal shelters during disasters, rescue displaced animals, and reunite pets with owners.",
-    roles: ["Emergency animal sheltering", "Animal rescue & transport", "Pet reunification", "Foster care during disasters"],
+    description: "Best Friends Animal Society deploys emergency response teams to set up animal shelters during disasters, rescue displaced animals, and reunite pets with owners. Their Emergency Response Volunteer Corps takes volunteers through a short interest form, then matches them to training, remote support, and field deployment.",
+    roles: ["Emergency animal sheltering", "Animal rescue & transport", "Pet reunification", "Foster care during disasters", "Remote / logistics support"],
   },
   {
     name: "Oregon Humane Society",

@@ -13,6 +13,7 @@ import ExternalResourcesTab from "../components/resources/ExternalResourcesTab";
 import EmergencyManuals from "../components/manuals/EmergencyManuals";
 import LocalShelters from "../components/resources/LocalShelters";
 import EvacuationAlertInfo from "../components/resources/EvacuationAlertInfo";
+import WinterOutlookCard from "../components/hazards/WinterOutlookCard";
 import { Link } from "react-router-dom";
 import { Package, MapPin, Users, Share2, ChevronRight, ShieldCheck } from "lucide-react";
 import HomeSafetyPanel from "@/components/safety/HomeSafetyPanel";
@@ -168,6 +169,7 @@ export default function Resources() {
           <TabsContent value="help" className="space-y-6">
             <AgentAssistant />
             <EvacuationAlertInfo />
+            <WinterOutlookCard />
             <div>
               <h2 className="font-serif text-lg font-bold text-foreground mb-3">External Resources</h2>
               <ExternalResourcesTab />

@@ -417,6 +417,78 @@ export const MANUALS = [
     footer: "Sources: NIFC (nifc.gov), IAFC Ready, Set, Go! Program (wildlandfiresrsg.org), Ready.gov/wildfires, Firewise USA (nfpa.org/Public-Education/By-topic/Wildfires/Firewise-USA). Review your plan and update your go-bag every 6 months.",
   },
   {
+    id: "burn_scar_flood",
+    title: "Post-Wildfire Burn-Scar Flooding",
+    category: "tools",
+    icon: "🌊",
+    source: "NWS / USGS / FEMA",
+    summary:
+      "A burned hillside is a flood hazard for years. Fire destroys the vegetation and soil structure that normally absorb rain, so a slope that once soaked up a storm now sheds it — fast. Burned areas can flood with as little as a fraction of the rain that used to be safe.",
+    sections: [
+      {
+        heading: "Why Burned Ground Floods Differently",
+        steps: [
+          "Fire bakes the soil and creates a water-repellent layer just below the surface, so rain runs off instead of soaking in.",
+          "Vegetation that once intercepted and slowed rainfall is gone — nothing holds the water back.",
+          "The result is a flash flood that arrives with far less warning than a normal river flood, often within minutes of the rain starting.",
+          "The runoff carries ash, mud, boulders, and burned debris — a debris flow, which moves faster and hits harder than clear water.",
+          "Rain falling miles uphill of you can reach you before any rain falls where you are standing.",
+        ],
+      },
+      {
+        heading: "Know If You're at Risk",
+        steps: [
+          "Check whether there is a burn scar uphill, upstream, or in the watershed above where you live, work, or hike.",
+          "Burn-scar flood risk can persist for 3 to 5 years or more, until vegetation regrows — longer if the fire burned hot.",
+          "Watch for burn-scar flood watches and warnings from your national weather service (in the U.S., NWS issues them for specific burn scars by name).",
+          "Sign up for local emergency alerts — burn-scar floods are the one hazard where official warning may be only minutes ahead of the water.",
+          "Avoid slot canyons, dry washes, and low-water crossings below burned slopes, especially during any rain forecast.",
+        ],
+      },
+      {
+        heading: "Leave Immediately If You See These",
+        steps: [
+          "Rain begins anywhere in the watershed — even if the sky above you is still clear.",
+          "The stream or wash near you turns muddy, rises suddenly, or starts carrying debris.",
+          "You hear a low rumbling or roaring sound — this can be a debris flow approaching, and it may be moving faster than you can run.",
+          "Water crosses a road you intended to use. Never drive through it — 30 cm (1 foot) of moving water can float a car.",
+          "You are in a canyon or wash and the weather upstream is deteriorating. Move to high ground now, not after you confirm the water.",
+        ],
+      },
+      {
+        heading: "If You're Caught in a Canyon or Wash",
+        steps: [
+          "Move perpendicular to the wash — get out of the path of flow, not downstream of it.",
+          "Climb to the highest ground you can reach safely. Do not try to outrun a debris flow downhill.",
+          "If you cannot climb out, get behind a solid obstacle and protect your head and airway from mud and debris.",
+          "Do not enter the water to help someone else — throw a rope or flotation device instead, and call emergency services.",
+          "Once out, stay out. Burn-scar floods recur repeatedly through the same storm season, often in the same channels.",
+        ],
+      },
+      {
+        heading: "Protect Your Home After a Nearby Fire",
+        steps: [
+          "Clear ash, sediment, and debris from drainage channels, culverts, and gutters before the first storm.",
+          "Move valuables and documents out of basements and ground-floor rooms that could take on mud and water.",
+          "Do not attempt to redirect flow with improvised berms — it can send water into a neighbor's property or fail suddenly.",
+          "Photograph your property before storms arrive for insurance purposes.",
+          "Check whether your insurance covers debris flow and mudflow — many standard policies exclude them, and separate coverage may be needed.",
+        ],
+      },
+      {
+        heading: "How Long the Risk Lasts",
+        steps: [
+          "The first one to two years after a fire are the highest risk, when the soil is most exposed.",
+          "Risk declines as vegetation returns, but elevated risk typically lasts three to five years.",
+          "A wet winter — such as a strong El Niño year — raises the odds of debris flows in burn scars well past the fire season.",
+          "Check with your local emergency management agency for the current burn-scar risk status in your area.",
+        ],
+      },
+    ],
+    footer:
+      "Sources: National Weather Service (weather.gov), USGS post-fire debris-flow hazard assessments (usgs.gov), FEMA / Ready.gov. Burn-scar flood risk is not limited to any one country — it applies to any watershed that has recently burned.",
+  },
+  {
     id: "evacuation_checklist",
     title: "Go-Bag Evacuation Checklist",
     category: "documents",

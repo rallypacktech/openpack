@@ -9,12 +9,12 @@ export const HURRICANE_OUTLOOK = {
   sourceUrl: "https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml",
   season: "June 1 – November 30, 2026",
   peakPeriod: "mid-August to late October",
-  forecast: "Below-Normal",
-  namedStorms: "8–14",
-  hurricanes: "3–6",
-  majorHurricanes: "1–3",
-  elNinoNote: "El Niño developing (82% chance May–Jul 2026), suppressing Atlantic hurricane activity",
-  summary: "NOAA predicts a below-normal 2026 Atlantic hurricane season due to developing El Niño. However, even a below-normal season carries risk — coastal residents should prepare.",
+  forecast: "Below-Normal — tracking below the forecast range",
+  namedStorms: "8–14 forecast (5 so far)",
+  hurricanes: "3–6 forecast (none so far)",
+  majorHurricanes: "1–3 forecast (none so far)",
+  elNinoNote: "Strong El Niño developing — strong wind shear and dry air continue to suppress Atlantic development",
+  summary: "2026 remains one of the quietest Atlantic hurricane seasons on record — only five short-lived tropical storms have formed all season, none reaching hurricane strength. The climatological peak has passed. Forecasters are watching a disturbance in the central Atlantic that could organize later this week, but no Gulf or Caribbean development is expected in the next 7 days. Even a quiet season carries risk — coastal residents should prepare.",
   // Coastal risk zones during hurricane season (month 6=Jun … 11=Nov)
   risk_zones: [
     { id: "gulf-coast", label: "Gulf Coast (TX–FL Panhandle)", months: [6, 7, 8, 9, 10, 11], latitude: 29.0, longitude: -93.0, radius_km: 300, description: "The Gulf Coast is the most hurricane-vulnerable U.S. coastline. Storm surges of 3–6 meters are possible in major landfalls." },
@@ -29,12 +29,13 @@ export const HURRICANE_OUTLOOK = {
 export const FLOOD_OUTLOOK = {
   source: "NWS National Water Center",
   sourceUrl: "https://www.weather.gov/ahps/",
-  period: "July 2026",
-  summary: "Elevated flood risk across the Lower Mississippi Valley, Eastern Texas, and Missouri River basin. Communities along the Mississippi and Missouri Rivers should monitor for moderate flooding.",
+  period: "September 2026",
+  summary: "Flash flooding is the most acute hazard right now. Monsoonal thunderstorms are driving widespread, often life-threatening flash flooding across the Southwest — including recurring post-wildfire flooding below the Salt burn scar in Ruidoso, New Mexico, where up to 2 inches of rain fell in under an hour. Southern Utah slot canyons and southern Arizona are also under flash flood warnings. The monsoon pattern is expected to keep producing scattered flash flood warnings through the month.",
   risk_regions: [
-    { id: "lower-mississippi", label: "Lower Mississippi Valley (LA, AR, MS)", months: [7], latitude: 32.5, longitude: -91.0, radius_km: 220, description: "Elevated risk of moderate flooding along the Mississippi River and its tributaries." },
-    { id: "eastern-tx", label: "Eastern Texas", months: [7], latitude: 31.0, longitude: -95.0, radius_km: 160, description: "Flash flood risk elevated due to above-normal precipitation and saturated soils." },
-    { id: "missouri-river", label: "Missouri River Basin", months: [7], latitude: 39.0, longitude: -94.5, radius_km: 220, description: "Elevated flood risk along the Missouri River and tributaries." },
+    { id: "ruidoso-burn-scar", label: "Ruidoso / Salt burn scar (NM)", months: [9], latitude: 33.33, longitude: -105.67, radius_km: 70, description: "Repeated Flash Flood Warnings downstream of the Salt burn scar — flooding along Cree Meadows Drive, White Mountain Drive, Cedar Creek, and Fence Canyon. A direct, recurring post-wildfire hazard, now actively producing life-threatening flooding." },
+    { id: "southern-utah", label: "Southern Utah slot canyons (Garfield/Kane)", months: [9], latitude: 37.4, longitude: -111.6, radius_km: 150, description: "Flash Flood Warnings for slot canyons and washes — including the Escalante River corridor and canyons off Hole-in-the-Rock Road. These are classic flash-flood-death locations for hikers and canyoneers." },
+    { id: "southern-arizona", label: "Southern Arizona (San Pedro / Tucson)", months: [9], latitude: 32.2, longitude: -110.5, radius_km: 160, description: "Flash flood warnings from heavy thunderstorm rainfall." },
+    { id: "new-mexico-nw", label: "Northwest New Mexico (Mexican Springs / Nakaibito)", months: [9], latitude: 35.6, longitude: -108.8, radius_km: 120, description: "Saturated ground from earlier rain means it takes far less new rainfall to cause flooding." },
   ],
 };
 
@@ -52,6 +53,37 @@ export const TORNADO_OUTLOOK = {
     { id: "central-northern-plains", label: "Central & Northern Plains", months: [5, 6, 7], latitude: 41.0, longitude: -99.0, radius_km: 220, description: "Peak tornado season for Nebraska, South Dakota, and North Dakota." },
     { id: "upper-midwest-ne", label: "Upper Midwest & Northeast", months: [6, 7, 8], latitude: 43.5, longitude: -90.0, radius_km: 230, description: "Peak tornado season for the Upper Midwest, Great Lakes, and Northeast." },
     { id: "gulf-coast-fall", label: "Gulf Coast (Hurricane-Spawned)", months: [8, 9, 10], latitude: 30.0, longitude: -89.0, radius_km: 180, description: "Fall tornado risk from tropical systems making landfall along the Gulf Coast." },
+  ],
+};
+
+// ── NOAA CPC ENSO Advisory — El Niño / Winter 2026–27 ──
+// Source: https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/
+// Regional U.S. detail plus the global teleconnections that matter to users
+// outside North America — El Niño is a Pacific-wide signal, not a U.S. one.
+export const EL_NINO_OUTLOOK = {
+  source: "NOAA Climate Prediction Center / WMO",
+  sourceUrl: "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/",
+  season: "Northern Hemisphere winter 2026–27",
+  strength: "90%+ chance of a 'very strong' event",
+  summary:
+    "NOAA's Climate Prediction Center projects a historically strong El Niño for winter 2026–27 — with a 90%+ chance of a 'very strong' event and a real possibility it exceeds every El Niño on record dating back to 1950. El Niño pushes the Pacific jet stream south and keeps it more active, typically producing a wetter, stormier winter across the southern tier of the United States and a milder, drier winter across the north. It also suppresses Atlantic hurricane activity while shifting cyclone risk toward the central and eastern Pacific — and it reshapes rainfall, drought, and fire risk across South America, southern Africa, Australia, and Southeast Asia.",
+  us_regions: [
+    { id: "pnw", label: "Pacific Northwest (WA, OR, ID)", outlook: "Warmer & drier", note: "Reduced mountain snowpack is possible, with downstream implications for spring/summer drought and fire risk in 2027." },
+    { id: "california", label: "California", outlook: "Wetter than normal", note: "Historically strong El Niño winters bring well above-average rain and snow, with an earlier start to the atmospheric river season. Raises landslide, debris-flow, and urban flooding risk — especially in areas burned by 2026 wildfires (Big Sur, Lake County / Upper Lake)." },
+    { id: "southwest", label: "Southwest (AZ, NM, southern UT)", outlook: "Wetter than normal", note: "Extends burn-scar flood risk in New Mexico well past fire season — a wetter winter means more runoff over the Ruidoso/Salt scar." },
+    { id: "southern-plains", label: "Southern Plains & Gulf Coast (TX, LA, and neighbors)", outlook: "Wetter than normal", note: "Elevated flood risk through the winter." },
+    { id: "southeast", label: "Southeast (FL, GA, and neighbors)", outlook: "Wetter than normal", note: "Wetter-than-normal winter favored." },
+    { id: "north-central", label: "Northern tier, Upper Midwest & Great Lakes", outlook: "Warmer & drier", note: "Drier conditions favored in the Northwest into the north-central states, trending toward the Great Lakes later in the season." },
+    { id: "alaska", label: "Alaska", outlook: "Significantly warmer", note: "The strongest El Niño warming signal of any U.S. region." },
+    { id: "south-central-temp", label: "South-Central U.S. temperatures", outlook: "Uncertain", note: "Some models show equal chances of below-, near-, or above-normal temperatures — cold snaps are still possible in an overall mild winter." },
+  ],
+  global_regions: [
+    { id: "peru-ecuador", label: "Peru & Ecuador", outlook: "Heavy rain & flooding", note: "The classic El Niño core — warm coastal water drives torrential rain, flash flooding, and landslides along a normally arid Pacific coast." },
+    { id: "australia", label: "Australia", outlook: "Drier & hotter", note: "Reduced rainfall and above-average heat raise drought and bushfire risk across eastern and northern Australia." },
+    { id: "southeast-asia", label: "Southeast Asia & Indonesia", outlook: "Drier", note: "Drought conditions increase peat and forest fire risk, with transboundary haze affecting the region." },
+    { id: "southern-africa", label: "Southern Africa", outlook: "Drier", note: "Below-normal rainfall raises drought and food-security risk across the region." },
+    { id: "south-america", label: "South America (Brazil & Amazonia)", outlook: "Mixed", note: "Drier than normal in the north and northeast, wetter in the south — with elevated Amazon fire risk in dry years." },
+    { id: "pacific-islands", label: "Pacific Islands", outlook: "Shifting cyclone & coral risk", note: "Cyclone activity shifts toward the central and eastern Pacific, and prolonged warm water raises coral bleaching risk." },
   ],
 };
 

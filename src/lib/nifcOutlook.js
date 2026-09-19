@@ -1,22 +1,22 @@
 // NIFC Monthly/Seasonal Significant Wildland Fire Potential Outlook
 // Source: https://www.nifc.gov/nicc-files/predictive/outlooks/monthly_seasonal_outlook.pdf
-// Issued: July 1, 2026 — Next issuance: August 1, 2026.
+// Issued: September 1, 2026 — Next issuance: October 1, 2026.
 // Updated manually each month when NIFC publishes the new outlook.
 
 export const NIFC_OUTLOOK_META = {
   source: "National Interagency Fire Center (NIFC)",
   sourceUrl: "https://www.nifc.gov/nicc-files/predictive/outlooks/monthly_seasonal_outlook.pdf",
-  issued: "2026-07-01",
-  nextIssuance: "2026-08-01",
-  period: "July–October 2026",
-  preparednessLevel: 4, // National Preparedness Level (scale 1–5)
+  issued: "2026-09-01",
+  nextIssuance: "2026-10-01",
+  period: "September–December 2026",
+  preparednessLevel: 3, // National Preparedness Level (scale 1–5)
   preparednessLevelMax: 5,
-  acresBurned: 3168102,
-  acresVsAverage: "157%", // % of 10-year average
-  wildfiresReported: 36262,
-  wildfiresVsAverage: "133%",
+  acresBurned: 8500000,
+  acresVsAverage: "147%", // % of 10-year average
+  wildfiresReported: 56042,
+  wildfiresVsAverage: "126%",
   summary:
-    "Above-normal significant fire potential is forecast across much of the Greater Four Corners, Great Basin, Northwest, and northeast California in July, expanding across the Northwest, central Idaho, and western Wyoming in August, and persisting in the Northwest, northern Great Basin, and northeast California in September. Normal potential nationwide by October.",
+    "Fire activity has shifted east and south: widespread precipitation has calmed much of the West, while a new cluster of extreme-behavior fires has broken out in the Southern Area (TX/OK/AR) with active evacuations. Above-normal significant fire potential persists in the Northwest, northern Great Basin, and northeast California through September, easing toward normal nationwide by October. A developing strong El Niño favors a wetter Southwest and California — and a drier Pacific Northwest — into 2027.",
 };
 
 // Above-normal significant fire potential regions.

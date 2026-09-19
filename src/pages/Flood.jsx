@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Droplets, MapPin, Phone, AlertTriangle, Shield, Home } from "lucide-react";
 import { useHeroShot } from "@/hooks/useHeroShot";
+import WinterOutlookCard from "@/components/hazards/WinterOutlookCard";
 
 const REGIONS = [
   {
@@ -124,6 +125,18 @@ export default function Flood() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="py-24 max-w-4xl mx-auto px-6">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Looking ahead</p>
+        <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-4 leading-tight max-w-2xl">
+          This winter's flood signal.
+        </h2>
+        <p className="text-sm text-[#8A8577] leading-relaxed mb-10 max-w-2xl">
+          Seasonal climate patterns — and the burn scars left by this year's wildfires — change where
+          flood risk lands. Here's what the forecast points to, in the U.S. and worldwide.
+        </p>
+        <WinterOutlookCard />
       </section>
 
       <section className="bg-[#1C1C1A] text-white py-20">

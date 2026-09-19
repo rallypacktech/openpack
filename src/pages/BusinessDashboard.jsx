@@ -18,6 +18,7 @@ import NeedsBoard from "@/components/business/NeedsBoard";
 import CommunityOneSheet from "@/components/business/CommunityOneSheet";
 import FireMarshalChecklist from "@/components/business/FireMarshalChecklist";
 import ExpiryTrackerPanel from "@/components/business/ExpiryTrackerPanel";
+import IcsTerminologyPanel from "@/components/business/IcsTerminologyPanel";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -235,6 +236,7 @@ export default function BusinessDashboard() {
           <TabsTrigger value="contact">Contact Admin</TabsTrigger>
           <TabsTrigger value="onesheet">Community Guide</TabsTrigger>
           <TabsTrigger value="firemarshal">Fire Marshal</TabsTrigger>
+          <TabsTrigger value="ics">ICS Reference</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members">
@@ -265,6 +267,9 @@ export default function BusinessDashboard() {
         </TabsContent>
         <TabsContent value="firemarshal">
           <FireMarshalChecklist subscription={subscription} members={members} kits={kits} plans={plans} />
+        </TabsContent>
+        <TabsContent value="ics">
+          <IcsTerminologyPanel />
         </TabsContent>
         <TabsContent value="needs">
           <NeedsBoard subscription={subscription} />

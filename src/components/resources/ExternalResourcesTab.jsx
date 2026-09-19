@@ -202,6 +202,23 @@ const RESOURCE_CATEGORIES = [
       { name: "CDC — Safe Water After Disaster", desc: "How to find, treat, and store safe drinking water during and after a wildfire, flood, or hurricane.", url: "https://www.cdc.gov/healthywater/emergency/", icon: "💧" },
     ],
   },
+  {
+    id: "forecasts",
+    label: "Forecasts & Global Alerts",
+    icon: Globe,
+    color: "text-cyan-700",
+    bg: "bg-cyan-50",
+    border: "border-cyan-200",
+    resources: [
+      { name: "NOAA Storm Prediction Center", desc: "Day 1–8 convective outlooks for tornado, hail, and damaging wind risk across the United States.", url: "https://www.spc.noaa.gov", icon: "⛈️" },
+      { name: "NWS Weather Prediction Center", desc: "Quantitative precipitation forecasts and excessive rainfall outlooks — the early signal for flash flooding.", url: "https://www.wpc.ncep.noaa.gov", icon: "🌧️" },
+      { name: "National Hurricane Center", desc: "Live Atlantic and eastern Pacific tropical cyclone forecasts, forecast cones, and public advisories.", url: "https://www.nhc.noaa.gov", icon: "🌀" },
+      { name: "NOAA Climate Prediction Center", desc: "Seasonal outlooks for temperature and precipitation, plus El Niño / La Niña (ENSO) advisories.", url: "https://www.cpc.ncep.noaa.gov", icon: "🌡️" },
+      { name: "GDACS — Global Disaster Alert & Coordination System", desc: "Real-time global alerts for earthquakes, cyclones, floods, and wildfires with estimated impact. A joint UN and European Commission service.", url: "https://www.gdacs.org", icon: "🌍" },
+      { name: "ReliefWeb", desc: "UN OCHA's global humanitarian information service — active disasters, needs assessments, and response updates worldwide.", url: "https://reliefweb.int", icon: "📰" },
+      { name: "WMO — World Meteorological Organization", desc: "The UN's global weather, climate, and water agency. Official warnings and climate outlooks from 190+ member states and territories.", url: "https://wmo.int", icon: "🌐" },
+    ],
+  },
 ];
 
 const FEMA_REGIONS = [
