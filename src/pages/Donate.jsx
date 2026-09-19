@@ -7,9 +7,12 @@ import {
   CheckCircle,
   Server,
   User,
+  Users,
   Globe,
   Mail,
   CreditCard,
+  Code2,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +22,9 @@ const _trackedDonationComplete = new Set();
 
 const COST_ICONS = {
   "Founder & Developer Salary": User,
+  "Software Engineer": Code2,
+  "Outreach Coordinator": Users,
+  "Ad Budget": Megaphone,
   "Base44 Builder Subscription": Server,
   "Domain Registration (Name.com)": Globe,
   "Email & Communication Tools": Mail,
@@ -149,9 +155,10 @@ export default function Donate() {
           <span className="text-[#D64A2E]">free for everyone.</span>
         </h1>
         <p className="text-white/60 font-sans max-w-xl mx-auto leading-relaxed text-base">
-          No venture funding. No ads on your safety data. No paywalled features.
-          RallyPack is sustained by people who believe every family deserves to
-          be prepared.
+          Community-funded, not venture-backed. No ads on your safety data. No
+          paywalled features. We're raising a $500,000 preseed to hire the
+          engineers and outreach staff who keep RallyPack free for the families
+          who need it most.
         </p>
       </div>
 
@@ -161,13 +168,13 @@ export default function Donate() {
           <div className="flex items-end justify-between mb-3">
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-[#8A8577] font-sans mb-1">
-                2026 Operating Goal
+                Preseed Funding Goal
               </p>
               <p className="font-serif text-3xl font-bold text-[#1C1C1A]">
                 {progressLoading ? "—" : progress?.total_raised_display || "$0"}
                 <span className="text-base text-[#1C1C1A]/40 font-sans font-normal">
                   {" "}
-                  / {progress?.goal_display || "$125,000"}
+                  / {progress?.goal_display || "$500,000"}
                 </span>
               </p>
             </div>
@@ -188,8 +195,8 @@ export default function Donate() {
           </div>
           {goalReached && (
             <p className="text-center text-sm text-green-700 font-sans font-medium mt-4">
-              🎉 We've hit our 2026 goal! Thank you. Additional donations go
-              toward 2027 operations.
+              🎉 We've hit our preseed goal! Thank you. Additional donations
+              fund operations beyond the preseed.
             </p>
           )}
         </div>
@@ -201,7 +208,7 @@ export default function Donate() {
           Where your money goes
         </p>
         <h2 className="font-serif text-2xl font-bold text-[#1C1C1A] mb-6 text-center">
-          Transparent operating costs
+          Transparent preseed budget
         </h2>
         <div className="space-y-px bg-[#D8D2C6]">
           {(progress?.operating_costs || []).map((cost) => {
@@ -232,10 +239,10 @@ export default function Donate() {
           })}
           <div className="bg-[#1C1C1A] p-5 flex items-center justify-between">
             <span className="font-sans font-semibold text-sm text-white uppercase tracking-widest">
-              Total Annual Goal
+              Total Preseed Goal
             </span>
             <span className="font-serif text-2xl font-bold text-[#D64A2E]">
-              ${(progress?.total_costs || 125000).toLocaleString()}
+              ${(progress?.total_costs || 500000).toLocaleString()}
             </span>
           </div>
         </div>
