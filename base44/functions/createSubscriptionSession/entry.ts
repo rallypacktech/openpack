@@ -1,19 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@17.5.0';
-
-// Post-checkout redirects are restricted to the app's own origins, so a caller-supplied
-// success_url/cancel_url cannot turn checkout into an open redirect to a phishing site.
-function isAllowedRedirect(url) {
-    if (typeof url !== 'string' || url.length > 2048) return false;
-    try {
-        const parsed = new URL(url);
-        if (parsed.protocol !== 'https:') return false;
-        const host = parsed.hostname.toLowerCase();
-        return host.endsWith('.base44.app') || host === 'rallypack.org' || host.endsWith('.rallypack.org');
-    } catch {
-        return false;
-    }
-}
+import { safeRedirect } from '../../shared/redirectAllowlist.ts';
 
 Deno.serve(async (req) => {
     try {
@@ -32,8 +19,6 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'price_id is required' }, { status: 400 });
         }
 
-        const appOrigin = new URL(req.url).origin;
-
         // Only pass through the metadata fields the app actually uses. Caller-supplied
         // values must never override platform-set keys such as base44_app_id or user_email.
         const safeMetadata: Record<string, string> = {};
@@ -51,12 +36,8 @@ Deno.serve(async (req) => {
                 trial_period_days: 7,
                 metadata: { base44_app_id: Deno.env.get('BASE44_APP_ID') },
             },
-            success_url: isAllowedRedirect(success_url)
-                ? success_url
-                : `${appOrigin}/BusinessDashboard?sub_success=true&sid={CHECKOUT_SESSION_ID}`,
-            cancel_url: isAllowedRedirect(cancel_url)
-                ? cancel_url
-                : `${appOrigin}/BusinessDashboard`,
+            success_url: safeRedirect(success_url, '/BusinessDashboard?sub_success=true&sid={CHECKOUT_SESSION_ID}'),
+            cancel_url: safeRedirect(cancel_url, '/BusinessDashboard'),
             // Always the authenticated account's email — never a caller-supplied value.
             customer_email: user.email,
             metadata: {

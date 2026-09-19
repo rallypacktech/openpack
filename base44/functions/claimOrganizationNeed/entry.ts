@@ -1,4 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { escapeHtml } from '../../shared/reminderUtils.ts';
+
+// A well-formed single address, with no characters that could break out of the header.
+const EMAIL_PATTERN = /^[^\s@,;<>"']+@[^\s@,;<>"']+\.[^\s@,;<>"']+$/;
+
+// Subject lines are a header context — strip CR/LF so field values cannot inject headers.
+function singleLine(value) {
+  return String(value ?? '').replace(/[\r\n]+/g, ' ').trim();
+}
 
 Deno.serve(async (req) => {
   try {
@@ -39,16 +48,19 @@ Deno.serve(async (req) => {
       claimed_at: new Date().toISOString(),
     });
 
-    // Notify the asking business that their need was claimed
-    const contactEmail = need.contact_email || need.posted_by_email;
-    try {
-      await base44.asServiceRole.integrations.Core.SendEmail({
-        to: contactEmail,
-        subject: `${claimerOrg} has claimed your need: ${need.need_title}`,
-        body: `Hello ${need.organization_name},\n\n${claimerOrg} (${user.email}) has claimed your posted need on the RallyPack Needs Board.\n\nNeed: ${need.need_title}\nDescription: ${need.need_description}\n\nPlease contact them directly to coordinate:\n  Email: ${user.email}\n\nOnce the need is fulfilled, you can mark it as filled or remove it from the Needs Board in your Business Dashboard.\n\n— RallyPack`,
-      });
-    } catch (e) {
-      // Email may fail if recipient is not a registered user — still mark as claimed
+    // Notify the asking business that their need was claimed. Every field below is set by
+    // the need's poster, so it is escaped before reaching the HTML email body.
+    const contactEmail = String(need.contact_email || need.posted_by_email || '').trim();
+    if (EMAIL_PATTERN.test(contactEmail)) {
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: contactEmail,
+          subject: `${singleLine(claimerOrg)} has claimed your need: ${singleLine(need.need_title)}`,
+          body: `Hello ${escapeHtml(need.organization_name)},\n\n${escapeHtml(claimerOrg)} (${escapeHtml(user.email)}) has claimed your posted need on the RallyPack Needs Board.\n\nNeed: ${escapeHtml(need.need_title)}\nDescription: ${escapeHtml(need.need_description)}\n\nPlease contact them directly to coordinate:\n  Email: ${escapeHtml(user.email)}\n\nOnce the need is fulfilled, you can mark it as filled or remove it from the Needs Board in your Business Dashboard.\n\n— RallyPack`,
+        });
+      } catch (e) {
+        // Email may fail if recipient is not a registered user — still mark as claimed
+      }
     }
 
     return Response.json({

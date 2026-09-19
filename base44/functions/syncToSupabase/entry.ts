@@ -67,6 +67,12 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        // This job reads every user's records via asServiceRole and pushes them to an
+        // external database — it is an administrative maintenance task, never an end-user action.
+        if (user.role !== 'admin') {
+            return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
+        }
+
         const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://kajkzaufnaalniioobqx.supabase.co";
         const supabaseKey = Deno.env.get("supapublish");
         

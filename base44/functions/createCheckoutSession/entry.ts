@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@17.5.0';
+import { safeRedirect } from '../../shared/redirectAllowlist.ts';
 
 Deno.serve(async (req) => {
     try {
@@ -56,13 +57,15 @@ Deno.serve(async (req) => {
             });
         }
 
-        // Create checkout session
+        // Create checkout session. Redirects are restricted to the app's own origins — an
+        // unvalidated success_url/cancel_url would let a caller send paying customers to a
+        // phishing page that mimics the app's checkout result screens.
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: success_url,
-            cancel_url: cancel_url,
+            success_url: safeRedirect(success_url, '/CheckoutSuccess'),
+            cancel_url: safeRedirect(cancel_url, '/CheckoutCancel'),
             customer_email: user.email,
             metadata: {
                 user_id: user.id,
