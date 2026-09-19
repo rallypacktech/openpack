@@ -56,7 +56,11 @@
     },
     "state": {
       "type": "string",
-      "description": "US state code (e.g. 'TX') this referral belongs to \u2014 used for HOA and fire marshal per-state tracking"
+      "description": "US state code (e.g. 'TX') for US referrals, or the province/region (e.g. 'Ontario', 'Karnataka') for international referrals \u2014 used for HOA, fire marshal and regional tracking"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code for referrals outside the US (e.g. 'IN', 'IE', 'CA', 'AU', 'PK', 'SG', 'BD'). Empty for US referrals, which are tracked by state."
     },
     "status": {
       "type": "string",
