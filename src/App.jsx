@@ -36,6 +36,8 @@ const Tornado = lazy(() => import('./pages/Tornado'));
 const AgentAssistant = lazy(() => import('./pages/AgentAssistant'));
 const WildfireTrends = lazy(() => import('./pages/WildfireTrends'));
 const ReadinessMap = lazy(() => import('./pages/ReadinessMap'));
+const GlobalCompliance = lazy(() => import('./pages/GlobalCompliance'));
+const ResponderTraining = lazy(() => import('./pages/ResponderTraining'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -122,6 +124,8 @@ const AuthenticatedApp = () => {
       <Route path="/tornado" element={<LayoutWrapper currentPageName="Tornado"><Tornado /></LayoutWrapper>} />
       <Route path="/wildfire-trends" element={<LayoutWrapper currentPageName="WildfireTrends"><WildfireTrends /></LayoutWrapper>} />
       <Route path="/readiness-map" element={<LayoutWrapper currentPageName="ReadinessMap"><ReadinessMap /></LayoutWrapper>} />
+      <Route path="/global-compliance" element={<LayoutWrapper currentPageName="GlobalCompliance"><GlobalCompliance /></LayoutWrapper>} />
+      <Route path="/responder-training" element={<LayoutWrapper currentPageName="ResponderTraining"><ResponderTraining /></LayoutWrapper>} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>
