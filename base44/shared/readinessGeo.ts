@@ -7,7 +7,9 @@
 // Geocode a postal code using Nominatim OpenStreetMap (free, HTTPS, no key).
 // `countryCode` is an optional ISO 3166-1 alpha-2 hint that disambiguates
 // postal codes shared across countries.
-export async function geolocateByPostalCode(postalCode, countryCode) {
+// `hints` (optional) adds city/state context so a postal code that exists in
+// more than one country resolves to the right one.
+export async function geolocateByPostalCode(postalCode, countryCode, hints = {}) {
   const postal = (postalCode || '').toString().trim();
   if (!postal) return null;
 
@@ -30,6 +32,8 @@ export async function geolocateByPostalCode(postalCode, countryCode) {
       limit: '1',
     });
     if (hint) params.set('countrycodes', hint.toLowerCase());
+    if (hints.city) params.set('city', String(hints.city).trim());
+    if (hints.state) params.set('state', String(hints.state).trim());
 
     const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
     const res = await fetch(url, {

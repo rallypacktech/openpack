@@ -14,9 +14,9 @@ const DEFAULT_TEMPLATES = [
   {
     audience_key: "general",
     label: "Workplace Preparedness",
-    subject: "Fire safety compliance & emergency tracking for your business",
-    intro: "RallyPack helps businesses stay inspection-ready. Track first aid kits across every floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to your whole team — all from one dashboard.",
-    learn_path: "/BusinessOnboarding",
+    subject: "Get your business inspection-ready — and show your community how prepared it is",
+    intro: "RallyPack gives your business one place to stay inspection-ready: log first aid kits across every floor, AEDs, staff CPR/first aid certifications and fire equipment checks, and get reminded before anything expires. Set up your business account at rallypack.org/BusinessOnboarding — every feature is free for 7 days, then pick the plan that fits.\n\nThen share the RallyPack Readiness Map with your community. Anyone can look up how their county, territory, state, province or country ranks for emergency preparedness — the simplest way to show people where they stand. Send them to rallypack.org/readiness-map to find their own neighborhood.",
+    learn_path: "/readiness-map",
     voucher_code: GENERAL_VOUCHER_CODE,
   },
   {
@@ -106,7 +106,7 @@ const DEFAULT_TEMPLATES = [
   },
   {
     audience_key: "fire_marshal",
-    label: "Fire Safety & Prevention",
+    label: "Fire Safety",
     subject: "A free year of RallyPack — and a request for your inspection expertise",
     intro: "We built RallyPack with input from the fire service: a dashboard where a business logs its first aid kits, AED units, batteries, pads, staff CPR/first aid/AED certifications, and fire equipment inspections, and gets reminded before anything expires. The goal is that nothing lapses between inspections.\n\nWe would like your candid feedback on whether this actually helps a building prepare for an inspection. In return, your first year of the Professional plan is free.",
     learn_path: "/BusinessOnboarding",
