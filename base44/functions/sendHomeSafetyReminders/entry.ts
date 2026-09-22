@@ -111,7 +111,7 @@ export default async function (req) {
             </div>` : ''}
             <p style="margin:0 0 18px;font-size:14px;">Test the alarm or service the extinguisher, then tap <strong>Log check</strong> and we will set the next due date for you.</p>
             <p style="margin:18px 0 0;">
-              <a href="https://www.rallypack.org/Resources?tab=safety" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:13px 28px;border-radius:4px;">Log your checks &rarr;</a>
+              <a href="https://rallypack.org/Resources?tab=safety" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:13px 28px;border-radius:4px;">Log your checks &rarr;</a>
             </p>
             <p style="margin:20px 0 0;font-size:14px;">Stay safe,<br><strong>The RallyPack Team</strong></p>
           </td>

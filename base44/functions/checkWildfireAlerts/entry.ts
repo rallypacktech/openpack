@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
             alertsToCreate.push({
               created_by: profile.created_by,
               title: `Wildfire Alert: ${fire.name}`,
-              message: `Active wildfire ${Math.round(distance)} km from your location in ${fire.county} County. ${Math.round((Number(fire.acres) || 0) * 0.4047)} hectares, ${fire.containment}% contained.\n\nIf local authorities issue an evacuation order, this is serious — grab your go-bag and leave immediately. Head to your designated meeting spot${meetSpotGuidance}. If you haven't set one up yet, do it now at rallypack.tech/Resources. Text your family where you're going (texts use less bandwidth than calls). Follow official evacuation routes only.`,
+              message: `Active wildfire ${Math.round(distance)} km from your location in ${fire.county} County. ${Math.round((Number(fire.acres) || 0) * 0.4047)} hectares, ${fire.containment}% contained.\n\nIf local authorities issue an evacuation order, this is serious — grab your go-bag and leave immediately. Head to your designated meeting spot${meetSpotGuidance}. If you haven't set one up yet, do it now at rallypack.org/Resources. Text your family where you're going (texts use less bandwidth than calls). Follow official evacuation routes only.`,
               type: 'alert',
               read: false,
               metadata: {

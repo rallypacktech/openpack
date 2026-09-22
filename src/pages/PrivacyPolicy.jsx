@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
                 </p>
                 <p className="text-sm text-yellow-800">
                   <strong>Send Feedback:</strong> Have suggestions or found a bug? Email us at{" "}
-                  <a href="mailto:beta@rallypack.org" className="underline font-semibold">beta@rallypack.org</a>
+                  <a href="mailto:beta@rallypack.tech" className="underline font-semibold">beta@rallypack.tech</a>
                 </p>
               </div>
             </div>

@@ -16,7 +16,7 @@ export default function FooterContactForm() {
     setSubmitting(true);
     try {
       await base44.integrations.Core.SendEmail({
-        to: "beta@rallypack.org",
+        to: "beta@rallypack.tech",
         subject: `RallyPack Contact: ${form.name}`,
         body: `From: ${form.name} <${form.email}>\n\n${form.message}`,
       });
@@ -25,7 +25,7 @@ export default function FooterContactForm() {
       }
       setSent(true);
     } catch (err) {
-      alert("Failed to send. Please email us directly at beta@rallypack.org");
+      alert("Failed to send. Please email us directly at beta@rallypack.tech");
     } finally {
       setSubmitting(false);
     }

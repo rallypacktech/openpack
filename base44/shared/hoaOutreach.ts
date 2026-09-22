@@ -4,7 +4,7 @@
 
 export const PROGRESS_CACHE_KEY = 'hoa_outreach_progress';
 export const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
-export const ORIGIN = 'https://www.rallypack.org';
+export const ORIGIN = 'https://rallypack.org';
 
 export const US_STATES = [
   { code: 'AL', name: 'Alabama' }, { code: 'AK', name: 'Alaska' }, { code: 'AZ', name: 'Arizona' },

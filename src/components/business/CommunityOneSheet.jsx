@@ -215,7 +215,7 @@ function buildOneSheetHTML(stateName, disaster, emergencyNum, orgName) {
 
 <div class="footer-block">
   <div>
-    <p style="font-size:0.78rem;color:#555;">Questions? Contact us: <strong>beta@rallypack.org</strong></p>
+    <p style="font-size:0.78rem;color:#555;">Questions? Contact us: <strong>beta@rallypack.tech</strong></p>
     <p style="font-size:0.78rem;color:#555;">Learn more: <strong>rallypack.org</strong></p>
     ${safeOrgName ? `<p style="font-size:0.72rem;color:#888;margin-top:4px;">Shared by: ${safeOrgName}</p>` : ""}
   </div>

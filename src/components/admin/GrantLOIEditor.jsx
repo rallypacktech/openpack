@@ -119,7 +119,7 @@ export default function GrantLOIEditor({ loi, open, onClose, onSave }) {
                 type="email"
                 value={form.assigned_to || ""}
                 onChange={(e) => setForm({ ...form, assigned_to: e.target.value })}
-                placeholder="admin@rallypack.org"
+                placeholder="admin@rallypack.tech"
                 className="mt-1"
               />
             </div>

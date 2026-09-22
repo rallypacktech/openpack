@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
               <ul style="margin:0;padding-left:18px;font-size:14px;">${expiring.map(row).join('')}</ul>
             </div>` : ''}
             <p style="margin:18px 0 0;">
-              <a href="https://www.rallypack.org/BusinessDashboard" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:13px 28px;border-radius:4px;">Open your dashboard &rarr;</a>
+              <a href="https://rallypack.org/BusinessDashboard" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:13px 28px;border-radius:4px;">Open your dashboard &rarr;</a>
             </p>
             <p style="margin:20px 0 0;font-size:14px;">Stay compliant,<br><strong>The RallyPack Team</strong></p>
           </td>

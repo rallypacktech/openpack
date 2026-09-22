@@ -42,7 +42,7 @@ export default async function(req: Request): Promise<Response> {
     const safeOwner = safe(owner_name || user?.full_name || 'A RallyPack user');
     const safeHandler = safe(handler_name || '');
     const safePets = safe(pet_names || 'your animals');
-    const signupUrl = 'https://www.rallypack.org/register';
+    const signupUrl = 'https://rallypack.org/register';
 
     const subject = `${safeOwner} chose you as an emergency contact for ${safePets}`;
     const htmlBody = `<!DOCTYPE html>
