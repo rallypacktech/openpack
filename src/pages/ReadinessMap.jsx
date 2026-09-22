@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import ReadinessMapView from "@/components/readiness/ReadinessMapView";
 import TopAreasLists from "@/components/readiness/TopAreasLists";
+import ReadinessQuizCta from "@/components/readiness/ReadinessQuizCta";
 import { Globe, ChevronRight, Loader2, MapPin } from "lucide-react";
 
 const LEVEL_LABELS = {
@@ -198,6 +199,9 @@ export default function ReadinessMap() {
             )}
           </div>
         </div>
+
+        {/* Quiz CTA */}
+        <ReadinessQuizCta />
 
         {/* Empty state */}
         {!loading && data && data.locations.length === 0 && (
