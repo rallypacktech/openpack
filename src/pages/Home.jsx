@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { ClipboardList, ArrowRight, Heart, X, Github, AlertTriangle, Users, Clock, MapPin, Home as HomeIcon, Backpack, Mountain, Shield, DollarSign, CheckCircle, Flame, Wind, CloudRain, Zap } from "lucide-react";
 import FooterContactForm from "../components/FooterContactForm";
+import ReadinessMapCta from "../components/home/ReadinessMapCta";
 import { useHeroShot } from "@/hooks/useHeroShot";
 
 export default function Home() {
@@ -292,6 +293,9 @@ export default function Home() {
           <img src={planningImg} alt="Family emergency planning" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
         </div>
       </section>
+
+      {/* ── Readiness map CTA ── */}
+      <ReadinessMapCta />
 
       {/* ── Sign-up CTA (reversed) ── */}
       {!user && (
