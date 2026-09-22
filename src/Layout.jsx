@@ -67,7 +67,7 @@ export default function Layout({ children, currentPageName }) {
         } catch (_e) { /* storage unavailable */ }
       } catch (e) {
         // Not logged in - redirect to Home if on protected page
-        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining"];
+        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining", "Faq", "Sitemap"];
         if (!publicPages.includes(currentPageName)) {
           window.location.href = createPageUrl("Home");
         } else {
@@ -78,7 +78,7 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, [currentPageName]);
 
-  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining"];
+  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining", "Faq", "Sitemap"];
   const isPublicPage = publicPages.includes(currentPageName);
   const isAdmin = user?.role === "admin";
 
@@ -290,6 +290,14 @@ export default function Layout({ children, currentPageName }) {
                   <nav className="space-y-2" aria-label="Programs navigation">
                     <Link to="/global-compliance" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Global Compliance</Link>
                     <Link to="/responder-training" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Responder Training</Link>
+                  </nav>
+                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-4 py-2">Explore</h3>
+                  <nav className="space-y-2" aria-label="Explore RallyPack">
+                    <Link to="/faq" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Preparedness FAQ</Link>
+                    <Link to="/ReadinessQuiz" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Readiness Quiz</Link>
+                    <Link to="/readiness-map" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Readiness Map</Link>
+                    <Link to="/wildfire-trends" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire Trend Report</Link>
+                    <Link to="/sitemap" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Sitemap</Link>
                   </nav>
                   <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3 mt-6">Follow Us</h3>
                   <div className="flex items-center gap-4">

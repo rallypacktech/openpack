@@ -41,7 +41,8 @@
     />
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1602491453631-e2a5ad90a131?w=1200&q=85" />
     <title>RallyPack — Free Wildfire, Hurricane, Flood & Tornado Emergency Preparedness</title>
-    <link rel="canonical" href="https://rallypack.tech/" />
+    <meta property="og:url" content="https://rallypack.org/" />
+    <link rel="canonical" href="https://rallypack.org/" />
     <script>
       (function (apiKey) {
         (function (p, e, n, d, o) {
@@ -90,6 +91,36 @@
         document.head.appendChild(s);
       });
     </script>
+    <!-- Sitewide structured data: Organization + WebSite, pinned to the public host -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://rallypack.org/#organization",
+            "name": "RallyPack",
+            "url": "https://rallypack.org/",
+            "description": "Free, open-source emergency preparedness for families and organizations worldwide.",
+            "email": "beta@rallypack.org",
+            "foundingDate": "2024",
+            "sameAs": [
+              "https://instagram.com/rallypackgear",
+              "https://facebook.com/rallypackgear",
+              "https://threads.net/@rallypackgear"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://rallypack.org/#website",
+            "name": "RallyPack",
+            "url": "https://rallypack.org/",
+            "publisher": { "@id": "https://rallypack.org/#organization" },
+            "inLanguage": "en"
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <script>
@@ -130,6 +161,78 @@
         });
       })();
     </script>
+    <!--
+      No-JavaScript fallback. The app is a client-rendered SPA, so crawlers and
+      answer engines that do not execute JavaScript would otherwise see an empty
+      page. This block carries the core preparedness guidance, the data-report
+      methodology and the source list so the content is readable without the
+      bundle. Browsers with JavaScript never display it.
+    -->
+    <noscript>
+      <div style="max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.25rem; font-family: Georgia, serif; line-height: 1.6; color: #1c1c1a; background: #f9f7f3;">
+        <h1>RallyPack — free emergency preparedness</h1>
+        <p>
+          RallyPack helps households, neighborhoods and organizations prepare for
+          wildfire, hurricane, flood and tornado, and for the animals and family
+          members who depend on them. Every feature is free and open source.
+        </p>
+        <h2>Plan to be self-sufficient for at least 72 hours</h2>
+        <p>
+          Assume your household may be on its own for at least 72 hours, and build
+          toward 7 to 14 days where wildfire, extreme heat, outages or remote access
+          make that realistic. Help may be delayed, shelters may be full or distant,
+          and normal services may be unavailable. Plan for the minimum rather than
+          the promise of aid.
+        </p>
+        <h2>Wildfire risk is year-round</h2>
+        <p>
+          Your region may still have peak wildfire months, but dangerous fire
+          conditions can recur outside the historic season. Prepare on a continuous
+          readiness cycle, and raise readiness whenever heat, drought, wind, low
+          humidity, holidays, festivals or utility shutoff conditions converge.
+        </p>
+        <h2>Wildfire and water stress reinforce each other</h2>
+        <p>
+          Drought, heat and wind dry vegetation and make fires harder to control.
+          During major incidents, water sources and municipal systems may be strained,
+          while fire ash and sediment can contaminate watersheds and increase
+          treatment costs afterward. Drinking-water networks are built for drinking
+          water and normal fire protection — they should not be assumed to suppress a
+          fast-moving wildfire at community scale. Prepare for evacuation and outages
+          without assuming water, hydrants, shelters or outside assistance will
+          remain available.
+        </p>
+        <h2>RallyPack wildfire trend report — methodology</h2>
+        <p>
+          The RallyPack 10-year global wildfire report counts large and notable
+          wildfire incidents reported by national and state fire agencies, not every
+          fire response. Small, quickly contained fires are intentionally excluded,
+          so counts are far lower than official all-incident totals. Causes are
+          standardized for display while raw labels are preserved on each record.
+          Fires that smoulder and re-ignite may be recorded as separate incidents,
+          which can inflate counts. Hectares represent burned area across recorded
+          incidents, not a global total.
+        </p>
+        <h2>Sources</h2>
+        <ul>
+          <li>FEMA — evacuation and shelter-in-place planning considerations (fema.gov)</li>
+          <li>US National Interagency Fire Center — large-fire incident data (nifc.gov)</li>
+          <li>CAL FIRE — California incident and cause data (fire.ca.gov)</li>
+          <li>Copernicus EFFIS — European forest fire information system (effis.jrc.ec.europa.eu)</li>
+          <li>NOAA / National Weather Service — hurricane and severe weather alerts (weather.gov)</li>
+          <li>US Drought Monitor / Drought.gov — drought and wildfire-management conditions (drought.gov)</li>
+          <li>US Forest Service — drought interactions with wildfire and water supply (fs.usda.gov)</li>
+          <li>USGS — post-fire water quality and watershed impacts (usgs.gov)</li>
+          <li>NFPA — fireworks ignition and home fire loss estimates (nfpa.org)</li>
+          <li>American Red Cross — household preparedness guidance (redcross.org)</li>
+        </ul>
+        <p>
+          Take the free readiness quiz, see how your area compares on the readiness
+          map, or create a free account at
+          <a href="https://rallypack.org/">rallypack.org</a>.
+        </p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

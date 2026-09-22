@@ -31,7 +31,7 @@ export default function AddToHomeScreen({ embedded = false }) {
           <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-3 flex-wrap">
             <div className="text-sm text-gray-700">
               <p className="font-semibold mb-0.5">Step 0: Open the Offline page first</p>
-              <p className="text-xs text-gray-500 font-mono break-all">https://www.rallypack.org/offline</p>
+              <p className="text-xs text-gray-500 font-mono break-all">https://rallypack.org/offline</p>
               <p className="text-xs text-gray-500 mt-1">The home screen bookmark saves whatever URL is in your address bar — so make sure it shows <strong>/offline</strong> before you add it. This button opens a fresh page load at that URL.</p>
             </div>
             <a href="/offline" className="shrink-0">

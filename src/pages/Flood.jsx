@@ -2,6 +2,11 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Droplets, MapPin, Phone, AlertTriangle, Shield, Home } from "lucide-react";
 import { useHeroShot } from "@/hooks/useHeroShot";
+import PreparednessBaseline from "@/components/public/PreparednessBaseline";
+import SourceNote from "@/components/public/SourceNote";
+import PublicSources from "@/components/public/PublicSources";
+import PublicCtaLadder from "@/components/public/PublicCtaLadder";
+import PageFaq from "@/components/public/PageFaq";
 import WinterOutlookCard from "@/components/hazards/WinterOutlookCard";
 
 const REGIONS = [
@@ -83,7 +88,12 @@ export default function Flood() {
             </div>
           ))}
         </div>
+        <div className="max-w-6xl mx-auto px-6 mt-10">
+          <SourceNote topics={["flood"]} tone="dark" />
+        </div>
       </section>
+
+      <PreparednessBaseline />
 
       <section className="py-24 max-w-6xl mx-auto px-6">
         <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Emergency numbers by region</p>
@@ -182,6 +192,17 @@ export default function Flood() {
           <p className="mt-8 text-xs font-sans text-white/30 tracking-wide">✓ Free forever · ✓ No credit card · ✓ Open source</p>
         </div>
       </section>
+
+      <PageFaq topic="flood" title="Flood questions, answered." path="/flood" />
+
+      <div className="max-w-6xl mx-auto px-6 pb-16">
+        <PublicSources
+          topics={["flood"]}
+          intro="Every figure and recommendation on this page traces back to the agency that produced it."
+        />
+      </div>
+
+      <PublicCtaLadder contextLabel="Flood readiness" />
 
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">

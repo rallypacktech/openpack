@@ -2,6 +2,11 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Flame, MapPin, Phone, AlertTriangle, Wind, Droplets, Shield, CheckCircle } from "lucide-react";
 import { useHeroShot } from "@/hooks/useHeroShot";
+import PreparednessBaseline from "@/components/public/PreparednessBaseline";
+import SourceNote from "@/components/public/SourceNote";
+import PublicSources from "@/components/public/PublicSources";
+import PublicCtaLadder from "@/components/public/PublicCtaLadder";
+import PageFaq from "@/components/public/PageFaq";
 
 const REGIONS = [
   {
@@ -31,10 +36,10 @@ const REGIONS = [
 ];
 
 const CHECKLIST = [
-  { icon: AlertTriangle, title: "Know Your Evacuation Level", desc: "Understand your local evacuation zones (Levels 1-3 in the US, 'Get Ready / Leave Now' in Australia). Sign up for official alerts before fire season." },
+  { icon: AlertTriangle, title: "Know Your Evacuation Level", desc: "Understand your local evacuation zones (Levels 1-3 in the US, 'Get Ready / Leave Now' in Australia). Sign up for official alerts before high-risk conditions return." },
   { icon: MapPin, title: "Two Escape Routes, Memorized", desc: "Wildfires close roads without warning. Map two routes out of your area — one may be blocked by fire or smoke." },
   { icon: Shield, title: "Defensible Space & Hardening", desc: "Clear vegetation within 30m of your home. Cover vents, remove ember traps, and move flammable items away from structures." },
-  { icon: ClipboardList, title: "Go-Bag by the Door", desc: "Documents, medications, cash, phone chargers, N95 masks, and 72 hours of water and food. Pack it before fire season, not during." },
+  { icon: ClipboardList, title: "Go-Bag by the Door", desc: "Documents, medications, cash, phone chargers, N95 masks, and at least 72 hours of water and food — build toward 7 to 14 days. Pack before high-risk conditions return, not during." },
   { icon: Wind, title: "Air Quality Plan", desc: "Wildfire smoke travels hundreds of kilometers. Keep HEPA filters, know how to create a clean-air room, and track AQI daily." },
   { icon: Droplets, title: "Water & Hydration Ready", desc: "Store at least 4 liters per person per day. Power outages and damaged infrastructure can cut water supply for days." },
 ];
@@ -59,7 +64,7 @@ export default function Wildfire() {
             When the air<br />turns orange,<br />it's too late to plan.
           </h1>
           <p className="font-sans text-base md:text-lg text-white/75 max-w-xl mb-10 leading-relaxed">
-            Wildfires give you hours, not days. RallyPack helps families in the Americas, Eastern Europe, Australia, and beyond build an evacuation plan before fire season starts — free and open source.
+            Wildfires give you hours, not days. RallyPack helps families in the Americas, Eastern Europe, Australia, and beyond build an evacuation plan — wildfire risk is year-round now, not just in season. Free and open source.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/ReadinessQuiz">
@@ -92,7 +97,12 @@ export default function Wildfire() {
             </div>
           ))}
         </div>
+        <div className="max-w-6xl mx-auto px-6 mt-10">
+          <SourceNote topics={["wildfire"]} tone="dark" />
+        </div>
       </section>
+
+      <PreparednessBaseline />
 
       <section className="py-24 max-w-6xl mx-auto px-6">
         <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Emergency numbers by region</p>
@@ -180,6 +190,17 @@ export default function Wildfire() {
           <p className="mt-8 text-xs font-sans text-white/30 tracking-wide">✓ Free forever · ✓ No credit card · ✓ Open source</p>
         </div>
       </section>
+
+      <PageFaq topic="wildfire" title="Wildfire questions, answered." path="/wildfire" />
+
+      <div className="max-w-6xl mx-auto px-6 pb-16">
+        <PublicSources
+          topics={["wildfire"]}
+          intro="Every figure and recommendation on this page traces back to the agency that produced it."
+        />
+      </div>
+
+      <PublicCtaLadder contextLabel="Wildfire readiness" />
 
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">

@@ -38,6 +38,8 @@ const WildfireTrends = lazy(() => import('./pages/WildfireTrends'));
 const ReadinessMap = lazy(() => import('./pages/ReadinessMap'));
 const GlobalCompliance = lazy(() => import('./pages/GlobalCompliance'));
 const ResponderTraining = lazy(() => import('./pages/ResponderTraining'));
+const Faq = lazy(() => import('./pages/Faq'));
+const Sitemap = lazy(() => import('./pages/Sitemap'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -126,6 +128,8 @@ const AuthenticatedApp = () => {
       <Route path="/readiness-map" element={<LayoutWrapper currentPageName="ReadinessMap"><ReadinessMap /></LayoutWrapper>} />
       <Route path="/global-compliance" element={<LayoutWrapper currentPageName="GlobalCompliance"><GlobalCompliance /></LayoutWrapper>} />
       <Route path="/responder-training" element={<LayoutWrapper currentPageName="ResponderTraining"><ResponderTraining /></LayoutWrapper>} />
+      <Route path="/faq" element={<LayoutWrapper currentPageName="Faq"><Faq /></LayoutWrapper>} />
+      <Route path="/sitemap" element={<LayoutWrapper currentPageName="Sitemap"><Sitemap /></LayoutWrapper>} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Public host for all RallyPack content.
+Sitemap: https://rallypack.org/sitemap.xml

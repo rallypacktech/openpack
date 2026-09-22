@@ -2,6 +2,11 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, Wind, MapPin, Phone, AlertTriangle, Droplets, Shield, Home } from "lucide-react";
 import { useHeroShot } from "@/hooks/useHeroShot";
+import PreparednessBaseline from "@/components/public/PreparednessBaseline";
+import SourceNote from "@/components/public/SourceNote";
+import PublicSources from "@/components/public/PublicSources";
+import PublicCtaLadder from "@/components/public/PublicCtaLadder";
+import PageFaq from "@/components/public/PageFaq";
 
 const REGIONS = [
   {
@@ -26,7 +31,7 @@ const CHECKLIST = [
   { icon: Droplets, title: "Water: 4 Liters Per Person/Day", desc: "Store at least 7 days of water per person and pet. Hurricanes can knock out water and power for a week or more. Fill bathtubs for sanitation." },
   { icon: Shield, title: "Documents in Waterproof Bag", desc: "Insurance policies, IDs, medical records, and property deeds sealed in a waterproof container. Photograph your home before the storm for insurance claims." },
   { icon: MapPin, title: "Two Evacuation Routes Planned", desc: "Storm surge can flood coastal roads within hours. Map two inland routes — one may be underwater or blocked by debris." },
-  { icon: Wind, title: "Don't Ride It Out Unnecessarily", desc: "Storm surge is the deadliest part of a hurricane — water can rise 6 meters in minutes. If officials order evacuation, leave. A 72-hour window shrinks fast." },
+  { icon: Wind, title: "Don't Ride It Out Unnecessarily", desc: "Storm surge is the deadliest part of a hurricane — water can rise 6 meters in minutes. If officials order evacuation, leave. Assume you will be on your own for at least 72 hours, and that your window to get out safely shrinks fast." },
 ];
 
 export default function Hurricane() {
@@ -48,7 +53,7 @@ export default function Hurricane() {
             When the wind<br />starts howling,<br />it's too late to plan.
           </h1>
           <p className="font-sans text-base md:text-lg text-white/75 max-w-xl mb-10 leading-relaxed">
-            Hurricanes give you days of warning — but storm surge gives you hours to leave. RallyPack helps families build an evacuation plan, track supplies, and coordinate before the season starts — free and open source.
+            Hurricanes give you days of warning — but storm surge gives you hours to leave. RallyPack helps families build an evacuation plan, track supplies, and coordinate long before a storm forms. Free and open source.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/ReadinessQuiz">
@@ -81,7 +86,12 @@ export default function Hurricane() {
             </div>
           ))}
         </div>
+        <div className="max-w-6xl mx-auto px-6 mt-10">
+          <SourceNote topics={["hurricane"]} tone="dark" />
+        </div>
       </section>
+
+      <PreparednessBaseline />
 
       <section className="py-24 max-w-6xl mx-auto px-6">
         <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Emergency numbers by region</p>
@@ -168,6 +178,17 @@ export default function Hurricane() {
           <p className="mt-8 text-xs font-sans text-white/30 tracking-wide">✓ Free forever · ✓ No credit card · ✓ Open source</p>
         </div>
       </section>
+
+      <PageFaq topic="hurricane" title="Hurricane questions, answered." path="/hurricane" />
+
+      <div className="max-w-6xl mx-auto px-6 pb-16">
+        <PublicSources
+          topics={["hurricane"]}
+          intro="Every figure and recommendation on this page traces back to the agency that produced it."
+        />
+      </div>
+
+      <PublicCtaLadder contextLabel="Hurricane readiness" />
 
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">

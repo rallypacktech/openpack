@@ -2,6 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, AlertTriangle, FileText, MapPin, Heart, Package, Thermometer } from "lucide-react";
 import { useHeroShot } from "@/hooks/useHeroShot";
+import PageFaq from "@/components/public/PageFaq";
+import PublicSources from "@/components/public/PublicSources";
+import PublicCtaLadder from "@/components/public/PublicCtaLadder";
 
 const CHECKLIST = [
   { icon: Package, title: "Formula & Feeding Supplies", desc: "Stock a 72-hour supply of formula, bottles, and sterilization tablets. If breastfeeding, include a manual pump in your go-bag." },
@@ -136,6 +139,17 @@ export default function Infant() {
           <p className="mt-8 text-xs font-sans text-white/30 tracking-wide">✓ Free forever &nbsp;·&nbsp; ✓ No credit card &nbsp;·&nbsp; ✓ Open source</p>
         </div>
       </section>
+
+      <PageFaq topic="species" title="Evacuating with animals — questions answered." path="/infant" />
+
+      <div className="max-w-6xl mx-auto px-6 pb-16">
+        <PublicSources
+          topics={["species"]}
+          intro="Animal evacuation guidance on this page traces back to the agency that produced it."
+        />
+      </div>
+
+      <PublicCtaLadder contextLabel="Family evacuation readiness" />
 
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">

@@ -2,6 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, AlertTriangle, FileText, Truck, MapPin, Heart, CheckCircle, Flame, Wind, Droplets, Shield } from "lucide-react";
 import { useHeroShot } from "@/hooks/useHeroShot";
+import PageFaq from "@/components/public/PageFaq";
+import PublicSources from "@/components/public/PublicSources";
+import PublicCtaLadder from "@/components/public/PublicCtaLadder";
 
 const CHECKLIST = [
   { icon: FileText, title: "Coggins & Health Papers", desc: "Keep a current negative Coggins test and health certificate in a waterproof pouch in your trailer." },
@@ -195,6 +198,17 @@ export default function Equine() {
       </section>
 
       {/* Footer */}
+      <PageFaq topic="species" title="Evacuating with animals — questions answered." path="/equine" />
+
+      <div className="max-w-6xl mx-auto px-6 pb-16">
+        <PublicSources
+          topics={["species"]}
+          intro="Animal evacuation guidance on this page traces back to the agency that produced it."
+        />
+      </div>
+
+      <PublicCtaLadder contextLabel="Animal evacuation readiness" />
+
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">
           <Link to="/" className="font-serif text-lg font-bold text-white/60 hover:text-white transition-colors">RallyPack</Link>

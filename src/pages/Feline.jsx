@@ -2,6 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, ArrowRight, AlertTriangle, FileText, MapPin, Heart, Package } from "lucide-react";
 import { useHeroShot } from "@/hooks/useHeroShot";
+import PageFaq from "@/components/public/PageFaq";
+import PublicSources from "@/components/public/PublicSources";
+import PublicCtaLadder from "@/components/public/PublicCtaLadder";
 
 const CHECKLIST = [
   { icon: FileText, title: "Carrier Ready to Go", desc: "Cats are notoriously hard to catch under stress. Keep a carrier open and accessible — not folded in the attic." },
@@ -136,6 +139,17 @@ export default function Feline() {
           <p className="mt-8 text-xs font-sans text-white/30 tracking-wide">✓ Free forever &nbsp;·&nbsp; ✓ No credit card &nbsp;·&nbsp; ✓ Open source</p>
         </div>
       </section>
+
+      <PageFaq topic="species" title="Evacuating with animals — questions answered." path="/feline" />
+
+      <div className="max-w-6xl mx-auto px-6 pb-16">
+        <PublicSources
+          topics={["species"]}
+          intro="Animal evacuation guidance on this page traces back to the agency that produced it."
+        />
+      </div>
+
+      <PublicCtaLadder contextLabel="Animal evacuation readiness" />
 
       <footer className="bg-[#141412] text-white/50">
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-sans text-white/25">
