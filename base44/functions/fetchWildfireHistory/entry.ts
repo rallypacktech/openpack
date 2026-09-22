@@ -32,7 +32,7 @@ export default async function (req) {
 
     const regionText = admin1_name ? `${admin1_name}, ${country_code}` : `the country with ISO code ${country_code}`;
 
-    const llmResponse = await base44.integrations.Core.InvokeLLM({
+    const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `List up to 10 most significant wildfires in ${regionText} from ${batchStartYear} to ${batchEndYear}. For each fire provide: incident_name, admin1_name, admin2_name, start_date (YYYY-MM-DD), containment_date or null, hectares_burned, acres_burned, responding_organizations (array), latitude, longitude, cause, structures_destroyed, fatalities, severity (minor/moderate/major/catastrophic), and a brief notes field. Focus on fires that burned more than 1,000 hectares or had structural damage or fatalities.`,
       add_context_from_internet: true,
       model: 'gemini_3_flash',

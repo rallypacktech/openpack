@@ -39,7 +39,7 @@ export default async function (req) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Search for DOCUMENTED wildfires that were caused by fireworks across the years 2016 through 2025. Cover the United States, Canada, Australia, European Union countries (especially Spain, Portugal, France, Greece), India (Diwali), China (Lunar New Year), and any other countries with firework traditions. For each documented fireworks-caused wildfire provide: incident_name (official name if known, otherwise a descriptive name), country_code (ISO 3166-1 alpha-2), admin1_name (state/province/region if known), start_date (YYYY-MM-DD, the ignition date), hectares_burned (number, convert from acres using 1 acre = 0.4047 ha if needed), acres_burned (number), and a short notes field with the source/context. Only include real, documented fires where fireworks were identified as the cause — do not invent or estimate fires. Return as many as you can find across the decade.`,
       add_context_from_internet: true,
       model: 'gemini_3_flash',

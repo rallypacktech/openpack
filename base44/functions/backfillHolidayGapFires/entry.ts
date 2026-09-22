@@ -43,7 +43,7 @@ export default async function (req) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Search for DOCUMENTED wildfires from 2016 through 2025 that occurred within roughly 7 days of firework-tradition holidays OUTSIDE the United States, where fireworks were a known or suspected cause, or where the fire coincided closely with public fireworks displays. Focus on these under-represented holidays and regions:
 
 1. Australia Day (January 26, Australia) — late January bushfires near fireworks events.

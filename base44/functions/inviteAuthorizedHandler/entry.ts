@@ -101,7 +101,7 @@ export default async function(req: Request): Promise<Response> {
 </body>
 </html>`;
 
-    await base44.integrations.Core.SendEmail({
+    await base44.asServiceRole.integrations.Core.SendEmail({
       // Send to the registered address, not the raw request value.
       to: registered[0].email,
       subject,

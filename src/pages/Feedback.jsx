@@ -31,10 +31,11 @@ export default function Feedback() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await base44.integrations.Core.SendEmail({
-        to: "beta@rallypack.tech",
-        subject: `[RallyPack Feedback – ${form.type.charAt(0).toUpperCase() + form.type.slice(1)}] ${form.subject}`,
-        body: `Feedback Type: ${form.type}\nFrom: ${form.email || "Anonymous"}\n\n${form.message}`,
+      await base44.functions.invoke("sendFeedbackEmail", {
+        type: form.type,
+        subject: form.subject,
+        message: form.message,
+        email: form.email,
       });
       if (typeof pendo !== "undefined") {
         pendo.track("feedback_submitted", {

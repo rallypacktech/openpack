@@ -61,7 +61,7 @@ Prioritize:
 For each item include a realistic Amazon search query as the affiliate_search so users can find it.
 Be very specific (e.g. "Pediatric liquid ibuprofen 4oz" not just "medicine").`;
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       response_json_schema: {
         type: 'object',

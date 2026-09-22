@@ -14,51 +14,11 @@ export default function BulkReferralUpload({ onSuccess }) {
     setLoading(true);
     setResult(null);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const extracted = await base44.integrations.Core.ExtractDataFromUploadedFile({
-        file_url,
-        json_schema: {
-          type: "object",
-          properties: {
-            rows: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  referee_email: { type: "string" },
-                  referee_name: { type: "string" },
-                  organization_name: { type: "string" },
-                  referrer_name: { type: "string" },
-                  referrer_email: { type: "string" },
-                  audience_type: { type: "string" },
-                  message: { type: "string" }
-                },
-                required: ["referee_email"]
-              }
-            }
-          }
-        }
-      });
-      if (extracted.status !== "success") throw new Error(extracted.details || "Extraction failed");
-      const rows = extracted.output?.rows || (Array.isArray(extracted.output) ? extracted.output : []);
-      let created = 0, failed = 0;
-      for (const row of rows) {
-        if (!row.referee_email) { failed++; continue; }
-        try {
-          await base44.entities.BusinessReferral.create({
-            referee_email: row.referee_email,
-            referee_name: row.referee_name || "",
-            organization_name: row.organization_name || "",
-            referrer_name: row.referrer_name || "",
-            referrer_email: row.referrer_email || "",
-            audience_type: row.audience_type || "general",
-            message: row.message || "",
-            status: "pending",
-          });
-          created++;
-        } catch { failed++; }
-      }
-      setResult({ created, failed, total: rows.length });
+      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      const res = await base44.functions.invoke("importReferralSpreadsheet", { file_url });
+      if (res.data?.error) throw new Error(res.data.error);
+      const { created, failed, total } = res.data || {};
+      setResult({ created, failed, total });
       if (created > 0) onSuccess?.();
     } catch (err) {
       setResult({ error: err.message || "Upload failed" });

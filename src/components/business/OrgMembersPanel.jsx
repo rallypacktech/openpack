@@ -91,22 +91,15 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
 
   const sendIncidentAlert = async () => {
     setNotifying(true);
-    const toNotify = sorted.filter(
-      (m) => m.notify_on_evacuation && m.status !== "inactive",
-    );
-    const areaNote = alertPostalCode
-      ? `This alert is targeted to the ${alertPostalCode} area and neighboring postal codes.`
-      : "";
-    for (const member of toNotify) {
-      await base44.integrations.Core.SendEmail({
-        to: member.email,
-        subject: `⚠️ INCIDENT ALERT — ${subscription?.organization_name || "Your Organization"}`,
-        body: `Dear ${member.full_name || member.email},\n\nThis is an incident alert from ${subscription?.organization_name || "your organization"}.\n\n${alertMessage || "Please be aware of an active incident in your area. Follow all instructions from local emergency services."}\n\n${areaNote}\n\nStay safe and monitor official channels for updates.\n\n— ${subscription?.organization_name || "Emergency Response Team"}`,
-      });
-    }
+    const res = await base44.functions.invoke("sendIncidentAlert", {
+      subscription_id: subscription?.id,
+      message: alertMessage,
+      postal_code: alertPostalCode,
+    });
+    const sentCount = res.data?.sent ?? 0;
     if (typeof pendo !== "undefined") {
       pendo.track("incident_alert_sent_to_team", {
-        recipient_count: toNotify.length,
+        recipient_count: sentCount,
         has_postal_code: !!alertPostalCode,
         has_custom_message: !!alertMessage,
         organization_name: subscription?.organization_name || "",
@@ -116,7 +109,7 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
     setAlertDialog(false);
     setAlertMessage("");
     setAlertPostalCode("");
-    alert(`Incident alert sent to ${toNotify.length} member(s).`);
+    alert(`Incident alert sent to ${sentCount} member(s).`);
   };
 
   const roleColor = {

@@ -8,7 +8,7 @@ Deno.serve(async (req) => {
     if (user.role !== 'admin') return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
 
     // Use LLM with web search to scrape NIFC's current active large incident list
-    const llmResponse = await base44.integrations.Core.InvokeLLM({
+    const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Search the NIFC (National Interagency Fire Center) website at nifc.gov and the NIFC National Fire News page for the current list of ACTIVE large wildfires in the United States. List ALL currently active large fire incidents that NIFC is tracking. For each fire provide: incident_name, admin1_name (state full name), admin2_name (county if available), start_date (YYYY-MM-DD), acres_burned (number), containment_percent (number 0-100), latitude, longitude, cause (if known), and responding_organizations (array of agency names). Only include incidents that are currently ACTIVE (not contained or fully controlled).`,
       add_context_from_internet: true,
       model: 'gemini_3_flash',

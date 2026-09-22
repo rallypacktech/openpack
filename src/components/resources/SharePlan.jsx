@@ -144,10 +144,9 @@ export default function SharePlan() {
     if (!emailInput.trim()) return;
     setSending(true);
     try {
-      await base44.integrations.Core.SendEmail({
+      await base44.functions.invoke("sharePlanByEmail", {
         to: emailInput.trim(),
-        subject: `${user?.full_name || "Someone"} shared their RallyPack Emergency Plan with you`,
-        body: `Hi,\n\n${user?.full_name || "A RallyPack user"} has shared their emergency preparedness plan with you.\n\n${planText}\n\nYou can create your own free plan at ${window.location.origin}\n\nStay safe,\nRallyPack`,
+        plan_text: planText,
       });
       if (typeof pendo !== "undefined") {
         pendo.track("emergency_plan_shared", {

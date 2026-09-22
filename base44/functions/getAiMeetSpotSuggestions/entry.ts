@@ -59,7 +59,7 @@ For each missing direction, suggest 2 specific, real types of locations that wor
 Include practical advice on what makes a good meet spot in that direction.
 Be actionable and specific — name real categories of places (e.g. "24-hour Walmart", "public library", "fire station", "community park").`;
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       response_json_schema: {

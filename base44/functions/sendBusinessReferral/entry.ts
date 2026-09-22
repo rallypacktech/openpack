@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
                 `;
                 for (const email of adminEmails) {
                     try {
-                        await base44.integrations.Core.SendEmail({
+                        await base44.asServiceRole.integrations.Core.SendEmail({
                             to: email,
                             subject: 'New Business Referral: ' + (safe_organization || safe_referee_email),
                             body: emailBody,

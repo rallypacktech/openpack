@@ -15,10 +15,10 @@ export default function FooterContactForm() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await base44.integrations.Core.SendEmail({
-        to: "beta@rallypack.tech",
-        subject: `RallyPack Contact: ${form.name}`,
-        body: `From: ${form.name} <${form.email}>\n\n${form.message}`,
+      await base44.functions.invoke("sendContactMessage", {
+        name: form.name,
+        email: form.email,
+        message: form.message,
       });
       if (typeof pendo !== "undefined") {
         pendo.track("contact_form_submitted");

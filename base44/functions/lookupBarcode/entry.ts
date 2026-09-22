@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     }
 
     // Use LLM with internet context to look up product details
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Look up the EXACT product with UPC/barcode: ${barcode}
       
       CRITICAL INSTRUCTIONS FOR PRODUCT NAME:

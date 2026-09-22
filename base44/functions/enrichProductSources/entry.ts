@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
         for: (p.family_member_types || []).join(",") || "person",
       }));
 
-      const llmResult = await base44.integrations.Core.InvokeLLM({
+      const llmResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `You are an emergency-preparedness expert. For each product below, list which of these official organizations publish guidance that recommends this item for emergency preparedness. ONLY choose from this exact list: ${KNOWN_ORGS.join(", ")}.
 
 Rules:

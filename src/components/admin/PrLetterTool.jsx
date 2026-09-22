@@ -56,21 +56,13 @@ export default function PrLetterTool({ report: reportProp }) {
     setGenerating(true);
     setStatus(null);
     try {
-      const prompt = `You are drafting a public-relations letter from RallyPack, a nonprofit disaster-preparedness platform, to ${recipientType === "press" ? "a journalist or newsroom" : "a municipal government official"}${recipientName ? ` (${recipientName})` : ""}${focusCountry ? `, focused on ${focusCountry}` : ""}.
-
-Use ONLY these verified figures from RallyPack's 10-year wildfire trend report (do not invent numbers):
-${statsBlock()}
-
-Methodology note to include: causes are canonicalized; fires that smoulder and re-ignite may be counted separately, which can inflate counts; no records were modified; hectares are burned area across recorded incidents, not a global total.
-
-Write a concise, professional letter (350–500 words) that:
-1. Opens with the trend story and the 2017–2018 / 2024–2025 spikes.
-2. Highlights the firework-holiday correlation and the dominance of human-caused fires.
-3. Frames these as preventable and proposes 3–4 concrete prevention actions (public fireworks restrictions, debris-burning bans during high-risk weather, community alert signup at rallypack.org, brush-clearance programs).
-4. Closes with an offer of the full dataset and a spokesperson contact (beta@rallypack.tech).
-Return only the letter body text, no subject line.`;
-      const res = await base44.integrations.Core.InvokeLLM({ prompt });
-      setDraft(res.data || res);
+      const res = await base44.functions.invoke("draftPrLetter", {
+        recipient_type: recipientType,
+        recipient_name: recipientName,
+        focus_country: focusCountry,
+        stats: statsBlock(),
+      });
+      setDraft(res.data?.draft || "");
       setStatus({ ok: true, msg: "Draft generated — review and edit below." });
     } catch (e) {
       setStatus({ ok: false, msg: e.response?.data?.error || e.message || "Generation failed" });
@@ -97,7 +89,7 @@ Return only the letter body text, no subject line.`;
     setSending(true);
     setStatus(null);
     try {
-      await base44.integrations.Core.SendEmail({ to: recipientEmail, subject, body: draft });
+      await base44.functions.invoke("sendPrLetterEmail", { to: recipientEmail, subject, body: draft });
       setStatus({ ok: true, msg: `Email sent to ${recipientEmail}.` });
     } catch (e) {
       setStatus({ ok: false, msg: e.response?.data?.error || e.message || "Email failed — try downloading instead." });

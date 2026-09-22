@@ -143,7 +143,7 @@ Deno.serve(async (req) => {
           const isRegistered = registeredEmails.has(email.toLowerCase());
           try {
             if (isRegistered) {
-              await base44.integrations.Core.SendEmail({
+              await base44.asServiceRole.integrations.Core.SendEmail({
                 to: email,
                 subject: `${emoji} RallyPack: ${userName} — ${statusText}`,
                 body: `${messageBody}\n\nThis is an automated status alert from RallyPack.`,

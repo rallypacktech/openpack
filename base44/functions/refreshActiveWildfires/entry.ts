@@ -189,7 +189,7 @@ const commonSchema = {
 };
 
 async function fetchNIFC(base44) {
-  const res = await base44.integrations.Core.InvokeLLM({
+  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt: `Search the NIFC (National Interagency Fire Center) and NIFC National Fire News page for the current list of ACTIVE large wildfires in the United States. List ALL currently active large fire incidents NIFC is tracking. For each fire provide: incident_name, country_code (use "US"), admin1_name (state full name), admin2_name (county if available), start_date (YYYY-MM-DD), acres_burned (number), hectares_burned (convert: 1 acre = 0.4047 ha), containment_percent (number 0-100), latitude, longitude, cause (if known), and responding_organizations (array of agency names). Only include incidents currently ACTIVE (not fully contained).`,
     add_context_from_internet: true,
     model: 'gemini_3_flash',
@@ -231,7 +231,7 @@ async function fetchCalFire(base44) {
     console.error('CAL FIRE feed fetch failed, falling back to LLM:', e);
   }
   // 2) LLM fallback.
-  const res = await base44.integrations.Core.InvokeLLM({
+  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt: `Search the official CAL FIRE (fire.ca.gov) incidents page for currently ACTIVE wildfires under CAL FIRE jurisdiction in California, USA. List ALL currently active fires. For each: incident_name, country_code "US", admin1_name "California", admin2_name (county if available), start_date (YYYY-MM-DD), acres_burned (number), hectares_burned (convert: 1 acre = 0.4047 ha), containment_percent (number 0-100), latitude, longitude, cause (if known), responding_organizations ["CAL FIRE"]. Only include active (not fully contained) fires.`,
     add_context_from_internet: true,
     model: 'gemini_3_flash',
@@ -242,7 +242,7 @@ async function fetchCalFire(base44) {
 
 async function fetchEFFIS(base44) {
   const countries = [...EFFIS_COUNTRY_CODES].join(', ');
-  const res = await base44.integrations.Core.InvokeLLM({
+  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt: `Using data from EFFIS / Copernicus European Forest Fire Information System, list currently ACTIVE (uncontained) wildfires in the current fire season across European countries (including but not limited to ${countries}). For each fire provide: incident_name, country_code (ISO alpha-2), admin1_name, admin2_name, start_date (YYYY-MM-DD), hectares_burned (number), acres_burned (convert: 1 ha = 2.471 acres), containment_percent (number 0-100, use 0 if still active), latitude, longitude, cause (if known), responding_organizations (array). Only include fires that are currently ACTIVE.`,
     add_context_from_internet: true,
     model: 'gemini_3_flash',
@@ -252,7 +252,7 @@ async function fetchEFFIS(base44) {
 }
 
 async function fetchOtherRegions(base44) {
-  const res = await base44.integrations.Core.InvokeLLM({
+  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt: `Search for currently ACTIVE large wildfires (uncontained, current or recent fire season) in major non-US, non-European fire regions: Australia, Canada, Russia, Brazil, Argentina, Chile, South Africa, Indonesia, Mongolia, and any other notable regions. For each fire provide: incident_name, country_code (ISO alpha-2), admin1_name, admin2_name, start_date (YYYY-MM-DD), hectares_burned (number), acres_burned (convert: 1 ha = 2.471 acres), containment_percent (number 0-100, use 0 if still active), latitude, longitude, cause (if known), responding_organizations (array). Only include fires that are currently ACTIVE.`,
     add_context_from_internet: true,
     model: 'gemini_3_flash',

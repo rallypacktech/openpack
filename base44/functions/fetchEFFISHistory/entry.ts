@@ -38,7 +38,7 @@ export default async function (req) {
     const yearsRange = `${batchStartYear}-${batchEndYear}`;
     const regionText = admin1_name ? `${admin1_name}, ${countryName} (ISO ${country_code})` : `${countryName} (ISO ${country_code})`;
 
-    const llmResponse = await base44.integrations.Core.InvokeLLM({
+    const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Using data from the European Forest Fire Information System (EFFIS / Copernicus), list up to 12 most significant wildfires in ${regionText} from ${batchStartYear} to ${batchEndYear}. Focus on fires documented by EFFIS with burnt areas greater than 500 hectares. For each fire provide: incident_name, admin1_name (region/province), admin2_name (province/department), start_date (YYYY-MM-DD), containment_date or null, hectares_burned, acres_burned (convert from hectares: 1 ha = 2.471 acres), latitude, longitude, cause (if known), structures_destroyed, fatalities, severity (minor/moderate/major/catastrophic), and a notes field mentioning it was sourced from EFFIS.`,
       add_context_from_internet: true,
       model: 'gemini_3_flash',
