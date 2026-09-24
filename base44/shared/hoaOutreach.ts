@@ -1,10 +1,26 @@
 // Shared HOA outreach helpers used by the daily seedDailyHoaReferrals function.
 // Keeps the 50-state list, HOA email template, Resend sender, and per-state progress
 // tracking in one place so the workflow function stays small.
+//
+// The HOA email renders through base44/shared/referralEmail.ts — the same builder
+// every other referral email uses — so the free-vs-paid options read identically.
+// HOA is the audience where the split matters most: RallyPack is free for every
+// resident, while the association's own business features are a paid tier, so the
+// email carries the FIRSTMONTHFREE code to let the board try that side.
+
+import {
+  FROM_EMAIL,
+  ORIGIN,
+  READINESS_MAP_PATH,
+  buildReferralEmailHtml,
+  buildReferralEmailText,
+  isQuotaError,
+  sendViaResend,
+} from './referralEmail.ts';
+
+export { FROM_EMAIL, ORIGIN, isQuotaError, sendViaResend };
 
 export const PROGRESS_CACHE_KEY = 'hoa_outreach_progress';
-export const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
-export const ORIGIN = 'https://rallypack.org';
 
 export const US_STATES = [
   { code: 'AL', name: 'Alabama' }, { code: 'AK', name: 'Alaska' }, { code: 'AZ', name: 'Arizona' },
@@ -32,9 +48,19 @@ export const SEEDED_STATES = ['WA', 'UT', 'NY', 'CA', 'TX', 'OR'];
 
 export const DEFAULT_HOA_CONFIG = {
   label: 'Homeowner Association (HOA)',
-  learnPath: '/ReadinessQuiz',
-  subject: 'A free preparedness resource for your neighborhood — from RallyPack',
-  intro: "RallyPack is a free, open-source emergency preparedness platform that helps families build go-bags, evacuation plans, and emergency supply caches — making it a great resource to share with your entire neighborhood. We'd love to encourage you to add our free Readiness Quiz to your next HOA newsletter so every resident can quickly check how prepared they really are."
+  learnPath: READINESS_MAP_PATH,
+  subject: 'Free for every resident — and a first month free on the HOA business plan',
+  opener: 'The RallyPack Team thought your neighborhood would benefit from a free emergency preparedness resource you can share with every resident.',
+  intro: "RallyPack is a free, open-source emergency preparedness platform. Every one of your members can build go-bags, document evacuation plans, and log emergency supply caches at no cost — and the Readiness Map shows each resident how their neighborhood ranks against the rest of the world.\n\nIf the association itself wants the business side, the first month is on us with the code below.",
+  freeTitle: 'Free — for every member of your association',
+  freeBody: 'RallyPack is free for all of your residents. They can build go-bags, document evacuation plans, log emergency supply caches, get real-time hazard alerts, and see how prepared their neighborhood is compared to the rest of the world. No cost, and no account required.',
+  freeCtaLabel: 'See how prepared you are compared to the rest of the world',
+  businessTitle: 'Paid — for the association',
+  businessBody: 'If the HOA wants the business side — tracking first aid kits, AEDs, staff certifications and fire equipment across every location, with expiry reminders, documented evacuation plans and association-wide emergency alerts — that is a paid plan. Your first month is free with the code below.',
+  businessCtaLabel: 'Start the business plan — first month free',
+  voucherCode: 'FIRSTMONTHFREE',
+  voucherLabel: 'First month free',
+  voucherNote: 'Your first month of the RallyPack business plan is on us — try every business feature, then decide.'
 };
 
 export async function loadHoaTemplate(base44: any) {
@@ -43,10 +69,12 @@ export async function loadHoaTemplate(base44: any) {
     if (templates.length > 0) {
       const t = templates[0];
       return {
+        ...DEFAULT_HOA_CONFIG,
         label: t.label || DEFAULT_HOA_CONFIG.label,
         learnPath: t.learn_path || DEFAULT_HOA_CONFIG.learnPath,
         subject: t.subject || DEFAULT_HOA_CONFIG.subject,
-        intro: t.intro || DEFAULT_HOA_CONFIG.intro
+        intro: t.intro || DEFAULT_HOA_CONFIG.intro,
+        voucherCode: t.voucher_code || DEFAULT_HOA_CONFIG.voucherCode
       };
     }
   } catch (_e) { /* fall through to default */ }
@@ -54,125 +82,11 @@ export async function loadHoaTemplate(base44: any) {
 }
 
 export function buildHoaEmailHtml(config: any) {
-  const learnUrl = `${ORIGIN}${config.learnPath}`;
-  const businessUrl = `${ORIGIN}/BusinessOnboarding`;
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${config.label} — RallyPack</title>
-</head>
-<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:Inter,DM Sans,Arial,sans-serif;color:#1c1c1a;line-height:1.6;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f0e8;padding:24px 12px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border:1px solid #d8d2c6;max-width:600px;width:100%;">
-          <tr>
-            <td style="background-color:#1c1c1a;padding:32px 24px;text-align:center;">
-              <h1 style="margin:0;font-family:Georgia,serif;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">RallyPack</h1>
-              <p style="margin:4px 0 0;font-size:12px;color:#ffffff;opacity:0.6;text-transform:uppercase;letter-spacing:2px;">Emergency Preparedness Platform</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 24px;">
-              <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:20px;font-weight:600;color:#1c1c1a;">${config.label}</h2>
-              <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">Hello,</p>
-              <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">
-                The RallyPack Team thought your neighborhood would benefit from a free emergency preparedness resource you can share with every resident.
-              </p>
-              <p style="margin:0 0 20px;font-size:15px;color:#1c1c1a;">${config.intro}</p>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-                <tr><td style="padding-bottom:12px;"><a href="${learnUrl}" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Take the Readiness Quiz &rarr;</a></td></tr>
-                <tr><td><a href="${businessUrl}" style="display:inline-block;background-color:#1c1c1a;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Explore Business Accounts</a></td></tr>
-              </table>
-              <p style="margin:0 0 16px;font-size:13px;color:#6b6b66;">RallyPack is free and open-source. No account is required to access preparedness guides and checklists.</p>
-              <p style="margin:0;font-size:14px;color:#1c1c1a;">Stay safe,<br><strong>RallyPack Team</strong></p>
-            </td>
-          </tr>
-          <tr>
-            <td style="background-color:#1c1c1a;padding:20px 24px;text-align:center;">
-              <p style="margin:0;font-size:11px;color:#ffffff;opacity:0.5;">&copy; 2026 RallyPack &middot; MIT License &middot; GDPR &amp; CCPA Compliant<br>In emergencies, always call your local emergency services first.</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+  return buildReferralEmailHtml(config, ORIGIN);
 }
 
 export function buildHoaEmailText(config: any) {
-  const learnUrl = `${ORIGIN}${config.learnPath}`;
-  const businessUrl = `${ORIGIN}/BusinessOnboarding`;
-  return [
-    'Hello,',
-    '',
-    'Audience: ' + config.label,
-    '',
-    'The RallyPack Team thought your neighborhood would benefit from a free emergency preparedness resource you can share with every resident.',
-    '',
-    config.intro,
-    '',
-    'Take the Readiness Quiz: ' + learnUrl,
-    'Explore Business Accounts: ' + businessUrl,
-    '',
-    'RallyPack is free and open-source. No account is required to access preparedness guides and checklists.',
-    '',
-    'Stay safe,',
-    'RallyPack Team',
-    '',
-    '—',
-    '© 2026 RallyPack · MIT License · GDPR & CCPA Compliant',
-    'In emergencies, always call your local emergency services first.'
-  ].join('\n');
-}
-
-export function isQuotaError(status: number, errorMessage: string) {
-  if (status === 429) return true;
-  const lower = (errorMessage || '').toLowerCase();
-  return lower.includes('limit') || lower.includes('quota') || lower.includes('exceeded') || lower.includes('rate');
-}
-
-export async function sendViaResend(to: string, subject: string, html: string, text: string, base44: any, sourceFunction: string) {
-  const apiKey = Deno.env.get('RESEND_API_KEY');
-  if (!apiKey) throw new Error('RESEND_API_KEY not set');
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: FROM_EMAIL,
-      to: [to],
-      subject,
-      html,
-      text
-    })
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    if (isQuotaError(response.status, errorBody) && base44) {
-      await base44.asServiceRole.entities.EmailQueue.create({
-        recipient_email: to,
-        subject,
-        html_body: html,
-        text_body: text,
-        from_name: FROM_EMAIL,
-        source_function: sourceFunction || 'seedDailyHoaReferrals',
-        status: 'pending',
-        queued_at: new Date().toISOString()
-      });
-      return { queued: true };
-    }
-    throw new Error(`Resend API error (${response.status}): ${errorBody}`);
-  }
-
-  return await response.json();
+  return buildReferralEmailText(config, ORIGIN);
 }
 
 export function defaultProgress() {

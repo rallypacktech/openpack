@@ -100,9 +100,10 @@ const DEFAULT_TEMPLATES = [
   {
     audience_key: "hoa",
     label: "Homeowner Association (HOA)",
-    subject: "A free preparedness resource for your neighborhood — from RallyPack",
-    intro: "RallyPack is a free, open-source emergency preparedness platform that helps families build go-bags, evacuation plans, and emergency supply caches — making it a great resource to share with your entire neighborhood. We'd love to encourage you to add our free Readiness Quiz to your next HOA newsletter so every resident can quickly check how prepared they really are.",
-    learn_path: "/ReadinessQuiz",
+    subject: "Free for every resident — and a first month free on the HOA business plan",
+    intro: "RallyPack is a free, open-source emergency preparedness platform. Every one of your members can build go-bags, document evacuation plans, and log emergency supply caches at no cost — and the Readiness Map shows each resident how their neighborhood ranks against the rest of the world.\n\nIf the association itself wants the business side, the first month is on us with the code below.",
+    learn_path: "/readiness-map",
+    voucher_code: GENERAL_VOUCHER_CODE,
   },
   {
     audience_key: "fire_marshal",

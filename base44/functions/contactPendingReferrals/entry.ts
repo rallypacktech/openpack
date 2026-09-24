@@ -1,13 +1,25 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import {
+    buildReferralEmailHtml,
+    buildReferralEmailText,
+    sendViaResend,
+} from '../../shared/referralEmail.ts';
 
-const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
-
+// Built-in fallbacks per audience. Every email renders through the shared
+// referralEmail builder, which presents the two options explicitly:
+//   Option 1 (free)  — personal/household preparedness for residents, members,
+//                      staff and clients.
+//   Option 2 (paid)  — the business dashboard (kits, AEDs, certifications,
+//                      inspections, team alerts).
+// The `learnPath` below is the FREE option's landing page; the paid option
+// always points at /BusinessOnboarding. When an audience's path is a business
+// page, the free option falls back to the Readiness Map automatically.
 const AUDIENCE_CONFIG = {
     general: {
         label: 'Workplace Preparedness',
         learnPath: '/readiness-map',
-        subject: 'Get your business inspection-ready — and show your community how prepared it is',
-        intro: 'RallyPack gives your business one place to stay inspection-ready: log first aid kits across every floor, AEDs, staff CPR/first aid certifications and fire equipment checks, and get reminded before anything expires. Set up your business account at rallypack.org/BusinessOnboarding — every feature is free for 7 days, then pick the plan that fits.\n\nThen share the RallyPack Readiness Map with your community. Anyone can look up how their county, territory, state, province or country ranks for emergency preparedness — the simplest way to show people where they stand. Send them to rallypack.org/readiness-map to find their own neighborhood.',
+        subject: 'Free for your team — and a first month free on the business dashboard',
+        intro: 'RallyPack gives your business one place to stay inspection-ready: log first aid kits across every floor, AEDs, staff CPR/first aid certifications and fire equipment checks, and get reminded before anything expires. That is the paid side — and your first month is on us with the code below.\n\nThe free side is for your people: anyone can look up how their county, territory, state, province or country ranks for emergency preparedness, and build a go-bag and evacuation plan at no cost.',
         voucherLabel: 'First month free',
         voucherNote: 'Your first month of the Professional plan is on us.',
     },
@@ -58,6 +70,8 @@ const AUDIENCE_CONFIG = {
         learnPath: '/wildfire',
         subject: 'Is your community ready for wildfire season? A free resource from RallyPack',
         intro: 'RallyPack provides free, real-time wildfire alerts, go-bag checklists, and evacuation planning tools for families in fire-prone areas. Whether you\'re a business in a high-risk region or serve clients who are, share this resource to help your community prepare before a fire starts.',
+        voucherLabel: 'Free year for wildfire partners',
+        voucherNote: 'Your first year of the Professional plan is on us.',
     },
     flood: {
         label: 'Flood Preparedness',
@@ -79,27 +93,42 @@ const AUDIENCE_CONFIG = {
     },
     hoa: {
         label: 'Homeowner Association (HOA)',
-        learnPath: '/ReadinessQuiz',
-        subject: 'A free preparedness resource for your neighborhood — from RallyPack',
-        intro: 'RallyPack is a free, open-source emergency preparedness platform that helps families build go-bags, evacuation plans, and emergency supply caches — making it a great resource to share with your entire neighborhood. We\u2019d love to encourage you to add our free Readiness Quiz to your next HOA newsletter so every resident can quickly check how prepared they really are.',
+        learnPath: '/readiness-map',
+        subject: 'Free for every resident — and a first month free on the HOA business plan',
+        opener: 'The RallyPack Team thought your neighborhood would benefit from a free emergency preparedness resource you can share with every resident.',
+        intro: 'RallyPack is a free, open-source emergency preparedness platform. Every one of your members can build go-bags, document evacuation plans, and log emergency supply caches at no cost — and the Readiness Map shows each resident how their neighborhood ranks against the rest of the world.\n\nIf the association itself wants the business side, the first month is on us with the code below.',
+        freeTitle: 'Free — for every member of your association',
+        freeBody: 'RallyPack is free for all of your residents. They can build go-bags, document evacuation plans, log emergency supply caches, get real-time hazard alerts, and see how prepared their neighborhood is compared to the rest of the world. No cost, and no account required.',
+        freeCtaLabel: 'See how prepared you are compared to the rest of the world',
+        businessTitle: 'Paid — for the association',
+        businessBody: 'If the HOA wants the business side — tracking first aid kits, AEDs, staff certifications and fire equipment across every location, with expiry reminders, documented evacuation plans and association-wide emergency alerts — that is a paid plan. Your first month is free with the code below.',
+        businessCtaLabel: 'Start the business plan — first month free',
+        voucherCode: 'FIRSTMONTHFREE',
+        voucherLabel: 'First month free',
+        voucherNote: 'Your first month of the RallyPack business plan is on us — try every business feature, then decide.',
     },
     commercial_property: {
         label: 'Commercial Property Preparedness',
         learnPath: '/BusinessOnboarding',
         subject: 'Fire safety readiness & emergency tracking for your properties',
         intro: 'RallyPack helps commercial landlords and office park managers stay inspection-ready across every building — track first aid kits by floor with automatic expiry alerts, document evacuation plans and assembly points, maintain your floor warden roster, and send emergency notifications to tenants and staff. One dashboard proves every property is compliant.',
+        businessCtaLabel: 'Explore business accounts — 7 days free',
     },
     insurance_broker: {
         label: 'Commercial Insurance Broker Preparedness',
         learnPath: '/BusinessOnboarding',
         subject: 'A value-add preparedness tool for your commercial clients',
         intro: 'RallyPack helps your commercial clients stay inspection-ready and disaster-prepared — tracking first aid kits and expiry dates across every floor, documenting evacuation plans and assembly points, and maintaining floor warden rosters. Clients who stay compliant file fewer claims. Share RallyPack as a free preparedness resource that adds value at every policy review.',
+        businessCtaLabel: 'Explore business accounts — 7 days free',
     },
     fire_marshal: {
         label: 'Fire Safety',
         learnPath: '/BusinessOnboarding',
         subject: 'A free year of RallyPack — and a request for your inspection expertise',
         intro: 'We built RallyPack with input from the fire service: a dashboard where a business logs its first aid kits, AED units, batteries, pads, staff CPR/first aid/AED certifications, and fire equipment inspections, and gets reminded before anything expires. The goal is that nothing lapses between inspections — no dead AED batteries, no out-of-date pads, no expired certifications.\n\nWe would like your candid feedback on whether this actually helps a building prepare for an inspection, and what you would want a business to have ready when you walk in. In return, your first year of the Professional plan is free.',
+        voucherLabel: 'Free year for fire safety teams',
+        voucherNote: 'Your first year of the Professional plan is on us.',
+        businessCtaLabel: 'Start the free year — no card required',
     },
 };
 
@@ -124,192 +153,6 @@ async function loadTemplates(base44) {
         }
     } catch (e) { /* use defaults */ }
     return result;
-}
-
-function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-function buildReferralEmailHtml(config, origin) {
-    const learnUrl = `${origin}${config.learnPath}`;
-    const quizUrl = `${origin}/ReadinessQuiz`;
-    const businessUrl = `${origin}/BusinessOnboarding`;
-
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${config.label} — RallyPack</title>
-</head>
-<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:Inter,DM Sans,Arial,sans-serif;color:#1c1c1a;line-height:1.6;">
-
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f0e8;padding:24px 12px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border:1px solid #d8d2c6;max-width:600px;">
-
-          <tr>
-            <td style="background-color:#1c1c1a;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;font-family:Georgia,serif;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">RallyPack</h1>
-              <p style="margin:4px 0 0;font-size:12px;color:#ffffff;opacity:0.6;text-transform:uppercase;letter-spacing:2px;">Emergency Preparedness Platform</p>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:32px 40px;">
-
-              <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:20px;font-weight:600;color:#1c1c1a;">${config.label}</h2>
-
-              <p style="margin:0 0 16px;">
-                <span style="display:inline-block;background-color:#f5f0e8;color:#1c1c1a;font-size:12px;font-weight:600;padding:4px 12px;border-radius:3px;border:1px solid #d8d2c6;">Audience: ${config.label}</span>
-              </p>
-
-              <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">Hello,</p>
-
-              <p style="margin:0 0 16px;font-size:15px;color:#1c1c1a;">
-                The RallyPack Team thought your business would benefit from partnering with RallyPack on ${config.label.toLowerCase()} resources for your customers.
-              </p>
-
-              <p style="margin:0 0 20px;font-size:15px;color:#1c1c1a;">
-                ${config.intro}
-              </p>
-
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-                <tr>
-                  <td style="padding-bottom:12px;">
-                    <a href="${businessUrl}" style="display:inline-block;background-color:#d64a2e;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Explore Business Accounts &rarr;</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <a href="${learnUrl}" style="display:inline-block;background-color:#1c1c1a;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:4px;">Learn More</a>
-                  </td>
-                </tr>
-              </table>
-
-              ${config.voucherCode ? `
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background-color:#fff8e7;border:1px dashed #d64a2e;">
-                <tr>
-                  <td style="padding:16px 20px;">
-                    <p style="margin:0 0 6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#a83a20;">${config.voucherLabel || 'Free year voucher'}</p>
-                    <p style="margin:0 0 8px;font-size:14px;color:#1c1c1a;">${config.voucherNote || 'Your first year of the Professional plan is on us.'} Enter this code in the promo code box at checkout:</p>
-                    <p style="margin:0;font-family:'Courier New',monospace;font-size:20px;font-weight:700;letter-spacing:2px;color:#1c1c1a;">${escapeHtml(config.voucherCode)}</p>
-                  </td>
-                </tr>
-              </table>` : ''}
-
-              <p style="margin:0 0 16px;font-size:13px;color:#6b6b66;">
-                Business plans include multi-location kit tracking, AED and certification expiry alerts, evacuation plan documentation, and emergency team notifications.
-              </p>
-
-              <p style="margin:0;font-size:14px;color:#1c1c1a;">
-                Stay safe,<br>
-                <strong>RallyPack Team</strong>
-              </p>
-
-            </td>
-          </tr>
-
-          <tr>
-            <td style="background-color:#1c1c1a;padding:20px 40px;text-align:center;">
-              <p style="margin:0;font-size:11px;color:#ffffff;opacity:0.5;">
-                &copy; 2026 RallyPack &middot; MIT License &middot; GDPR &amp; CCPA Compliant<br>
-                In emergencies, always call your local emergency services first.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-}
-
-function buildReferralEmailText(config, origin) {
-    const learnUrl = `${origin}${config.learnPath}`;
-    const quizUrl = `${origin}/ReadinessQuiz`;
-    const businessUrl = `${origin}/BusinessOnboarding`;
-    return [
-        'Hello,',
-        '',
-        'Audience: ' + config.label,
-        '',
-        'The RallyPack Team thought your business would benefit from partnering with RallyPack on ' + config.label.toLowerCase() + ' resources for your customers.',
-        '',
-        config.intro,
-        '',
-        'Explore Business Accounts: ' + businessUrl,
-        'Learn More: ' + learnUrl,
-        '',
-        ...(config.voucherCode ? [
-            (config.voucherLabel || 'Free year voucher').toUpperCase() + ': ' + (config.voucherNote || 'Your first year of the Professional plan is on us.'),
-            'Enter this code in the promo code box at checkout: ' + config.voucherCode,
-            '',
-        ] : []),
-        'Business plans include multi-location kit tracking, AED and certification expiry alerts, evacuation plan documentation, and emergency team notifications.',
-        '',
-        'Stay safe,',
-        'RallyPack Team',
-        '',
-        '—',
-        '© 2026 RallyPack · MIT License · GDPR & CCPA Compliant',
-        'In emergencies, always call your local emergency services first.'
-    ].join('\n');
-}
-
-function isQuotaError(status, errorMessage) {
-    if (status === 429) return true;
-    const lower = (errorMessage || '').toLowerCase();
-    return lower.includes('limit') || lower.includes('quota') || lower.includes('exceeded') || lower.includes('rate');
-}
-
-async function sendViaResend(to, subject, html, text, base44, sourceFunction) {
-    const apiKey = Deno.env.get('RESEND_API_KEY');
-    if (!apiKey) throw new Error('RESEND_API_KEY not set');
-
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            from: FROM_EMAIL,
-            to: [to],
-            subject,
-            html,
-            text
-        })
-    });
-
-    if (!response.ok) {
-        const errorBody = await response.text();
-        if (isQuotaError(response.status, errorBody) && base44) {
-            await base44.asServiceRole.entities.EmailQueue.create({
-                recipient_email: to,
-                subject,
-                html_body: html,
-                text_body: text,
-                from_name: FROM_EMAIL,
-                source_function: sourceFunction || 'contactPendingReferrals',
-                status: 'pending',
-                queued_at: new Date().toISOString(),
-            });
-            return { queued: true };
-        }
-        throw new Error(`Resend API error (${response.status}): ${errorBody}`);
-    }
-
-    return await response.json();
 }
 
 Deno.serve(async (req) => {
