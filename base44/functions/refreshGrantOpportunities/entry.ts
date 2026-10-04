@@ -49,6 +49,7 @@ GRANT DISCOVERY SOURCES TO CHECK:
 7. Chronicle of Philanthropy — https://www.philanthropy.com/fundraising/
 8. GrantInterface — https://www.grantinterface.com
 9. Petco Love Shelter Partner Grants — https://petcolove.org/shelter-partners/grants/
+10. Zealous Creative Opportunities — https://zealous.co/about/creative-opportunities/
 
 Focus on:
 - Federal agencies (FEMA, DHS, CDC, NSF, etc.)

@@ -96,7 +96,7 @@ export default function AdminMonitor() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="incidents">
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 h-auto w-full flex-wrap justify-start gap-1">
             <TabsTrigger value="incidents" className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4" /> Incidents
             </TabsTrigger>

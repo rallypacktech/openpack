@@ -195,6 +195,100 @@ export const GRANT_LIBRARY = [
       budget_summary: "$50K over 12 months: shelter partner onboarding (40%), emergency planning tools (35%), evaluation (25%).",
       org_capacity: "Species-specific preparedness pages (equine, canine, feline, livestock), pet-friendly shelter mapping, and a disaster referral pipeline connecting businesses to animal welfare resources."
     }
+  },
+
+  // ── Opportunities listed on Zealous (zealous.co) ──
+  {
+    grant_name: "Prince Claus Fund Seed Award 2026",
+    funder_name: "Prince Claus Fund (via Zealous)",
+    grant_category: "community_resilience",
+    grant_url: "https://zealous.co/about/opportunities/prince-claus-fund-seed-award-2026/",
+    amount_requested: 5400,
+    priority: "low",
+    loi_sections: {
+      need: "Community-rooted initiatives working with vulnerable populations need early, trust-based funding to turn a working prototype into a durable public resource.",
+      approach: "RallyPack is a free, open-source preparedness platform serving households that mainstream tools overlook — pet and livestock owners, non-English speakers, and rural communities.",
+      impact: "Extend localized preparedness resources to an additional 25,000 households across 5 regions, with translations and offline access.",
+      budget_summary: "Seed funding covers localization (45%), accessibility and offline work (30%), and community partner onboarding (25%).",
+      org_capacity: "Live platform with multilingual alert delivery, species-specific preparedness pages, and a country-aware emergency number directory."
+    }
+  },
+  {
+    grant_name: "Bader + Simon Empowerment Grant",
+    funder_name: "Bader + Simon (via Zealous)",
+    grant_category: "other",
+    grant_url: "https://zealous.co/about/opportunities/empowerment-grant-for-emerging-artists-based-in-the-us/",
+    amount_requested: 7500,
+    priority: "low",
+    loi_sections: {
+      need: "Public-interest projects led by emerging, non-institutional teams need unrestricted support to sustain work that has no commercial revenue model.",
+      approach: "RallyPack sustains a free public safety tool entirely on grants and donations, with no paywall on any life-safety feature.",
+      impact: "Fund 12 months of hosting, alert delivery, and accessibility work so the platform stays free for every household.",
+      budget_summary: "Infrastructure and alert delivery (50%), accessibility improvements (30%), documentation and open-source maintenance (20%).",
+      org_capacity: "Open-source MIT-licensed platform with production alert pipelines, GDPR/CCPA compliance, and accessibility modes including high-contrast and reduced-motion."
+    }
+  },
+  {
+    grant_name: "2026 Craft Research Fund Grant",
+    funder_name: "Center for Craft (via Zealous)",
+    grant_category: "other",
+    grant_url: "https://zealous.co/about/opportunities/2026-craft-research-fund-grant/",
+    amount_requested: 15000,
+    priority: "low",
+    loi_sections: {
+      need: "Practical, field-tested knowledge about how households actually prepare — and where they fail — is rarely documented in a form practitioners can reuse.",
+      approach: "RallyPack publishes open readiness-assessment data and methodology, including a free household readiness quiz and a public neighborhood Readiness Map.",
+      impact: "Produce an open research report on household preparedness gaps across regions, with anonymized aggregate data and reproducible methodology.",
+      budget_summary: "Research and analysis (45%), data anonymization and privacy review (30%), open publication and design (25%).",
+      org_capacity: "Live readiness assessment with scoring, geographic aggregation, and an existing public reporting pipeline for wildfire and readiness data."
+    }
+  },
+  {
+    grant_name: "William Morris Art Futures Bursary",
+    funder_name: "House of Hackney (via Zealous)",
+    grant_category: "community_resilience",
+    grant_url: "https://zealous.co/about/opportunities/william-morris-art-futures-bursary-10000-funding-for-young-artists-in-hackney-and-waltham-forest/",
+    amount_requested: 13000,
+    priority: "low",
+    loi_sections: {
+      need: "Young people facing barriers to training and mentorship need direct support to build practical skills, including in community safety and preparedness work.",
+      approach: "RallyPack's volunteer and contributor pathway gives young people hands-on experience in accessibility, localization, and community preparedness outreach.",
+      impact: "Support a cohort of young contributors with materials, mentorship, and training while expanding preparedness content for their communities.",
+      budget_summary: "Mentorship and training (40%), equipment and materials (35%), community outreach projects (25%).",
+      org_capacity: "Open-source platform with documented contribution pathways, accessibility-first design practice, and active community preparedness programs."
+    }
+  },
+  {
+    grant_name: "World of Animals Art Competition",
+    funder_name: "Megalopolitan Art Gallery (via Zealous)",
+    grant_category: "other",
+    opportunity_type: "award",
+    grant_url: "https://zealous.co/about/opportunities/world-of-animals-art-competition/",
+    amount_requested: 0,
+    priority: "low",
+    loi_sections: {
+      need: "Animal welfare and disaster preparedness for pets and livestock are underrepresented in public awareness and community programming.",
+      approach: "RallyPack raises awareness of animal-inclusive emergency planning through species-specific preparedness guidance for dogs, cats, birds, reptiles, equine, and livestock.",
+      impact: "Recognized for animal-inclusive preparedness work, expanding reach to pet and livestock owners in additional regions.",
+      budget_summary: "Recognition award (non-monetary); visibility for animal-inclusive preparedness messaging.",
+      org_capacity: "Species-specific preparedness pages, pet-friendly shelter mapping, and a disaster referral pipeline connecting businesses to animal welfare resources."
+    }
+  },
+  {
+    grant_name: "The Cot Open: Artists Open Submission",
+    funder_name: "The Cot Open (via Zealous)",
+    grant_category: "other",
+    opportunity_type: "award",
+    grant_url: "https://zealous.co/about/opportunities/the-cot-open-artists-open-submission/",
+    amount_requested: 1300,
+    priority: "low",
+    loi_sections: {
+      need: "Public-interest technology and community resilience work needs visibility outside the traditional tech sector to reach new partners and supporters.",
+      approach: "RallyPack presents community preparedness as a public good, using clear visual communication to make household readiness approachable.",
+      impact: "Recognition award supporting continued community outreach and public preparedness messaging.",
+      budget_summary: "Prize funding supports community outreach materials and public preparedness campaigns.",
+      org_capacity: "Free public platform with a readiness map, public hazard reporting, and accessible community-facing design."
+    }
   }
 ];
 
@@ -210,6 +304,7 @@ export const GRANT_SOURCES = [
   { name: "Chronicle of Philanthropy — Fundraising", url: "https://www.philanthropy.com/fundraising/", description: "Fundraising resources and nonprofit funding news" },
   { name: "GrantInterface", url: "https://www.grantinterface.com", description: "Grant management platform — eligible opportunities" },
   { name: "Petco Love Shelter Partner Grants", url: "https://petcolove.org/shelter-partners/grants/", description: "Petco Love grants for shelter partners" },
+  { name: "Zealous Creative Opportunities", url: "https://zealous.co/about/creative-opportunities/", description: "Awards, grants, open calls and residencies listed on Zealous" },
 ];
 
 // Recognition awards RallyPack qualifies for, across all categories.
