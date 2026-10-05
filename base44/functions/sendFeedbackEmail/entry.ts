@@ -1,7 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.49';
+import { escapeHtml } from '../../shared/reminderUtils.ts';
 
 // Delivers a beta feedback submission to the RallyPack team.
 // The recipient is fixed server-side so the form can never be used as a mail relay.
+// Every user-supplied value is HTML-escaped before it reaches the email body.
 
 const FEEDBACK_EMAIL = 'beta@rallypack.tech';
 const FEEDBACK_TYPES = ['general', 'bug', 'feature', 'rating'];
@@ -22,10 +24,14 @@ export default async function (req) {
 
     const label = type.charAt(0).toUpperCase() + type.slice(1);
 
+    // Strip CR/LF from the value used in the subject line to prevent header injection.
+    const subjectLine = subject.replace(/[\r\n]+/g, ' ').trim();
+    const safeMessage = escapeHtml(message).replace(/\r?\n/g, '<br>');
+
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: FEEDBACK_EMAIL,
-      subject: `[RallyPack Feedback – ${label}] ${subject}`,
-      body: `Feedback Type: ${type}\nFrom: ${email || 'Anonymous'}\n\n${message}`,
+      subject: `[RallyPack Feedback \u2013 ${label}] ${subjectLine}`,
+      body: `<p>Feedback Type: ${escapeHtml(type)}</p><p>From: ${escapeHtml(email || 'Anonymous')}</p><p>${safeMessage}</p>`,
     });
 
     return Response.json({ success: true });

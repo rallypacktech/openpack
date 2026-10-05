@@ -96,9 +96,15 @@ Deno.serve(async (req) => {
 
     const submission = submissions[0];
 
-    // Verify the submission is approved
+    // Verify the submission is approved AND that an admin actually approved it.
+    // Only approveAlertSubmission (admin-only) writes approved_by/approved_at, and
+    // the AlertSubmission create RLS is admin-only, so a regular user cannot forge
+    // a record that carries this marker.
     if (submission.status !== 'approved') {
       return Response.json({ error: `Submission must be approved before dispatching (current: ${submission.status})` }, { status: 400 });
+    }
+    if (!submission.approved_by || !submission.approved_at) {
+      return Response.json({ error: 'Submission has not been approved by an admin' }, { status: 403 });
     }
 
     // Verify the calling user is authorized (either the submitter or an admin)
@@ -106,6 +112,25 @@ Deno.serve(async (req) => {
     const isSubmitter = submission.submitted_by_email === user.email;
     if (!isAdmin && !isSubmitter) {
       return Response.json({ error: 'You are not authorized to dispatch this alert' }, { status: 403 });
+    }
+
+    // Re-check the caller's CURRENT delegation and subscription entitlement, so a
+    // revoked or stale authorization cannot be used to dispatch, and so a caller
+    // cannot dispatch against an organization they are not part of.
+    if (!isAdmin) {
+      const delegations = await base44.asServiceRole.entities.AlertDelegation.filter({
+        authorized_email: user.email,
+        is_active: true,
+      });
+      const delegation = delegations.find((d) => d.subscription_id === submission.subscription_id);
+      if (!delegation) {
+        return Response.json({ error: 'Your organization is not authorized to dispatch alerts for this submission' }, { status: 403 });
+      }
+      const subs = await base44.asServiceRole.entities.BusinessSubscription.filter({ id: submission.subscription_id });
+      const subscription = subs.length > 0 ? subs[0] : null;
+      if (!subscription || (subscription.status !== 'active' && subscription.status !== 'trialing') || !subscription.alert_sending_enabled) {
+        return Response.json({ error: 'Your organization subscription does not allow alert sending' }, { status: 403 });
+      }
     }
 
     // Don't send twice

@@ -1,7 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.49';
+import { escapeHtml } from '../../shared/reminderUtils.ts';
 
 // Delivers a footer contact-form message to the RallyPack team.
 // The recipient is fixed server-side so the form can never be used as a mail relay.
+// Every user-supplied value is HTML-escaped before it reaches the email body.
 
 const CONTACT_EMAIL = 'beta@rallypack.tech';
 
@@ -18,10 +20,14 @@ export default async function (req) {
       return Response.json({ error: 'Name and message are required' }, { status: 400 });
     }
 
+    // Strip CR/LF from the value used in the subject line to prevent header injection.
+    const subjectName = name.replace(/[\r\n]+/g, ' ').trim();
+    const safeMessage = escapeHtml(message).replace(/\r?\n/g, '<br>');
+
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: CONTACT_EMAIL,
-      subject: `RallyPack Contact: ${name}`,
-      body: `From: ${name} <${email}>\n\n${message}`,
+      subject: `RallyPack Contact: ${subjectName}`,
+      body: `<p>From: ${escapeHtml(name)} &lt;${escapeHtml(email)}&gt;</p><p>${safeMessage}</p>`,
     });
 
     return Response.json({ success: true });

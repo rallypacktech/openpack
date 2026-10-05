@@ -1,18 +1,27 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
+// Telegram webhook receiver.
+// Every request must carry the secret_token configured when the webhook was
+// registered with Telegram (X-Telegram-Bot-Api-Secret-Token header); anything
+// else is rejected. The webhook is registered once, out of band — this handler
+// no longer re-registers itself on every request.
+
+function timingSafeEqual(a, b) {
+  const enc = new TextEncoder();
+  const bufA = enc.encode(String(a));
+  const bufB = enc.encode(String(b));
+  if (bufA.length !== bufB.length) return false;
+  let diff = 0;
+  for (let i = 0; i < bufA.length; i++) diff |= bufA[i] ^ bufB[i];
+  return diff === 0;
+}
+
 Deno.serve(async (req) => {
   try {
-    // Self-register this function's URL as the Telegram webhook (idempotent)
-    // req.url is the public dispatcher URL for this function
-    const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
-    try {
-      await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: req.url, allowed_updates: ["message"] })
-      });
-    } catch (e) {
-      console.error('Webhook self-registration failed:', e);
+    const secret = Deno.env.get("TELEGRAM_WEBHOOK_SECRET");
+    const provided = req.headers.get("x-telegram-bot-api-secret-token") || "";
+    if (!secret || !provided || !timingSafeEqual(provided, secret)) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await req.json();
