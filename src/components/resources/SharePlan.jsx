@@ -21,7 +21,8 @@ export default function SharePlan() {
   const [meetSpots, setMeetSpots] = useState([]);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
-  const [emailInput, setEmailInput] = useState("");
+  const [contacts, setContacts] = useState([]);
+  const [selectedContact, setSelectedContact] = useState("");
   const [copied, setCopied] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [sending, setSending] = useState(false);
@@ -32,13 +33,14 @@ export default function SharePlan() {
       try {
         const u = await base44.auth.me();
         setUser(u);
-        const [profileData, cachesResp, spotsResp, membersData, petsData] =
+        const [profileData, cachesResp, spotsResp, membersData, petsData, handlersData] =
           await Promise.all([
             base44.entities.UserProfile.filter({ created_by: u.email }),
             base44.functions.invoke("getCaches"),
             base44.functions.invoke("getMeetSpots"),
             base44.entities.FamilyMember.filter({ created_by: u.email }),
             base44.entities.Pet.filter({ created_by: u.email }),
+            base44.entities.AuthorizedHandler.filter({ created_by: u.email }),
           ]);
         const p = profileData[0] || null;
         setProfile(p);
@@ -46,6 +48,23 @@ export default function SharePlan() {
         setMeetSpots(spotsResp.data.spots || []);
         setFamilyMembers(membersData);
         setPets(petsData);
+
+        // Only contacts the user already saved can receive the plan.
+        const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const contactMap = new Map();
+        membersData.forEach((m) => {
+          const e = String(m.emergency_contact || "").trim();
+          if (emailRe.test(e)) {
+            contactMap.set(e.toLowerCase(), { email: e, label: `${m.name} (family)` });
+          }
+        });
+        handlersData.forEach((h) => {
+          const e = String(h.email || "").trim();
+          if (emailRe.test(e)) {
+            contactMap.set(e.toLowerCase(), { email: e, label: `${h.name} (authorized handler)` });
+          }
+        });
+        setContacts(Array.from(contactMap.values()));
 
         // Build plain-text plan summary
         const lines = [];
@@ -141,12 +160,11 @@ export default function SharePlan() {
   };
 
   const handleEmailShare = async () => {
-    if (!emailInput.trim()) return;
+    if (!selectedContact) return;
     setSending(true);
     try {
       await base44.functions.invoke("sharePlanByEmail", {
-        to: emailInput.trim(),
-        plan_text: planText,
+        to: selectedContact,
       });
       if (typeof pendo !== "undefined") {
         pendo.track("emergency_plan_shared", {
@@ -158,7 +176,7 @@ export default function SharePlan() {
         });
       }
       setEmailSent(true);
-      setEmailInput("");
+      setSelectedContact("");
       setTimeout(() => setEmailSent(false), 4000);
     } catch (e) {
       console.error(e);
@@ -188,25 +206,36 @@ export default function SharePlan() {
         <CardContent className="space-y-3">
           <p className="text-xs text-muted-foreground font-sans">
             Send a full copy of your emergency plan — meet spots, caches, and
-            household info — to anyone. No account required to receive it.
+            household info — to a saved family member or authorized handler.
           </p>
-          <div className="flex gap-2">
-            <Input
-              type="email"
-              placeholder="email@example.com"
-              value={emailInput}
-              onChange={(e) => setEmailInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleEmailShare()}
-              className="flex-1"
-            />
-            <Button
-              onClick={handleEmailShare}
-              disabled={sending || !emailInput.trim()}
-              className="bg-foreground text-background hover:bg-foreground/90"
-            >
-              {sending ? "Sending…" : "Send"}
-            </Button>
-          </div>
+          {contacts.length === 0 ? (
+            <p className="text-xs text-muted-foreground font-sans">
+              Add a family member with an email address, or an authorized
+              handler, to email them your plan.
+            </p>
+          ) : (
+            <div className="flex gap-2">
+              <select
+                value={selectedContact}
+                onChange={(e) => setSelectedContact(e.target.value)}
+                className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm font-sans text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="">Select a contact…</option>
+                {contacts.map((c) => (
+                  <option key={c.email} value={c.email}>
+                    {c.label} — {c.email}
+                  </option>
+                ))}
+              </select>
+              <Button
+                onClick={handleEmailShare}
+                disabled={sending || !selectedContact}
+                className="bg-foreground text-background hover:bg-foreground/90"
+              >
+                {sending ? "Sending…" : "Send"}
+              </Button>
+            </div>
+          )}
           {emailSent && (
             <p className="flex items-center gap-2 text-sm text-green-600 font-sans">
               <CheckCircle className="w-4 h-4" /> Plan sent successfully!
