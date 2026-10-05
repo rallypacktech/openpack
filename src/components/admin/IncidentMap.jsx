@@ -8,6 +8,7 @@ import L from "leaflet";
 import { NIFC_OUTLOOK_META, getActiveFireRegions } from "@/lib/nifcOutlook";
 import { HURRICANE_OUTLOOK, FLOOD_OUTLOOK, TORNADO_OUTLOOK, getActiveHurricaneZones, getActiveFloodRegions, getActiveTornadoRegions } from "@/lib/hazardOutlooks";
 import OutlookOverlay from "@/components/admin/OutlookOverlay";
+import AlertLog from "@/components/admin/AlertLog";
 
 // Static incidents removed — the map now shows live NWS active alerts fetched in real time.
 // The NWS API provides timestamps (sent, expires) so admin can verify freshness at a glance.
@@ -412,55 +413,8 @@ export default function IncidentMap() {
         ))}
       </div>
 
-      {/* Incident List */}
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-widest">Incident List</h3>
-        {allIncidents.map(incident => {
-          const cfg = TYPE_CONFIG[incident.type] || TYPE_CONFIG.other;
-          const Icon = cfg.icon;
-          return (
-            <div key={incident.id} className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 bg-white hover:shadow-sm transition-shadow">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: cfg.bgColor }}>
-                <Icon className="w-4 h-4" style={{ color: cfg.color }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-semibold text-gray-900 text-sm">{incident.title}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded border font-medium ${SEVERITY_BADGE[incident.severity] || SEVERITY_BADGE.watch}`}>
-                    {incident.severity?.toUpperCase()}
-                  </span>
-                  {incident.isExpired && (
-                    <span className="text-xs px-2 py-0.5 rounded border font-medium bg-gray-100 text-gray-500 border-gray-300">
-                      EXPIRED
-                    </span>
-                  )}
-                  {incident.agency && (
-                    <span className="text-xs text-gray-400 font-mono">{incident.agency}</span>
-                  )}
-                </div>
-                <p className="text-xs text-gray-500 mt-0.5">{incident.state}</p>
-                <div className="flex items-center gap-3 mt-1 flex-wrap">
-                  {incident.sent && (
-                    <p className="text-xs text-gray-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3" aria-hidden="true" />
-                      Issued {new Date(incident.sent).toLocaleString()}
-                    </p>
-                  )}
-                  {incident.expires && (
-                    <p className={`text-xs flex items-center gap-1 ${incident.isExpired ? "text-red-600 font-medium" : "text-gray-400"}`}>
-                      <Clock className="w-3 h-3" aria-hidden="true" />
-                      {incident.isExpired ? "Expired" : "Expires"} {new Date(incident.expires).toLocaleString()}
-                    </p>
-                  )}
-                </div>
-                {incident.description && (
-                  <p className="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-2">{incident.description}</p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* Alert Log — active and same-day alerts first, everything else below */}
+      <AlertLog incidents={allIncidents} typeConfig={TYPE_CONFIG} severityBadge={SEVERITY_BADGE} />
     </div>
   );
 }

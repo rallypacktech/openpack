@@ -96,6 +96,10 @@ Deno.serve(async (req) => {
     }
 
     const profiles = await base44.asServiceRole.entities.UserProfile.list();
+    // Admin accounts no longer receive weather-alert emails — they follow alerts in the
+    // Incident Map alert log instead. In-app notifications are unaffected.
+    const users = await base44.asServiceRole.entities.User.list();
+    const adminEmails = new Set(users.filter((u) => u.role === "admin").map((u) => u.email));
     const allItems = await base44.asServiceRole.entities.CacheItem.list();
     const allFirstAid = await base44.asServiceRole.entities.FirstAidItem.list();
 
@@ -108,6 +112,7 @@ Deno.serve(async (req) => {
 
     for (const profile of profiles) {
       const userEmail = profile.created_by;
+      const isAdmin = adminEmails.has(userEmail);
       const wantsEmail = profile.notification_method === "email" || profile.notification_method === "both";
       const alertSettings = profile.alert_settings || {};
 
@@ -319,7 +324,7 @@ Deno.serve(async (req) => {
           });
           notificationsCreated++;
 
-          if (wantsEmail) {
+          if (wantsEmail && !isAdmin) {
             await base44.asServiceRole.integrations.Core.SendEmail({
               to: userEmail,
               subject: `RallyPack Weather Alert: ${props.event}`,
