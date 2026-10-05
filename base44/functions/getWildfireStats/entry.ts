@@ -17,46 +17,69 @@ export default async function (req) {
     const territoriesSet = new Set();
     let mostRecent = null;
 
-    // Page per-country so every country is fully counted (no global list cap)
-    // and zero-incident countries are represented accurately.
-    const CHUNK = 10;
-    for (let i = 0; i < codes.length; i += CHUNK) {
-      const chunk = codes.slice(i, i + CHUNK);
-      const results = await Promise.all(chunk.map(async (code) => {
-        const incs = await base44.asServiceRole.entities.WildfireIncident.filter({ country_code: code });
-        return { code, incs };
-      }));
-      for (const { code, incs } of results) {
-        const coverage = {};
-        COVERAGE_YEARS.forEach((y) => (coverage[y] = 0));
-        let count = 0;
-        let hectares = 0;
-        let lastDate = null;
-        const sourceSet = new Set();
-        for (const inc of incs) {
-          if (inc.is_merged_away) continue;
-          count++;
-          hectares += inc.hectares_burned || 0;
-          if (inc.source) sourceSet.add(inc.source);
-          if (inc.admin1_name) territoriesSet.add(inc.admin1_name);
-          if (inc.start_date) {
-            const y = parseInt(String(inc.start_date).substring(0, 4), 10);
-            if (coverage[y] !== undefined) coverage[y]++;
-            if (!lastDate || inc.start_date > lastDate) lastDate = inc.start_date;
-          }
+    // Read the incident collection once with cursor pagination (a few reads) and group in
+    // memory. The previous one-filter-per-country approach fired ~200 reads per run, which
+    // exhausted the app's entity rate limit — and took unrelated requests down with it.
+    const allIncidents = [];
+    let cursor;
+    let hasMore = true;
+    let pages = 0;
+    while (hasMore && pages < 40) {
+      const page = await base44.asServiceRole.entities.WildfireIncident.filter(
+        {},
+        {
+          sort: '-start_date',
+          limit: 500,
+          fields: ['country_code', 'hectares_burned', 'source', 'admin1_name', 'start_date', 'is_merged_away'],
+          ...(cursor ? { cursor } : {}),
+        },
+      );
+      console.log('DEBUG page shape', { isArray: Array.isArray(page), items: page?.items?.length, has_more: page?.has_more, keys: Array.isArray(page) ? null : Object.keys(page || {}) });
+      allIncidents.push(...(page.items || []));
+      cursor = page.next_cursor;
+      hasMore = !!page.has_more && !!cursor;
+      pages++;
+    }
+
+    // Seed every known country so zero-incident countries are represented accurately.
+    for (const code of codes) {
+      const coverage = {};
+      COVERAGE_YEARS.forEach((y) => (coverage[y] = 0));
+      byCountry[code] = {
+        country_name: COUNTRIES[code],
+        count: 0,
+        hectares: 0,
+        last_incident_date: null,
+        coverage,
+        sources: [],
+      };
+    }
+
+    const sourceSets = {};
+    for (const inc of allIncidents) {
+      if (inc.is_merged_away) continue;
+      const bucket = byCountry[inc.country_code];
+      if (!bucket) continue;
+      bucket.count++;
+      bucket.hectares += inc.hectares_burned || 0;
+      if (inc.source) (sourceSets[inc.country_code] = sourceSets[inc.country_code] || new Set()).add(inc.source);
+      if (inc.admin1_name) territoriesSet.add(inc.admin1_name);
+      if (inc.start_date) {
+        const y = parseInt(String(inc.start_date).substring(0, 4), 10);
+        if (bucket.coverage[y] !== undefined) bucket.coverage[y]++;
+        if (!bucket.last_incident_date || inc.start_date > bucket.last_incident_date) {
+          bucket.last_incident_date = inc.start_date;
         }
-        byCountry[code] = {
-          country_name: COUNTRIES[code],
-          count,
-          hectares: Math.round(hectares),
-          last_incident_date: lastDate,
-          coverage,
-          sources: Array.from(sourceSet).sort(),
-        };
-        totalIncidents += count;
-        totalHectares += hectares;
-        if (lastDate && (!mostRecent || lastDate > mostRecent)) mostRecent = lastDate;
       }
+      totalIncidents++;
+      totalHectares += inc.hectares_burned || 0;
+      if (inc.start_date && (!mostRecent || inc.start_date > mostRecent)) mostRecent = inc.start_date;
+    }
+
+    for (const code of codes) {
+      const bucket = byCountry[code];
+      bucket.hectares = Math.round(bucket.hectares);
+      bucket.sources = Array.from(sourceSets[code] || []).sort();
     }
 
     // Last refresh per country from import logs (captures runs that created 0 incidents too)
@@ -75,6 +98,12 @@ export default async function (req) {
     }
 
     return Response.json({
+      _debug: {
+        pages,
+        fetched: allIncidents.length,
+        firstKeys: allIncidents[0] ? Object.keys(allIncidents[0]) : null,
+        first: allIncidents[0] || null,
+      },
       totals: {
         total_incidents: totalIncidents,
         total_hectares: Math.round(totalHectares),
