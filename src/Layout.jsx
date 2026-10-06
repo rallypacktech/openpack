@@ -22,6 +22,9 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import AccessibilityProvider from "./components/AccessibilityProvider";
 
+// Pages that render for signed-out visitors.
+const PUBLIC_PAGES = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining", "Faq", "Sitemap"];
+
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -32,54 +35,62 @@ export default function Layout({ children, currentPageName }) {
 
   useEffect(() => {
     const loadUser = async () => {
+      let userData = null;
       try {
-        const userData = await base44.auth.me();
-        setUser(userData);
-        // Load profile silently to get emergency_countries
+        userData = await base44.auth.me();
+      } catch (_e) {
+        userData = null;
+      }
+
+      // Auth is settled above. Everything below is non-critical enrichment, so a
+      // failure there must never be mistaken for a signed-out session — and this
+      // component never navigates, or it fights Home's redirect to the dashboard.
+      if (!userData) {
+        setAuthChecked(true);
+        return;
+      }
+
+      setUser(userData);
+      setAuthChecked(true);
+
+      // Load profile silently to get emergency_countries
+      try {
         const profiles = await base44.entities.UserProfile.filter({ created_by: userData.email });
         if (profiles.length > 0) setProfile(profiles[0]);
-        setAuthChecked(true);
-        // Claim any readiness quiz this user took before they had an account —
-        // this is what makes the quiz → signup conversion measurable.
-        try {
-          const quizSession = localStorage.getItem("rp_quiz_session");
-          const claimedKey = `rallypack_quiz_claimed_${userData.id}`;
-          if (quizSession && !localStorage.getItem(claimedKey)) {
-            await base44.functions.invoke("linkQuizResults", { session_id: quizSession });
-            localStorage.setItem(claimedKey, "1");
-          }
-        } catch (_e) { /* non-fatal */ }
-        // Fire Google Ads SIGNUP conversion once for a freshly-registered user
-        // (Register.jsx sets the pending flag right before the post-signup redirect).
-        try {
-          const pending = localStorage.getItem("__rallypack_pending_signup");
-          if (pending && userData.email && pending.toLowerCase() === userData.email.toLowerCase()) {
-            const firedKey = `rallypack_signup_fired_${userData.id}`;
-            if (!localStorage.getItem(firedKey) && typeof window !== "undefined" && window.gtag) {
-              window.gtag("event", "conversion", {
-                send_to: "AW-18405445520/hSWHCMLJl-YcEJCfs8hE",
-                transaction_id: userData.id,
-              });
-              localStorage.setItem(firedKey, "1");
-            }
-            localStorage.removeItem("__rallypack_pending_signup");
-          }
-        } catch (_e) { /* storage unavailable */ }
-      } catch (e) {
-        // Not logged in - redirect to Home if on protected page
-        const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining", "Faq", "Sitemap"];
-        if (!publicPages.includes(currentPageName)) {
-          window.location.href = createPageUrl("Home");
-        } else {
-          setAuthChecked(true);
+      } catch (_e) { /* non-fatal */ }
+
+      // Claim any readiness quiz this user took before they had an account —
+      // this is what makes the quiz → signup conversion measurable.
+      try {
+        const quizSession = localStorage.getItem("rp_quiz_session");
+        const claimedKey = `rallypack_quiz_claimed_${userData.id}`;
+        if (quizSession && !localStorage.getItem(claimedKey)) {
+          await base44.functions.invoke("linkQuizResults", { session_id: quizSession });
+          localStorage.setItem(claimedKey, "1");
         }
-      }
+      } catch (_e) { /* non-fatal */ }
+
+      // Fire Google Ads SIGNUP conversion once for a freshly-registered user
+      // (Register.jsx sets the pending flag right before the post-signup redirect).
+      try {
+        const pending = localStorage.getItem("__rallypack_pending_signup");
+        if (pending && userData.email && pending.toLowerCase() === userData.email.toLowerCase()) {
+          const firedKey = `rallypack_signup_fired_${userData.id}`;
+          if (!localStorage.getItem(firedKey) && typeof window !== "undefined" && window.gtag) {
+            window.gtag("event", "conversion", {
+              send_to: "AW-18405445520/hSWHCMLJl-YcEJCfs8hE",
+              transaction_id: userData.id,
+            });
+            localStorage.setItem(firedKey, "1");
+          }
+          localStorage.removeItem("__rallypack_pending_signup");
+        }
+      } catch (_e) { /* storage unavailable */ }
     };
     loadUser();
   }, [currentPageName]);
 
-  const publicPages = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining", "Faq", "Sitemap"];
-  const isPublicPage = publicPages.includes(currentPageName);
+  const isPublicPage = PUBLIC_PAGES.includes(currentPageName);
   const isAdmin = user?.role === "admin";
 
   // Show loading while checking auth on protected pages
