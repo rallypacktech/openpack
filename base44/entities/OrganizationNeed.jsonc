@@ -45,6 +45,29 @@
       "default": "supplies",
       "description": "Category of the need"
     },
+    "species": {
+      "type": "string",
+      "enum": [
+        "general",
+        "equine",
+        "canine",
+        "feline",
+        "infant",
+        "avian",
+        "reptile",
+        "livestock",
+        "wildfire",
+        "flood",
+        "hurricane",
+        "tornado",
+        "hoa",
+        "commercial_property",
+        "insurance_broker",
+        "fire_safety"
+      ],
+      "default": "general",
+      "description": "Species or audience this need serves \u2014 drives the Needs Board species filter"
+    },
     "quantity": {
       "type": "number",
       "description": "Quantity needed"
@@ -55,7 +78,23 @@
     },
     "location": {
       "type": "string",
-      "description": "Geographic area or address where the need is"
+      "description": "Human-readable location label shown on the need card, derived from the structured location fields"
+    },
+    "country_name": {
+      "type": "string",
+      "description": "Country where the need is \u2014 top level of the location drill-down"
+    },
+    "admin1_name": {
+      "type": "string",
+      "description": "State / territory / province where the need is"
+    },
+    "admin2_name": {
+      "type": "string",
+      "description": "County / district where the need is"
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "Postal code where the need is \u2014 deepest level of the location drill-down"
     },
     "urgency": {
       "type": "string",

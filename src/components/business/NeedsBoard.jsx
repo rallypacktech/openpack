@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, HandHeart, CheckCircle2, Trash2, AlertCircle, Clock, Mail, Phone, MapPin, Package } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import NeedsBoardFilters, { EMPTY_NEEDS_FILTERS, SPECIES_OPTIONS, countActiveFilters } from "@/components/business/NeedsBoardFilters";
 
 const CATEGORY_LABELS = {
   supplies: "Supplies", volunteers: "Volunteers", equipment: "Equipment",
@@ -35,9 +36,11 @@ export default function NeedsBoard({ subscription }) {
   const [user, setUser] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [filters, setFilters] = useState(EMPTY_NEEDS_FILTERS);
   const [form, setForm] = useState({
     need_title: "", need_description: "", category: "supplies",
-    quantity: 1, unit: "", location: "", urgency: "medium",
+    quantity: 1, unit: "", urgency: "medium", species: "general",
+    country_name: "", admin1_name: "", admin2_name: "", postal_code: "",
     contact_email: "", contact_phone: "",
   });
   const [claimingId, setClaimingId] = useState(null);
@@ -68,8 +71,10 @@ export default function NeedsBoard({ subscription }) {
       return;
     }
     try {
+      const locationLabel = [form.admin2_name, form.admin1_name, form.country_name].filter(Boolean).join(", ");
       await base44.entities.OrganizationNeed.create({
         ...form,
+        location: locationLabel,
         organization_name: subscription?.organization_name || "Unknown Organization",
         subscription_id: subscription?.id || "",
         posted_by_email: myEmail,
@@ -77,7 +82,7 @@ export default function NeedsBoard({ subscription }) {
         status: "open",
       });
       setShowForm(false);
-      setForm({ need_title: "", need_description: "", category: "supplies", quantity: 1, unit: "", location: "", urgency: "medium", contact_email: "", contact_phone: "" });
+      setForm({ need_title: "", need_description: "", category: "supplies", quantity: 1, unit: "", urgency: "medium", species: "general", country_name: "", admin1_name: "", admin2_name: "", postal_code: "", contact_email: "", contact_phone: "" });
       toast({ title: "Need posted", description: "Other organizations can now see and claim your need." });
       loadNeeds();
     } catch (e) {
@@ -120,9 +125,24 @@ export default function NeedsBoard({ subscription }) {
   };
 
   const filteredNeeds = needs.filter(n => {
-    if (filter === "all") return n.status !== "filled";
-    if (filter === "mine") return n.posted_by_email === myEmail;
-    if (filter === "open") return n.status === "open";
+    // Location drill-down
+    if (filters.country_name && n.country_name !== filters.country_name) return false;
+    if (filters.admin1_name && n.admin1_name !== filters.admin1_name) return false;
+    if (filters.admin2_name && n.admin2_name !== filters.admin2_name) return false;
+    if (filters.postal_code && n.postal_code !== filters.postal_code) return false;
+    // Species, request type and urgency
+    if (filters.species.length && !filters.species.includes(n.species)) return false;
+    if (filters.categories.length && !filters.categories.includes(n.category)) return false;
+    if (filters.urgencies.length && !filters.urgencies.includes(n.urgency)) return false;
+    // An explicit status filter replaces the quick-view's status logic
+    if (filters.statuses.length) {
+      if (!filters.statuses.includes(n.status)) return false;
+    } else if (filter === "all") {
+      if (n.status === "filled") return false;
+    } else if (filter === "open") {
+      if (n.status !== "open") return false;
+    }
+    if (filter === "mine" && n.posted_by_email !== myEmail) return false;
     return true;
   });
 
@@ -159,6 +179,13 @@ export default function NeedsBoard({ subscription }) {
         ))}
       </div>
 
+      <NeedsBoardFilters
+        needs={needs}
+        filters={filters}
+        onChange={(patch) => setFilters(f => ({ ...f, ...patch }))}
+        onClear={() => setFilters(EMPTY_NEEDS_FILTERS)}
+      />
+
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
@@ -168,7 +195,11 @@ export default function NeedsBoard({ subscription }) {
           <CardContent>
             <HandHeart className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
             <p className="text-muted-foreground text-sm">
-              {filter === "mine" ? "You haven't posted any needs yet." : "No needs posted yet. Be the first to post or check back later."}
+              {countActiveFilters(filters) > 0
+                ? "No needs match the selected filters."
+                : filter === "mine"
+                  ? "You haven't posted any needs yet."
+                  : "No needs posted yet. Be the first to post or check back later."}
             </p>
           </CardContent>
         </Card>
@@ -192,6 +223,11 @@ export default function NeedsBoard({ subscription }) {
                   <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{need.need_description}</p>
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-3">
                     <Badge variant="secondary" className="text-xs">{CATEGORY_LABELS[need.category] || need.category}</Badge>
+                    {need.species && (
+                      <Badge variant="outline" className="text-xs">
+                        {SPECIES_OPTIONS.find(o => o.value === need.species)?.label || need.species}
+                      </Badge>
+                    )}
                     {need.quantity > 0 && (
                       <span className="flex items-center gap-1">
                         <Package className="w-3 h-3" /> {need.quantity} {need.unit || ""}
@@ -277,7 +313,22 @@ export default function NeedsBoard({ subscription }) {
               <div><Label>Quantity</Label><Input type="number" value={form.quantity} onChange={e => setForm(f => ({ ...f, quantity: parseInt(e.target.value) || 0 }))} /></div>
               <div><Label>Unit</Label><Input value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))} placeholder="boxes, meals, people" /></div>
             </div>
-            <div><Label>Location</Label><Input value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} placeholder="City, state, or address" /></div>
+            <div><Label>Species / Audience</Label>
+              <Select value={form.species} onValueChange={v => setForm(f => ({ ...f, species: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {SPECIES_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>Country</Label><Input value={form.country_name} onChange={e => setForm(f => ({ ...f, country_name: e.target.value }))} placeholder="United States" /></div>
+              <div><Label>State / Territory</Label><Input value={form.admin1_name} onChange={e => setForm(f => ({ ...f, admin1_name: e.target.value }))} placeholder="Texas" /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>County / District</Label><Input value={form.admin2_name} onChange={e => setForm(f => ({ ...f, admin2_name: e.target.value }))} placeholder="Travis County" /></div>
+              <div><Label>Postal code</Label><Input value={form.postal_code} onChange={e => setForm(f => ({ ...f, postal_code: e.target.value }))} placeholder="78701" /></div>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Contact Email</Label><Input type="email" value={form.contact_email} onChange={e => setForm(f => ({ ...f, contact_email: e.target.value }))} placeholder={myEmail || "your@email.com"} /></div>
               <div><Label>Contact Phone</Label><Input value={form.contact_phone} onChange={e => setForm(f => ({ ...f, contact_phone: e.target.value }))} placeholder="Optional" /></div>
