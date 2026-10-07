@@ -55,7 +55,12 @@ Deno.serve(async (req) => {
         const sameEmailToday = recentToday.filter(
             (r) => String(r.referee_email || '').toLowerCase() === referee_email.toLowerCase(),
         ).length;
-        console.log('referral rate check', { recent: recentToday.length, sameEmailToday, isArray: Array.isArray(recentPage), keys: Array.isArray(recentPage) ? null : Object.keys(recentPage || {}) });
+        const _compound = await base44.asServiceRole.entities.BusinessReferral.filter({ source: 'public_form', created_date: { $gte: oneDayAgo } });
+        const _sourceOnly = await base44.asServiceRole.entities.BusinessReferral.filter({ source: 'public_form' });
+        const _cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 19);
+        const _bArr = Array.isArray(_sourceOnly) ? _sourceOnly : (_sourceOnly?.items || []);
+        const _todayCount = _bArr.filter((r) => String(r.created_date || '') >= _cutoff).length;
+        console.log('referral rate check', { compound: Array.isArray(_compound) ? _compound.length : (_compound?.items?.length), sourceOnly: _bArr.length, today: _todayCount });
         if (sameEmailToday >= MAX_PER_EMAIL_PER_DAY) {
             return Response.json({ error: 'This business has already been referred recently.' }, { status: 429 });
         }
@@ -123,7 +128,7 @@ Deno.serve(async (req) => {
             }
         } catch (e) { /* notification failure shouldn't block the referral */ }
 
-        return Response.json({ success: true, referral_id: referral.id, message: 'Referral submitted', _diag: { recent: recentToday.length, sameEmail: sameEmailToday, isArray: Array.isArray(recentPage), keys: Array.isArray(recentPage) ? null : Object.keys(recentPage || {}) } });
+        return Response.json({ success: true, referral_id: referral.id, message: 'Referral submitted', _diag: { bounded: _bArr.length, today: _todayCount, first: _bArr[0]?.created_date, isArray: Array.isArray(_bounded) } });
     } catch (error) {
         console.error('sendBusinessReferral error:', error);
         return Response.json({ error: error.message }, { status: 500 });
