@@ -1,9 +1,22 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@17.5.0';
+import { readCachedPayload, writeCachedPayload } from '../../shared/reportCache.ts';
+
+// Public, unauthenticated endpoint: the subscription pricing shown on the public
+// pricing pages. It spends the app's Stripe secret key, so the result is
+// snapshotted — anonymous traffic is served the snapshot instead of amplifying
+// into unlimited Stripe API calls.
+const CACHE_KEY = 'stripe_prices';
+const TTL_MS = 60 * 60 * 1000; // 1 hour
 
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
+        const sr = base44.asServiceRole;
+
+        const cached = await readCachedPayload(sr, CACHE_KEY, TTL_MS);
+        if (cached) return Response.json(cached);
+
         const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
         // Fetch all active prices with their product info
@@ -29,7 +42,10 @@ Deno.serve(async (req) => {
                 },
             }));
 
-        return Response.json({ prices: priceData });
+        const payload = { prices: priceData };
+        await writeCachedPayload(sr, CACHE_KEY, payload);
+
+        return Response.json(payload);
     } catch (error) {
         console.error('getStripePrices error:', error);
         return Response.json({ error: error.message }, { status: 500 });
