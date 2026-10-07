@@ -47,6 +47,11 @@ export const URGENCY_OPTIONS = [
   { value: "critical", label: "Critical" },
 ];
 
+export const SOURCE_OPTIONS = [
+  { value: "organization", label: "Organization" },
+  { value: "individual", label: "Individual" },
+];
+
 export const EMPTY_NEEDS_FILTERS = {
   country_name: "",
   admin1_name: "",
@@ -56,6 +61,7 @@ export const EMPTY_NEEDS_FILTERS = {
   categories: [],
   statuses: [],
   urgencies: [],
+  sources: [],
 };
 
 export function countActiveFilters(filters) {
@@ -64,7 +70,8 @@ export function countActiveFilters(filters) {
     filters.species.length +
     filters.categories.length +
     filters.statuses.length +
-    filters.urgencies.length
+    filters.urgencies.length +
+    filters.sources.length
   );
 }
 
@@ -120,6 +127,13 @@ export default function NeedsBoardFilters({ needs, filters, onChange, onClear })
             onToggle={(v) => toggle("urgencies", v)}
           />
         </div>
+
+        <FilterChipGroup
+          label="Request source"
+          options={SOURCE_OPTIONS}
+          selected={filters.sources}
+          onToggle={(v) => toggle("sources", v)}
+        />
       </div>
     </div>
   );

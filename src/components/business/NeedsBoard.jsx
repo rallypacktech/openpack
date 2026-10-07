@@ -75,6 +75,8 @@ export default function NeedsBoard({ subscription }) {
       await base44.entities.OrganizationNeed.create({
         ...form,
         location: locationLabel,
+        request_source: "organization",
+        shared_with_organizations: true,
         organization_name: subscription?.organization_name || "Unknown Organization",
         subscription_id: subscription?.id || "",
         posted_by_email: myEmail,
@@ -131,6 +133,7 @@ export default function NeedsBoard({ subscription }) {
     if (filters.admin2_name && n.admin2_name !== filters.admin2_name) return false;
     if (filters.postal_code && n.postal_code !== filters.postal_code) return false;
     // Species, request type and urgency
+    if (filters.sources.length && !filters.sources.includes(n.request_source || "organization")) return false;
     if (filters.species.length && !filters.species.includes(n.species)) return false;
     if (filters.categories.length && !filters.categories.includes(n.category)) return false;
     if (filters.urgencies.length && !filters.urgencies.includes(n.urgency)) return false;
@@ -218,6 +221,12 @@ export default function NeedsBoard({ subscription }) {
                     <div className="flex flex-col items-end gap-1">
                       <Badge variant="outline" className={`text-xs ${STATUS_STYLES[need.status] || ""} capitalize`}>{need.status}</Badge>
                       <Badge variant="outline" className={`text-xs ${URGENCY_STYLES[need.urgency] || ""} capitalize`}>{need.urgency}</Badge>
+                      <Badge
+                        variant="outline"
+                        className={`text-xs ${need.request_source === "individual" ? "bg-blue-50 text-blue-700 border-blue-300" : ""}`}
+                      >
+                        {need.request_source === "individual" ? "Individual" : "Organization"}
+                      </Badge>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{need.need_description}</p>

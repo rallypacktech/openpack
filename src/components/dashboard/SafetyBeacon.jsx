@@ -12,6 +12,7 @@ import {
   Share2,
 } from "lucide-react";
 import { toast } from "sonner";
+import HelpRequestDialog from "@/components/dashboard/HelpRequestDialog";
 
 /**
  * SafetyBeacon — minimal one-tap "I'm Safe" / "At Rally Point" widget.
@@ -28,6 +29,7 @@ export default function SafetyBeacon() {
   const [posting, setPosting] = useState(false);
   const [showRallyPicker, setShowRallyPicker] = useState(false);
   const [shareLinks, setShareLinks] = useState(null);
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
 
   useEffect(() => {
     load();
@@ -120,6 +122,40 @@ export default function SafetyBeacon() {
     }
   };
 
+  // Always posts the family status alert; the Needs Board record is only created
+  // when the person chose to share their request with organizations.
+  const handleHelpRequest = async ({ share, title, description, category, urgency, location }) => {
+    setShowHelpDialog(false);
+    await postStatus("needs_assistance");
+    if (!share) return;
+    try {
+      await base44.entities.OrganizationNeed.create({
+        need_title: title,
+        need_description: description,
+        category,
+        species: "general",
+        quantity: 1,
+        urgency,
+        country_name: location.country_name,
+        admin1_name: location.admin1_name,
+        admin2_name: location.admin2_name,
+        postal_code: location.postal_code,
+        location: [location.admin2_name, location.admin1_name, location.country_name].filter(Boolean).join(", "),
+        organization_name: profile?.display_name || user?.full_name || "Individual",
+        posted_by_email: user?.email,
+        contact_email: user?.email,
+        status: "open",
+        request_source: "individual",
+        shared_with_organizations: true,
+      });
+      toast.success("Shared with organizations", {
+        description: "Your request is now on the Needs Board.",
+      });
+    } catch (e) {
+      toast.error("Could not share your request with organizations");
+    }
+  };
+
   const myStatus = profile?.current_status;
   const myStatusAge = profile?.status_updated_at
     ? Math.round((Date.now() - new Date(profile.status_updated_at)) / 60000)
@@ -182,7 +218,7 @@ export default function SafetyBeacon() {
               size="sm"
               variant="destructive"
               className="font-sans text-xs h-10"
-              onClick={() => postStatus("needs_assistance")}
+              onClick={() => setShowHelpDialog(true)}
               disabled={posting}
             >
               <AlertTriangle className="w-3.5 h-3.5 mr-1" />
@@ -331,6 +367,14 @@ export default function SafetyBeacon() {
           </div>
         )}
       </CardContent>
+
+      <HelpRequestDialog
+        open={showHelpDialog}
+        onOpenChange={setShowHelpDialog}
+        profile={profile}
+        user={user}
+        onConfirm={handleHelpRequest}
+      />
     </Card>
   );
 }

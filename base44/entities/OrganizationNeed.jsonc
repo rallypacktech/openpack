@@ -4,7 +4,7 @@
   "properties": {
     "organization_name": {
       "type": "string",
-      "description": "Name of the organization posting the need"
+      "description": "Name of the organization posting the need, or the individual's display name for personal requests"
     },
     "subscription_id": {
       "type": "string",
@@ -67,6 +67,20 @@
       ],
       "default": "general",
       "description": "Species or audience this need serves \u2014 drives the Needs Board species filter"
+    },
+    "request_source": {
+      "type": "string",
+      "enum": [
+        "organization",
+        "individual"
+      ],
+      "default": "organization",
+      "description": "Who raised the request \u2014 an organization or an individual. Individual requests only exist here when the person chose to share them with organizations."
+    },
+    "shared_with_organizations": {
+      "type": "boolean",
+      "default": true,
+      "description": "For individual requests: whether the person opted to share this on the Needs Board. Individual records are only created once they opted in."
     },
     "quantity": {
       "type": "number",
