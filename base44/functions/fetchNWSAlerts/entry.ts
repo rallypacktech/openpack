@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { timingSafeEqual } from '../../shared/reminderUtils.ts';
 
 // Map NWS event severity to our notification type
 function getNotificationType(severity, urgency) {
@@ -16,8 +17,19 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Allow admin-triggered runs OR scheduled (no user context)
-    // For scheduled runs we use service role throughout
+    // Auth: require the AUTOMATION_SECRET (scheduled runs) or an authenticated
+    // admin — otherwise anyone could invoke this and spam every user's feed.
+    const automationSecret = Deno.env.get("AUTOMATION_SECRET");
+    const headerSecret = req.headers.get("x-automation-secret") || req.headers.get("automation-secret");
+    if (!(headerSecret && automationSecret && timingSafeEqual(headerSecret, automationSecret))) {
+      let user;
+      try { user = await base44.auth.me(); } catch (_) { user = null; }
+      if (!user || user.role !== 'admin') {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
+    // Scheduled runs use service role throughout
     const srBase44 = base44.asServiceRole;
 
     // 1. Load all user profiles that have coordinates

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { escapeHtml } from '../../shared/reminderUtils.ts';
 
 const MILESTONES = [500, 5000];
 
@@ -6,14 +7,14 @@ function buildEmailHtml(stats, milestone) {
   const { total, humans, bots, avgScore, levels, topRegions, meetingSpotPct, documentedPct } = stats;
   const levelRows = Object.entries(levels).map(([level, count]) => {
     const pct = humans > 0 ? Math.round(count / humans * 100) : 0;
-    return `<tr><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;font-size:14px;color:#1c1c1a;">${level}</td><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;text-align:right;font-size:14px;font-weight:600;color:#1c1c1a;">${count} (${pct}%)</td></tr>`;
+    return `<tr><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;font-size:14px;color:#1c1c1a;">${escapeHtml(level)}</td><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;text-align:right;font-size:14px;font-weight:600;color:#1c1c1a;">${count} (${pct}%)</td></tr>`;
   }).join('');
 
   const regionRows = topRegions.map(([region, count]) => 
-    `<tr><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;font-size:14px;color:#1c1c1a;text-transform:capitalize;">${region}</td><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;text-align:right;font-size:14px;font-weight:600;color:#1c1c1a;">${count}</td></tr>`
+    `<tr><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;font-size:14px;color:#1c1c1a;text-transform:capitalize;">${escapeHtml(region)}</td><td style="padding:8px 12px;border-bottom:1px solid #e8e2d6;text-align:right;font-size:14px;font-weight:600;color:#1c1c1a;">${count}</td></tr>`
   ).join('');
 
-  const socialBlurb = `🎉 RallyPack just hit ${milestone} readiness quiz results!\n\n📊 Average readiness score: ${avgScore}/100\n✅ ${levels['A Solid Foundation'] || 0} people have a solid emergency foundation\n⚠️ ${levels['Gaps That Put You at Risk'] || 0} have critical preparedness gaps\n📍 Top concern: ${topRegions[0] ? topRegions[0][0] : 'Various'}\n📋 Only ${documentedPct}% have a documented emergency plan\n\nHow prepared are YOU? Take the free quiz: https://rallypack.org/ReadinessQuiz`;
+  const socialBlurb = `🎉 RallyPack just hit ${milestone} readiness quiz results!\n\n📊 Average readiness score: ${avgScore}/100\n✅ ${levels['A Solid Foundation'] || 0} people have a solid emergency foundation\n⚠️ ${levels['Gaps That Put You at Risk'] || 0} have critical preparedness gaps\n📍 Top concern: ${topRegions[0] ? escapeHtml(topRegions[0][0]) : 'Various'}\n📋 Only ${documentedPct}% have a documented emergency plan\n\nHow prepared are YOU? Take the free quiz: https://rallypack.org/ReadinessQuiz`;
 
   return `<!DOCTYPE html>
 <html lang="en">

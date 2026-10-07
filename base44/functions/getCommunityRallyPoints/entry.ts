@@ -11,9 +11,30 @@ Deno.serve(async (req) => {
 
     const { latitude, longitude, radius = 25 } = await req.json();
 
-    if (!latitude || !longitude) {
+    if (latitude == null || latitude === '' || longitude == null || longitude === '') {
       return Response.json({ 
         error: 'Latitude and longitude required',
+        rallyPoints: []
+      }, { status: 400 });
+    }
+
+    // Coerce to strict finite numbers within sane bounds so no attacker text can
+    // be interpolated into the Overpass QL query.
+    const centerLat = Number(latitude);
+    const centerLon = Number(longitude);
+    const radiusMiles = Number(radius);
+
+    if (!Number.isFinite(centerLat) || centerLat < -90 || centerLat > 90 ||
+        !Number.isFinite(centerLon) || centerLon < -180 || centerLon > 180) {
+      return Response.json({ 
+        error: 'Valid latitude (-90..90) and longitude (-180..180) are required',
+        rallyPoints: []
+      }, { status: 400 });
+    }
+
+    if (!Number.isFinite(radiusMiles) || radiusMiles < 1 || radiusMiles > 50) {
+      return Response.json({ 
+        error: 'Radius must be between 1 and 50 miles',
         rallyPoints: []
       }, { status: 400 });
     }
@@ -23,12 +44,12 @@ Deno.serve(async (req) => {
     const overpassQuery = `
       [out:json][timeout:25];
       (
-        node["amenity"="community_centre"](around:${radius * 1609.34},${latitude},${longitude});
-        node["leisure"="park"](around:${radius * 1609.34},${latitude},${longitude});
-        node["amenity"="public_building"](around:${radius * 1609.34},${latitude},${longitude});
-        node["amenity"="shelter"](around:${radius * 1609.34},${latitude},${longitude});
-        way["leisure"="park"](around:${radius * 1609.34},${latitude},${longitude});
-        way["amenity"="community_centre"](around:${radius * 1609.34},${latitude},${longitude});
+        node["amenity"="community_centre"](around:${radiusMiles * 1609.34},${centerLat},${centerLon});
+        node["leisure"="park"](around:${radiusMiles * 1609.34},${centerLat},${centerLon});
+        node["amenity"="public_building"](around:${radiusMiles * 1609.34},${centerLat},${centerLon});
+        node["amenity"="shelter"](around:${radiusMiles * 1609.34},${centerLat},${centerLon});
+        way["leisure"="park"](around:${radiusMiles * 1609.34},${centerLat},${centerLon});
+        way["amenity"="community_centre"](around:${radiusMiles * 1609.34},${centerLat},${centerLon});
       );
       out center;
     `;
@@ -52,10 +73,10 @@ Deno.serve(async (req) => {
 
       // Calculate distance
       const R = 6371; // Earth radius in kilometers
-      const lat1 = latitude * Math.PI / 180;
+      const lat1 = centerLat * Math.PI / 180;
       const lat2 = lat * Math.PI / 180;
-      const deltaLat = (lat - latitude) * Math.PI / 180;
-      const deltaLon = (lon - longitude) * Math.PI / 180;
+      const deltaLat = (lat - centerLat) * Math.PI / 180;
+      const deltaLon = (lon - centerLon) * Math.PI / 180;
 
       const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
                 Math.cos(lat1) * Math.cos(lat2) *

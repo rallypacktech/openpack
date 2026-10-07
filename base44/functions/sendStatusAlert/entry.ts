@@ -101,6 +101,18 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
+    // Rate limit broadcasts so one account cannot flood recipients with branded
+    // mail: at most 10 status alerts per rolling hour.
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const recentBroadcasts = await base44.entities.FamilyMessage.filter({
+      created_by: user.email,
+      message_type: { $in: ['status_safe', 'status_needs_assistance'] },
+      created_date: { $gte: oneHourAgo },
+    });
+    if (recentBroadcasts.length >= 10) {
+      return Response.json({ error: 'Too many status alerts — please wait before sending another.' }, { status: 429 });
+    }
+
     const { status, rally_spot_name, latitude, longitude } = await req.json();
     // status: "safe" | "needs_assistance"
 
@@ -125,22 +137,35 @@ Deno.serve(async (req) => {
 
     const results = { email: [], telegram: [], discord: null, share_links: {} };
 
-    // 2. EMAIL — send to family members with email addresses
-    //    Registered RallyPack users → Base44 SendEmail
-    //    Non-user emergency contacts → Resend (external delivery)
+    // 2. EMAIL — deliver only to recipients who have opted in: either a
+    //    registered RallyPack user, or a family contact whose link the recipient
+    //    accepted. Unverified external addresses are never emailed, so the app's
+    //    sending domain cannot be used as an open relay for phishing or spam.
     if (channels.includes('email')) {
-      const emailRecipients = familyMembers
-        .map(m => m.emergency_contact)
-        .filter(e => e && e.includes('@'));
+      const candidates = familyMembers
+        .map(m => ({
+          email: (m.emergency_contact || '').trim(),
+          verifiedLink: m.link_status === 'accepted' && !!m.linked_user_id,
+        }))
+        .filter(c => c.email && c.email.includes('@'));
 
-      if (emailRecipients.length > 0) {
+      if (candidates.length > 0) {
         const allUsers = await base44.asServiceRole.entities.User.list();
         const registeredEmails = new Set(
           allUsers.filter(u => u.email).map(u => u.email.toLowerCase())
         );
 
-        for (const email of emailRecipients) {
-          const isRegistered = registeredEmails.has(email.toLowerCase());
+        const seenEmails = new Set();
+        for (const c of candidates) {
+          const email = c.email;
+          const key = email.toLowerCase();
+          if (seenEmails.has(key)) continue;
+          seenEmails.add(key);
+
+          const isRegistered = registeredEmails.has(key);
+          // Skip recipients who never opted in.
+          if (!isRegistered && !c.verifiedLink) continue;
+
           try {
             if (isRegistered) {
               await base44.asServiceRole.integrations.Core.SendEmail({
