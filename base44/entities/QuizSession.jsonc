@@ -1,0 +1,45 @@
+{
+  "name": "QuizSession",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Server-issued id for one readiness quiz attempt \u2014 the id saveQuizResult accepts, and what the public readiness map aggregates on"
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the session token was issued"
+    },
+    "is_bot": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the caller self-identified as a bot when the session was issued"
+    }
+  },
+  "required": [
+    "session_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

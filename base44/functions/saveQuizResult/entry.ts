@@ -1,9 +1,17 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { secrets } from 'base44:runtime';
 import { geolocateByPostalCode } from '../../shared/readinessGeo.ts';
 import { detectBotFromUserAgent } from '../../shared/botDetection.ts';
+import { verifyQuizSession } from '../../shared/quizSession.ts';
 
 const SCORE_LEVELS = new Set(['Not Ready', 'Gaps That Put You at Risk', 'A Solid Foundation']);
 const SHORT_TEXT_MAX = 60;
+
+// A session must be at least this old before its result is accepted. A person
+// answering the quiz takes far longer than this; a script posting in a tight loop
+// cannot clear it.
+const MIN_SESSION_AGE_MS = 5000;
+const MAX_SESSION_AGE_MS = 6 * 60 * 60 * 1000;
 
 function shortText(value) {
   if (typeof value !== 'string') return null;
@@ -36,7 +44,7 @@ export default async function(req) {
 
     const body = await req.json();
     const {
-      session_id, score, score_level, region,
+      session_token, score, score_level, region,
       county_plan, experienced_disaster, felt_prepared,
       meeting_spot, supplies, plan_documented, insurance,
       postal_code, country_code
@@ -49,7 +57,18 @@ export default async function(req) {
       return Response.json({ error: 'A score between 0 and 100 is required' }, { status: 400 });
     }
     const cleanScore = Math.round(numericScore);
-    const cleanSessionId = shortText(session_id);
+
+    // The session id is issued and signed by startQuizSession — it is never taken
+    // from the request body. A caller cannot invent an id, and because the dedupe
+    // below keys on it, one issued session can only ever produce a single row.
+    const session = await verifyQuizSession(secrets.get('QUIZ_SESSION_SECRET'), session_token, {
+      minAgeMs: MIN_SESSION_AGE_MS,
+      maxAgeMs: MAX_SESSION_AGE_MS,
+    });
+    if (!session) {
+      return Response.json({ error: 'A valid quiz session is required' }, { status: 403 });
+    }
+    const cleanSessionId = session.sessionId;
     const cleanScoreLevel = SCORE_LEVELS.has(score_level) ? score_level : null;
     const cleanPostalCode = cleanPostal(postal_code);
     const cleanCountry = cleanCountryCode(country_code);

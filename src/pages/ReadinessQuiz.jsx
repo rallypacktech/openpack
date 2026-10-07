@@ -247,17 +247,24 @@ const REGION_RESOURCES = {
   },
 };
 
-function getSessionId() {
+// The quiz session is issued and signed by the server — the client can no longer
+// invent a session id, which is what used to let fabricated scores reach the public
+// readiness map. Claiming one as the quiz opens also means the token is already old
+// enough by the time the results are saved.
+async function startQuizSession() {
   const { isBot } = detectBot();
-  if (isBot) {
-    return getStableBotId();
+  const res = await base44.functions.invoke("startQuizSession", {
+    is_bot: isBot,
+    bot_id: isBot ? getStableBotId() : null,
+  });
+  const session = res.data || {};
+  if (session.session_id && session.session_token) {
+    sessionStorage.setItem("rp_quiz_session_token", session.session_token);
+    // Layout and linkQuizResults read this to claim a pre-signup quiz once the
+    // taker creates an account.
+    localStorage.setItem("rp_quiz_session", session.session_id);
   }
-  let sid = localStorage.getItem("rp_quiz_session");
-  if (!sid) {
-    sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem("rp_quiz_session", sid);
-  }
-  return sid;
+  return session;
 }
 
 function QuizResults({ score, answers, onRetake }) {
@@ -277,7 +284,8 @@ function QuizResults({ score, answers, onRetake }) {
   // Save result on mount (once)
   React.useEffect(() => {
     const save = async () => {
-      const sessionId = getSessionId();
+      const sessionId = localStorage.getItem("rp_quiz_session") || "";
+      const sessionToken = sessionStorage.getItem("rp_quiz_session_token") || "";
       let isRegistered = false;
       try {
         const user = await base44.auth.me();
@@ -292,7 +300,7 @@ function QuizResults({ score, answers, onRetake }) {
       try {
         const location = answers.location || {};
         const res = await base44.functions.invoke("saveQuizResult", {
-          session_id: sessionId,
+          session_token: sessionToken,
           score,
           score_level: result.level,
           region: answers.region,
@@ -657,6 +665,12 @@ function QuizResults({ score, answers, onRetake }) {
 }
 
 export default function ReadinessQuiz() {
+  // Claim a signed session as the quiz opens, so the token is old enough by the
+  // time the result is saved.
+  React.useEffect(() => {
+    startQuizSession().catch(() => {});
+  }, []);
+
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
