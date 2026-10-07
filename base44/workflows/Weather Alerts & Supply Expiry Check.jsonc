@@ -1,6 +1,4 @@
 {
-  "name": "Weather Alerts & Supply Expiry Check",
-  "description": "Checks NWS weather alerts and supply/first-aid expiration for all users. Creates in-app notifications always; sends emails based on user preference.",
   "trigger": {
     "condition": null,
     "config": {
@@ -18,6 +16,7 @@
       "ends_after_count": null
     }
   },
+  "description": "Checks NWS weather alerts and supply/first-aid expiration for all users. Creates in-app notifications always; sends emails based on user preference.",
   "definition": {
     "document": {
       "dsl": "1.0.0",
@@ -31,15 +30,14 @@
           "call": "invoke_backend_function",
           "with": {
             "function_name": "checkWeatherAndExpiry",
-            "args": {
-              "automation_secret": "rp-auto-a7f3b2e9-1d4a-4b8c-9e2f-6a5b3c8d7e1f"
-            }
+            "args": {}
           },
           "then": "end"
         }
       }
     ]
   },
+  "name": "Weather Alerts & Supply Expiry Check",
   "x-base44-migrated-from-automation": {
     "legacy_payload_function": "checkWeatherAndExpiry"
   }

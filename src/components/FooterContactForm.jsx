@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Send, CheckCircle, Loader2 } from "lucide-react";
+import { getFormSessionId } from "@/lib/formSession";
 
 export default function FooterContactForm() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -19,6 +20,7 @@ export default function FooterContactForm() {
         name: form.name,
         email: form.email,
         message: form.message,
+        session_id: getFormSessionId(),
       });
       if (typeof pendo !== "undefined") {
         pendo.track("contact_form_submitted");

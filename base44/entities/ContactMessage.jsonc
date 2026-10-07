@@ -1,0 +1,58 @@
+{
+  "name": "ContactMessage",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "contact",
+        "feedback"
+      ],
+      "default": "contact",
+      "description": "Which public form this came from \u2014 the footer contact form or the feedback form"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name supplied by the sender"
+    },
+    "email": {
+      "type": "string",
+      "description": "Reply address supplied by the sender"
+    },
+    "message": {
+      "type": "string",
+      "description": "The message body as submitted"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Anonymous per-browser id used to rate-limit the public forms \u2014 identifies a browser, not a person"
+    }
+  },
+  "required": [
+    "kind",
+    "message",
+    "session_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

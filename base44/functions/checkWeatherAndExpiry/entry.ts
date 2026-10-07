@@ -86,7 +86,13 @@ Deno.serve(async (req) => {
     // Timing-safe comparison prevents auth-bypass via timing side-channels on the secret.
     const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET");
     const body = await req.json().catch(() => ({}));
-    const isAutomation = AUTOMATION_SECRET && timingSafeEqual(body.automation_secret, AUTOMATION_SECRET);
+    // Scheduled workflow runs carry the automation secret in a platform-injected
+    // header; the body form is still accepted for direct invocations.
+    const headerSecret = req.headers.get("x-automation-secret") || req.headers.get("automation-secret");
+    const isAutomation = Boolean(AUTOMATION_SECRET) && (
+      timingSafeEqual(headerSecret, AUTOMATION_SECRET) ||
+      timingSafeEqual(body.automation_secret, AUTOMATION_SECRET)
+    );
 
     if (!isAutomation) {
       const user = await base44.auth.me();

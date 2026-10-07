@@ -36,6 +36,7 @@ export default function Feedback() {
         subject: form.subject,
         message: form.message,
         email: form.email,
+        session_id: getFormSessionId(),
       });
       if (typeof pendo !== "undefined") {
         pendo.track("feedback_submitted", {
