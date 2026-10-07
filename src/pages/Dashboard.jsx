@@ -284,7 +284,13 @@ export default function Dashboard() {
             }
           }
         },
-      );
+      ).catch((error) => {
+        // These five are background enrichment only. Without this handler a single
+        // failed request — a 500, a rate limit — escapes the enclosing try/catch as
+        // an unhandled rejection and surfaces as an app error, even though the
+        // dashboard itself loaded fine.
+        console.error("Error loading dashboard extras:", error);
+      });
     } catch (error) {
       console.error("Error loading data:", error);
       setLoading(false);
