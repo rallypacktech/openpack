@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.49';
 import { escapeHtml } from '../../shared/reminderUtils.ts';
-import { checkContactThrottle } from '../../shared/contactThrottle.ts';
+import { claimContactSlot } from '../../shared/contactThrottle.ts';
 
 // Delivers a beta feedback submission to the RallyPack team.
 // The recipient is fixed server-side so the form can never be used as a mail relay.
@@ -28,19 +28,18 @@ export default async function (req) {
     }
 
     // This endpoint is public and unauthenticated, so cap how much mail a burst can
-    // generate before anything is stored or sent.
-    const throttle = await checkContactThrottle(base44.asServiceRole, sessionId);
-    if (!throttle.ok) {
-      return Response.json({ error: throttle.error }, { status: 429 });
-    }
-
-    await base44.asServiceRole.entities.ContactMessage.create({
+    // generate before anything is sent. The submission is recorded first and the cap
+    // re-checked with it included, so parallel callers can't slip past together.
+    const claim = await claimContactSlot(base44.asServiceRole, {
       kind: 'feedback',
       name: subject,
       email,
       message,
       session_id: sessionId,
     });
+    if (!claim.ok) {
+      return Response.json({ error: claim.error }, { status: 429 });
+    }
 
     const label = type.charAt(0).toUpperCase() + type.slice(1);
 

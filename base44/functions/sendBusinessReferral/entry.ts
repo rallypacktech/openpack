@@ -91,6 +91,25 @@ Deno.serve(async (req) => {
             source: 'public_form'
         });
 
+        // Re-count with our own row included — the count that actually holds. Parallel
+        // callers each see the others' rows, so a burst can no longer pass the stale
+        // pre-check above together and carry the pipeline past its daily ceiling.
+        const afterPage = await base44.asServiceRole.entities.BusinessReferral.filter({
+            source: 'public_form',
+            created_date: { $gte: oneDayAgo },
+        });
+        const afterRows = Array.isArray(afterPage) ? afterPage : (afterPage?.items || []);
+        const overTotal = afterRows.length > MAX_TOTAL_PER_DAY;
+        const overEmail = afterRows.filter(
+            (r) => String(r.referee_email || '').toLowerCase() === referee_email.toLowerCase(),
+        ).length > MAX_PER_EMAIL_PER_DAY;
+        if (overTotal || overEmail) {
+            try {
+                await base44.asServiceRole.entities.BusinessReferral.delete(referral.id);
+            } catch (_) { /* the row still counts against the next caller */ }
+            return Response.json({ error: 'Too many referrals submitted right now — please try again later.' }, { status: 429 });
+        }
+
         // Notify admins who have accounts in the app
         try {
             const admins = await base44.asServiceRole.entities.User.list();

@@ -1,0 +1,45 @@
+{
+  "name": "Stripe Price Snapshot Refresh",
+  "description": "Refreshes the public pricing snapshot from Stripe every hour. The public pricing endpoint serves this snapshot and never calls Stripe itself, so anonymous traffic cannot spend the app's Stripe key.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 * * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "stripe_price_snapshot_refresh",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshStripePrices",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Refresh pricing snapshot",
+            "description": "Reads live prices from Stripe"
+          }
+        }
+      }
+    ]
+  }
+}
