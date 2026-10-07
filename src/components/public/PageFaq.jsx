@@ -28,7 +28,7 @@ export default function PageFaq({ topic, title = "Common questions", path }) {
 
   return (
     <section className="py-20 max-w-6xl mx-auto px-6">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Answers</p>
       <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-12 leading-tight max-w-2xl">
         {title}

@@ -12,6 +12,7 @@ import {
   Plus, Pencil, Trash2, Package, AlertCircle, DollarSign, Link as LinkIcon,
   Check, X, Filter, Search, RefreshCw, Eye, EyeOff
 } from "lucide-react";
+import { isAllowedAffiliateUrl } from "@/lib/affiliateUrl";
 
 const CATEGORIES = ["water","food","medical","tools","clothing","documents","communication","hygiene","other"];
 const CACHE_TYPES = ["go_bag","automobile","general","first_aid_kit"];
@@ -789,7 +790,14 @@ export default function AdminProducts() {
               {viewDetails.suggested_fema_regions?.length > 0 && <div><strong>FEMA Regions:</strong> {viewDetails.suggested_fema_regions.join(", ")}</div>}
               {viewDetails.source_organization && <div><strong>Source:</strong> {viewDetails.source_organization}</div>}
               {viewDetails.suggested_affiliate_link && (
-                <div><strong>Link:</strong> <a href={viewDetails.suggested_affiliate_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Product</a></div>
+                <div>
+                  <strong>Link:</strong>{" "}
+                  {isAllowedAffiliateUrl(viewDetails.suggested_affiliate_link) ? (
+                    <a href={viewDetails.suggested_affiliate_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Product</a>
+                  ) : (
+                    <span className="text-red-600 break-all">{viewDetails.suggested_affiliate_link} (unverified link — not clickable)</span>
+                  )}
+                </div>
               )}
               <div><strong>Suggested By:</strong> {viewDetails.suggested_by}</div>
               <div><strong>Status:</strong> {viewDetails.status}</div>

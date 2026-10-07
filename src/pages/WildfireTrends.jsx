@@ -96,11 +96,11 @@ export default function WildfireTrends() {
   return (
     <div className="bg-cream">
       {jsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       )}
       {/* Full report as machine-readable JSON for AI/crawlers — not rendered for end users. */}
       {report && (
-        <script type="application/json" data-rallypack-wildfire-report dangerouslySetInnerHTML={{ __html: JSON.stringify(report) }} />
+        <script type="application/json" data-rallypack-wildfire-report dangerouslySetInnerHTML={{ __html: JSON.stringify(report).replace(/</g, "\\u003c") }} />
       )}
 
       {/* Hero — static, renders immediately */}

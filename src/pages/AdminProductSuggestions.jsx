@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Check, X, Pencil, Eye, Package, RefreshCw } from "lucide-react";
+import { isAllowedAffiliateUrl } from "@/lib/affiliateUrl";
 
 export default function AdminProductSuggestions() {
   const [suggestions, setSuggestions] = useState([]);
@@ -485,9 +486,13 @@ export default function AdminProductSuggestions() {
               {viewDetails.suggested_affiliate_link && (
                 <div>
                   <strong>Link:</strong>{" "}
-                  <a href={viewDetails.suggested_affiliate_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                    View Product
-                  </a>
+                  {isAllowedAffiliateUrl(viewDetails.suggested_affiliate_link) ? (
+                    <a href={viewDetails.suggested_affiliate_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                      View Product
+                    </a>
+                  ) : (
+                    <span className="text-red-600 break-all">{viewDetails.suggested_affiliate_link} (unverified link — not clickable)</span>
+                  )}
                 </div>
               )}
               <div><strong>Suggested By:</strong> {viewDetails.suggested_by}</div>

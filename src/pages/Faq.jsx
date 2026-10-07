@@ -31,7 +31,7 @@ export default function Faq() {
 
   return (
     <div className="bg-cream min-h-screen font-sans">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">

@@ -30,6 +30,7 @@ import {
   DownloadResourceButton,
   getPrintableResource,
 } from "@/components/manuals/PrintableResources";
+import { isAllowedAffiliateUrl } from "@/lib/affiliateUrl";
 
 const CATEGORY_COLORS = {
   water: "bg-blue-100 text-blue-800",
@@ -171,6 +172,9 @@ export default function Shopping() {
   };
 
   const handleAffiliateClick = async (rec) => {
+    // Only ever act on links that pass the shared scheme/host allow-list — never
+    // a javascript: or off-list URL that reached the catalog.
+    if (!isAllowedAffiliateUrl(rec.affiliate_link)) return;
     try {
       await base44.functions.invoke("trackAffiliateClick", {
         recommendationId: rec.id,
@@ -190,7 +194,7 @@ export default function Shopping() {
         is_required_item: !!rec.is_required,
       });
     }
-    window.open(rec.affiliate_link, "_blank");
+    window.open(rec.affiliate_link, "_blank", "noopener,noreferrer");
   };
 
   const openMarkOwned = (recId) => {
@@ -436,7 +440,7 @@ export default function Shopping() {
                         <CheckCircle2 className="w-4 h-4 mr-1" /> I already have this
                       </Button>
                     )}
-                    {rec.affiliate_link && (
+                    {rec.affiliate_link && isAllowedAffiliateUrl(rec.affiliate_link) && (
                       <Button
                         size="sm"
                         className="w-full bg-crimson hover:bg-crimson/90 text-white"

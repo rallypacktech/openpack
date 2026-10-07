@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { escapeHtml } from '../../shared/reminderUtils.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -77,23 +78,23 @@ Deno.serve(async (req) => {
       }
 
       // Build email body (HTML)
-      let body = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">Monthly Emergency Preparedness Update</h2><p>Hi ${user.full_name || "there"},</p>`;
+      let body = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#222;"><h1 style="font-size:1.1em;border-bottom:2px solid #222;padding-bottom:8px;">RallyPack</h1><h2 style="font-size:1em;">Monthly Emergency Preparedness Update</h2><p>Hi ${escapeHtml(user.full_name || "there")},</p>`;
 
       if (expired.length > 0) {
         body += `<p><strong>🚨 EXPIRED ITEMS — replace these now:</strong><br>`;
-        expired.forEach(i => { body += `• ${i.name} (expired ${new Date(i.date).toLocaleDateString()})<br>`; });
+        expired.forEach(i => { body += `• ${escapeHtml(i.name)} (expired ${new Date(i.date).toLocaleDateString()})<br>`; });
         body += `</p>`;
       }
 
       if (expiringSoon.length > 0) {
         body += `<p><strong>⚠️ EXPIRING SOON — replace within 30 days:</strong><br>`;
-        expiringSoon.forEach(i => { body += `• ${i.name} (expires ${new Date(i.date).toLocaleDateString()})<br>`; });
+        expiringSoon.forEach(i => { body += `• ${escapeHtml(i.name)} (expires ${new Date(i.date).toLocaleDateString()})<br>`; });
         body += `</p>`;
       }
 
       if (missingItems.length > 0) {
         body += `<p><strong>📦 MISSING ESSENTIALS — ${missingItems.length} recommended item${missingItems.length !== 1 ? "s" : ""} not yet in your inventory:</strong><br>`;
-        missingItems.slice(0, 10).forEach(i => { body += `• ${i.item_name} (${i.category})<br>`; });
+        missingItems.slice(0, 10).forEach(i => { body += `• ${escapeHtml(i.item_name)} (${escapeHtml(i.category)})<br>`; });
         if (missingItems.length > 10) body += `… and ${missingItems.length - 10} more.<br>`;
         body += `</p>`;
       }

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { safeAffiliateUrl } from '../../shared/affiliateUrl.ts';
 
 Deno.serve(async (req) => {
     try {
@@ -25,6 +26,13 @@ Deno.serve(async (req) => {
           suggestion = { ...suggestion, ...overrides };
         }
 
+        // Only a vetted https retail link may enter the catalog. Drop anything
+        // that fails validation so a submitted javascript:/phishing URL can
+        // never be opened by end users as a trusted "Buy Now" action.
+        const rawLink = suggestion.suggested_affiliate_link;
+        const safeLink = safeAffiliateUrl(rawLink);
+        const linkDropped = Boolean(rawLink) && !safeLink;
+
         // If original_recommendation_id exists, try to update it. If not found, fall through to create.
         let updated = false;
         if (suggestion.original_recommendation_id) {
@@ -42,7 +50,7 @@ Deno.serve(async (req) => {
                         fema_regions: suggestion.suggested_fema_regions,
                         disaster_types: suggestion.suggested_disaster_types,
                         family_member_types: suggestion.suggested_family_member_types,
-                        affiliate_link: suggestion.suggested_affiliate_link,
+                        affiliate_link: safeLink,
                         active: true
                     }
                 );
@@ -63,7 +71,7 @@ Deno.serve(async (req) => {
                 fema_regions: suggestion.suggested_fema_regions || [],
                 disaster_types: suggestion.suggested_disaster_types || [],
                 family_member_types: suggestion.suggested_family_member_types || [],
-                affiliate_link: suggestion.suggested_affiliate_link,
+                affiliate_link: safeLink,
                 source_organizations: suggestion.source_organizations || [],
                 active: true,
                 priority: 0
@@ -78,7 +86,10 @@ Deno.serve(async (req) => {
 
         return Response.json({
             success: true,
-            message: 'Suggestion approved and product recommendation updated'
+            message: linkDropped
+                ? 'Suggestion approved. The affiliate link failed validation and was removed — add a supported https retailer link if one is needed.'
+                : 'Suggestion approved and product recommendation updated',
+            link_dropped: linkDropped
         });
 
     } catch (error) {

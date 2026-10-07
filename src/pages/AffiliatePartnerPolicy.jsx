@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { isAllowedAffiliateUrl } from "@/lib/affiliateUrl";
 
 export default function AffiliatePartnerPolicy() {
   const [form, setForm] = useState({
@@ -24,6 +25,13 @@ export default function AffiliatePartnerPolicy() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Reject links that are not https on a supported retail host, so an
+    // unsafe scheme (javascript:, data:) or a look-alike domain never enters
+    // the review queue in the first place.
+    if (!isAllowedAffiliateUrl(form.affiliate_link)) {
+      toast.error("Please provide a valid https product link from a supported retailer.");
+      return;
+    }
     setSubmitting(true);
     try {
       await base44.entities.ProductRecommendationSuggestion.create({

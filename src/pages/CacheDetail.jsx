@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
+import { isAllowedAffiliateUrl } from "@/lib/affiliateUrl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1124,7 +1125,7 @@ export default function CacheDetail() {
                             Manage First Aid Kit
                           </Button>
                         ) : (
-                          rec.affiliate_link && (
+                          rec.affiliate_link && isAllowedAffiliateUrl(rec.affiliate_link) && (
                             <Button
                               onClick={() =>
                                 window.open(
