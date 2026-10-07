@@ -56,11 +56,20 @@ Deno.serve(async (req) => {
         const html = buildReferralEmailHtml(config);
         const text = buildReferralEmailText(config);
 
-        // Find referrals that haven't received the general email yet
+        // Cap each run so a large backlog can never flood the sending domain.
+        // Anything over the cap is left untouched and picked up next week.
+        const MAX_EMAILS_PER_RUN = 200;
+
+        // Find referrals that haven't received the general email yet. Bounced
+        // addresses are excluded so a dead mailbox is never retried.
         const allReferrals = await base44.asServiceRole.entities.BusinessReferral.filter({});
         const needsGeneral = allReferrals.filter(r =>
             !r.general_email_sent && r.status !== 'archived' && r.referee_email && !r.bounced
         );
+
+        const uniqueEmailCount = new Set(
+            needsGeneral.map(r => (r.referee_email || '').trim().toLowerCase()).filter(Boolean)
+        ).size;
 
         if (needsGeneral.length === 0) {
             return Response.json({
@@ -72,18 +81,21 @@ Deno.serve(async (req) => {
             });
         }
 
-        // Deduplicate by email — send once per unique address
+        // Deduplicate by email — send once per unique address, up to the cap
         const seenEmails = new Set();
         const contactedIds = [];
         let sent = 0;
         let failed = 0;
         let queued = 0;
+        let processed = 0;
         const errors = [];
 
         for (const r of needsGeneral) {
+            if (processed >= MAX_EMAILS_PER_RUN) break;
             const email = (r.referee_email || '').trim().toLowerCase();
             if (!email || seenEmails.has(email)) continue;
             seenEmails.add(email);
+            processed++;
 
             try {
                 const result = await sendViaResend(email, config.subject, html, text, base44, 'sendGeneralEmailCatchup');
@@ -107,13 +119,16 @@ Deno.serve(async (req) => {
             );
         }
 
+        const deferred = Math.max(0, uniqueEmailCount - processed);
+
         return Response.json({
             success: true,
             sent,
             queued,
             failed,
             total: needsGeneral.length,
-            message: `${sent} general email(s) sent. ${queued} queued (Resend cap). ${failed} failed.`,
+            deferred,
+            message: `${sent} general email(s) sent. ${queued} queued (Resend cap). ${failed} failed.${deferred > 0 ? ` ${deferred} deferred to next week.` : ''}`,
             errors: errors.length > 0 ? errors : undefined
         });
     } catch (error) {
