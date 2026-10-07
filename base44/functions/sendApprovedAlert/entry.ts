@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { verifyAlertDelegation } from '../../shared/alertDelegation.ts';
 
 // Dispatches an approved alert submission to all organization members.
 // Critical and custom alerts go to BOTH email and Telegram/Discord (bypassing user preferences).
@@ -133,10 +134,11 @@ Deno.serve(async (req) => {
       if (!delegation) {
         return Response.json({ error: 'Your organization is not authorized to dispatch alerts for this submission' }, { status: 403 });
       }
-      const subs = await base44.asServiceRole.entities.BusinessSubscription.filter({ id: submission.subscription_id });
-      const subscription = subs.length > 0 ? subs[0] : null;
-      if (!subscription || (subscription.status !== 'active' && subscription.status !== 'trialing') || !subscription.alert_sending_enabled) {
-        return Response.json({ error: 'Your organization subscription does not allow alert sending' }, { status: 403 });
+      // The grant is verified from the record's platform-set creator, not from the
+      // delegation row's own written fields.
+      const grant = await verifyAlertDelegation(base44.asServiceRole, delegation);
+      if (!grant.ok) {
+        return Response.json({ error: grant.error }, { status: grant.status });
       }
     }
 

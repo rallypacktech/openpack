@@ -2,10 +2,10 @@
 //
 // Scheduled workflow invocations carry the automation secret in a request header;
 // the body form is accepted too, for a direct invocation from a trusted caller.
-// The comparison is timing-safe so the secret cannot be recovered by measuring how
-// long a wrong value takes to reject.
+// Every comparison of the secret is timing-safe, so it cannot be recovered by
+// measuring how long a wrong value takes to reject.
 
-function timingSafeEqual(a, b) {
+export function timingSafeEqual(a, b) {
   const enc = new TextEncoder();
   const bufA = enc.encode(String(a));
   const bufB = enc.encode(String(b));
@@ -17,11 +17,16 @@ function timingSafeEqual(a, b) {
   return diff === 0;
 }
 
-/** True when the request proves it came from the app's own automation, not the public. */
-export function isAutomationRequest(req, body) {
+/** Constant-time check of a caller-supplied secret value against AUTOMATION_SECRET. */
+export function matchesAutomationSecret(candidate) {
   const secret = Deno.env.get('AUTOMATION_SECRET');
   if (!secret) return false;
+  return timingSafeEqual(candidate, secret);
+}
+
+/** True when the request proves it came from the app's own automation, not the public. */
+export function isAutomationRequest(req, body) {
   const headerSecret =
     req.headers.get('x-automation-secret') || req.headers.get('automation-secret');
-  return timingSafeEqual(headerSecret, secret) || timingSafeEqual(body?.automation_secret, secret);
+  return matchesAutomationSecret(headerSecret) || matchesAutomationSecret(body?.automation_secret);
 }

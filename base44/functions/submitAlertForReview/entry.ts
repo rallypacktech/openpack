@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { verifyAlertDelegation } from '../../shared/alertDelegation.ts';
 
 // Business submits an emergency alert for admin review.
 // Verifies the user has an active AlertDelegation and a subscription that allows alert sending.
@@ -45,20 +46,12 @@ Deno.serve(async (req) => {
 
     const delegation = delegations[0];
 
-    // Verify the linked subscription is active and allows alert sending
-    const subs = await base44.asServiceRole.entities.BusinessSubscription.filter({
-      id: delegation.subscription_id,
-    });
-    const subscription = subs.length > 0 ? subs[0] : null;
-
-    if (!subscription || (subscription.status !== 'active' && subscription.status !== 'trialing')) {
-      return Response.json({ error: 'Your organization subscription is not active.' }, { status: 403 });
-    }
-
-    if (!subscription.alert_sending_enabled) {
-      return Response.json({
-        error: 'Your subscription tier does not include emergency alert sending. Upgrade to Professional or Enterprise to submit alerts.',
-      }, { status: 403 });
+    // Verify the delegation was granted by an admin and that the linked subscription
+    // is active and allows alert sending. The grant is read from the record's
+    // platform-set creator, never from its own written fields.
+    const grant = await verifyAlertDelegation(base44.asServiceRole, delegation);
+    if (!grant.ok) {
+      return Response.json({ error: grant.error }, { status: grant.status });
     }
 
     // Verify the incident type is allowed for this delegation type

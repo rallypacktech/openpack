@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { matchesAutomationSecret } from '../../shared/automationAuth.ts';
 import {
   loadHoaTemplate, buildHoaEmailHtml, buildHoaEmailText, sendViaResend,
   loadProgress, saveProgress, pickNextState
@@ -11,9 +12,8 @@ Deno.serve(async (req: Request) => {
     const base44 = createClientFromRequest(req);
 
     // Auth: AUTOMATION_SECRET (scheduled automations) or authenticated admin
-    const automationSecret = Deno.env.get('AUTOMATION_SECRET');
     const headerSecret = req.headers.get('x-automation-secret') || req.headers.get('automation-secret');
-    if (!(headerSecret && automationSecret && headerSecret === automationSecret)) {
+    if (!matchesAutomationSecret(headerSecret)) {
       let user;
       try { user = await base44.auth.me(); } catch (_) { user = null; }
       if (!user || user.role !== 'admin') {

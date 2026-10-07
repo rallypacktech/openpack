@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { verifyAlertDelegation } from '../../shared/alertDelegation.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -25,21 +26,13 @@ Deno.serve(async (req) => {
 
     const delegation = delegations[0];
 
-    // Verify the delegation was actually granted by an admin and that the
-    // referenced subscription is entitled to send alerts, so a forged or stale
-    // delegation row cannot be used to broadcast to an organization's members.
-    if (!delegation.granted_by) {
-      return Response.json({ error: 'Delegation is missing an admin grant' }, { status: 403 });
-    }
-    const admins = await base44.asServiceRole.entities.User.filter({ role: 'admin' });
-    const adminEmails = new Set(admins.map(a => (a.email || '').toLowerCase()).filter(Boolean));
-    if (!adminEmails.has(delegation.granted_by.toLowerCase())) {
-      return Response.json({ error: 'Delegation was not granted by an admin' }, { status: 403 });
-    }
-    const subs = await base44.asServiceRole.entities.BusinessSubscription.filter({ id: delegation.subscription_id });
-    const subscription = subs.length > 0 ? subs[0] : null;
-    if (!subscription || (subscription.status !== 'active' && subscription.status !== 'trialing') || !subscription.alert_sending_enabled) {
-      return Response.json({ error: 'Organization subscription does not allow alert sending' }, { status: 403 });
+    // Verify the delegation was granted by an admin and that the referenced
+    // subscription is entitled to send alerts, so a forged or stale delegation row
+    // cannot be used to broadcast to an organization's members. The grant is read
+    // from the record's platform-set creator, never from its own written fields.
+    const grant = await verifyAlertDelegation(base44.asServiceRole, delegation);
+    if (!grant.ok) {
+      return Response.json({ error: grant.error }, { status: grant.status });
     }
 
     const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET");

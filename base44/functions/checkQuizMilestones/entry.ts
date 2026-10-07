@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import { escapeHtml } from '../../shared/reminderUtils.ts';
+import { isAutomationRequest } from '../../shared/automationAuth.ts';
 
 const MILESTONES = [500, 5000];
 
@@ -88,9 +89,8 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET");
     const body = await req.json().catch(() => ({}));
-    const isAutomation = AUTOMATION_SECRET && body.automation_secret === AUTOMATION_SECRET;
+    const isAutomation = isAutomationRequest(req, body);
 
     if (!isAutomation) {
       const user = await base44.auth.me();

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { matchesAutomationSecret } from '../../shared/automationAuth.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -10,7 +11,7 @@ Deno.serve(async (req) => {
     // must be authenticated and may only send to themselves (useful for testing).
     let targetEmail = user_email;
     let isInternalCall = false;
-    if (secret && secret === Deno.env.get("AUTOMATION_SECRET")) {
+    if (matchesAutomationSecret(secret)) {
       // internal call — use provided user_email
       isInternalCall = true;
     } else {
