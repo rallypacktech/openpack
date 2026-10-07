@@ -12,11 +12,16 @@ export default function FamilyStatuses() {
   useEffect(() => {
     loadStatuses();
 
-    // Subscribe to profile updates
+    // Profile updates fire constantly (the activity heartbeat rewrites last_active
+    // every 90s for every user online), so reload at most once a minute instead of
+    // once per event.
+    let lastReload = 0;
     const unsubscribe = base44.entities.UserProfile.subscribe((event) => {
-      if (event.type === 'update') {
-        loadStatuses();
-      }
+      if (event.type !== 'update') return;
+      const now = Date.now();
+      if (now - lastReload < 60000) return;
+      lastReload = now;
+      loadStatuses();
     });
 
     return unsubscribe;

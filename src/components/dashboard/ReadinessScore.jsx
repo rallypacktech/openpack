@@ -18,10 +18,12 @@ export default function ReadinessScore() {
     try {
       const [response, quizResults] = await Promise.all([
         base44.functions.invoke('calculateReadinessScore'),
-        base44.entities.QuizResult.list(),
+        // Only whether a quiz result exists matters here — one id is enough, so
+        // there's no reason to pull the whole quiz history on every dashboard load.
+        base44.entities.QuizResult.filter({}, { limit: 1, fields: ['id'] }),
       ]);
       setScoreData(response.data);
-      setHasQuizResult(quizResults.length > 0);
+      setHasQuizResult((quizResults.items || []).length > 0);
     } catch (error) {
       console.error('Error loading readiness score:', error);
     } finally {

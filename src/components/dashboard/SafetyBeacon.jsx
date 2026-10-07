@@ -1,5 +1,5 @@
 /* global pendo */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,12 +30,26 @@ export default function SafetyBeacon() {
   const [showRallyPicker, setShowRallyPicker] = useState(false);
   const [shareLinks, setShareLinks] = useState(null);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const profileIdRef = useRef(null);
 
   useEffect(() => {
     load();
-    // Subscribe to real-time profile updates
+    // Profile updates fire constantly: the activity heartbeat rewrites last_active
+    // every 90s for every user online, and an admin's subscription sees them all.
+    // Reloading on each one hammered the API, so the signed-in user's own update is
+    // merged straight into state (no request) and everyone else's is throttled to
+    // at most one reload a minute.
+    let lastReload = 0;
     const unsub = base44.entities.UserProfile.subscribe((event) => {
-      if (event.type === "update") load();
+      if (event.type !== "update" || !event.data) return;
+      if (event.data.id && event.data.id === profileIdRef.current) {
+        setProfile((prev) => ({ ...prev, ...event.data }));
+        return;
+      }
+      const now = Date.now();
+      if (now - lastReload < 60000) return;
+      lastReload = now;
+      load();
     });
     return unsub;
   }, []);
@@ -48,6 +62,7 @@ export default function SafetyBeacon() {
         base44.entities.UserProfile.filter({ created_by: u.email }),
         base44.entities.MeetSpot.list(),
       ]);
+      profileIdRef.current = profiles[0]?.id || null;
       setProfile(profiles[0] || null);
       setMeetSpots(spots);
 
