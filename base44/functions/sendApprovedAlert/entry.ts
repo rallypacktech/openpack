@@ -11,6 +11,13 @@ function escapeHtml(str) {
   return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
+// Collapses a value to a single line. The alert title is sent as an email subject,
+// so CR/LF must be stripped again here at the send boundary — a stored value cannot
+// be trusted to have been normalized at write time.
+function singleLine(str) {
+  return (str || '').replace(/[\r\n]+/g, ' ').trim();
+}
+
 function isSafeDiscordWebhookUrl(url) {
   if (!url || typeof url !== 'string') return false;
   try {
@@ -145,6 +152,8 @@ Deno.serve(async (req) => {
 
     const AUTOMATION_SECRET = Deno.env.get("AUTOMATION_SECRET");
     const eventTime = new Date().toISOString();
+    // Normalized once, then used for every sink (email subject/body, Telegram, Discord, in-app).
+    const alertTitle = singleLine(submission.generated_title);
     const isCriticalOrCustom = submission.event_level === 'critical' || submission.incident_type === 'custom';
 
     let emailDelivered = 0;
@@ -155,7 +164,7 @@ Deno.serve(async (req) => {
     let noContact = 0;
     const results = [];
 
-    const emailHtml = buildEmailHtml(submission.generated_title, submission.generated_body, submission.organization_name, submission.event_level);
+    const emailHtml = buildEmailHtml(alertTitle, submission.generated_body, submission.organization_name, submission.event_level);
 
     for (const member of members) {
       if (!member.email) continue;
@@ -201,7 +210,7 @@ Deno.serve(async (req) => {
           if (channel === 'email') {
             await base44.asServiceRole.integrations.Core.SendEmail({
               to: member.email,
-              subject: submission.generated_title,
+              subject: alertTitle,
               body: emailHtml,
             });
             emailDelivered++;
@@ -209,7 +218,7 @@ Deno.serve(async (req) => {
 
             // Also create an in-app notification record
             await base44.asServiceRole.entities.Notification.create({
-              title: submission.generated_title,
+              title: alertTitle,
               message: submission.generated_body,
               type: submission.event_level === 'critical' ? 'alert' : 'warning',
               recipient_email: member.email,
@@ -222,7 +231,7 @@ Deno.serve(async (req) => {
           } else if (channel === 'telegram') {
             const tgResult = await base44.asServiceRole.functions.invoke('sendTelegramAlert', {
               message: submission.generated_body,
-              event_type: submission.generated_title,
+              event_type: alertTitle,
               user_email: member.email,
               secret: AUTOMATION_SECRET,
               original_event_time: eventTime,
@@ -237,7 +246,7 @@ Deno.serve(async (req) => {
               if (isCriticalOrCustom && !channels.includes('email')) {
                 await base44.asServiceRole.integrations.Core.SendEmail({
                   to: member.email,
-                  subject: submission.generated_title,
+                  subject: alertTitle,
                   body: emailHtml,
                 });
                 emailDelivered++;
@@ -256,7 +265,7 @@ Deno.serve(async (req) => {
                 redirect: 'manual',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(buildDiscordPayload(
-                  submission.generated_title,
+                  alertTitle,
                   submission.generated_body,
                   submission.organization_name,
                   submission.event_level,
@@ -268,7 +277,7 @@ Deno.serve(async (req) => {
                 discordDelivered++;
                 memberResult.channels.discord = 'delivered';
                 await base44.asServiceRole.entities.Notification.create({
-                  title: submission.generated_title,
+                  title: alertTitle,
                   message: submission.generated_body,
                   type: submission.event_level === 'critical' ? 'alert' : 'warning',
                   recipient_email: member.email,
@@ -285,7 +294,7 @@ Deno.serve(async (req) => {
             }
           } else if (channel === 'in_app') {
             await base44.asServiceRole.entities.Notification.create({
-              title: submission.generated_title,
+              title: alertTitle,
               message: submission.generated_body,
               type: submission.event_level === 'critical' ? 'alert' : 'warning',
               recipient_email: member.email,

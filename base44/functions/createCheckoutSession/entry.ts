@@ -12,7 +12,10 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { items, cache_id, success_url, cancel_url, metadata } = await req.json();
+        // Caller-supplied metadata is intentionally ignored: the session metadata below is
+        // the fulfillment contract verifyCheckoutSession trusts, so it must be built
+        // exclusively from server-derived values.
+        const { items, cache_id, success_url, cancel_url } = await req.json();
 
         if (!Array.isArray(items) || items.length === 0) {
             return Response.json({ error: 'No items provided' }, { status: 400 });
@@ -70,8 +73,7 @@ Deno.serve(async (req) => {
             metadata: {
                 user_id: user.id,
                 cache_id: cache_id,
-                recommendation_ids: JSON.stringify(items.map(i => i.id)),
-                ...(metadata || {})
+                recommendation_ids: JSON.stringify(items.map(i => i.id))
             }
         });
 

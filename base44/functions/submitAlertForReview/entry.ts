@@ -4,6 +4,12 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 // Verifies the user has an active AlertDelegation and a subscription that allows alert sending.
 // Stores the generated unified message (title + body) on the submission for admin review.
 
+// Collapses a value to a single line. The title is later used as an email subject,
+// so CR/LF must never survive to that boundary.
+function singleLine(str) {
+  return (str || '').replace(/[\r\n]+/g, ' ').trim();
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -82,7 +88,7 @@ Deno.serve(async (req) => {
       target_area: target_area || '',
       instructions: instructions || '',
       custom_message: custom_message || '',
-      generated_title: generated_title || `${incident_type} ${event_level}`,
+      generated_title: singleLine(generated_title) || `${incident_type} ${event_level}`,
       generated_body: generated_body || custom_message || '',
       status: 'pending_review',
       payment_status: 'not_required',
