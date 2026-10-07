@@ -82,6 +82,10 @@
       "type": "boolean",
       "default": false,
       "description": "Whether email delivery to this referral bounced \u2014 flagged for cleanup so it stops triggering follow-up messages"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the referral came from. 'public_form' marks submissions from the anonymous web referral form, which are rate-limited separately from seeded/imported referrals."
     }
   },
   "required": [

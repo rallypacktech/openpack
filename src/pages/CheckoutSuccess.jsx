@@ -5,79 +5,66 @@ import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package } from "lucide-react";
+import { CheckCircle, Package, AlertCircle } from "lucide-react";
 
 export default function CheckoutSuccess() {
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(true);
+  const [order, setOrder] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get("session_id");
-    const cacheId = urlParams.get("cache_id");
-    const recIds = urlParams.get("rec_ids");
+    const sessionId = new URLSearchParams(window.location.search).get(
+      "session_id",
+    );
 
-    if (sessionId && cacheId && recIds) {
-      processOrder(cacheId, recIds.split(","));
-    } else {
+    if (!sessionId) {
       setProcessing(false);
+      setError("We couldn't find a checkout session for this page.");
+      return;
     }
+
+    // Fulfillment is confirmed server-side against Stripe. The URL parameters alone
+    // never mark anything as purchased.
+    (async () => {
+      try {
+        const res = await base44.functions.invoke("verifyCheckoutSession", {
+          session_id: sessionId,
+        });
+        const data = res.data || {};
+
+        if (!data.success) {
+          setError(data.error || "We couldn't verify this payment.");
+          return;
+        }
+
+        setOrder(data);
+
+        if (typeof pendo !== "undefined") {
+          pendo.track("checkout_completed", {
+            item_count: data.item_count || 0,
+            cache_id: data.cache_id || "",
+          });
+        }
+        // Google Ads PURCHASE — only after the server has confirmed the payment.
+        if (typeof window !== "undefined" && window.gtag) {
+          window.gtag("event", "conversion", {
+            send_to: "AW-18405445520/mfsYCOvFl-YcEJCfs8hE",
+            value: (data.total_cents || 0) / 100,
+            currency: "USD",
+            transaction_id: sessionId,
+          });
+        }
+      } catch (e) {
+        console.error("Error verifying order:", e);
+        setError(
+          "We couldn't verify this payment. If you were charged, please contact support.",
+        );
+      } finally {
+        setProcessing(false);
+      }
+    })();
   }, []);
-
-  const processOrder = async (cacheId, recIds) => {
-    try {
-      // Get recommendations
-      const recs = await base44.entities.ProductRecommendation.list();
-
-      for (const recId of recIds) {
-        const rec = recs.find((r) => r.id === recId);
-        if (!rec) continue;
-
-        // Mark as purchased
-        await base44.entities.UserCacheProgress.create({
-          cache_id: cacheId,
-          recommendation_id: recId,
-          status: "purchased",
-          purchased_at: new Date().toISOString(),
-        });
-
-        // Add to cache
-        await base44.entities.CacheItem.create({
-          cache_id: cacheId,
-          item_name: rec.item_name,
-          quantity: rec.quantity,
-          category: rec.category,
-          notes: "Purchased via Stripe checkout",
-        });
-      }
-      if (typeof pendo !== "undefined") {
-        pendo.track("checkout_completed", {
-          item_count: recIds.length,
-          cache_id: cacheId,
-        });
-      }
-      // Google Ads PURCHASE — product checkout completed.
-      const _urlParams = new URLSearchParams(window.location.search);
-      const _sessionId = _urlParams.get("session_id");
-      const _totalCents = recIds.reduce((sum, recId) => {
-        const rec = recs.find((r) => r.id === recId);
-        return sum + (rec ? (rec.price_cents || 0) * (rec.quantity || 1) : 0);
-      }, 0);
-      if (typeof window !== "undefined" && window.gtag) {
-        const payload = {
-          send_to: "AW-18405445520/mfsYCOvFl-YcEJCfs8hE",
-          value: _totalCents / 100,
-          currency: "USD",
-        };
-        if (_sessionId) payload.transaction_id = _sessionId;
-        window.gtag("event", "conversion", payload);
-      }
-    } catch (error) {
-      console.error("Error processing order:", error);
-    } finally {
-      setProcessing(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -87,9 +74,25 @@ export default function CheckoutSuccess() {
             <>
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <h2 className="text-xl font-semibold mb-2">
-                Processing your order...
+                Confirming your payment...
               </h2>
-              <p className="text-gray-600">Adding items to your cache</p>
+              <p className="text-gray-600">Verifying with our payment provider</p>
+            </>
+          ) : error ? (
+            <>
+              <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">
+                We couldn't confirm this order
+              </h2>
+              <p className="text-gray-600 mb-6">{error}</p>
+              <div className="flex flex-col gap-3">
+                <Button
+                  onClick={() => navigate(createPageUrl("Resources"))}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  Back to Resources
+                </Button>
+              </div>
             </>
           ) : (
             <>
@@ -100,19 +103,19 @@ export default function CheckoutSuccess() {
                 cache.
               </p>
               <div className="flex flex-col gap-3">
-                <Button
-                  onClick={() => {
-                    const urlParams = new URLSearchParams(
-                      window.location.search,
-                    );
-                    const cacheId = urlParams.get("cache_id");
-                    navigate(createPageUrl("CacheDetail") + "?id=" + cacheId);
-                  }}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Package className="w-4 h-4 mr-2" />
-                  View Cache
-                </Button>
+                {order?.cache_id && (
+                  <Button
+                    onClick={() =>
+                      navigate(
+                        createPageUrl("CacheDetail") + "?id=" + order.cache_id,
+                      )
+                    }
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Package className="w-4 h-4 mr-2" />
+                    View Cache
+                  </Button>
+                )}
                 <Button
                   onClick={() => navigate(createPageUrl("Resources"))}
                   variant="outline"

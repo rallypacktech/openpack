@@ -22,18 +22,44 @@ export default async function (req) {
       return Response.json({ error: 'Organization not found' }, { status: 404 });
     }
 
+    const isAdmin = user.role === 'admin';
     const isOwner =
       subscription.created_by_id === user.id || subscription.owner_email === user.email;
-    if (!isOwner && user.role !== 'admin') {
+    if (!isOwner && !isAdmin) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Entitlement: only an active subscription whose plan allows alert sending may
+    // dispatch branded incident alerts. Without this a self-created trial account
+    // could send attacker-written "INCIDENT ALERT" mail under RallyPack's brand.
+    if (
+      !isAdmin &&
+      ((subscription.status !== 'active' && subscription.status !== 'trialing') ||
+        !subscription.alert_sending_enabled)
+    ) {
+      return Response.json({ error: 'Your organization subscription does not allow alert sending' }, { status: 403 });
     }
 
     const members = await base44.asServiceRole.entities.OrganizationMember.filter({
       subscription_id: subscriptionId,
     });
-    const toNotify = members.filter(
-      (m) => m.notify_on_evacuation && m.status !== 'inactive' && m.email,
+
+    // Recipients are restricted to registered RallyPack accounts. A member row is
+    // only an address someone typed in, so on its own it must never be enough to
+    // make the app deliver branded emergency mail to an outside mailbox.
+    const allUsers = await base44.asServiceRole.entities.User.list();
+    const registeredEmails = new Set(
+      allUsers.filter((u) => u.email).map((u) => u.email.toLowerCase()),
     );
+    const seenEmails = new Set();
+    const toNotify = [];
+    for (const member of members) {
+      if (!member.notify_on_evacuation || member.status === 'inactive' || !member.email) continue;
+      const key = String(member.email).trim().toLowerCase();
+      if (!key || seenEmails.has(key) || !registeredEmails.has(key)) continue;
+      seenEmails.add(key);
+      toNotify.push(member);
+    }
 
     const orgName = subscription.organization_name || 'Your Organization';
     const areaNote = body.postal_code

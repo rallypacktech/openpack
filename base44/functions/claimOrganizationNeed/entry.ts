@@ -51,10 +51,24 @@ Deno.serve(async (req) => {
     // Notify the asking business that their need was claimed. Every field below is set by
     // the need's poster, so it is escaped before reaching the HTML email body.
     const contactEmail = String(need.contact_email || need.posted_by_email || '').trim();
-    if (EMAIL_PATTERN.test(contactEmail)) {
+
+    // The notification recipient is resolved from the platform-set creator id — the
+    // account that actually posted the need — never from the free-form contact field,
+    // so a poster cannot route this branded mail to an address of their choosing.
+    let recipientEmail = '';
+    try {
+      if (need.created_by_id) {
+        const posters = await base44.asServiceRole.entities.User.filter({ id: need.created_by_id });
+        recipientEmail = String(posters[0]?.email || '').trim();
+      }
+    } catch (e) {
+      // Poster account unresolvable — skip the notification rather than guess an address.
+    }
+
+    if (recipientEmail && EMAIL_PATTERN.test(recipientEmail)) {
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({
-          to: contactEmail,
+          to: recipientEmail,
           subject: `${singleLine(claimerOrg)} has claimed your need: ${singleLine(need.need_title)}`,
           body: `Hello ${escapeHtml(need.organization_name)},\n\n${escapeHtml(claimerOrg)} (${escapeHtml(user.email)}) has claimed your posted need on the RallyPack Needs Board.\n\nNeed: ${escapeHtml(need.need_title)}\nDescription: ${escapeHtml(need.need_description)}\n\nPlease contact them directly to coordinate:\n  Email: ${escapeHtml(user.email)}\n\nOnce the need is fulfilled, you can mark it as filled or remove it from the Needs Board in your Business Dashboard.\n\n— RallyPack`,
         });
