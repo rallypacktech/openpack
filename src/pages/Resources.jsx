@@ -44,16 +44,23 @@ export default function Resources() {
   }, []);
 
   const loadData = async () => {
-    try {
-      const user = await base44.auth.me();
-      const [cachesResponse, spotsResponse] = await Promise.all([
-        base44.functions.invoke('getCaches'),
-        base44.functions.invoke('getMeetSpots'),
-      ]);
+    const user = await base44.auth.me();
 
+    // Meeting spots are read straight from the database, so a spot you just
+    // saved always shows up. The sharing helper only adds spots from pack
+    // members when it's available.
+    let spots = [];
+    try {
+      const spotsResponse = await base44.functions.invoke('getMeetSpots');
+      spots = spotsResponse.data.spots || [];
+    } catch (_e) {
+      spots = await base44.entities.MeetSpot.filter({ created_by: user.email });
+    }
+    setMeetSpots(spots);
+
+    try {
+      const cachesResponse = await base44.functions.invoke('getCaches');
       setCaches(cachesResponse.data.caches);
-      setMeetSpots(spotsResponse.data.spots);
-      setLoading(false);
 
       const ownCaches = cachesResponse.data.caches.filter(c => c.created_by === user.email);
       if (!samplesCreated && ownCaches.length === 0) {
@@ -64,8 +71,9 @@ export default function Resources() {
       }
     } catch (error) {
       console.error("Error loading data:", error);
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const handleAddCache = async (data) => { await base44.entities.EmergencyCache.create(data); loadData(); };
