@@ -210,10 +210,27 @@ export default function Dashboard() {
       setDataLoaded(true);
       setLoading(false);
 
+      // Caches and meet spots are read straight from the database so they still
+      // show up when the sharing helpers aren't reachable.
+      const loadOwnCaches = async () => {
+        try {
+          return (await base44.functions.invoke("getCaches")).data.caches;
+        } catch (_e) {
+          return await base44.entities.EmergencyCache.filter({ created_by: user.email });
+        }
+      };
+      const loadOwnMeetSpots = async () => {
+        try {
+          return (await base44.functions.invoke("getMeetSpots")).data.spots;
+        } catch (_e) {
+          return await base44.entities.MeetSpot.filter({ created_by: user.email });
+        }
+      };
+
       // Load everything else in background
       Promise.all([
-        base44.functions.invoke("getCaches"),
-        base44.functions.invoke("getMeetSpots"),
+        loadOwnCaches(),
+        loadOwnMeetSpots(),
         base44.entities.FirstAidItem.filter({ created_by: user.email }),
         base44.entities.Notification.filter(
           { created_by: user.email },
@@ -226,10 +243,7 @@ export default function Dashboard() {
           3,
         ),
       ]).then(
-        ([cachesResponse, spotsResponse, firstAidData, notifData, allRecs]) => {
-          const cachesData = cachesResponse.data.caches;
-          const filteredSpots = spotsResponse.data.spots;
-
+        ([cachesData, filteredSpots, firstAidData, notifData, allRecs]) => {
           setCaches(cachesData);
           setMeetSpots(filteredSpots);
           setFirstAidItems(firstAidData);

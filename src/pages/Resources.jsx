@@ -58,11 +58,18 @@ export default function Resources() {
     }
     setMeetSpots(spots);
 
+    // Caches come straight from the database so they still show up when the
+    // sharing helper isn't reachable.
+    let caches = [];
     try {
-      const cachesResponse = await base44.functions.invoke('getCaches');
-      setCaches(cachesResponse.data.caches);
+      caches = (await base44.functions.invoke('getCaches')).data.caches;
+    } catch (_e) {
+      caches = await base44.entities.EmergencyCache.filter({ created_by: user.email });
+    }
+    setCaches(caches);
 
-      const ownCaches = cachesResponse.data.caches.filter(c => c.created_by === user.email);
+    try {
+      const ownCaches = caches.filter(c => c.created_by === user.email);
       if (!samplesCreated && ownCaches.length === 0) {
         setSamplesCreated(true);
         base44.functions.invoke('generateSampleCaches').then(() => {

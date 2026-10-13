@@ -33,19 +33,35 @@ export default function SharePlan() {
       try {
         const u = await base44.auth.me();
         setUser(u);
-        const [profileData, cachesResp, spotsResp, membersData, petsData, handlersData] =
+        // Caches and spots are read straight from the database so the plan still
+        // builds when the sharing helpers aren't reachable.
+        const loadCaches = async () => {
+          try {
+            return (await base44.functions.invoke("getCaches")).data.caches || [];
+          } catch (_e) {
+            return await base44.entities.EmergencyCache.filter({ created_by: u.email });
+          }
+        };
+        const loadSpots = async () => {
+          try {
+            return (await base44.functions.invoke("getMeetSpots")).data.spots || [];
+          } catch (_e) {
+            return await base44.entities.MeetSpot.filter({ created_by: u.email });
+          }
+        };
+        const [profileData, caches, spots, membersData, petsData, handlersData] =
           await Promise.all([
             base44.entities.UserProfile.filter({ created_by: u.email }),
-            base44.functions.invoke("getCaches"),
-            base44.functions.invoke("getMeetSpots"),
+            loadCaches(),
+            loadSpots(),
             base44.entities.FamilyMember.filter({ created_by: u.email }),
             base44.entities.Pet.filter({ created_by: u.email }),
             base44.entities.AuthorizedHandler.filter({ created_by: u.email }),
           ]);
         const p = profileData[0] || null;
         setProfile(p);
-        setCaches(cachesResp.data.caches || []);
-        setMeetSpots(spotsResp.data.spots || []);
+        setCaches(caches || []);
+        setMeetSpots(spots || []);
         setFamilyMembers(membersData);
         setPets(petsData);
 
@@ -73,9 +89,9 @@ export default function SharePlan() {
         if (p?.city) lines.push(`Location: ${p.city}, ${p.state_province}`);
         lines.push("");
 
-        if (spotsResp.data.spots?.length) {
+        if (spots?.length) {
           lines.push("--- MEETING SPOTS ---");
-          spotsResp.data.spots.forEach((s) => {
+          spots.forEach((s) => {
             lines.push(
               `• ${s.is_primary ? "[PRIMARY] " : ""}${s.name}${s.address ? " — " + s.address : ""}`,
             );
@@ -84,9 +100,9 @@ export default function SharePlan() {
           lines.push("");
         }
 
-        if (cachesResp.data.caches?.length) {
+        if (caches?.length) {
           lines.push("--- EMERGENCY CACHES ---");
-          cachesResp.data.caches.forEach((c) => {
+          caches.forEach((c) => {
             lines.push(
               `• ${c.name} (${c.cache_type?.replace("_", " ")}) — Location: ${c.location}`,
             );
