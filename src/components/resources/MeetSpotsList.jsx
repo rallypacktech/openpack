@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { base44 } from "@/api/base44Client";
+import { useToast } from "@/components/ui/use-toast";
 import MeetSpotFinder from "./MeetSpotFinder";
 import MeetSpotFormDialog from "./MeetSpotFormDialog";
 
@@ -57,6 +58,8 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   const [recommendations, setRecommendations] = useState([]);
   const [rallyPoints, setRallyPoints] = useState([]);
   const [formData, setFormData] = useState(emptyForm);
+  const [selectingPlaceId, setSelectingPlaceId] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -147,37 +150,114 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
   };
 
   const handleSave = async () => {
+    const lat = parseFloat(formData.latitude);
+    const lon = parseFloat(formData.longitude);
+    // Only the fields a MeetSpot record actually has — and coordinates only
+    // when we really have them (manual entries often don't).
     const data = {
-      ...formData,
-      latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-      longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+      name: formData.name.trim(),
+      address:
+        formData.address ||
+        [
+          formData.street_address,
+          formData.city,
+          formData.state_province,
+          formData.postal_code,
+          formData.country,
+        ]
+          .filter(Boolean)
+          .join(", "),
+      description: formData.description || "",
+      is_primary: !!formData.is_primary,
+      ...(Number.isFinite(lat) && Number.isFinite(lon)
+        ? { latitude: lat, longitude: lon }
+        : {}),
     };
 
-    if (editingSpot) {
-      await onUpdate(editingSpot.id, data);
-    } else {
-      await onAdd(data);
-      if (typeof pendo !== "undefined") {
-        pendo.track("meet_spot_created", {
-          name: data.name,
-          is_primary: !!data.is_primary,
-          has_coordinates: !!(data.latitude && data.longitude),
-          source: editingSpot ? "edit" : "manual",
-        });
+    try {
+      if (editingSpot) {
+        await onUpdate(editingSpot.id, data);
+      } else {
+        await onAdd(data);
+        if (typeof pendo !== "undefined") {
+          pendo.track("meet_spot_created", {
+            name: data.name,
+            is_primary: !!data.is_primary,
+            has_coordinates: !!(data.latitude && data.longitude),
+            source: "manual",
+          });
+        }
       }
+    } catch (e) {
+      toast({
+        title: "Couldn't save this meeting spot",
+        description: e?.message || "Please try again.",
+        variant: "destructive",
+      });
+      return;
     }
     setDialogOpen(false);
     resetForm();
   };
 
   // A real place picked from the map opens the same form, prefilled for review.
-  const handleSelectPlace = (place) => {
+  // Map entries often carry only a street, so we complete city / state / postal
+  // with one reverse lookup before showing the form.
+  const handleSelectPlace = async (place) => {
+    setSelectingPlaceId(place.id);
+    let parts = {
+      street: place.street || "",
+      city: place.city || "",
+      state_province: place.stateProvince || "",
+      postal_code: place.postalCode || "",
+      country: place.country || "",
+    };
+
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${place.latitude}&lon=${place.longitude}&format=json&addressdetails=1`,
+      );
+      if (res.ok) {
+        const a = (await res.json()).address || {};
+        parts = {
+          street:
+            [a.house_number, a.road].filter(Boolean).join(" ") || parts.street,
+          city:
+            a.city ||
+            a.town ||
+            a.village ||
+            a.municipality ||
+            a.county ||
+            parts.city,
+          state_province:
+            a.state || a.province || a.region || parts.state_province,
+          postal_code: a.postcode || parts.postal_code,
+          country: a.country || parts.country,
+        };
+      }
+    } catch (_e) {
+      /* the form still opens with whatever the map entry provided */
+    }
+
+    setSelectingPlaceId("");
     setEditingSpot(null);
     setFormData({
       ...emptyForm,
       name: place.name,
-      address: place.address || "",
-      street_address: place.address || "",
+      address: [
+        parts.street,
+        parts.city,
+        parts.state_province,
+        parts.postal_code,
+        parts.country,
+      ]
+        .filter(Boolean)
+        .join(", "),
+      street_address: parts.street,
+      city: parts.city,
+      state_province: parts.state_province,
+      postal_code: parts.postal_code,
+      country: parts.country,
       latitude: place.latitude.toString(),
       longitude: place.longitude.toString(),
       description: `${place.kindLabel}, ${place.distanceKm.toFixed(1)} km ${place.direction} of home.`,
@@ -338,6 +418,7 @@ export default function MeetSpotsList({ spots, onAdd, onUpdate, onDelete }) {
           }
           onSelect={handleSelectPlace}
           onManual={openAddDialog}
+          selectingId={selectingPlaceId}
         />
       )}
 

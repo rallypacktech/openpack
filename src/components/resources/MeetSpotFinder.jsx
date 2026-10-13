@@ -78,13 +78,13 @@ function parseElements(elements, home) {
         id: `${el.type}/${el.id}`,
         name: el.tags.name,
         kindLabel: KIND_LABELS[kind] || "Place",
-        address: [
-          el.tags["addr:housenumber"],
-          el.tags["addr:street"],
-          el.tags["addr:city"],
-        ]
+        street: [el.tags["addr:housenumber"], el.tags["addr:street"]]
           .filter(Boolean)
           .join(" "),
+        city: el.tags["addr:city"] || "",
+        stateProvince: el.tags["addr:state"] || "",
+        postalCode: el.tags["addr:postcode"] || "",
+        country: el.tags["addr:country"] || "",
         latitude: lat,
         longitude: lon,
         distanceKm: distanceKm(home.lat, home.lon, lat, lon),
@@ -95,7 +95,7 @@ function parseElements(elements, home) {
     .sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
-export default function MeetSpotFinder({ homeCoords, missingDirections, onSelect, onManual }) {
+export default function MeetSpotFinder({ homeCoords, missingDirections, onSelect, onManual, selectingId }) {
   const [places, setPlaces] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -255,9 +255,16 @@ export default function MeetSpotFinder({ homeCoords, missingDirections, onSelect
                       <p className="text-xs font-sans text-muted-foreground mt-0.5">
                         {place.kindLabel} · {place.distanceKm.toFixed(1)} km away
                       </p>
-                      {place.address && (
+                      {(place.street || place.city) && (
                         <p className="text-xs font-sans text-muted-foreground mt-0.5 truncate">
-                          {place.address}
+                          {[
+                            place.street,
+                            place.city,
+                            place.stateProvince,
+                            place.postalCode,
+                          ]
+                            .filter(Boolean)
+                            .join(", ")}
                         </p>
                       )}
                       <a
@@ -274,9 +281,17 @@ export default function MeetSpotFinder({ homeCoords, missingDirections, onSelect
                       size="sm"
                       variant="outline"
                       className="shrink-0 text-xs"
+                      disabled={selectingId === place.id}
                       onClick={() => onSelect(place)}
                     >
-                      Use this
+                      {selectingId === place.id ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Loading
+                        </>
+                      ) : (
+                        "Use this"
+                      )}
                     </Button>
                   </li>
                 ))}
