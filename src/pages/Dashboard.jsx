@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [handlers, setHandlers] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [familyStepCompleted, setFamilyStepCompleted] = useState(false);
+  const [meetSpotsStepCompleted, setMeetSpotsStepCompleted] = useState(false);
   const [handlersStepCompleted, setHandlersStepCompleted] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [locationForm, setLocationForm] = useState({
@@ -653,6 +654,7 @@ export default function Dashboard() {
   const needsMeetSpots =
     dataLoaded &&
     meetSpots.length === 0 &&
+    !meetSpotsStepCompleted &&
     !needsAddress &&
     !needsFamilySetup &&
     !isEstablishedUser;
@@ -1038,41 +1040,23 @@ export default function Dashboard() {
                   <span className="text-2xl">📍</span>
                 </div>
                 <h2 className="font-serif text-2xl font-semibold text-foreground mb-2">
-                  Step 3: Define Meeting Spots
+                  Step 3: Pick Meeting Spots
                 </h2>
                 <p className="text-muted-foreground font-sans text-sm max-w-md mx-auto">
-                  When cell service fails, where will your family meet?
+                  If phones stop working, where will your household meet? Choose
+                  one safe, well-known place in each direction from home.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="bg-secondary/50 p-4 rounded">
-                  <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
-                    Why it's essential:
-                  </h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>
-                      • <strong>Cell service goes down</strong> in
-                      emergencies—you can't rely on phones
-                    </li>
-                    <li>
-                      • Family members may be separated at work, school, or on
-                      the road
-                    </li>
-                    <li>
-                      • Having predetermined spots in all directions prevents
-                      confusion
-                    </li>
-                    <li>
-                      • FEMA recommends multiple meetup locations for different
-                      scenarios
-                    </li>
-                  </ul>
-                </div>
-                <div className="bg-primary/5 border-l-2 border-primary p-4 rounded-r">
-                  <p className="text-sm font-sans text-foreground">
-                    <strong>Real scenario:</strong> During Hurricane Harvey,
-                    families couldn't contact each other for days. Those with
-                    pre-planned meeting spots reunited faster.
+                  <p className="font-sans font-semibold text-foreground text-sm mb-2">
+                    What you'll set up
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    One spot in each direction —{" "}
+                    <strong>North, East, South, and West</strong>. We'll show you
+                    real places near your home so you can pick one and confirm
+                    the details.
                   </p>
                 </div>
                 <button
@@ -1081,10 +1065,17 @@ export default function Dashboard() {
                   }
                   className="w-full bg-foreground text-background hover:bg-foreground/90 py-3 rounded font-sans font-semibold transition-colors"
                 >
-                  Set Up Meeting Spots Now
+                  Set Up Meeting Spots
                 </button>
+                <Button
+                  variant="outline"
+                  onClick={() => setMeetSpotsStepCompleted(true)}
+                  className="w-full font-sans font-semibold py-3"
+                >
+                  Skip for now
+                </Button>
                 <p className="text-xs text-muted-foreground text-center font-sans">
-                  Manage in Resources → Meet Spots
+                  Manage anytime in Resources → Meet Spots
                 </p>
               </div>
             </article>
