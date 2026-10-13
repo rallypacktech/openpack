@@ -48,9 +48,6 @@
           "data.receiver_id": "{{user.id}}"
         },
         {
-          "data.receiver_id": "family"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
@@ -61,6 +58,9 @@
       "$or": [
         {
           "data.sender_id": "{{user.id}}"
+        },
+        {
+          "data.receiver_id": "{{user.id}}"
         },
         {
           "user_condition": {
