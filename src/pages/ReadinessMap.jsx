@@ -3,7 +3,8 @@ import { base44 } from "@/api/base44Client";
 import ReadinessMapView from "@/components/readiness/ReadinessMapView";
 import TopAreasLists from "@/components/readiness/TopAreasLists";
 import ReadinessQuizCta from "@/components/readiness/ReadinessQuizCta";
-import { Globe, ChevronRight, Loader2, MapPin } from "lucide-react";
+import { readReadinessSnapshot, refreshReadinessSnapshots } from "@/lib/readinessAggregates";
+import { Globe, ChevronRight, Loader2, MapPin, RefreshCw } from "lucide-react";
 
 const LEVEL_LABELS = {
   global: "Countries",
@@ -26,30 +27,65 @@ export default function ReadinessMap() {
   ]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const res = await base44.functions.invoke("getReadinessAverages", {
+    base44.auth
+      .me()
+      .then((u) => setIsAdmin(u?.role === "admin"))
+      .catch(() => setIsAdmin(false));
+  }, []);
+
+  const loadSnapshot = async () => {
+    setLoading(true);
+    try {
+      const payload = await readReadinessSnapshot({
+        level,
+        country_name: filters.country_name || null,
+        admin1_name: filters.admin1_name || null,
+        admin2_name: filters.admin2_name || null,
+      });
+      setData(
+        payload || {
           level,
-          country_name: filters.country_name || null,
-          admin1_name: filters.admin1_name || null,
-          admin2_name: filters.admin2_name || null,
-        });
-        if (!cancelled && res.data) setData(res.data);
-      } catch (e) {
-        console.error("Failed to load readiness data:", e);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    load();
-    return () => {
-      cancelled = true;
-    };
+          locations: [],
+          top5_best: [],
+          top5_worst: [],
+          global_average: 0,
+          total_responses: 0,
+        }
+      );
+    } catch (e) {
+      console.error("Failed to load readiness data:", e);
+      setData({
+        level,
+        locations: [],
+        top5_best: [],
+        top5_worst: [],
+        global_average: 0,
+        total_responses: 0,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSnapshot();
   }, [level, JSON.stringify(filters)]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refreshReadinessSnapshots();
+      await loadSnapshot();
+    } catch (e) {
+      console.error("Failed to refresh readiness data:", e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleDrillDown = (loc) => {
     const nextLevel = NEXT_LEVEL[level];
@@ -88,6 +124,16 @@ export default function ReadinessMap() {
             See how average readiness scores compare across the world. Drill down
             from country to postal code to find out where your neighborhood stands.
           </p>
+          {isAdmin && (
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="mt-4 inline-flex items-center gap-2 text-xs font-sans font-medium text-muted-foreground hover:text-foreground border border-border rounded px-3 py-1.5 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Refreshing…" : "Refresh map data"}
+            </button>
+          )}
         </div>
 
         {/* Global stats bar */}
