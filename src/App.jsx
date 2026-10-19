@@ -40,6 +40,7 @@ const GlobalCompliance = lazy(() => import('./pages/GlobalCompliance'));
 const ResponderTraining = lazy(() => import('./pages/ResponderTraining'));
 const Faq = lazy(() => import('./pages/Faq'));
 const Sitemap = lazy(() => import('./pages/Sitemap'));
+const GrowthRoadmap = lazy(() => import('./pages/GrowthRoadmap'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -113,6 +114,7 @@ const AuthenticatedApp = () => {
           ))
         }
         <Route path="/TrackedItems" element={<LayoutWrapper currentPageName="TrackedItems"><TrackedItems /></LayoutWrapper>} />
+          <Route path="/GrowthRoadmap" element={<LayoutWrapper currentPageName="GrowthRoadmap"><GrowthRoadmap /></LayoutWrapper>} />
           <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
           <Route path="/AgentAssistant" element={<LayoutWrapper currentPageName="AgentAssistant"><AgentAssistant /></LayoutWrapper>} />
       </Route>

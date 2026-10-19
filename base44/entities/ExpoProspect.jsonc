@@ -1,0 +1,100 @@
+{
+  "name": "ExpoProspect",
+  "type": "object",
+  "properties": {
+    "organization_name": {
+      "type": "string",
+      "description": "Name of the exhibitor, speaker's organization, or agency being tracked for manual outreach"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Name of the person to approach, as listed by the source"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Email address for the contact, once verified \u2014 never scraped or guessed"
+    },
+    "contact_role": {
+      "type": "string",
+      "description": "The person's role or title as listed by the source"
+    },
+    "partnership_fit": {
+      "type": "string",
+      "enum": [
+        "forecast_inputs",
+        "resource_distribution",
+        "county_partnership",
+        "funding_referral",
+        "communications",
+        "training",
+        "housing_resilience",
+        "other"
+      ],
+      "default": "other",
+      "description": "Which kind of partnership fit this contact represents"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium",
+      "description": "How urgently this contact should be worked"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "identified",
+        "contacted",
+        "in_conversation",
+        "partnered",
+        "declined"
+      ],
+      "default": "identified",
+      "description": "Where this prospect stands in the manual outreach process"
+    },
+    "conversation_goal": {
+      "type": "string",
+      "description": "Suggested goal for the first conversation"
+    },
+    "rallypack_need": {
+      "type": "string",
+      "description": "What RallyPack would want from this contact"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the contact came from, e.g. 'Disasters Expo Texas 2026 \u2014 exhibitor' or '\u2014 agenda speaker'"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form notes from outreach attempts"
+    }
+  },
+  "required": [
+    "organization_name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

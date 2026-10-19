@@ -16,6 +16,7 @@ import {
   X,
   Users,
   Building2,
+  TrendingUp,
   Lock } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -114,7 +115,8 @@ export default function Layout({ children, currentPageName }) {
 
   if (isAdmin) {
     allNavItems.push(
-      { name: "Monitor", page: "AdminMonitor", icon: Users, requiresAuth: true }
+      { name: "Monitor", page: "AdminMonitor", icon: Users, requiresAuth: true },
+      { name: "Roadmap", page: "GrowthRoadmap", icon: TrendingUp, requiresAuth: true }
     );
   }
 

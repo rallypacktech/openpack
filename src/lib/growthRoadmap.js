@@ -1,0 +1,210 @@
+// The approved RallyPack growth and engagement roadmap, phased sign-up-growth-first
+// with explicit dependencies, success metrics and tradeoffs.
+
+export const ROADMAP_PHASES = [
+  {
+    id: "phase-1",
+    label: "Phase 1 — Foundations & measurement",
+    signupLift: false,
+    goal: "You cannot grow sign-ups you cannot measure, and un-consented tracking is a liability. Do this before any campaign spend.",
+    items: [
+      "Gate Google Ads and Analytics behind a consent prompt so nothing fires before the visitor agrees.",
+      "Establish a baseline: readiness-quiz starts → sign-ups, and sign-up → first cache created.",
+      "Fix the onboarding stuck state that leaves a new account without a profile record.",
+      "Confirm currency and tax handling before paid business tiers are promoted internationally.",
+    ],
+    metrics: [
+      "Baseline visitor → sign-up conversion rate",
+      "Share of new accounts that complete a profile",
+      "Consent captured before any tracking event fires",
+    ],
+    dependsOn: [],
+    tradeoff: "Delays launching ads, but every later number becomes trustworthy.",
+  },
+  {
+    id: "phase-2",
+    label: "Phase 2 — Sign-up growth",
+    signupLift: true,
+    goal: "Turn search traffic and business interest into accounts — the highest-priority work once measurement is sound.",
+    items: [
+      "Publish volunteer-targeted preparedness content (the Level 1 volunteer goal) optimised for search.",
+      "Make the readiness map the primary neighbourhood CTA across public pages.",
+      "Surface wildfire trends prominently on Business Onboarding.",
+      "Ship the business compliance quiz with a tailored trial CTA (FIRSTMONTHFREE).",
+      "Keep the two-option CTA on every referral email: free resident resources and the paid business dashboard.",
+    ],
+    metrics: [
+      "Organic sessions → readiness-quiz starts",
+      "Quiz starts → sign-ups",
+      "Business quiz completions → trial starts",
+    ],
+    dependsOn: ["Phase 1 consent gate and conversion baseline"],
+    tradeoff: "The business trial focus can dilute the free-resident funnel — keep both CTAs on every touchpoint.",
+  },
+  {
+    id: "phase-3",
+    label: "Phase 3 — Expo follow-up (manual outreach)",
+    signupLift: true,
+    goal: "Convert Disasters Expo Texas contacts into partnerships and referrals by hand — never by cold blast.",
+    items: [
+      "Work the verified exhibitor and speaker list in the Expo Outreach tab, one conversation goal per contact.",
+      "Record each prospect and its status so outreach stays auditable.",
+      "Route financial-aid organisations to trusted-resource links with eligibility disclaimers, not partnership claims.",
+    ],
+    metrics: [
+      "Prospects recorded per week",
+      "Conversations started → partnerships or referrals",
+      "Zero unsolicited bulk sends",
+    ],
+    dependsOn: ["Phase 1 accurate contact data", "Phase 2 a landing page worth sending them to"],
+    tradeoff: "Manual outreach caps volume — that is the point; it protects deliverability and reputation.",
+  },
+  {
+    id: "phase-4",
+    label: "Phase 4 — Community & content depth",
+    signupLift: false,
+    goal: "Give every hazard audience a concrete next step, not just information.",
+    items: [
+      "Add the Buoyant Foundation Project to flood mitigation content.",
+      "Add Red Cross Sound the Alarm and the Barnstable County and Ouray County community-drill examples.",
+      "Verify and publish Red Cross / Alexa smart-speaker training links only once confirmed.",
+      "Expand Red Cross preparedness tasks and trainings into user task recommendations.",
+    ],
+    metrics: [
+      "Outbound clicks per resource",
+      "Share of flood-region users who open a mitigation resource",
+      "Volunteer-intent conversions",
+    ],
+    dependsOn: ["Phase 2 public content structure"],
+    tradeoff: "Verification slows publishing — publish nothing unconfirmed.",
+  },
+  {
+    id: "phase-5",
+    label: "Phase 5 — Retention, multi-role & navigation",
+    signupLift: false,
+    goal: "Keep the users you won, without confusing their records.",
+    items: [
+      "Model account context explicitly: individual, household, and multiple organisation affiliations, with role-based access and auditable sharing.",
+      "Let a person accept shared access to a family member's plan while keeping control of their own — never duplicating plans.",
+      "Standardise primary and sub-navigation across every dashboard so it wraps cleanly on narrow screens.",
+      "Frame expiry reminders sensitively: safe disposal and replacement for anything safety-critical, reuse only for non-critical items.",
+    ],
+    metrics: [
+      "Multi-role accounts created",
+      "Cross-dashboard navigation drop-off",
+      "Expiry-reminder action rate",
+    ],
+    dependsOn: ["Phase 1 profile integrity"],
+    tradeoff: "Multi-role modelling touches identity and data — sequence it after the profile fix, not before.",
+  },
+  {
+    id: "phase-6",
+    label: "Phase 6 — Admin data quality & platform access",
+    signupLift: false,
+    goal: "Restore full admin tooling without pretending the constrained path is equivalent.",
+    items: [
+      "Compare the two backend-access options in the Backend Access tab and choose one.",
+      "Keep duplicate-incident, missing-hectares and validation reviews running on whichever path is available.",
+      "Never let a read-only or manual workflow claim to repair server-side records it cannot touch.",
+    ],
+    metrics: [
+      "Open data-quality findings closed",
+      "Time to resolve a duplicate incident",
+      "No silent no-op 'fixes'",
+    ],
+    dependsOn: ["A decision on backend access (upgrade vs constrained)"],
+    tradeoff: "The constrained path avoids cost but caps automation; the upgrade restores it but adds spend.",
+  },
+];
+
+export const CONTENT_ADDITIONS = [
+  {
+    name: "Buoyant Foundation Project",
+    kind: "Provider resource",
+    audience: "Flood mitigation",
+    url: "https://www.buoyantfoundation.org/",
+    showPublicly: true,
+    desc: "Amphibious (buoyant) foundation research and low-cost flood-mitigation strategies — retrofitting an existing home so it floats safely during a flood.",
+  },
+  {
+    name: "American Red Cross — Sound the Alarm",
+    kind: "Provider program",
+    audience: "Home fire safety",
+    url: "https://www.redcross.org/sound-the-alarm.html",
+    showPublicly: true,
+    desc: "Free smoke-alarm installation and home-fire safety visits. Practice a two-minute escape drill and test alarms monthly.",
+  },
+  {
+    name: "Barnstable County Emergency Management (Cape Cod)",
+    kind: "Community example",
+    audience: "Community drill model",
+    url: "https://www.capecod.gov/2026/09/03/september-is-emergency-preparedness-month-cape-cod-are-you-ready/",
+    showPublicly: true,
+    desc: "A regional model: Barnstable County coordinates Cape Cod's 15 towns, runs shelter-operation training, partners with the Red Cross on local sheltering, and has exercised a full-scale drill at Cape Cod Gateway Airport.",
+  },
+  {
+    name: "Ouray County, Colorado — Flood resources",
+    kind: "Community example",
+    audience: "Community drill model",
+    url: "https://ouraycountyco.gov/569/2026-Ouray-County-Flood-Resources-and-In",
+    showPublicly: true,
+    desc: "A rural county's flood-resources page, including FEMA assistance pathways for imminent flood threats — a template for county-level preparedness messaging.",
+  },
+  {
+    name: "American Red Cross skills for Alexa",
+    kind: "Provider resource",
+    audience: "Smart-speaker training",
+    url: "https://www.redcross.org/apps",
+    showPublicly: true,
+    verify: true,
+    desc: "Red Cross first-aid and preparedness skills for Alexa-enabled devices give instant first-aid guidance and can push emergency notifications. Confirm current skill availability and wording on redcross.org before publishing.",
+  },
+  {
+    name: "Financial-aid pathways (SBA, USDA, FEMA Individual Assistance)",
+    kind: "Cross-link",
+    audience: "Funding referrals",
+    showPublicly: false,
+    disclaimer: "Eligibility and availability vary by declaration, location and program; these are provider resources, not RallyPack partners, and no assistance is guaranteed.",
+    desc: "Already listed in External Resources → Insurance & Financial. Keep the disclaimer attached and never imply a partnership or a confirmed award.",
+  },
+];
+
+export const BACKEND_ACCESS_OPTIONS = [
+  {
+    id: "upgrade",
+    label: "Option A — Restore backend functions (upgrade)",
+    summary: "Upgrade the plan to regain backend functions and the workflows that call them.",
+    gives: [
+      "Scheduled alert polling, email queues and expiry reminders resume.",
+      "Admin merge, validation and backfill automations run again.",
+      "Secret-guarded endpoints with server-side authentication and rate limits.",
+      "Secure admin controls for destructive operations.",
+    ],
+    cost: "Recurring plan cost — the workflows already exist and resume as-is.",
+    risk: "Low technical risk: the code is already written and previously ran.",
+    effort: "Low — upgrade and re-enable.",
+    guardrails: [
+      "Keep automation secrets in the platform secret store, never inline in a workflow.",
+      "Require server-side auth and rate limits on the public form endpoints.",
+    ],
+  },
+  {
+    id: "constrained",
+    label: "Option B — Constrain to frontend & manual workflows (no upgrade)",
+    summary: "Keep operating without backend functions, using client-side reads and manual admin steps.",
+    gives: [
+      "Public preparedness content and read-only admin views keep working.",
+      "Client-side aggregation of cached report snapshots.",
+      "Manual admin review recorded in entities.",
+      "Manual, non-unsolicited outreach and follow-up.",
+    ],
+    cost: "No added spend.",
+    risk: "Cannot repair server-side records, cannot run scheduled automations, and cannot enforce server-side rate limits. A manual step must never be presented as an automated fix.",
+    effort: "Ongoing manual effort every cycle.",
+    guardrails: [
+      "Label every manual step as manual in the UI.",
+      "Never present a client-side action as repairing stored data.",
+      "Move the shared automation secret into the secret store.",
+    ],
+  },
+];

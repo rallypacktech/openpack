@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ExternalLink, ChevronDown, ChevronUp, Phone, Globe, MapPin, Heart, Home, Brain, Shield, Plane, TrendingUp } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import CommunityPreparednessPrograms from "./CommunityPreparednessPrograms";
 
 const RESOURCE_CATEGORIES = [
   {
@@ -303,6 +304,8 @@ export default function ExternalResourcesTab() {
 
   return (
     <div className="space-y-4">
+      <CommunityPreparednessPrograms />
+
       {/* Spain Resources — only shown for users in Spain */}
       {isSpainUser && (
         <div className="rounded-lg border-2 border-yellow-400 bg-yellow-50 px-4 py-3 mb-2">
