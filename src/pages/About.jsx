@@ -105,13 +105,13 @@ export default function About() {
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3">Meet the founder</p>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1C1C1A] mb-12 leading-tight">
-            Llora McGrath
+            Lore Taylor
           </h2>
           <div className="flex flex-col md:flex-row gap-12 items-start">
             <div className="flex-shrink-0">
               <img
                 src="https://media.base44.com/images/public/69dc170f0871ac017d79debb/aa879fed8_StaffLoraMcGrath_Peanut_0430_bySonyaSellers.jpg"
-                alt="Llora McGrath, Founder of RallyPack"
+                alt="Lore Taylor, Founder of RallyPack"
                 loading="lazy"
                 className="w-48 h-48 object-cover bg-[#D8D2C6]"
                 onError={(e) => { e.target.style.display = 'none'; }}
