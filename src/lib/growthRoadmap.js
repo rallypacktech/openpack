@@ -99,21 +99,21 @@ export const ROADMAP_PHASES = [
   },
   {
     id: "phase-6",
-    label: "Phase 6 — Admin data quality & platform access",
+    label: "Phase 6 — Admin data quality (backend functions restored)",
     signupLift: false,
-    goal: "Restore full admin tooling without pretending the constrained path is equivalent.",
+    goal: "Backend functions are being restored through the plan upgrade, so the scheduled automations and admin tooling can run at full strength again.",
     items: [
-      "Compare the two backend-access options in the Backend Access tab and choose one.",
-      "Keep duplicate-incident, missing-hectares and validation reviews running on whichever path is available.",
-      "Never let a read-only or manual workflow claim to repair server-side records it cannot touch.",
+      "Upgrade the plan and re-enable the backend functions and the workflows that call them.",
+      "Keep duplicate-incident, missing-hectares and validation reviews running on the restored automations.",
+      "Move the shared automation secret into the platform secret store and require server-side auth on the public form endpoints.",
     ],
     metrics: [
       "Open data-quality findings closed",
       "Time to resolve a duplicate incident",
-      "No silent no-op 'fixes'",
+      "Scheduled automations completing without errors",
     ],
-    dependsOn: ["A decision on backend access (upgrade vs constrained)"],
-    tradeoff: "The constrained path avoids cost but caps automation; the upgrade restores it but adds spend.",
+    dependsOn: ["Plan upgrade completed"],
+    tradeoff: "The upgrade adds recurring spend, but restores the automations and secure admin controls a manual path could not provide.",
   },
 ];
 
@@ -166,45 +166,5 @@ export const CONTENT_ADDITIONS = [
     showPublicly: false,
     disclaimer: "Eligibility and availability vary by declaration, location and program; these are provider resources, not RallyPack partners, and no assistance is guaranteed.",
     desc: "Already listed in External Resources → Insurance & Financial. Keep the disclaimer attached and never imply a partnership or a confirmed award.",
-  },
-];
-
-export const BACKEND_ACCESS_OPTIONS = [
-  {
-    id: "upgrade",
-    label: "Option A — Restore backend functions (upgrade)",
-    summary: "Upgrade the plan to regain backend functions and the workflows that call them.",
-    gives: [
-      "Scheduled alert polling, email queues and expiry reminders resume.",
-      "Admin merge, validation and backfill automations run again.",
-      "Secret-guarded endpoints with server-side authentication and rate limits.",
-      "Secure admin controls for destructive operations.",
-    ],
-    cost: "Recurring plan cost — the workflows already exist and resume as-is.",
-    risk: "Low technical risk: the code is already written and previously ran.",
-    effort: "Low — upgrade and re-enable.",
-    guardrails: [
-      "Keep automation secrets in the platform secret store, never inline in a workflow.",
-      "Require server-side auth and rate limits on the public form endpoints.",
-    ],
-  },
-  {
-    id: "constrained",
-    label: "Option B — Constrain to frontend & manual workflows (no upgrade)",
-    summary: "Keep operating without backend functions, using client-side reads and manual admin steps.",
-    gives: [
-      "Public preparedness content and read-only admin views keep working.",
-      "Client-side aggregation of cached report snapshots.",
-      "Manual admin review recorded in entities.",
-      "Manual, non-unsolicited outreach and follow-up.",
-    ],
-    cost: "No added spend.",
-    risk: "Cannot repair server-side records, cannot run scheduled automations, and cannot enforce server-side rate limits. A manual step must never be presented as an automated fix.",
-    effort: "Ongoing manual effort every cycle.",
-    guardrails: [
-      "Label every manual step as manual in the UI.",
-      "Never present a client-side action as repairing stored data.",
-      "Move the shared automation secret into the secret store.",
-    ],
   },
 ];

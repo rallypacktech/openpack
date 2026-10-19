@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Map, Handshake, Library, ServerCog, Lock } from "lucide-react";
+import { Map, Handshake, Library, Lock } from "lucide-react";
 import RoadmapPhases from "@/components/growth/RoadmapPhases";
 import ExpoOutreachPanel from "@/components/growth/ExpoOutreachPanel";
 import ContentAdditionsPanel from "@/components/growth/ContentAdditionsPanel";
-import BackendAccessComparison from "@/components/growth/BackendAccessComparison";
 import { ROADMAP_PHASES } from "@/lib/growthRoadmap";
 
 export default function GrowthRoadmap() {
@@ -67,9 +66,6 @@ export default function GrowthRoadmap() {
             <TabsTrigger value="content" className="flex items-center gap-2">
               <Library className="w-4 h-4" aria-hidden="true" /> Content Additions
             </TabsTrigger>
-            <TabsTrigger value="backend" className="flex items-center gap-2">
-              <ServerCog className="w-4 h-4" aria-hidden="true" /> Backend Access
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="roadmap">
@@ -82,10 +78,6 @@ export default function GrowthRoadmap() {
 
           <TabsContent value="content">
             <ContentAdditionsPanel />
-          </TabsContent>
-
-          <TabsContent value="backend">
-            <BackendAccessComparison />
           </TabsContent>
         </Tabs>
       </div>
