@@ -1,30 +1,18 @@
 import React from "react";
 import { ExternalLink, ShieldAlert } from "lucide-react";
-import { CONTENT_ADDITIONS } from "@/lib/growthRoadmap";
-
-const PROGRAM_NAMES = [
-  "Buoyant Foundation Project",
-  "American Red Cross — Sound the Alarm",
-  "Barnstable County Emergency Management (Cape Cod)",
-  "Ouray County, Colorado — Flood resources",
-  "American Red Cross skills for Alexa",
-];
+import { COMMUNITY_PROGRAMS } from "@/lib/communityPrograms";
 
 export default function CommunityPreparednessPrograms() {
-  const programs = CONTENT_ADDITIONS.filter(
-    (item) => item.showPublicly && PROGRAM_NAMES.includes(item.name)
-  );
-
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card">
       <div className="px-5 py-3.5 bg-secondary/50 border-b border-border">
-        <p className="font-sans font-semibold text-sm text-foreground">Community & Flood Resilience Programs</p>
+        <p className="font-sans font-semibold text-sm text-foreground">Community Preparedness Programs</p>
         <p className="text-xs text-muted-foreground font-sans">
-          Mitigation programs, home-fire visits and real community-drill examples you can take part in.
+          Mitigation programs, home-fire visits and real county, city and regional examples from the United States and Canada.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4">
-        {programs.map((p) => (
+        {COMMUNITY_PROGRAMS.map((p) => (
           <a
             key={p.name}
             href={p.url}
@@ -37,6 +25,9 @@ export default function CommunityPreparednessPrograms() {
                 <span className="font-sans font-semibold text-foreground text-sm">{p.name}</span>
                 <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-primary shrink-0" aria-hidden="true" />
               </div>
+              <p className="text-[10px] uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-1.5">
+                {p.audience}
+              </p>
               <p className="text-xs text-muted-foreground font-sans leading-relaxed">{p.desc}</p>
               {p.verify && (
                 <p className="text-[11px] font-sans text-amber-900 mt-1.5 flex items-center gap-1">

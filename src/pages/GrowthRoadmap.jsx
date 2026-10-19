@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Map, Handshake, Library, Lock } from "lucide-react";
+import { Map, Handshake, Lock } from "lucide-react";
 import RoadmapPhases from "@/components/growth/RoadmapPhases";
 import ExpoOutreachPanel from "@/components/growth/ExpoOutreachPanel";
-import ContentAdditionsPanel from "@/components/growth/ContentAdditionsPanel";
 import { ROADMAP_PHASES } from "@/lib/growthRoadmap";
 
 export default function GrowthRoadmap() {
@@ -63,9 +62,6 @@ export default function GrowthRoadmap() {
             <TabsTrigger value="expo" className="flex items-center gap-2">
               <Handshake className="w-4 h-4" aria-hidden="true" /> Expo Outreach
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
-              <Library className="w-4 h-4" aria-hidden="true" /> Content Additions
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="roadmap">
@@ -74,10 +70,6 @@ export default function GrowthRoadmap() {
 
           <TabsContent value="expo">
             <ExpoOutreachPanel />
-          </TabsContent>
-
-          <TabsContent value="content">
-            <ContentAdditionsPanel />
           </TabsContent>
         </Tabs>
       </div>

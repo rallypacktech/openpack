@@ -65,9 +65,8 @@ export const ROADMAP_PHASES = [
     signupLift: false,
     goal: "Give every hazard audience a concrete next step, not just information.",
     items: [
-      "Add the Buoyant Foundation Project to flood mitigation content.",
-      "Add Red Cross Sound the Alarm and the Barnstable County and Ouray County community-drill examples.",
-      "Verify and publish Red Cross / Alexa smart-speaker training links only once confirmed.",
+      "Publish the flood-mitigation, home-fire and community-drill resources — now live on the public Resources page.",
+      "Add US and Canadian county, city and regional emergency programs as further community examples.",
       "Expand Red Cross preparedness tasks and trainings into user task recommendations.",
     ],
     metrics: [
@@ -114,57 +113,5 @@ export const ROADMAP_PHASES = [
     ],
     dependsOn: ["Plan upgrade completed"],
     tradeoff: "The upgrade adds recurring spend, but restores the automations and secure admin controls a manual path could not provide.",
-  },
-];
-
-export const CONTENT_ADDITIONS = [
-  {
-    name: "Buoyant Foundation Project",
-    kind: "Provider resource",
-    audience: "Flood mitigation",
-    url: "https://www.buoyantfoundation.org/",
-    showPublicly: true,
-    desc: "Amphibious (buoyant) foundation research and low-cost flood-mitigation strategies — retrofitting an existing home so it floats safely during a flood.",
-  },
-  {
-    name: "American Red Cross — Sound the Alarm",
-    kind: "Provider program",
-    audience: "Home fire safety",
-    url: "https://www.redcross.org/sound-the-alarm.html",
-    showPublicly: true,
-    desc: "Free smoke-alarm installation and home-fire safety visits. Practice a two-minute escape drill and test alarms monthly.",
-  },
-  {
-    name: "Barnstable County Emergency Management (Cape Cod)",
-    kind: "Community example",
-    audience: "Community drill model",
-    url: "https://www.capecod.gov/2026/09/03/september-is-emergency-preparedness-month-cape-cod-are-you-ready/",
-    showPublicly: true,
-    desc: "A regional model: Barnstable County coordinates Cape Cod's 15 towns, runs shelter-operation training, partners with the Red Cross on local sheltering, and has exercised a full-scale drill at Cape Cod Gateway Airport.",
-  },
-  {
-    name: "Ouray County, Colorado — Flood resources",
-    kind: "Community example",
-    audience: "Community drill model",
-    url: "https://ouraycountyco.gov/569/2026-Ouray-County-Flood-Resources-and-In",
-    showPublicly: true,
-    desc: "A rural county's flood-resources page, including FEMA assistance pathways for imminent flood threats — a template for county-level preparedness messaging.",
-  },
-  {
-    name: "American Red Cross skills for Alexa",
-    kind: "Provider resource",
-    audience: "Smart-speaker training",
-    url: "https://www.redcross.org/apps",
-    showPublicly: true,
-    verify: true,
-    desc: "Red Cross first-aid and preparedness skills for Alexa-enabled devices give instant first-aid guidance and can push emergency notifications. Confirm current skill availability and wording on redcross.org before publishing.",
-  },
-  {
-    name: "Financial-aid pathways (SBA, USDA, FEMA Individual Assistance)",
-    kind: "Cross-link",
-    audience: "Funding referrals",
-    showPublicly: false,
-    disclaimer: "Eligibility and availability vary by declaration, location and program; these are provider resources, not RallyPack partners, and no assistance is guaranteed.",
-    desc: "Already listed in External Resources → Insurance & Financial. Keep the disclaimer attached and never imply a partnership or a confirmed award.",
   },
 ];
