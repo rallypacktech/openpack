@@ -127,7 +127,7 @@ export default function About() {
               <p>
                 "We don't sell safety. We give it away. Every family — regardless of income, language, or geography — deserves to be ready before it matters."
               </p>
-              <p className="text-sm text-[#8A8577] italic">— Llora McGrath, Founder</p>
+              <p className="text-sm text-[#8A8577] italic">— Lore Taylor, Founder</p>
             </div>
           </div>
         </div>
