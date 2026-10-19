@@ -21,6 +21,7 @@ import TermsAgreement, {
   TERMS_VERSION,
 } from "../components/onboarding/TermsAgreement";
 import { safeSessionGet, safeSessionSet } from "../lib/utils";
+import { useFirstCacheMilestone } from "@/hooks/useFirstCacheMilestone";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -177,6 +178,9 @@ export default function Dashboard() {
     }
   }, [dataLoaded, userProfile, familyMembers]);
 
+  // Baseline funnel: quiz start → sign-up → first cache created.
+  useFirstCacheMilestone(currentUser, caches, dataLoaded);
+
   const loadData = async () => {
     try {
       const user = await base44.auth.me();
@@ -202,6 +206,18 @@ export default function Dashboard() {
             profileData[0].longitude,
             profileData[0].country,
           );
+        }
+      } else {
+        // A new account must never be left without a profile record — every
+        // onboarding step, setting and reminder reads from it. Bootstrap one on
+        // first load so nobody gets stuck on an empty dashboard.
+        try {
+          const created = await base44.entities.UserProfile.create({
+            display_name: user.full_name || "",
+          });
+          if (created?.id) setUserProfile(created);
+        } catch (_e) {
+          // Non-fatal — the rest of the dashboard still renders.
         }
       }
 

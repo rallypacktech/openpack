@@ -14,6 +14,9 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import OAuthConsent from './pages/OAuthConsent';
+import ConsentBanner from '@/components/ConsentBanner';
+import { hasConsent, subscribeConsent } from '@/lib/consent';
+import { loadGtag } from '@/lib/gtag';
 
 const AffiliatePartnerPolicy = lazy(() => import('./pages/AffiliatePartnerPolicy'));
 const Equine = lazy(() => import('./pages/Equine'));
@@ -141,37 +144,12 @@ const AuthenticatedApp = () => {
 
 
 function App() {
-  // Google Ads gtag bootstrap (loads once; cross-origin relay for iframe previews).
+  // Analytics loads only after the visitor agrees — nothing fires before consent.
   useEffect(() => {
-    if (typeof window === "undefined" || window.__gads_loaded) return;
-    window.__gads_loaded = true;
-    window.dataLayer = window.dataLayer || [];
-    const inIframe = (() => { try { return window.self !== window.top; } catch { return true; } })();
-    window.gtag = function gtag() {
-      window.dataLayer.push(arguments);
-      if (inIframe) {
-        try {
-          const args = Array.prototype.slice.call(arguments);
-          const cmd = args[0];
-          window.parent.postMessage({
-            type: 'base44_gtag_event',
-            event: {
-              source: 'gtag',
-              timestamp: new Date().toLocaleTimeString(),
-              command: cmd,
-              params: args.slice(1),
-              type: cmd === 'event' ? (args[1] || 'event') : cmd,
-            },
-          }, '*');
-        } catch (_e) { /* relay must not break gtag */ }
-      }
-    };
-    const s = document.createElement('script');
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18405445520';
-    s.async = true;
-    document.head.appendChild(s);
-    window.gtag('js', new Date());
-    window.gtag('config', 'AW-18405445520', { send_page_view: false });
+    if (hasConsent()) loadGtag();
+    return subscribeConsent(() => {
+      if (hasConsent()) loadGtag();
+    });
   }, []);
 
   return (
@@ -182,6 +160,7 @@ function App() {
           <AuthenticatedApp />
         </Router>
         <Toaster />
+        <ConsentBanner />
         <VisualEditAgent />
       </QueryClientProvider>
     </AuthProvider>

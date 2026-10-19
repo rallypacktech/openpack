@@ -20,6 +20,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import PricingSection from "@/components/business/PricingSection";
+import { isPlanLimitError } from "@/lib/planLimits";
 
 export default function BusinessOnboarding() {
   const [form, setForm] = useState({
@@ -43,14 +44,33 @@ export default function BusinessOnboarding() {
     setError(null);
     try {
       const me = await base44.auth.me().catch(() => null);
-      await base44.functions.invoke("sendBusinessReferral", {
+      const referral = {
         referee_email: form.referee_email,
         referee_name: form.referee_name,
         organization_name: form.organization_name,
         message: form.message,
         referrer_name: me?.full_name || "",
         referrer_email: me?.email || "",
-      });
+      };
+
+      // Recorded so the referral is never lost when the email helper can't run.
+      let recorded = false;
+      try {
+        await base44.functions.invoke("sendBusinessReferral", referral);
+        recorded = true;
+      } catch (err) {
+        if (!isPlanLimitError(err)) throw err;
+        try {
+          await base44.entities.BusinessReferral.create({
+            ...referral,
+            source: "public_form",
+            status: "pending",
+          });
+          recorded = true;
+        } catch (_e) {
+          recorded = false;
+        }
+      }
       if (typeof pendo !== "undefined") {
         pendo.track("business_referral_sent", {
           has_organization_name: !!form.organization_name,
@@ -64,6 +84,7 @@ export default function BusinessOnboarding() {
         name: form.referee_name,
         org: form.organization_name,
         message: form.message,
+        recorded,
       });
       setForm({
         referee_email: "",
@@ -274,8 +295,9 @@ export default function BusinessOnboarding() {
                   Referral Submitted!
                 </h3>
                 <p className="text-sm text-muted-foreground mb-6">
-                  We've logged the referral and notified the RallyPack team.
-                  Want to send a personal note too?
+                  {sent.recorded
+                    ? "We've logged the referral for the RallyPack team. Want to send them a personal note too?"
+                    : "Here's your ready-to-send email — one click and it's on its way."}
                 </p>
                 <div className="flex flex-col gap-3 items-center">
                   <a

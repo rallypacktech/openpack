@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySettings";
 import LoginWall from "../components/LoginWall";
 import { detectBot, getStableBotId } from "@/lib/botDetection";
+import { trackFunnel, FUNNEL } from "@/lib/funnel";
 import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
 
@@ -668,6 +669,8 @@ export default function ReadinessQuiz() {
   // Claim a signed session as the quiz opens, so the token is old enough by the
   // time the result is saved.
   React.useEffect(() => {
+    // Baseline funnel: a visitor who actually opened the quiz.
+    trackFunnel(FUNNEL.QUIZ_STARTED);
     startQuizSession().catch(() => {});
   }, []);
 

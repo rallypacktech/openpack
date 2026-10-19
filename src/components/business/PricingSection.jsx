@@ -69,16 +69,20 @@ export default function PricingSection() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {Object.values(TIER_META).map(tier => {
           const stripePrice = getPriceForTier(tier.id);
+          // No live price available (the price helper can't run) — show nothing
+          // rather than a broken placeholder.
           const displayPrice = tier.id === "enterprise"
             ? "Contact us"
             : stripePrice
               ? formatPrice(stripePrice)
-              : loading ? "..." : "—";
+              : loading ? "..." : null;
           return (
             <Card key={tier.id} className="text-center border-border">
               <CardContent className="p-6">
                 <h4 className="font-sans font-bold text-lg text-foreground">{tier.name}</h4>
-                <div className="text-3xl font-serif font-bold text-[#D64A2E] mt-2 mb-1">{displayPrice}</div>
+                {displayPrice && (
+                  <div className="text-3xl font-serif font-bold text-[#D64A2E] mt-2 mb-1">{displayPrice}</div>
+                )}
                 <div className="text-xs text-muted-foreground mb-5">
                   {tier.id === "enterprise"
                     ? "Custom pricing for large orgs"

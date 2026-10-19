@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { base44 } from "@/api/base44Client";
 import { useActivityHeartbeat } from "@/hooks/useActivityHeartbeat";
+import { getConsent } from "@/lib/consent";
+import { trackFunnel, FUNNEL } from "@/lib/funnel";
 import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySettings";
 import {
   LayoutDashboard,
@@ -77,14 +79,22 @@ export default function Layout({ children, currentPageName }) {
         const pending = localStorage.getItem("__rallypack_pending_signup");
         if (pending && userData.email && pending.toLowerCase() === userData.email.toLowerCase()) {
           const firedKey = `rallypack_signup_fired_${userData.id}`;
-          if (!localStorage.getItem(firedKey) && typeof window !== "undefined" && window.gtag) {
-            window.gtag("event", "conversion", {
-              send_to: "AW-18405445520/hSWHCMLJl-YcEJCfs8hE",
-              transaction_id: userData.id,
-            });
-            localStorage.setItem(firedKey, "1");
+          if (!localStorage.getItem(firedKey)) {
+            // Baseline funnel: a quiz taker who created an account.
+            trackFunnel(FUNNEL.SIGNUP_COMPLETED, { method: "email" });
+            if (typeof window !== "undefined" && window.gtag) {
+              window.gtag("event", "conversion", {
+                send_to: "AW-18405445520/hSWHCMLJl-YcEJCfs8hE",
+                transaction_id: userData.id,
+              });
+              localStorage.setItem(firedKey, "1");
+              localStorage.removeItem("__rallypack_pending_signup");
+            } else if (getConsent() === "denied") {
+              // No consent to measure — nothing to retry.
+              localStorage.setItem(firedKey, "1");
+              localStorage.removeItem("__rallypack_pending_signup");
+            }
           }
-          localStorage.removeItem("__rallypack_pending_signup");
         }
       } catch (_e) { /* storage unavailable */ }
     };
