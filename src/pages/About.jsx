@@ -119,10 +119,10 @@ export default function About() {
             </div>
             <div className="flex-1 space-y-5 text-base text-[#1C1C1A]/70 leading-relaxed font-sans">
               <p>
-                Llora McGrath founded RallyPack after seeing firsthand how disasters disproportionately affect families who were never given the tools to prepare. Her mission is simple: make emergency preparedness accessible to everyone — free, private, and without paywalls on safety.
+                Lore Taylor founded RallyPack after seeing firsthand how disasters disproportionately affect families who were never given the tools to prepare. Her mission is simple: make emergency preparedness accessible to everyone — free, private, and without paywalls on safety.
               </p>
               <p>
-                With a background in community resilience and a belief that safety tools should be transparent and open-source, Llora built RallyPack around FEMA guidelines and international Red Cross frameworks. The platform serves families across the Americas, Eastern Europe, Australia, and beyond — guiding them through readiness quizzes, go-bag tracking, and species-specific evacuation planning for pets and livestock.
+                With a background in community resilience and a belief that safety tools should be transparent and open-source, Lore built RallyPack around FEMA guidelines and international Red Cross frameworks. The platform serves families across the Americas, Eastern Europe, Australia, and beyond — guiding them through readiness quizzes, go-bag tracking, and species-specific evacuation planning for pets and livestock.
               </p>
               <p>
                 "We don't sell safety. We give it away. Every family — regardless of income, language, or geography — deserves to be ready before it matters."
