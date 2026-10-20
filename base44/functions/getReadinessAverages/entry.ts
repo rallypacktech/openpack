@@ -67,10 +67,13 @@ export default async function(req) {
     const hasFilter = Object.keys(filterQuery).length > 0;
 
     if (hasFilter) {
-      const probe = await base44.asServiceRole.entities.QuizResult.filter(
-        { ...filterQuery, is_bot: { $ne: true } },
-        { limit: 1, fields: ['id'] }
-      );
+      // The query goes in on its own: this SDK build returns an empty result when
+      // filter() is handed an options object, which silently emptied every
+      // drill-down view.
+      const probe = await base44.asServiceRole.entities.QuizResult.filter({
+        ...filterQuery,
+        is_bot: { $ne: true },
+      });
       const probeItems = Array.isArray(probe) ? probe : (probe?.items || []);
       if (probeItems.length === 0) {
         // Nothing matches — serve the global figures from the cached global
