@@ -44,6 +44,8 @@ const ResponderTraining = lazy(() => import('./pages/ResponderTraining'));
 const Faq = lazy(() => import('./pages/Faq'));
 const Sitemap = lazy(() => import('./pages/Sitemap'));
 const GrowthRoadmap = lazy(() => import('./pages/GrowthRoadmap'));
+const Volunteer = lazy(() => import('./pages/Volunteer'));
+const ComplianceQuiz = lazy(() => import('./pages/ComplianceQuiz'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -135,6 +137,8 @@ const AuthenticatedApp = () => {
       <Route path="/responder-training" element={<LayoutWrapper currentPageName="ResponderTraining"><ResponderTraining /></LayoutWrapper>} />
       <Route path="/faq" element={<LayoutWrapper currentPageName="Faq"><Faq /></LayoutWrapper>} />
       <Route path="/sitemap" element={<LayoutWrapper currentPageName="Sitemap"><Sitemap /></LayoutWrapper>} />
+      <Route path="/volunteer" element={<LayoutWrapper currentPageName="Volunteer"><Volunteer /></LayoutWrapper>} />
+      <Route path="/compliance-quiz" element={<LayoutWrapper currentPageName="ComplianceQuiz"><ComplianceQuiz /></LayoutWrapper>} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>

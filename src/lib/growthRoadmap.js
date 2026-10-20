@@ -1,31 +1,15 @@
 // The approved RallyPack growth and engagement roadmap, phased sign-up-growth-first
 // with explicit dependencies, success metrics and tradeoffs.
+//
+// Phase 1 (consent gate, conversion baseline, onboarding profile fix) is complete
+// and has been retired — its dependencies below are now satisfied.
 
 export const ROADMAP_PHASES = [
   {
     id: "phase-1",
-    label: "Phase 1 — Foundations & measurement",
-    signupLift: false,
-    goal: "You cannot grow sign-ups you cannot measure, and un-consented tracking is a liability. Do this before any campaign spend.",
-    items: [
-      "Gate Google Ads and Analytics behind a consent prompt so nothing fires before the visitor agrees.",
-      "Establish a baseline: readiness-quiz starts → sign-ups, and sign-up → first cache created.",
-      "Fix the onboarding stuck state that leaves a new account without a profile record.",
-      "Confirm currency and tax handling before paid business tiers are promoted internationally.",
-    ],
-    metrics: [
-      "Baseline visitor → sign-up conversion rate",
-      "Share of new accounts that complete a profile",
-      "Consent captured before any tracking event fires",
-    ],
-    dependsOn: [],
-    tradeoff: "Delays launching ads, but every later number becomes trustworthy.",
-  },
-  {
-    id: "phase-2",
-    label: "Phase 2 — Sign-up growth",
+    label: "Phase 1 — Sign-up growth",
     signupLift: true,
-    goal: "Turn search traffic and business interest into accounts — the highest-priority work once measurement is sound.",
+    goal: "Turn search traffic and business interest into accounts — the highest-priority work now that measurement is sound.",
     items: [
       "Publish volunteer-targeted preparedness content (the Level 1 volunteer goal) optimised for search.",
       "Make the readiness map the primary neighbourhood CTA across public pages.",
@@ -38,12 +22,12 @@ export const ROADMAP_PHASES = [
       "Quiz starts → sign-ups",
       "Business quiz completions → trial starts",
     ],
-    dependsOn: ["Phase 1 consent gate and conversion baseline"],
+    dependsOn: [],
     tradeoff: "The business trial focus can dilute the free-resident funnel — keep both CTAs on every touchpoint.",
   },
   {
-    id: "phase-3",
-    label: "Phase 3 — Expo follow-up (manual outreach)",
+    id: "phase-2",
+    label: "Phase 2 — Expo follow-up (manual outreach)",
     signupLift: true,
     goal: "Convert Disasters Expo Texas contacts into partnerships and referrals by hand — never by cold blast.",
     items: [
@@ -56,12 +40,12 @@ export const ROADMAP_PHASES = [
       "Conversations started → partnerships or referrals",
       "Zero unsolicited bulk sends",
     ],
-    dependsOn: ["Phase 1 accurate contact data", "Phase 2 a landing page worth sending them to"],
+    dependsOn: ["Verified Expo contact data", "Phase 1 landing pages worth sending them to"],
     tradeoff: "Manual outreach caps volume — that is the point; it protects deliverability and reputation.",
   },
   {
-    id: "phase-4",
-    label: "Phase 4 — Community & content depth",
+    id: "phase-3",
+    label: "Phase 3 — Community & content depth",
     signupLift: false,
     goal: "Give every hazard audience a concrete next step, not just information.",
     items: [
@@ -74,12 +58,12 @@ export const ROADMAP_PHASES = [
       "Share of flood-region users who open a mitigation resource",
       "Volunteer-intent conversions",
     ],
-    dependsOn: ["Phase 2 public content structure"],
+    dependsOn: ["Phase 1 public content structure"],
     tradeoff: "Verification slows publishing — publish nothing unconfirmed.",
   },
   {
-    id: "phase-5",
-    label: "Phase 5 — Retention, multi-role & navigation",
+    id: "phase-4",
+    label: "Phase 4 — Retention, multi-role & navigation",
     signupLift: false,
     goal: "Keep the users you won, without confusing their records.",
     items: [
@@ -93,12 +77,12 @@ export const ROADMAP_PHASES = [
       "Cross-dashboard navigation drop-off",
       "Expiry-reminder action rate",
     ],
-    dependsOn: ["Phase 1 profile integrity"],
-    tradeoff: "Multi-role modelling touches identity and data — sequence it after the profile fix, not before.",
+    dependsOn: [],
+    tradeoff: "Multi-role modelling touches identity and data — sequence it carefully, with sharing auditable from day one.",
   },
   {
-    id: "phase-6",
-    label: "Phase 6 — Admin data quality (backend functions restored)",
+    id: "phase-5",
+    label: "Phase 5 — Admin data quality (backend functions restored)",
     signupLift: false,
     goal: "Backend functions are being restored through the plan upgrade, so the scheduled automations and admin tooling can run at full strength again.",
     items: [

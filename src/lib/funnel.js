@@ -9,6 +9,7 @@ export const FUNNEL = {
   QUIZ_STARTED: "readiness_quiz_started",
   SIGNUP_COMPLETED: "signup_completed",
   FIRST_CACHE_CREATED: "first_cache_created",
+  BUSINESS_QUIZ_COMPLETED: "business_quiz_completed",
 };
 
 export function trackFunnel(eventName, properties = {}) {

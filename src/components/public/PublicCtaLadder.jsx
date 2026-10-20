@@ -4,8 +4,9 @@ import { ClipboardList, MapPin, ArrowRight, Heart } from "lucide-react";
 
 /**
  * The closing call-to-action ladder shared by every public page, so the next
- * step is identical everywhere: the readiness quiz leads, the readiness map
- * follows, and account creation and donation sit quietly beneath.
+ * step is identical everywhere: the readiness map leads as the neighborhood CTA,
+ * the readiness quiz follows as the way to add your own score, and account
+ * creation and donation sit quietly beneath.
  */
 export default function PublicCtaLadder({ contextLabel = "Your next step" }) {
   return (
@@ -13,25 +14,25 @@ export default function PublicCtaLadder({ contextLabel = "Your next step" }) {
       <div className="max-w-4xl mx-auto px-6 py-16 sm:py-20 text-center">
         <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-sans mb-4">{contextLabel}</p>
         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
-          Find out how ready you really are.
+          How prepared is your neighborhood?
         </h2>
         <p className="text-sm sm:text-base text-foreground/70 font-sans max-w-xl mx-auto mb-10 leading-relaxed">
-          The free readiness quiz scores your plan in three minutes — no account required. Then see how
-          your neighborhood compares on the RallyPack readiness map.
+          The readiness map shows average preparedness from country down to postal code — and
+          where the gaps really are. Add your own score to it with the free three-minute quiz.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
           <Link
-            to="/ReadinessQuiz"
+            to="/readiness-map"
             className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-8 py-4 text-xs tracking-widest uppercase hover:opacity-90 transition-opacity"
           >
-            <ClipboardList className="w-4 h-4" /> Take the readiness quiz
+            <MapPin className="w-4 h-4" /> See your area on the map
           </Link>
           <Link
-            to="/readiness-map"
+            to="/ReadinessQuiz"
             className="inline-flex items-center justify-center gap-2 border border-foreground/25 text-foreground font-sans font-semibold px-8 py-4 text-xs tracking-widest uppercase hover:bg-foreground/5 transition-colors"
           >
-            <MapPin className="w-4 h-4" /> See your area on the map
+            <ClipboardList className="w-4 h-4" /> Take the readiness quiz
           </Link>
         </div>
 

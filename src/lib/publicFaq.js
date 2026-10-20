@@ -10,6 +10,8 @@ export const FAQ_TOPICS = [
   { key: "flood", label: "Flood" },
   { key: "tornado", label: "Tornado" },
   { key: "species", label: "Pets, livestock & family" },
+  { key: "volunteer", label: "Volunteering" },
+  { key: "business", label: "Business compliance" },
 ];
 
 export const PUBLIC_FAQ = {
@@ -197,6 +199,46 @@ export const PUBLIC_FAQ = {
       a: "Use a microchip plus a collar tag with a phone number, and carry a recent photo of you with the animal.",
       detail:
         "Keep microchip registration details current and store copies of vaccination records with your own documents, since shelters and boarding facilities often require them.",
+    },
+  ],
+  volunteer: [
+    {
+      q: "Do I need experience to volunteer for disaster relief?",
+      a: "No — most organizations train you for free, and the best time to start is months before a disaster, not during one.",
+      detail:
+        "Large response organizations run their own onboarding and training, often including background checks and role-specific courses. Signing up in a quiet month means you are already credentialed when a deployment call goes out, instead of waiting in a queue while a response is under way.",
+    },
+    {
+      q: "What volunteer roles help most in a disaster?",
+      a: "Sheltering, feeding, logistics and distribution, animal care, financial-recovery coaching and local coordination are the roles in shortest supply.",
+      detail:
+        "Not every role needs a uniform or a chainsaw. Documentation, registration desks, translation, donations sorting, phone lines and logistics coordination are all consistently understaffed — and they free trained responders to work where they are most needed.",
+    },
+    {
+      q: "How do I volunteer in my own neighborhood?",
+      a: "Join your local COAD or VOAD member organization, or the Community Emergency Response Team (CERT) run by your city or county.",
+      detail:
+        "A COAD is a coalition of local nonprofits, faith groups and businesses that work together before and after disasters, and most counties have one. CERT programs teach basic disaster response skills and are usually free. Starting locally means you already know the streets, the people and the risks.",
+    },
+  ],
+  business: [
+    {
+      q: "How often do fire extinguishers need servicing?",
+      a: "In most jurisdictions a licensed technician inspects them annually, with quick visual checks in between.",
+      detail:
+        "The annual service is what an inspector asks to see on the tag, and it is usually what an insurer asks for after a claim. Monthly visual checks — that the unit is in place, unobstructed, and the gauge is in the green — catch the problems that happen between services.",
+    },
+    {
+      q: "How often do CPR, first aid and AED certifications need renewing?",
+      a: "Typically every two years, and AED training is usually renewed on the same cycle.",
+      detail:
+        "Certification periods vary by issuing body and by country, so confirm the interval your regulator or licensing authority requires. What matters operationally is having a renewal date recorded per staff member, with a warning far enough ahead that a course can actually be booked.",
+    },
+    {
+      q: "What does a fire inspector typically ask for?",
+      a: "Current extinguisher and alarm service records, clear and lit exits, and a documented evacuation plan with a muster point.",
+      detail:
+        "The visit itself is usually quick; the time is lost afterwards, hunting for paperwork. Being able to produce every record — service dates, certification renewals, device checks and the evacuation plan — in one place is what turns an inspection into a formality.",
     },
   ],
 };

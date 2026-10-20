@@ -17,9 +17,11 @@ import {
   MapPin,
   Package,
   Flame,
+  ClipboardCheck,
   ArrowRight,
 } from "lucide-react";
 import PricingSection from "@/components/business/PricingSection";
+import WildfireTrendsCallout from "@/components/business/WildfireTrendsCallout";
 import { isPlanLimitError } from "@/lib/planLimits";
 
 export default function BusinessOnboarding() {
@@ -119,6 +121,9 @@ export default function BusinessOnboarding() {
           </div>
         </div>
       </section>
+
+      {/* Wildfire trends — the hazard that drives continuity planning */}
+      <WildfireTrendsCallout />
 
       {/* Features */}
       <section className="py-16 max-w-5xl mx-auto px-6">
@@ -266,6 +271,27 @@ export default function BusinessOnboarding() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* Compliance check — the fastest route from interest to a trial */}
+      <section className="py-16 max-w-5xl mx-auto px-6">
+        <div className="border border-border rounded-lg bg-white p-8 text-center">
+          <ClipboardCheck className="w-9 h-9 text-[#D64A2E] mx-auto mb-4" />
+          <h2 className="font-serif text-3xl font-bold text-foreground mb-3">
+            How inspection-ready is your building?
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-6">
+            Six questions, two minutes, no account. You'll get a readiness score, the gaps
+            an inspector would flag, and the exact fixes for each one.
+          </p>
+          <Link
+            to="/compliance-quiz"
+            className="inline-flex items-center gap-2 bg-[#D64A2E] text-white font-semibold text-sm px-6 py-3 rounded hover:bg-[#be3f25] transition-colors"
+          >
+            Take the compliance check
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
 

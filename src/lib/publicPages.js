@@ -7,6 +7,7 @@ export const PUBLIC_PAGE_GROUPS = [
       { path: "/ReadinessQuiz", label: "Readiness Quiz", description: "Score your household plan in three minutes — no account required." },
       { path: "/readiness-map", label: "Readiness Map", description: "See how average preparedness compares from country down to postal code." },
       { path: "/faq", label: "FAQ", description: "Direct answers to the questions people ask most about preparing for disasters." },
+      { path: "/volunteer", label: "Volunteer", description: "Train with the organizations that deploy volunteers when disasters strike." },
     ],
   },
   {
@@ -35,6 +36,7 @@ export const PUBLIC_PAGE_GROUPS = [
     group: "Organizations",
     pages: [
       { path: "/BusinessOnboarding", label: "RallyPack for Business", description: "Track kits, AEDs, certifications and fire safety across your organization." },
+      { path: "/compliance-quiz", label: "Compliance Check", description: "Score your building's fire and life-safety readiness in two minutes." },
       { path: "/global-compliance", label: "Global Compliance", description: "Fire and life-safety requirements by country." },
       { path: "/responder-training", label: "Responder Training", description: "Incident command terminology and field reference guides." },
       { path: "/Shopping", label: "Equipment Shop", description: "Recommended preparedness equipment by cache type." },
