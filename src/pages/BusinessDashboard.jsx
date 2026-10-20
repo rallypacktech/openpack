@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Building2, Users, Shield, MapPin, AlertTriangle, CheckCircle2, Clock, Flame, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Building2, Users, Shield, MapPin, AlertTriangle, CheckCircle2, Clock, Flame, Zap, ClipboardCheck } from "lucide-react";
 import OrgMembersPanel from "@/components/business/OrgMembersPanel";
 import EvacuationPlanPanel from "@/components/business/EvacuationPlanPanel";
 import BusinessKitsPanel from "@/components/business/BusinessKitsPanel";
@@ -166,6 +167,12 @@ export default function BusinessDashboard() {
             {subscription?.organization_name || "Business Dashboard"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Manage your organization's emergency preparedness</p>
+          <Link
+            to="/business-compliance"
+            className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline mt-2"
+          >
+            <ClipboardCheck className="w-3.5 h-3.5" aria-hidden="true" /> Open the Compliance Hub
+          </Link>
         </div>
         {subscription && (
           <div className="flex items-center gap-2">

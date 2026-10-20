@@ -46,6 +46,8 @@ const Sitemap = lazy(() => import('./pages/Sitemap'));
 const GrowthRoadmap = lazy(() => import('./pages/GrowthRoadmap'));
 const Volunteer = lazy(() => import('./pages/Volunteer'));
 const ComplianceQuiz = lazy(() => import('./pages/ComplianceQuiz'));
+const Drills = lazy(() => import('./pages/Drills'));
+const BusinessCompliance = lazy(() => import('./pages/BusinessCompliance'));
 
 const { Pages, Layout } = pagesConfig;
 
@@ -119,6 +121,7 @@ const AuthenticatedApp = () => {
           ))
         }
         <Route path="/TrackedItems" element={<LayoutWrapper currentPageName="TrackedItems"><TrackedItems /></LayoutWrapper>} />
+          <Route path="/business-compliance" element={<LayoutWrapper currentPageName="BusinessCompliance"><BusinessCompliance /></LayoutWrapper>} />
           <Route path="/GrowthRoadmap" element={<LayoutWrapper currentPageName="GrowthRoadmap"><GrowthRoadmap /></LayoutWrapper>} />
           <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
           <Route path="/AgentAssistant" element={<LayoutWrapper currentPageName="AgentAssistant"><AgentAssistant /></LayoutWrapper>} />
@@ -139,6 +142,7 @@ const AuthenticatedApp = () => {
       <Route path="/sitemap" element={<LayoutWrapper currentPageName="Sitemap"><Sitemap /></LayoutWrapper>} />
       <Route path="/volunteer" element={<LayoutWrapper currentPageName="Volunteer"><Volunteer /></LayoutWrapper>} />
       <Route path="/compliance-quiz" element={<LayoutWrapper currentPageName="ComplianceQuiz"><ComplianceQuiz /></LayoutWrapper>} />
+      <Route path="/drills" element={<LayoutWrapper currentPageName="Drills"><Drills /></LayoutWrapper>} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>

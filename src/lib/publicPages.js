@@ -8,6 +8,7 @@ export const PUBLIC_PAGE_GROUPS = [
       { path: "/readiness-map", label: "Readiness Map", description: "See how average preparedness compares from country down to postal code." },
       { path: "/faq", label: "FAQ", description: "Direct answers to the questions people ask most about preparing for disasters." },
       { path: "/volunteer", label: "Volunteer", description: "Train with the organizations that deploy volunteers when disasters strike." },
+      { path: "/drills", label: "Drill Directory", description: "Upcoming community safety drills you can join and train at." },
     ],
   },
   {

@@ -1,0 +1,76 @@
+{
+  "name": "DrillFlag",
+  "type": "object",
+  "properties": {
+    "drill_id": {
+      "type": "string",
+      "description": "Reference to the CommunityDrill being flagged"
+    },
+    "drill_title": {
+      "type": "string",
+      "description": "Title of the flagged drill, kept so admins can review flags without a lookup"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "wrong_date",
+        "wrong_location",
+        "cancelled",
+        "duplicate",
+        "not_a_drill",
+        "inappropriate",
+        "other"
+      ],
+      "default": "other",
+      "description": "What is wrong with the listing"
+    },
+    "details": {
+      "type": "string",
+      "description": "Free-form detail from the person flagging the listing"
+    },
+    "flagged_by_email": {
+      "type": "string",
+      "description": "Email of the viewer who flagged the listing"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "resolved"
+      ],
+      "default": "open",
+      "description": "Whether an admin has dealt with this flag"
+    }
+  },
+  "required": [
+    "drill_id",
+    "reason"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

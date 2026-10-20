@@ -71,6 +71,19 @@
     },
     "notes": {
       "type": "string"
+    },
+    "document_uri": {
+      "type": "string",
+      "description": "Private storage URI of the uploaded certificate, service report or inspection record. Opened through a short-lived signed URL."
+    },
+    "document_name": {
+      "type": "string",
+      "description": "Original filename of the uploaded document, shown in the Compliance Hub"
+    },
+    "document_uploaded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the current document was uploaded"
     }
   },
   "required": [

@@ -1,0 +1,132 @@
+{
+  "name": "CommunityDrill",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Name of the drill, e.g. 'Great ShakeOut Earthquake Drill'"
+    },
+    "organization_name": {
+      "type": "string",
+      "description": "The city agency, school, business or community organization running the drill"
+    },
+    "drill_type": {
+      "type": "string",
+      "enum": [
+        "fire_evacuation",
+        "earthquake",
+        "flood",
+        "hurricane",
+        "tornado",
+        "wildfire",
+        "active_threat",
+        "cpr_aed",
+        "tabletop",
+        "full_scale",
+        "other"
+      ],
+      "default": "fire_evacuation",
+      "description": "What the drill rehearses"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the drill takes place"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Local start time as shown to participants, e.g. '10:00 AM'"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Local end time as shown to participants, e.g. '11:30 AM'"
+    },
+    "country_code": {
+      "type": "string",
+      "default": "US",
+      "description": "ISO 3166-1 alpha-2 country code"
+    },
+    "admin1_name": {
+      "type": "string",
+      "description": "State, province or territory the drill is in \u2014 drives the region filter"
+    },
+    "city": {
+      "type": "string",
+      "description": "City or town the drill is in"
+    },
+    "postal_code": {
+      "type": "string"
+    },
+    "venue": {
+      "type": "string",
+      "description": "Building, park or address where participants meet"
+    },
+    "description": {
+      "type": "string",
+      "description": "What participants will do and who can take part"
+    },
+    "registration_url": {
+      "type": "string",
+      "description": "Where participants sign up, if registration is required"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact address for questions about this drill"
+    },
+    "open_to_public": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether members of the public may take part"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "completed",
+        "cancelled"
+      ],
+      "default": "scheduled",
+      "description": "Current state of the drill"
+    },
+    "submitted_by_email": {
+      "type": "string",
+      "description": "Email of the organization representative who submitted this listing"
+    }
+  },
+  "required": [
+    "title",
+    "organization_name",
+    "drill_type",
+    "date"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
