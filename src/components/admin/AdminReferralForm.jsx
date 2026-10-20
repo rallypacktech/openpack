@@ -12,8 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Send, X, Mail } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import { REFERRAL_AUDIENCES as AUDIENCE_OPTIONS } from "@/lib/referralAudiences";
-import { sendReferralEmail } from "@/lib/referralFallback";
 
 export default function AdminReferralForm({ onSuccess, onCancel }) {
   const [formData, setFormData] = useState({
@@ -40,8 +40,8 @@ export default function AdminReferralForm({ onSuccess, onCancel }) {
     setSubmitting(true);
     setError(null);
     try {
-      const { data } = await sendReferralEmail(formData);
-      setResult(data);
+      const res = await base44.functions.invoke("adminReferBusiness", formData);
+      setResult(res?.data || null);
       if (typeof pendo !== "undefined") {
         pendo.track("admin_referral_sent", {
           audience_type: formData.audience_type,
@@ -82,7 +82,11 @@ export default function AdminReferralForm({ onSuccess, onCancel }) {
               </p>
               <p className="text-xs text-green-700 mt-1">
                 Audience: {result.audience} · Status:{" "}
-                {result.used_fallback ? "Saved — send it from your mail client" : "Contacted"}
+                {result.email_sent
+                  ? "Contacted"
+                  : result.queued
+                  ? "Queued for delivery"
+                  : "Saved — send it from your mail client"}
               </p>
             </div>
           </div>

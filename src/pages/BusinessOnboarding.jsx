@@ -22,8 +22,7 @@ import {
 } from "lucide-react";
 import PricingSection from "@/components/business/PricingSection";
 import WildfireTrendsCallout from "@/components/business/WildfireTrendsCallout";
-import { isPlanLimitError } from "@/lib/planLimits";
-import { buildReferralMailto, recordReferralFallback } from "@/lib/referralFallback";
+import { buildReferralMailto } from "@/lib/referralMailto";
 
 export default function BusinessOnboarding() {
   const [form, setForm] = useState({
@@ -56,20 +55,8 @@ export default function BusinessOnboarding() {
         referrer_email: me?.email || "",
       };
 
-      // Recorded so the referral is never lost when the email helper can't run.
-      let recorded = false;
-      try {
-        await base44.functions.invoke("sendBusinessReferral", referral);
-        recorded = true;
-      } catch (err) {
-        if (!isPlanLimitError(err)) throw err;
-        try {
-          await recordReferralFallback(referral, "public_form");
-          recorded = true;
-        } catch (_e) {
-          recorded = false;
-        }
-      }
+      await base44.functions.invoke("sendBusinessReferral", referral);
+      const recorded = true;
       if (typeof pendo !== "undefined") {
         pendo.track("business_referral_sent", {
           has_organization_name: !!form.organization_name,
