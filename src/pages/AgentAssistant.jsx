@@ -4,6 +4,7 @@ import { Send, Bot, Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MessageBubble from "@/components/agent/MessageBubble";
+import { getMyProfile } from "@/lib/currentUser";
 
 const AGENT_NAME = "preparedness_assistant";
 
@@ -14,11 +15,19 @@ export default function AgentAssistant() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [telegramConnected, setTelegramConnected] = useState(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
     loadConversations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Someone who already linked Telegram shouldn't be asked to connect again.
+  useEffect(() => {
+    getMyProfile()
+      .then((profile) => setTelegramConnected(!!profile?.telegram_chat_id))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -105,21 +114,23 @@ export default function AgentAssistant() {
             <strong className="text-foreground">In-app:</strong> Chat right here — your
             conversations are saved to your account and resume where you left off.
           </li>
-          <li>
-            <strong className="text-foreground">Telegram:</strong> Get answers on the go by
-            connecting your Telegram account.
-            <a
-              href={telegramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-2 inline-flex items-center gap-1 text-primary underline underline-offset-2 font-medium"
-            >
-              <Send className="w-3.5 h-3.5" aria-hidden="true" /> Connect Telegram
-            </a>
-            <span className="block text-xs mt-1 text-muted-foreground/80">
-              Requires a Telegram bot linked to this assistant in the agent editor first.
-            </span>
-          </li>
+          {!telegramConnected && (
+            <li>
+              <strong className="text-foreground">Telegram:</strong> Get answers on the go by
+              connecting your Telegram account.
+              <a
+                href={telegramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-2 inline-flex items-center gap-1 text-primary underline underline-offset-2 font-medium"
+              >
+                <Send className="w-3.5 h-3.5" aria-hidden="true" /> Connect Telegram
+              </a>
+              <span className="block text-xs mt-1 text-muted-foreground/80">
+                Requires a Telegram bot linked to this assistant in the agent editor first.
+              </span>
+            </li>
+          )}
         </ul>
       </div>
 

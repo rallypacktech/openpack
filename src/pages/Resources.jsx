@@ -182,7 +182,6 @@ export default function Resources() {
 
           {/* ── Find Help ── */}
           <TabsContent value="help" className="space-y-6">
-            <AgentAssistant />
             <EvacuationAlertInfo />
             <WinterOutlookCard />
             <div>
@@ -198,6 +197,8 @@ export default function Resources() {
               <p className="text-sm text-muted-foreground font-sans mb-3">Expand any manual to read it. Use <strong>Save as PDF / Print</strong> to save it to your device for offline access.</p>
               <EmergencyManuals />
             </div>
+            {/* Asked last, on purpose: work through the resources above, then ask. */}
+            <AgentAssistant />
           </TabsContent>
 
           {/* ── Community ── */}
