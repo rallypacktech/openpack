@@ -9,7 +9,11 @@ const TabsList = React.forwardRef(({ className, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+      // One shared shape for every tab bar in the app. `flex-wrap` lets a long row
+      // of tabs wrap onto a second line instead of overflowing the viewport, and
+      // `h-auto` lets the bar grow to fit — which is what keeps the dashboards
+      // usable on a phone. Pages no longer need to pass these classes themselves.
+      "flex h-auto w-full flex-wrap items-center justify-start gap-1 rounded-lg bg-muted p-1 text-muted-foreground",
       className
     )}
     {...props} />

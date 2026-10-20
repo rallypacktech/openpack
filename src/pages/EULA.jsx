@@ -30,20 +30,38 @@ export default function EULA() {
             <FileText className="w-10 h-10 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-900">End User License Agreement (EULA)</h1>
           </div>
-          <p className="text-gray-500">Effective Date: March 11, 2026</p>
-          <p className="text-gray-500">Last Updated: March 11, 2026</p>
-          <p className="text-gray-500 mt-1">Version: 1.0</p>
+          <p className="text-gray-500">Effective Date: October 20, 2026</p>
+          <p className="text-gray-500">Last Updated: October 20, 2026</p>
+          <p className="text-gray-500 mt-1">Version: 2.0</p>
         </div>
 
         <div className="space-y-6">
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                What changed in Version 2.0 (October 20, 2026)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <ul>
+                <li>The licence now expressly covers paid organization accounts. Version 1.0 granted the App "solely for personal, non-commercial" use, which no longer matched the product — businesses can subscribe, and this version says so plainly.</li>
+                <li>The App is described as licensed for personal preparedness and for the internal preparedness and compliance record-keeping of an organization holding a paid subscription.</li>
+                <li>The licence now states that the App is provided as a web application and through our mobile apps, so the terms are clear whichever way you reach it.</li>
+                <li>No restriction from Version 1.0 has been removed or relaxed, and no obligation of yours has been reduced.</li>
+              </ul>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader><CardTitle>1. Grant of License</CardTitle></CardHeader>
             <CardContent className="prose prose-sm max-w-none">
               <p>
                 Subject to your acceptance of and compliance with this End User License Agreement ("EULA"),
                 RallyPack ("we", "us", "our") grants you a limited, non-exclusive, non-transferable,
-                revocable license to access and use the RallyPack application ("the App") solely for your
-                personal, non-commercial emergency preparedness purposes.
+                revocable license to access and use the RallyPack application ("the App") for your own
+                personal emergency preparedness, and — where you hold a paid organization subscription —
+                for the internal preparedness and compliance record-keeping of that organization. The App is
+                licensed, not sold, and is made available as a web application and through our mobile apps.
               </p>
             </CardContent>
           </Card>

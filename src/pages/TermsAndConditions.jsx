@@ -30,12 +30,33 @@ export default function TermsAndConditions() {
             <FileText className="w-10 h-10 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-900">Terms and Conditions</h1>
           </div>
-          <p className="text-gray-500">Version: 2.0</p>
-          <p className="text-gray-500">Effective Date: December 27, 2025</p>
-          <p className="text-gray-500">Last Updated: August 8, 2026</p>
+          <p className="text-gray-500">Version: 3.0</p>
+          <p className="text-gray-500">Effective Date: October 20, 2026</p>
+          <p className="text-gray-500">Last Updated: October 20, 2026</p>
         </div>
 
         <div className="space-y-6">
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                What changed in Version 3.0 (October 20, 2026)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <p>
+                Version 3.0 adds terms for features introduced since Version 2.0. Your existing rights are
+                unchanged. In summary:
+              </p>
+              <ul>
+                <li><strong>Business &amp; organization accounts:</strong> new sections cover paid tiers, role-based access for members, and compliance documents you upload.</li>
+                <li><strong>Community features:</strong> new terms for the community needs board, the public drill directory, and the readiness map, including what you are publishing when you submit.</li>
+                <li><strong>Status alerts:</strong> a new section explains that broadcasts through email, Telegram and Discord are a household convenience, not an emergency service.</li>
+                <li><strong>Referrals:</strong> business referrals you submit are described as their own category, with your responsibilities for the information you provide.</li>
+                <li><strong>Consent-gated analytics:</strong> measurement loads only after you agree, and never includes your preparedness data.</li>
+              </ul>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <CardTitle>Agreement to Terms</CardTitle>
@@ -109,6 +130,12 @@ export default function TermsAndConditions() {
                 <li>Emergency meeting spot coordination</li>
                 <li>Offline access to critical emergency information</li>
                 <li>E-commerce functionality for purchasing recommended emergency supplies</li>
+                <li>One-tap status alerts ("I'm Safe" / "Need Help") broadcast to your household through the channels you connect</li>
+                <li>A public community drill directory, so organizations can list upcoming preparedness drills</li>
+                <li>A community needs board connecting organizations with supplies, volunteers and space</li>
+                <li>A readiness map showing anonymized, aggregate preparedness levels by region</li>
+                <li>Business and organization tools: workplace compliance records, expiry and inspection tracking, and member management</li>
+                <li>Educational resources by hazard and by species, and printable emergency manuals</li>
               </ul>
 
               <h3 className="font-semibold mt-4">Camera & Scanning Features:</h3>
@@ -211,6 +238,10 @@ export default function TermsAndConditions() {
               <ul>
                 <li><strong>Open-Meteo API:</strong> Weather data and forecasts. Only coordinates are shared, no personal information</li>
                 <li><strong>OpenStreetMap Nominatim:</strong> Address geocoding and autocomplete. Only address strings are sent for lookup</li>
+                <li><strong>Resend:</strong> Email delivery for notifications, reminders and shared plans</li>
+                <li><strong>Telegram:</strong> Delivers emergency alerts and status broadcasts you opt into, to a chat you connect</li>
+                <li><strong>Discord:</strong> Posts status alerts to a server channel you configure with your own webhook URL</li>
+                <li><strong>Public agency data:</strong> Wildfire, weather and emergency-alert information is sourced from public agency and satellite monitoring programmes. These sources receive no personal information about you</li>
               </ul>
 
               <h3 className="font-semibold mt-4">Authorized Integrations:</h3>
@@ -282,6 +313,99 @@ export default function TermsAndConditions() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Business & Organization Accounts</CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <h3 className="font-semibold">Subscriptions &amp; Billing:</h3>
+              <ul>
+                <li>Business and organization features are offered on paid tiers, billed through Stripe on a recurring basis</li>
+                <li>Subscriptions renew automatically until cancelled; you can cancel at any time from the business dashboard</li>
+                <li>Paid tiers set limits on tracked members, kits and included alert incidents, as shown at the point of purchase</li>
+                <li>Where a free trial or promotional code is offered, its terms apply for the stated period only</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Members &amp; Roles:</h3>
+              <ul>
+                <li>The account owner is responsible for who they invite and for the role granted to each member</li>
+                <li>Access to an organization's records is scoped by role. Only grant access to people who should see that information</li>
+                <li>An organization is responsible for obtaining any consent required from its staff before entering certification or training records about them</li>
+                <li>Removing a member ends their access to the organization's records; records they entered remain with the organization</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Compliance Records &amp; Uploaded Documents:</h3>
+              <ul>
+                <li>RallyPack is a record-keeping and reminder tool. It does not certify compliance, inspect your premises, or replace the judgement of a fire authority, inspector or other regulator</li>
+                <li>You are responsible for the accuracy of the dates, equipment and certifications you record, and for acting on the reminders you receive</li>
+                <li>Upload only documents you have the right to store, and only where you are authorized to hold that information on behalf of the people named in them</li>
+                <li>Uploaded documents are stored in private storage and opened through a short-lived signed link, visible only to accounts authorized to view them</li>
+                <li>Records must not be used to store sensitive categories of data beyond what compliance tracking requires</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Community Features &amp; User Submissions</CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <p>
+                Some parts of RallyPack publish what you submit. Please read this section before posting.
+              </p>
+
+              <h3 className="font-semibold mt-4">Public Drill Directory:</h3>
+              <ul>
+                <li>Drill listings you submit — including the organizing body, date, location, description and contact email — are <strong>publicly visible</strong></li>
+                <li>Submit only details you are willing to make public, and only for drills you are authorized to list</li>
+                <li>Listings must be genuine, current and accurate. Community members can flag a listing that is wrong, duplicated or cancelled, and we may remove any listing at our discretion</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Needs Board:</h3>
+              <ul>
+                <li>Needs you post, and individual requests you explicitly choose to share, are visible to organizations using the platform, together with the contact details you provide</li>
+                <li>Do not post another person's details without their permission, and do not post requests that are unlawful or intended to deceive responders</li>
+                <li>RallyPack does not verify needs, claims or the identity of organizations responding to them. Exercise your own judgement before acting on a posting</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Business Referrals:</h3>
+              <ul>
+                <li>When you submit a referral you confirm you have a legitimate reason to introduce that organization, and that the contact details you provide are accurate</li>
+                <li>Referrals are stored and shared with our team for follow-up, and are subject to rate limits that cap how many can be submitted</li>
+                <li>Referral submissions must never be used to send unsolicited bulk messages or to harass a business</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Readiness Map:</h3>
+              <ul>
+                <li>The readiness map shows only anonymized, aggregate figures by geographic area. Individual households, addresses and results are never displayed</li>
+                <li>By taking the readiness quiz you agree that your result may contribute to these regional aggregates, as described in our Privacy Policy</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Status Alerts &amp; Third-Party Channels</CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-4">
+                <p className="font-semibold text-red-800">NOT AN EMERGENCY SERVICE:</p>
+                <p className="text-red-700">
+                  Status alerts are a convenience for keeping your own household informed. They are not monitored,
+                  not guaranteed to be delivered, and are never seen by emergency responders. Never rely on them to
+                  summon help. In an emergency, call your local emergency number.
+                </p>
+              </div>
+              <ul>
+                <li>Broadcasts are delivered through third-party channels you connect (email, Telegram, Discord). Their availability, delivery and retention are governed by their own terms</li>
+                <li>We cannot guarantee that any alert arrives, or arrives promptly. Message delivery depends on networks and providers outside our control</li>
+                <li>Connecting a channel may share your status text with that provider. Only connect channels you trust, and disconnect them in Settings when you no longer want them</li>
+                <li>A Discord webhook URL you supply lets us post into a server you control. Anyone able to read that channel will see your status — choose the channel accordingly</li>
+                <li>Do not use status alerts to report an emergency to authorities, and do not use them to send abusive or misleading messages</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Prohibited Activities</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-sm max-w-none">
@@ -294,6 +418,8 @@ export default function TermsAndConditions() {
                 <li>Attempt to gain unauthorized access to our systems</li>
                 <li>Interfere with or disrupt the Service</li>
                 <li>Use automated systems to access the Service without permission</li>
+                <li>Submit the contact, feedback or referral forms automatically, or script submissions to bypass their rate limits</li>
+                <li>Post false, duplicated, misleading or unlawful listings, needs or referrals</li>
                 <li>Share or sell your account access</li>
                 <li>Make fraudulent purchases or chargebacks</li>
                 <li>Abuse the shopping cart or payment system</li>

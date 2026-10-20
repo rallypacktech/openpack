@@ -57,7 +57,7 @@ export const ROADMAP_PHASES = [
   {
     id: "phase-4",
     label: "Phase 4 — Retention, multi-role & navigation",
-    status: "planned",
+    status: "in_progress",
     signupLift: false,
     goal: "Keep the users you won, without confusing their records.",
     items: [
@@ -77,20 +77,20 @@ export const ROADMAP_PHASES = [
   {
     id: "phase-5",
     label: "Phase 5 — Admin data quality (backend functions restored)",
-    status: "in_progress",
+    status: "complete",
     signupLift: false,
-    goal: "Backend functions are being restored through the plan upgrade, so the scheduled automations and admin tooling can run at full strength again.",
+    goal: "Done. The plan upgrade restored the backend functions, and every scheduled automation that calls them has been re-enabled, so alerts, wildfire refreshes, expiry reminders, referral outreach and the daily maintenance jobs all run again.",
     items: [
-      "Upgrade the plan and re-enable the backend functions and the workflows that call them.",
-      "Keep duplicate-incident, missing-hectares and validation reviews running on the restored automations.",
-      "Move the shared automation secret into the platform secret store and require server-side auth on the public form endpoints.",
+      "Upgraded the plan and re-enabled the backend functions and the workflows that call them — the eleven automations that had been paused are live again.",
+      "Duplicate-incident, missing-hectares and validation reviews run on the restored automations.",
+      "Moved the shared automation secret into the platform secret store, and bounded the public form endpoints server-side: fixed recipients, capped field sizes, escaped output, and race-safe daily submission limits.",
     ],
     metrics: [
       "Open data-quality findings closed",
       "Time to resolve a duplicate incident",
       "Scheduled automations completing without errors",
     ],
-    dependsOn: ["Plan upgrade completed"],
+    dependsOn: [],
     tradeoff: "The upgrade adds recurring spend, but restores the automations and secure admin controls a manual path could not provide.",
   },
 ];

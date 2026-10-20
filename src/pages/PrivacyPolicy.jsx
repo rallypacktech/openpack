@@ -30,12 +30,34 @@ export default function PrivacyPolicy() {
             <Shield className="w-10 h-10 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
           </div>
-          <p className="text-gray-500">Version: 2.0</p>
-          <p className="text-gray-500">Effective Date: December 27, 2025</p>
-          <p className="text-gray-500">Last Updated: August 8, 2026</p>
+          <p className="text-gray-500">Version: 3.0</p>
+          <p className="text-gray-500">Effective Date: October 20, 2026</p>
+          <p className="text-gray-500">Last Updated: October 20, 2026</p>
         </div>
 
         <div className="space-y-6">
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                What changed in Version 3.0 (October 20, 2026)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <p>
+                This version brings the policy up to date with features added since Version 2.0. It does not
+                reduce any protection described previously. In summary:
+              </p>
+              <ul>
+                <li><strong>Status alerts:</strong> the channels you can broadcast an "I'm Safe" or "Need Help" status through now include email, Telegram and Discord, and the policy names each one.</li>
+                <li><strong>Business &amp; organization accounts:</strong> organizations can now hold compliance records and upload supporting documents. How those are stored and who can see them is described below.</li>
+                <li><strong>Community features:</strong> the community needs board, the public drill directory and the readiness map are covered, including what is public and what is not.</li>
+                <li><strong>Organization affiliations:</strong> an account can now belong to a household and to one or more organizations, with role-based access. The policy explains how those affiliations are scoped.</li>
+                <li><strong>Consent-gated analytics:</strong> third-party analytics and advertising measurement load only after you agree, and are never used to build a profile of your preparedness data.</li>
+                <li><strong>Referral submissions:</strong> business referrals you submit are stored and shared with our team, and are described as their own category.</li>
+              </ul>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -84,6 +106,31 @@ export default function PrivacyPolicy() {
                 <li>Notifications history and read status</li>
                 <li>Emergency cache and supply tracking data</li>
                 <li>Weather alert preferences and history</li>
+                <li>Readiness quiz answers and the resulting score</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Status Alert Channels:</h3>
+              <ul>
+                <li><strong>Channel Connections:</strong> If you connect a messaging account to broadcast an "I'm Safe" or "Need Help" status, we store the connection identifier needed to send to it — for example a Telegram chat ID and username, or a Discord webhook URL for a server you choose.</li>
+                <li><strong>Status Broadcasts:</strong> Your current status (safe, needs assistance, or unknown) and the time it was set, so your household can see it.</li>
+                <li><strong>Control:</strong> These channels are optional and can be disconnected at any time in Settings.</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Business & Organization Data:</h3>
+              <ul>
+                <li><strong>Organization Details:</strong> Organization name, country, and the email address of the account owner.</li>
+                <li><strong>Membership:</strong> Which organization a member belongs to and the role they hold, so access can be scoped correctly.</li>
+                <li><strong>Compliance Records:</strong> Staff certifications, workplace fire and life-safety equipment, and household safety devices, together with their inspection or expiry dates.</li>
+                <li><strong>Uploaded Documents:</strong> Certificates, service reports and inspection records you upload are stored in private storage. They are never publicly readable; they are opened through a short-lived signed link that expires, and only for accounts authorized to view them.</li>
+                <li><strong>Billing:</strong> Subscription tier and billing status. Card details are handled entirely by Stripe and never reach our servers.</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Community Submissions:</h3>
+              <ul>
+                <li><strong>Needs Board:</strong> When you post a need, or choose to share an individual request with organizations, we store the request, its location area and the contact details you supplied so organizations can respond.</li>
+                <li><strong>Drill Listings:</strong> Community drills you submit — the title, organizing body, type, date, location, description and the contact email you provide — are shown publicly in the drill directory. Only submit details you are willing to make public.</li>
+                <li><strong>Referrals:</strong> Business referrals you submit are stored with the referred organization's details, your name and email, and any personal message, and are shared with our team for follow-up.</li>
+                <li><strong>Contact &amp; Feedback:</strong> Messages sent through the contact and feedback forms, together with the anonymous per-browser identifier used to rate-limit those forms.</li>
               </ul>
 
               <h3 className="font-semibold mt-4">Camera & Scanning:</h3>
@@ -224,6 +271,14 @@ export default function PrivacyPolicy() {
                 <li><strong>Stripe:</strong> Secure payment processing (receives payment information, email, and transaction details)</li>
                 <li><strong>Open-Meteo:</strong> Weather data provider (location coordinates only, no personal data)</li>
                 <li><strong>OpenStreetMap Nominatim:</strong> Address geocoding (address data only, no account information)</li>
+                <li><strong>Resend:</strong> Email delivery for notifications, reminders and shared plans (recipient address and message content only)</li>
+                <li><strong>Telegram:</strong> Delivers emergency alerts and status broadcasts you have opted into, to the chat you connected</li>
+                <li><strong>Discord:</strong> Posts status alerts to a server channel you configured with your own webhook URL</li>
+              </ul>
+
+              <p className="font-semibold mt-4">Public Emergency Data Sources:</p>
+              <ul>
+                <li>Wildfire, weather and emergency-alert information is drawn from public agency sources (for example national fire and weather services, and European and global satellite fire monitoring programmes). These sources supply event data only and receive no personal information about you.</li>
               </ul>
 
               <p className="font-semibold mt-4">Legal Disclosure:</p>
@@ -235,6 +290,24 @@ export default function PrivacyPolicy() {
                 <li><strong>AI Agent Access:</strong> AI agents and chatbots that access RallyPack must comply with our Terms and this Privacy Policy. We do not share user personal data with AI systems. Any AI agent processing public RallyPack content must respect robots.txt and must not republish user-generated data.</li>
                 <li><strong>Training Data:</strong> User personal data and user-generated content are never shared with, sold to, or made available to AI model training systems. Using RallyPack content to train AI models without written authorization is prohibited.</li>
                 <li><strong>Analytics:</strong> Anonymous, aggregate usage statistics (page views, quiz completions, preparedness scores by region) may be collected to improve the service. These statistics cannot be traced back to individual users.</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Cookies, Analytics & Your Consent</CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <p>
+                Third-party analytics and advertising measurement load <strong>only after you agree</strong>. Until you
+                accept, no analytics or advertising script is loaded and no measurement request is sent.
+              </p>
+              <ul>
+                <li><strong>What runs after consent:</strong> aggregate page-view and conversion measurement (for example Google Analytics and Google Ads conversion tracking), used to understand which preparedness pages help people and which campaigns reach them.</li>
+                <li><strong>What is never measured:</strong> your preparedness data is not shared with analytics or advertising providers. Cache contents, family and pet details, health information, addresses and uploaded documents are never sent to them.</li>
+                <li><strong>Anonymous browser identifier:</strong> the public contact, feedback and referral forms use a random identifier stored in your browser — not a cookie that identifies you — purely to rate-limit submissions. It carries no personal data.</li>
+                <li><strong>Withdrawing consent:</strong> you can decline or withdraw at any time; declining does not limit any part of the service.</li>
               </ul>
             </CardContent>
           </Card>
@@ -264,6 +337,7 @@ export default function PrivacyPolicy() {
                   </ul>
                   These aggregate statistics cannot be traced back to individual users. They are retained indefinitely to support public safety, emergency planning, and disaster response coordination. When you delete your account, your personal data is removed, but you remain counted in these regional aggregates until the next data refresh cycle (typically 30 days).
                 </li>
+                <li><strong>Business Compliance Records:</strong> Retained while the organization's subscription is active, so inspection and certification history stays auditable. Uploaded documents are deleted with the record. If an organization's subscription ends, records are retained for 90 days to allow export, then removed.</li>
                 <li><strong>Backup Data:</strong> Encrypted backups retained for 90 days for disaster recovery</li>
                 <li><strong>Compliance Records:</strong> Anonymized data may be retained longer for legal compliance</li>
                 <li><strong>Audit Logs:</strong> Security and access logs retained for 12 months for SOC 2 compliance</li>

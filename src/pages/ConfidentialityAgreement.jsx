@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lock, AlertTriangle, Shield, Eye } from "lucide-react";
+import { Lock, AlertTriangle, Shield, Eye, FileText } from "lucide-react";
 
 export default function ConfidentialityAgreement() {
   return (
@@ -30,12 +30,28 @@ export default function ConfidentialityAgreement() {
             <Lock className="w-10 h-10 text-blue-600" />
             <h1 className="text-3xl font-bold text-gray-900">Confidentiality Agreement</h1>
           </div>
-          <p className="text-gray-500">Effective Date: March 11, 2026</p>
-          <p className="text-gray-500">Last Updated: March 11, 2026</p>
-          <p className="text-gray-500 mt-1">Version: 1.0</p>
+          <p className="text-gray-500">Effective Date: October 20, 2026</p>
+          <p className="text-gray-500">Last Updated: October 20, 2026</p>
+          <p className="text-gray-500 mt-1">Version: 2.0</p>
         </div>
 
         <div className="space-y-6">
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                What changed in Version 2.0 (October 20, 2026)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="prose prose-sm max-w-none">
+              <ul>
+                <li><strong>Organization affiliations are now covered.</strong> An account can belong to a household and to one or more organizations. Section 5 has been renamed and extended so the sharing rules apply to organization members and their roles, not only to households.</li>
+                <li><strong>Business compliance documents are named as Confidential Information.</strong> Certificates, service reports, inspection records and the staff or equipment details they relate to are now explicitly protected under Section 2.</li>
+                <li><strong>Referral and community submissions are addressed.</strong> Section 2 now distinguishes what you publish deliberately (drill listings, needs board posts) from what stays confidential, so the two are not confused.</li>
+                <li><strong>Auditable sharing is stated.</strong> Access to shared records is scoped by role and the person granting access is accountable for it, as set out in Section 5.</li>
+              </ul>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader><CardTitle>1. Purpose</CardTitle></CardHeader>
             <CardContent className="prose prose-sm max-w-none">
@@ -66,7 +82,18 @@ export default function ConfidentialityAgreement() {
                 <li>Meeting spot coordinates and descriptions</li>
                 <li>Emergency plans and preparedness notes</li>
                 <li>Any information shared by or about other users linked to your household</li>
+                <li>Status alert channel connections — Telegram chat identifiers and Discord webhook URLs you have configured</li>
+                <li>Business compliance records, including staff certifications, equipment details, inspection dates, and the contents of any certificate, service report or inspection record you upload</li>
+                <li>Organization membership details, including which members belong to an organization and the role each holds</li>
+                <li>Contact and feedback messages sent to our team, and business referrals you submit</li>
               </ul>
+
+              <p className="font-semibold mt-4">What is not Confidential Information:</p>
+              <p>
+                Information you deliberately publish is not confidential. Community drill listings you submit, needs
+                board posts you choose to share with organizations, and the anonymized regional aggregates shown on
+                the readiness map are public or shared by design. Everything else listed above remains confidential.
+              </p>
             </CardContent>
           </Card>
 
@@ -104,7 +131,7 @@ export default function ConfidentialityAgreement() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="w-5 h-5" />
-                5. Family & Household Data Sharing
+                5. Family, Household & Organization Data Sharing
               </CardTitle>
             </CardHeader>
             <CardContent className="prose prose-sm max-w-none">
@@ -116,6 +143,22 @@ export default function ConfidentialityAgreement() {
                 <li>You are responsible for the accuracy and lawful submission of information about minors in your household</li>
                 <li>Linked users will have access to shared emergency plans — you agree to only link individuals you trust</li>
                 <li>You understand that linked users may view cache locations, meet spots, and emergency plans associated with your household</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Keeping your own plan under your own control:</h3>
+              <ul>
+                <li>Accepting shared access to another person's plan gives you a view of that plan. It does not merge, copy or duplicate it, and it does not take your own plan away from you</li>
+                <li>You remain the owner of your own records at all times, and can leave a shared plan without losing anything of your own</li>
+                <li>The person who granted access controls what is shared and can withdraw it at any time</li>
+              </ul>
+
+              <h3 className="font-semibold mt-4">Organization affiliations and roles:</h3>
+              <ul>
+                <li>An account may hold a household context and one or more organization affiliations at the same time. Data entered in one context is not automatically visible in another</li>
+                <li>Access to an organization's records is scoped by the role granted to each member. Members see only what their role permits</li>
+                <li>Who granted access, to whom, and in what role is recorded, so sharing within an organization stays auditable</li>
+                <li>The account owner is accountable for the members they invite and the roles they assign, and must remove access when a person no longer needs it</li>
+                <li>Compliance records about a named staff member belong to the organization, not to the individual's personal account, and are handled under the organization's instructions</li>
               </ul>
             </CardContent>
           </Card>
