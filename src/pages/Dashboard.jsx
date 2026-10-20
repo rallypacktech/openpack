@@ -36,6 +36,10 @@ export default function Dashboard() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
+  // Meet spots, caches and first-aid items arrive after the critical batch. The
+  // onboarding gate must not run on their empty initial state, or a user who has
+  // already completed a step is shown it again until the data lands.
+  const [supportingDataLoaded, setSupportingDataLoaded] = useState(false);
   const [emergencyMode, setEmergencyMode] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [pets, setPets] = useState([]);
@@ -265,6 +269,7 @@ export default function Dashboard() {
           setCaches(cachesData);
           setMeetSpots(filteredSpots);
           setFirstAidItems(firstAidData);
+          setSupportingDataLoaded(true);
 
           // If no notifications, add top recommendations
           if (notifData.length === 0) {
@@ -323,6 +328,8 @@ export default function Dashboard() {
         // an unhandled rejection and surfaces as an app error, even though the
         // dashboard itself loaded fine.
         console.error("Error loading dashboard extras:", error);
+        // Unblock the onboarding gate even on failure so nobody is stuck on a spinner.
+        setSupportingDataLoaded(true);
       });
     } catch (error) {
       console.error("Error loading data:", error);
@@ -670,6 +677,10 @@ export default function Dashboard() {
   const needsTermsAgreement =
     dataLoaded && !sessionTermsAcked && !sameVersion && !withinWeek;
 
+  // Steps 3–5 read data that arrives after the critical batch, so they stay
+  // undecided until it has loaded.
+  const supportingReady = dataLoaded && supportingDataLoaded;
+
   // An "established" user has already added family members or has a complete address — don't force them through onboarding steps they haven't done
   const isEstablishedUser = familyMembers.length > 0;
   const needsAddress =
@@ -684,21 +695,21 @@ export default function Dashboard() {
     pets.length === 0 &&
     !isEstablishedUser;
   const needsMeetSpots =
-    dataLoaded &&
+    supportingReady &&
     meetSpots.length === 0 &&
     !meetSpotsStepCompleted &&
     !needsAddress &&
     !needsFamilySetup &&
     !isEstablishedUser;
   const needsCaches =
-    dataLoaded &&
+    supportingReady &&
     caches.length === 0 &&
     !needsAddress &&
     !needsFamilySetup &&
     !needsMeetSpots &&
     !isEstablishedUser;
   const needsHandlers =
-    dataLoaded &&
+    supportingReady &&
     pets.length > 0 &&
     handlers.length === 0 &&
     !handlersStepCompleted &&
