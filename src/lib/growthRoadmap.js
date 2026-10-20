@@ -1,6 +1,10 @@
 // The approved RallyPack growth and engagement roadmap, phased sign-up-growth-first
 // with explicit dependencies, success metrics and tradeoffs.
 //
+// Every phase carries a status — "complete", "in_progress" or "planned" — so the
+// roadmap page can say plainly which phases are finished. Update the status here
+// as work lands; the page reads it, it does not guess.
+//
 // Phase 1 (consent gate, conversion baseline, onboarding profile fix) is complete
 // and has been retired — its dependencies below are now satisfied.
 //
@@ -13,6 +17,7 @@ export const ROADMAP_PHASES = [
   {
     id: "phase-1",
     label: "Phase 1 — Sign-up growth",
+    status: "complete",
     signupLift: true,
     goal: "Turn search traffic and business interest into accounts — the highest-priority work now that measurement is sound.",
     items: [
@@ -33,6 +38,7 @@ export const ROADMAP_PHASES = [
   {
     id: "phase-2",
     label: "Phase 2 — Expo follow-up (manual outreach)",
+    status: "in_progress",
     signupLift: true,
     goal: "Convert Disasters Expo Texas contacts into partnerships and referrals by hand — never by cold blast.",
     items: [
@@ -51,6 +57,7 @@ export const ROADMAP_PHASES = [
   {
     id: "phase-4",
     label: "Phase 4 — Retention, multi-role & navigation",
+    status: "planned",
     signupLift: false,
     goal: "Keep the users you won, without confusing their records.",
     items: [
@@ -70,6 +77,7 @@ export const ROADMAP_PHASES = [
   {
     id: "phase-5",
     label: "Phase 5 — Admin data quality (backend functions restored)",
+    status: "in_progress",
     signupLift: false,
     goal: "Backend functions are being restored through the plan upgrade, so the scheduled automations and admin tooling can run at full strength again.",
     items: [

@@ -21,10 +21,41 @@ export default function AdminMonitor() {
   const [allProfiles, setAllProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // This monitor used to poll every 10 seconds forever, pulling every profile in
+  // the app each time — a steady drain on the app's rate limit even with the tab
+  // sitting in the background. It now refreshes every 5 minutes, and only while
+  // the tab is actually visible.
   useEffect(() => {
+    const REFRESH_INTERVAL = 5 * 60 * 1000;
+    let interval = null;
+
+    const start = () => {
+      if (interval) return;
+      interval = setInterval(loadData, REFRESH_INTERVAL);
+    };
+    const stop = () => {
+      if (!interval) return;
+      clearInterval(interval);
+      interval = null;
+    };
+    const onVisibility = () => {
+      if (document.hidden) {
+        stop();
+        return;
+      }
+      // Catch up on anything that changed while the tab was away, then resume.
+      loadData();
+      start();
+    };
+
     loadData();
-    const interval = setInterval(loadData, 10000); // Refresh every 10 seconds
-    return () => clearInterval(interval);
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   const loadData = async () => {
@@ -87,7 +118,7 @@ export default function AdminMonitor() {
               </div>
               <div className="bg-white/20 px-4 py-2 rounded-lg">
                 <div className="text-sm text-blue-100">Auto-refresh</div>
-                <div className="font-bold">10s</div>
+                <div className="font-bold">5 min</div>
               </div>
             </div>
           </div>
