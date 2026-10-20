@@ -3,6 +3,11 @@
 //
 // Phase 1 (consent gate, conversion baseline, onboarding profile fix) is complete
 // and has been retired — its dependencies below are now satisfied.
+//
+// Phase 3 (community & content depth) is complete and has been retired too:
+// flood-mitigation, home-fire and community-drill resources are published, US and
+// Canadian county/city/regional programs are listed on the Resources page, and the
+// Red Cross tasks and trainings now run as user task recommendations on the dashboard.
 
 export const ROADMAP_PHASES = [
   {
@@ -42,24 +47,6 @@ export const ROADMAP_PHASES = [
     ],
     dependsOn: ["Verified Expo contact data", "Phase 1 landing pages worth sending them to"],
     tradeoff: "Manual outreach caps volume — that is the point; it protects deliverability and reputation.",
-  },
-  {
-    id: "phase-3",
-    label: "Phase 3 — Community & content depth",
-    signupLift: false,
-    goal: "Give every hazard audience a concrete next step, not just information.",
-    items: [
-      "Publish the flood-mitigation, home-fire and community-drill resources — now live on the public Resources page.",
-      "Add US and Canadian county, city and regional emergency programs as further community examples.",
-      "Expand Red Cross preparedness tasks and trainings into user task recommendations.",
-    ],
-    metrics: [
-      "Outbound clicks per resource",
-      "Share of flood-region users who open a mitigation resource",
-      "Volunteer-intent conversions",
-    ],
-    dependsOn: ["Phase 1 public content structure"],
-    tradeoff: "Verification slows publishing — publish nothing unconfirmed.",
   },
   {
     id: "phase-4",

@@ -1,6 +1,5 @@
 /* global pendo */
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,24 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Send, X, Mail } from "lucide-react";
-
-const AUDIENCE_OPTIONS = [
-  { value: "general", label: "General / Household", path: "/LearnMore" },
-  { value: "equine", label: "Equine / Horses", path: "/equine" },
-  { value: "canine", label: "Canine / Dogs", path: "/canine" },
-  { value: "feline", label: "Feline / Cats", path: "/feline" },
-  { value: "infant", label: "Infants", path: "/infant" },
-  { value: "avian", label: "Avian / Birds", path: "/avian" },
-  { value: "reptile", label: "Reptiles", path: "/reptile" },
-  { value: "livestock", label: "Livestock", path: "/livestock" },
-  { value: "wildfire", label: "Wildfire", path: "/wildfire" },
-  { value: "flood", label: "Flood", path: "/flood" },
-  { value: "hurricane", label: "Hurricane", path: "/hurricane" },
-  { value: "tornado", label: "Tornado", path: "/tornado" },
-  { value: "hoa", label: "Homeowner Association (HOA)", path: "/ReadinessQuiz" },
-  { value: "fire_marshal", label: "Fire Safety & Prevention", path: "/BusinessOnboarding" },
-  { value: "commercial_property", label: "Commercial Property / Coworking", path: "/BusinessOnboarding" },
-];
+import { REFERRAL_AUDIENCES as AUDIENCE_OPTIONS } from "@/lib/referralAudiences";
+import { sendReferralEmail } from "@/lib/referralFallback";
 
 export default function AdminReferralForm({ onSuccess, onCancel }) {
   const [formData, setFormData] = useState({
@@ -57,11 +40,8 @@ export default function AdminReferralForm({ onSuccess, onCancel }) {
     setSubmitting(true);
     setError(null);
     try {
-      const response = await base44.functions.invoke(
-        "adminReferBusiness",
-        formData,
-      );
-      setResult(response.data);
+      const { data } = await sendReferralEmail(formData);
+      setResult(data);
       if (typeof pendo !== "undefined") {
         pendo.track("admin_referral_sent", {
           audience_type: formData.audience_type,
@@ -101,7 +81,8 @@ export default function AdminReferralForm({ onSuccess, onCancel }) {
                 {result.message}
               </p>
               <p className="text-xs text-green-700 mt-1">
-                Audience: {result.audience} · Status: Contacted
+                Audience: {result.audience} · Status:{" "}
+                {result.used_fallback ? "Saved — send it from your mail client" : "Contacted"}
               </p>
             </div>
           </div>

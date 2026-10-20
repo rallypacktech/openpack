@@ -12,6 +12,7 @@ import StatsCard from "../components/dashboard/StatsCard";
 import NotificationsList from "../components/dashboard/NotificationsList";
 import QuickActions from "../components/dashboard/QuickActions";
 import PreparednessTips from "../components/dashboard/PreparednessTips";
+import RecommendedTasks from "../components/dashboard/RecommendedTasks";
 import StructuredAddressInput from "../components/settings/StructuredAddressInput";
 import ReadinessScore from "../components/dashboard/ReadinessScore";
 import SafetyBeacon from "../components/dashboard/SafetyBeacon";
@@ -1323,6 +1324,9 @@ export default function Dashboard() {
 
             {/* Preparedness Tips */}
             <PreparednessTips />
+
+            {/* Recommended Next Steps — Red Cross tasks and trainings */}
+            <RecommendedTasks />
           </div>
 
           {/* Sidebar */}

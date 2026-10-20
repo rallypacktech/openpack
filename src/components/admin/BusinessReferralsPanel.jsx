@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import AdminReferralForm from "./AdminReferralForm";
 import EmailTemplatesEditor from "./EmailTemplatesEditor";
+import { invokeWithFallback } from "@/lib/planLimits";
+import { buildReferralMailto, openMailto } from "@/lib/referralFallback";
 
 const AUDIENCE_LABELS = {
   general: 'General',
@@ -86,8 +88,9 @@ export default function BusinessReferralsPanel() {
     if (!window.confirm(`Send referral emails to all ${pendingCount} pending businesses via Resend?`)) return;
     setContacting(true);
     try {
-      const res = await base44.functions.invoke('contactPendingReferrals', {});
-      const data = res.data || res;
+      const { data } = await invokeWithFallback('contactPendingReferrals', {}, async () => ({
+        message: `RallyPack's email service isn't available on this plan. Use the email button on each of the ${pendingCount} pending referrals to send it from your own mail client.`,
+      }));
       window.alert(data.message || `Sent ${data.sent_automatically || 0} email(s).`);
       loadReferrals();
     } catch (error) {
@@ -101,8 +104,21 @@ export default function BusinessReferralsPanel() {
   const handleResend = async (referralId) => {
     setResendingId(referralId);
     try {
-      const res = await base44.functions.invoke('contactPendingReferrals', { referral_ids: [referralId] });
-      const data = res.data || res;
+      const { data, usedFallback } = await invokeWithFallback(
+        'contactPendingReferrals',
+        { referral_ids: [referralId] },
+        async () => {
+          const referral = referrals.find(r => r.id === referralId);
+          if (referral) openMailto(buildReferralMailto(referral));
+          return {
+            message: "RallyPack's email service isn't available on this plan, so this referral has been opened in your mail client. Mark it contacted once you've sent it.",
+          };
+        },
+      );
+      if (usedFallback) {
+        window.alert(data.message);
+        return;
+      }
       const errors = data.per_audience?.flatMap(a => a.errors || []) || [];
       const queued = (data.per_audience || []).reduce((sum, a) => sum + (a.queued_count || 0), 0);
       if (data.sent_automatically > 0) {

@@ -1,0 +1,82 @@
+{
+  "name": "UserTask",
+  "type": "object",
+  "properties": {
+    "task_key": {
+      "type": "string",
+      "description": "Stable key of the recommended task this row tracks, so a task keeps its completion state when the catalogue is reworded"
+    },
+    "title": {
+      "type": "string",
+      "description": "The task title as it read when it was completed"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "preparedness",
+        "training"
+      ],
+      "default": "preparedness",
+      "description": "Whether this is a household preparedness task or a training to take"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the recommendation came from, e.g. 'American Red Cross'"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has marked this task done"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the task was marked done"
+    }
+  },
+  "required": [
+    "task_key",
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -23,6 +23,7 @@ import {
 import PricingSection from "@/components/business/PricingSection";
 import WildfireTrendsCallout from "@/components/business/WildfireTrendsCallout";
 import { isPlanLimitError } from "@/lib/planLimits";
+import { buildReferralMailto, recordReferralFallback } from "@/lib/referralFallback";
 
 export default function BusinessOnboarding() {
   const [form, setForm] = useState({
@@ -63,11 +64,7 @@ export default function BusinessOnboarding() {
       } catch (err) {
         if (!isPlanLimitError(err)) throw err;
         try {
-          await base44.entities.BusinessReferral.create({
-            ...referral,
-            source: "public_form",
-            status: "pending",
-          });
+          await recordReferralFallback(referral, "public_form");
           recorded = true;
         } catch (_e) {
           recorded = false;
@@ -87,6 +84,7 @@ export default function BusinessOnboarding() {
         org: form.organization_name,
         message: form.message,
         recorded,
+        mailto: buildReferralMailto(referral),
       });
       setForm({
         referee_email: "",
@@ -327,16 +325,7 @@ export default function BusinessOnboarding() {
                 </p>
                 <div className="flex flex-col gap-3 items-center">
                   <a
-                    href={`mailto:${sent.email}?subject=${encodeURIComponent(
-                      (sent.org ? sent.org + " — " : "") +
-                        "Check out RallyPack for Business",
-                    )}&body=${encodeURIComponent(
-                      `Hi${sent.name ? " " + sent.name : ""},\n\n` +
-                        `I thought your organization${sent.org ? " (" + sent.org + ")" : ""} would benefit from RallyPack — it tracks first aid kit inventory, expiry dates, and evacuation plans so you're always inspection ready.\n\n` +
-                        `Features include:\n• Multi-location first aid kit tracking with expiry alerts\n• Evacuation plan documentation\n• Floor warden & chain-of-command roster\n\n` +
-                        (sent.message ? `My note: ${sent.message}\n\n` : "") +
-                        `Check it out: https://rallypack.org/BusinessOnboarding\n\nThanks!`,
-                    )}`}
+                    href={sent.mailto}
                     className="inline-flex items-center gap-2 bg-[#D64A2E] text-white font-semibold text-sm px-6 py-2.5 rounded hover:bg-[#be3f25] transition-colors"
                   >
                     <Mail className="w-4 h-4" /> Email them directly
