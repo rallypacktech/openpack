@@ -140,6 +140,7 @@ const RESOURCE_CATEGORIES = [
       { name: "Red Cross Psychological First Aid", desc: "The Red Cross provides mental health and spiritual care services to disaster survivors, family members, and responders.", url: "https://www.redcross.org/local/georgia.html", icon: "🔴" },
       { name: "FEMA Crisis Counseling Program", desc: "Free short-term individual and group counseling funded by FEMA for survivors in presidentially declared disaster areas.", url: "https://www.samhsa.gov/dtac/ccp", icon: "🏛️" },
       { name: "Headspace — First Responders", desc: "Free mindfulness and meditation app access for first responders and disaster relief workers experiencing burnout or trauma.", url: "https://www.headspace.com/first-responders", icon: "🧘" },
+      { name: "First Responder Therapy Dogs", desc: "Certified therapy dog teams deployed to support first responders after critical incidents — peer support, stress relief, and wellness programs for police, fire, EMS, and dispatch.", url: "https://firstrespondertherapydogs.org/", icon: "🐕" },
     ],
   },
   {
