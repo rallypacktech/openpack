@@ -41,7 +41,11 @@ Deno.serve(async (req) => {
                 } catch (e) { /* skip not found */ }
             }
         } else {
-            referrals = await base44.asServiceRole.entities.BusinessReferral.filter({ status: 'pending' });
+            // Expo contacts are mirrored in for manual tracking only — a bulk send
+            // must never reach them, so they are excluded here.
+            referrals = (
+                await base44.asServiceRole.entities.BusinessReferral.filter({ status: 'pending' })
+            ).filter((r) => r.source !== 'expo_outreach');
         }
 
         if (referrals.length === 0) {

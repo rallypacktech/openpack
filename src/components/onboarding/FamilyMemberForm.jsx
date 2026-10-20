@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { X, Plus, Users, Info, PawPrint } from "lucide-react";
+import { shareFieldsFor } from "@/lib/planShare";
 
 export default function FamilyMemberForm({ onComplete, onSkip }) {
   const [saving, setSaving] = useState(false);
@@ -33,7 +34,11 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
 
   const handleAddMember = () => {
     if (currentMember.name) {
-      setMembers([...members, currentMember]);
+      // An email address is what starts the share — see lib/planShare.
+      setMembers([
+        ...members,
+        { ...currentMember, ...shareFieldsFor(currentMember.emergency_contact) },
+      ]);
       setCurrentMember({
         name: "",
         relationship: "spouse",
@@ -98,9 +103,9 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
           <div className="text-sm text-blue-900">
             <p className="font-semibold mb-2">What happens when you add family members:</p>
             <ul className="space-y-1">
-              <li>✓ <strong>If you provide an email:</strong> They'll receive an invitation to join RallyPack and can see your emergency caches, meet spots, and coordinate with you during disasters</li>
+              <li>✓ <strong>If you provide an email:</strong> They're invited to your plan — once they accept, they can see your emergency caches and meet spots in their own account</li>
               <li>✓ <strong>Without an email:</strong> Their info is stored for your reference and used for personalized recommendations</li>
-              <li>✓ All family members can access shared emergency plans and communicate through the app</li>
+              <li>✓ Accepting never copies your plan — you keep your own records and can unshare at any time</li>
             </ul>
           </div>
         </div>
@@ -277,7 +282,7 @@ export default function FamilyMemberForm({ onComplete, onSkip }) {
                   placeholder="e.g., sarah@email.com or (555) 123-4567"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  If you provide an email, they'll be invited to join and can access your shared emergency plans
+                  If you provide an email, they can accept access to your plan from their own account — nothing is copied, and you can unshare later
                 </p>
               </div>
 

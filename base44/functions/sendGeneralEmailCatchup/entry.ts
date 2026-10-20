@@ -63,8 +63,11 @@ Deno.serve(async (req) => {
         // Find referrals that haven't received the general email yet. Bounced
         // addresses are excluded so a dead mailbox is never retried.
         const allReferrals = await base44.asServiceRole.entities.BusinessReferral.filter({});
+        // Expo contacts are mirrored into the pipeline for manual tracking only —
+        // they never consented to an email, so the scheduled send skips them.
         const needsGeneral = allReferrals.filter(r =>
-            !r.general_email_sent && r.status !== 'archived' && r.referee_email && !r.bounced
+            !r.general_email_sent && r.status !== 'archived' && r.referee_email && !r.bounced &&
+            r.source !== 'expo_outreach'
         );
 
         const uniqueEmailCount = new Set(

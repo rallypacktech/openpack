@@ -44,6 +44,7 @@ export const ROADMAP_PHASES = [
     items: [
       "Work the verified exhibitor and speaker list in the Expo Outreach tab, one conversation goal per contact.",
       "Record each prospect and its status so outreach stays auditable.",
+      "Mirror the verified Expo contacts into the referral pipeline, tagged as Expo outreach so the scheduled referral emails skip them and outreach stays one conversation at a time.",
       "Route financial-aid organisations to trusted-resource links with eligibility disclaimers, not partnership claims.",
     ],
     metrics: [
@@ -57,14 +58,14 @@ export const ROADMAP_PHASES = [
   {
     id: "phase-4",
     label: "Phase 4 — Retention, multi-role & navigation",
-    status: "in_progress",
+    status: "complete",
     signupLift: false,
-    goal: "Keep the users you won, without confusing their records.",
+    goal: "Done. People can hold several roles at once without their records colliding, plans are shared by consent rather than copied, navigation holds up on a phone, and expiry reminders say what to actually do.",
     items: [
-      "Model account context explicitly: individual, household, and multiple organisation affiliations, with role-based access and auditable sharing.",
-      "Let a person accept shared access to a family member's plan while keeping control of their own — never duplicating plans.",
-      "Standardise primary and sub-navigation across every dashboard so it wraps cleanly on narrow screens.",
-      "Frame expiry reminders sensitively: safe disposal and replacement for anything safety-critical, reuse only for non-critical items.",
+      "Account context is explicit: one person can be an individual, part of a household, and a member of several organisations, each with its own role and permissions.",
+      "Plan sharing is a handshake — the owner offers access, the family member accepts or declines from their own account, and the plan is never duplicated. Each share records who invited whom and when, and the owner can withdraw it at any time.",
+      "Primary and sub-navigation share one wrapping tab bar, so every dashboard stays usable on a narrow screen.",
+      "Expiry reminders now separate safety-critical items — devices, certifications and medication — from ordinary supplies: the first are taken out of service and replaced with safe-disposal guidance, the second are checked and reused rather than thrown away.",
     ],
     metrics: [
       "Multi-role accounts created",

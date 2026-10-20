@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { DAY_MS, escapeHtml, daysUntil, isAutomationRequest } from '../../shared/reminderUtils.ts';
+import { splitLapsed, CRITICAL_GUIDANCE, REUSABLE_GUIDANCE } from '../../shared/expiryGuidance.ts';
 
 /**
  * Monthly scheduled job: emails each business organization a single summary of
@@ -80,6 +81,10 @@ Deno.serve(async (req) => {
 
       if (expired.length === 0 && expiring.length === 0) { skipped++; continue; }
 
+      // Equipment and certifications must be replaced; ordinary kit supplies
+      // only need checking before they are kept or reused.
+      const lapsed = splitLapsed(expired);
+
       const row = (e) =>
         `<li style="margin:0 0 6px;">${escapeHtml(e.label)} — <strong>${e.days < 0 ? 'expired' : 'expires'} ${new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>${e.days < 0 ? ` (${Math.abs(e.days)} days ago)` : ` (in ${e.days} days)`}</li>`;
 
@@ -105,10 +110,18 @@ Deno.serve(async (req) => {
           <td style="padding:28px 32px;">
             <h2 style="margin:0 0 12px;font-family:Georgia,serif;font-size:19px;">Expiration summary for ${orgName}</h2>
             <p style="margin:0 0 18px;font-size:15px;">Here is what needs attention before your next inspection.</p>
-            ${expired.length > 0 ? `
+            ${lapsed.critical.length > 0 ? `
             <div style="background:#fdecea;border-left:4px solid #b3261e;padding:12px 16px;margin:0 0 16px;">
-              <h3 style="margin:0 0 8px;font-size:14px;color:#b3261e;">Replace now — ${expired.length} item${expired.length !== 1 ? 's' : ''} expired</h3>
-              <ul style="margin:0;padding-left:18px;font-size:14px;">${expired.map(row).join('')}</ul>
+              <h3 style="margin:0 0 8px;font-size:14px;color:#b3261e;">${CRITICAL_GUIDANCE.heading} — ${lapsed.critical.length} safety item${lapsed.critical.length !== 1 ? 's' : ''} expired</h3>
+              <ul style="margin:0;padding-left:18px;font-size:14px;">${lapsed.critical.map(row).join('')}</ul>
+              <p style="margin:10px 0 0;font-size:13px;">${CRITICAL_GUIDANCE.action}</p>
+              <p style="margin:6px 0 0;font-size:13px;">${CRITICAL_GUIDANCE.disposal}</p>
+            </div>` : ''}
+            ${lapsed.reusable.length > 0 ? `
+            <div style="background:#fff8e7;border-left:4px solid #d64a2e;padding:12px 16px;margin:0 0 16px;">
+              <h3 style="margin:0 0 8px;font-size:14px;color:#a83a20;">${REUSABLE_GUIDANCE.heading} — ${lapsed.reusable.length} supply item${lapsed.reusable.length !== 1 ? 's' : ''} expired</h3>
+              <ul style="margin:0;padding-left:18px;font-size:14px;">${lapsed.reusable.map(row).join('')}</ul>
+              <p style="margin:10px 0 0;font-size:13px;">${REUSABLE_GUIDANCE.action} ${REUSABLE_GUIDANCE.disposal}</p>
             </div>` : ''}
             ${expiring.length > 0 ? `
             <div style="background:#fff8e7;border-left:4px solid #d64a2e;padding:12px 16px;margin:0 0 16px;">

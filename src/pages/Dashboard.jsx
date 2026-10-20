@@ -24,6 +24,7 @@ import TermsAgreement, {
 import { safeSessionGet, safeSessionSet } from "../lib/utils";
 import { useFirstCacheMilestone } from "@/hooks/useFirstCacheMilestone";
 import { getCurrentUser, getMyProfile } from "@/lib/currentUser";
+import { shareFieldsFor } from "@/lib/planShare";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -957,7 +958,7 @@ export default function Dashboard() {
                             member.medical_conditions || undefined,
                           emergency_contact:
                             member.emergency_contact || undefined,
-                          link_status: member.link_status || "none",
+                          ...shareFieldsFor(member.emergency_contact),
                         };
                         await base44.entities.FamilyMember.create(cleanMember);
                       }
@@ -1018,7 +1019,7 @@ export default function Dashboard() {
                               member.medical_conditions || undefined,
                             emergency_contact:
                               member.emergency_contact || undefined,
-                            link_status: member.link_status || "none",
+                            ...shareFieldsFor(member.emergency_contact),
                           };
                           await base44.entities.FamilyMember.create(
                             cleanMember,

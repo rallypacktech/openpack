@@ -19,6 +19,8 @@ import StatusAlertChannels from "../components/settings/StatusAlertChannels";
 import AddToHomeScreen from "../components/settings/AddToHomeScreen";
 import TelegramConnect from "../components/settings/TelegramConnect";
 import DiscordConnect from "../components/settings/DiscordConnect";
+import SharedAccessPanel from "../components/settings/SharedAccessPanel";
+import { shareFieldsFor } from "@/lib/planShare";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -125,7 +127,11 @@ export default function Settings() {
   };
 
   const handleAddFamilyMember = async (data) => {
-    await base44.entities.FamilyMember.create(data);
+    // An email address is what offers plan access — see lib/planShare.
+    await base44.entities.FamilyMember.create({
+      ...data,
+      ...shareFieldsFor(data.emergency_contact),
+    });
 
     // Generate notifications for new family member
     await base44.functions.invoke("generateFamilyNeedsNotifications", {
@@ -142,7 +148,16 @@ export default function Settings() {
   };
 
   const handleUpdateFamilyMember = async (id, data) => {
-    await base44.entities.FamilyMember.update(id, data);
+    // Re-offering access on every edit would wipe an accepted link, so only
+    // touch the share state when the address itself changed.
+    const existing = familyMembers.find((m) => m.id === id);
+    const emailChanged =
+      String(existing?.emergency_contact || "").trim().toLowerCase() !==
+      String(data.emergency_contact || "").trim().toLowerCase();
+    await base44.entities.FamilyMember.update(id, {
+      ...data,
+      ...(emailChanged ? shareFieldsFor(data.emergency_contact) : {}),
+    });
     loadData();
   };
 
@@ -271,6 +286,9 @@ export default function Settings() {
             onDelete={handleDeleteFamilyMember}
           />
         </div>
+
+        {/* Plans shared with you by family members */}
+        <SharedAccessPanel user={user} onChanged={loadData} />
 
         {/* Pets Section */}
         <PetsList

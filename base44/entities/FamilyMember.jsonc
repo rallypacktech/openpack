@@ -40,10 +40,21 @@
       "enum": [
         "pending",
         "accepted",
+        "declined",
         "none"
       ],
       "default": "none",
-      "description": "Status of account linking"
+      "description": "Status of account linking: 'pending' once a share is offered, 'accepted' or 'declined' once the family member answers, 'none' when there is nothing to share"
+    },
+    "invited_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When plan sharing was offered to this family member"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the family member accepted or declined the share"
     }
   },
   "required": [
