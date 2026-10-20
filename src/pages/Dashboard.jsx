@@ -23,6 +23,7 @@ import TermsAgreement, {
 } from "../components/onboarding/TermsAgreement";
 import { safeSessionGet, safeSessionSet } from "../lib/utils";
 import { useFirstCacheMilestone } from "@/hooks/useFirstCacheMilestone";
+import { getCurrentUser, getMyProfile } from "@/lib/currentUser";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -184,12 +185,12 @@ export default function Dashboard() {
 
   const loadData = async () => {
     try {
-      const user = await base44.auth.me();
+      const user = await getCurrentUser();
       setUserEmail(user.email);
 
       // Load critical data for onboarding check
-      const [profileData, petsData, familyData, handlersData] = await Promise.all([
-        base44.entities.UserProfile.filter({ created_by: user.email }),
+      const [profileRecord, petsData, familyData, handlersData] = await Promise.all([
+        getMyProfile(),
         base44.entities.Pet.filter({ created_by: user.email }),
         base44.entities.FamilyMember.filter({ created_by: user.email }),
         base44.entities.AuthorizedHandler.filter({ created_by: user.email }),
@@ -198,14 +199,14 @@ export default function Dashboard() {
       setCurrentUser(user);
       setHandlers(handlersData);
 
-      if (profileData.length > 0) {
-        setUserProfile(profileData[0]);
+      if (profileRecord) {
+        setUserProfile(profileRecord);
         // Fetch weather in background
-        if (profileData[0].latitude && profileData[0].longitude) {
+        if (profileRecord.latitude && profileRecord.longitude) {
           fetchWeather(
-            profileData[0].latitude,
-            profileData[0].longitude,
-            profileData[0].country,
+            profileRecord.latitude,
+            profileRecord.longitude,
+            profileRecord.country,
           );
         }
       } else {

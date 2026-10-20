@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser, getMyProfile } from "@/lib/currentUser";
 import { useActivityHeartbeat } from "@/hooks/useActivityHeartbeat";
 import { getConsent } from "@/lib/consent";
 import { trackFunnel, FUNNEL } from "@/lib/funnel";
@@ -40,7 +41,7 @@ export default function Layout({ children, currentPageName }) {
     const loadUser = async () => {
       let userData = null;
       try {
-        userData = await base44.auth.me();
+        userData = await getCurrentUser();
       } catch (_e) {
         userData = null;
       }
@@ -58,8 +59,8 @@ export default function Layout({ children, currentPageName }) {
 
       // Load profile silently to get emergency_countries
       try {
-        const profiles = await base44.entities.UserProfile.filter({ created_by: userData.email });
-        if (profiles.length > 0) setProfile(profiles[0]);
+        const myProfile = await getMyProfile();
+        if (myProfile) setProfile(myProfile);
       } catch (_e) { /* non-fatal */ }
 
       // Claim any readiness quiz this user took before they had an account —

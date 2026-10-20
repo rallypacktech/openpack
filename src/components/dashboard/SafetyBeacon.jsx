@@ -1,6 +1,7 @@
 /* global pendo */
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser, getMyProfile } from "@/lib/currentUser";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,14 +57,14 @@ export default function SafetyBeacon() {
 
   const load = async () => {
     try {
-      const u = await base44.auth.me();
+      const u = await getCurrentUser();
       setUser(u);
-      const [profiles, spots] = await Promise.all([
-        base44.entities.UserProfile.filter({ created_by: u.email }),
+      const [myProfile, spots] = await Promise.all([
+        getMyProfile(),
         base44.entities.MeetSpot.list(),
       ]);
-      profileIdRef.current = profiles[0]?.id || null;
-      setProfile(profiles[0] || null);
+      profileIdRef.current = myProfile?.id || null;
+      setProfile(myProfile);
       setMeetSpots(spots);
 
       // Load family statuses

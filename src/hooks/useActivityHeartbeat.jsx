@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
+import { getCurrentUser, getMyProfile } from "@/lib/currentUser";
 
 // Updates the user's last_active timestamp periodically while they're active in the app.
 // This powers the "Online Now" count in the admin system monitor.
@@ -48,11 +49,11 @@ export function useActivityHeartbeat() {
 
     (async () => {
       try {
-        const user = await base44.auth.me();
+        const user = await getCurrentUser();
         if (!user) return;
-        const profiles = await base44.entities.UserProfile.filter({ created_by_id: user.id });
-        if (profiles.length > 0 && mounted) {
-          profileIdRef.current = profiles[0].id;
+        const profile = await getMyProfile();
+        if (profile && mounted) {
+          profileIdRef.current = profile.id;
           heartbeat();
           intervalRef.current = setInterval(heartbeat, HEARTBEAT_INTERVAL);
         }
