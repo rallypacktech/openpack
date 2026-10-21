@@ -668,15 +668,13 @@ export default function Dashboard() {
 
   // Onboarding Flow
   const sessionTermsKey = "rallypack_terms_ack_session";
-  const sessionTermsAcked = safeSessionGet(sessionTermsKey) === "true";
+  // The session ack is scoped to the exact version agreed to, so publishing a
+  // new version always re-prompts instead of being masked by an earlier ack.
+  const sessionTermsAcked = safeSessionGet(sessionTermsKey) === TERMS_VERSION;
   const agreedVersion = userProfile?.terms_agreed_version;
-  const agreedDate = userProfile?.terms_agreed_date;
   const sameVersion = agreedVersion === TERMS_VERSION;
-  const withinWeek =
-    agreedDate &&
-    Date.now() - new Date(agreedDate).getTime() < 7 * 24 * 60 * 60 * 1000;
   const needsTermsAgreement =
-    dataLoaded && !sessionTermsAcked && !sameVersion && !withinWeek;
+    dataLoaded && !sessionTermsAcked && !sameVersion;
 
   // Steps 3–5 read data that arrives after the critical batch, so they stay
   // undecided until it has loaded.
@@ -728,7 +726,7 @@ export default function Dashboard() {
       <TermsAgreement
         onAgree={async (version, date) => {
           try {
-            safeSessionSet("rallypack_terms_ack_session", "true");
+            safeSessionSet("rallypack_terms_ack_session", version);
             const isNewUser = !userProfile;
             const previousVersion = userProfile?.terms_agreed_version || "";
             if (userProfile) {
