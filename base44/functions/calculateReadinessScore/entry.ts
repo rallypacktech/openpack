@@ -12,13 +12,17 @@ Deno.serve(async (req) => {
     const EQUINE_SPECIES = ['equine', 'livestock'];
 
     // Fetch all preparedness data
-    const [profile, caches, meetSpots, familyMembers, pets, firstAidItems] = await Promise.all([
+    // Quiz results are written by the service role, so the caller cannot read
+    // their own rows under RLS. Count them here, scoped to the signed-in user's
+    // own address, so the dashboard knows whether to recommend the quiz.
+    const [profile, caches, meetSpots, familyMembers, pets, firstAidItems, quizResults] = await Promise.all([
       base44.entities.UserProfile.filter({ created_by: user.email }),
       base44.entities.EmergencyCache.filter({ created_by: user.email, is_sample: false }),
       base44.entities.MeetSpot.filter({ created_by: user.email }),
       base44.entities.FamilyMember.filter({ created_by: user.email }),
       base44.entities.Pet.filter({ created_by: user.email }),
-      base44.entities.FirstAidItem.filter({ created_by: user.email })
+      base44.entities.FirstAidItem.filter({ created_by: user.email }),
+      base44.asServiceRole.entities.QuizResult.filter({ user_email: user.email })
     ]);
 
     const userProfile = profile[0];
@@ -96,6 +100,7 @@ Deno.serve(async (req) => {
     return Response.json({
       score: percentage,
       breakdown,
+      has_quiz_result: quizResults.length > 0,
       hasLargeAnimals,
       level: percentage >= 80 ? 'Excellent' : percentage >= 60 ? 'Good' : percentage >= 40 ? 'Fair' : 'Needs Improvement',
       recommendations: generateRecommendations(breakdown, familyMembers.length, pets.length, hasLargeAnimals, userProfile)

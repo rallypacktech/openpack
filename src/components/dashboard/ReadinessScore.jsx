@@ -16,14 +16,12 @@ export default function ReadinessScore() {
 
   const loadScore = async () => {
     try {
-      const [response, quizResults] = await Promise.all([
-        base44.functions.invoke('calculateReadinessScore'),
-        // Only whether a quiz result exists matters here — one id is enough, so
-        // there's no reason to pull the whole quiz history on every dashboard load.
-        base44.entities.QuizResult.filter({}, { limit: 1, fields: ['id'] }),
-      ]);
+      // Whether the user has a quiz result comes back with the score itself: the
+      // result rows are written by the service role, so a user-scoped read of
+      // them returns nothing and the quiz was recommended to everyone.
+      const response = await base44.functions.invoke('calculateReadinessScore');
       setScoreData(response.data);
-      setHasQuizResult((quizResults.items || []).length > 0);
+      setHasQuizResult(!!response.data?.has_quiz_result);
     } catch (error) {
       console.error('Error loading readiness score:', error);
     } finally {

@@ -14,6 +14,7 @@ import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySe
 import LoginWall from "../components/LoginWall";
 import { detectBot, getStableBotId } from "@/lib/botDetection";
 import { trackFunnel, FUNNEL } from "@/lib/funnel";
+import { getMyProfile } from "@/lib/currentUser";
 import AdSlot from "../components/AdSlot";
 import ResourcesSection from "../components/ResourcesSection";
 
@@ -273,6 +274,7 @@ function QuizResults({ score, answers, onRetake }) {
   const regionRes =
     REGION_RESOURCES[answers.region] || REGION_RESOURCES.general;
   const [isAuthed, setIsAuthed] = React.useState(null);
+  const [isOnboarded, setIsOnboarded] = React.useState(false);
   const [avgScore, setAvgScore] = React.useState(null);
 
   React.useEffect(() => {
@@ -281,6 +283,24 @@ function QuizResults({ score, answers, onRetake }) {
       .then(setIsAuthed)
       .catch(() => setIsAuthed(false));
   }, []);
+
+  // Someone who already finished onboarding must not be sent back through it
+  // after retaking the quiz — the results screen hands them to their dashboard.
+  React.useEffect(() => {
+    if (!isAuthed) return;
+    let cancelled = false;
+    getMyProfile()
+      .then((profile) => {
+        if (cancelled) return;
+        setIsOnboarded(
+          !!(profile?.street_address || profile?.onboarding_completed),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthed]);
 
   // Save result on mount (once)
   React.useEffect(() => {
@@ -567,8 +587,9 @@ function QuizResults({ score, answers, onRetake }) {
                   Results saved to your account.
                 </p>
                 <p className="text-sm text-muted-foreground font-sans mt-1">
-                  Set up your household profile, address, and emergency plan —
-                  it takes 2 minutes.
+                  {isOnboarded
+                    ? "Your updated score is waiting on your dashboard."
+                    : "Set up your household profile, address, and emergency plan — it takes 2 minutes."}
                 </p>
               </div>
               <div className="flex gap-3 flex-shrink-0">
@@ -582,9 +603,19 @@ function QuizResults({ score, answers, onRetake }) {
                   to="/Dashboard"
                   className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-medium px-6 py-2.5 rounded hover:bg-primary/90 transition-colors text-sm"
                 >
-                  Start Onboarding <ChevronRight className="w-4 h-4" />
+                  {isOnboarded ? "Back to Dashboard" : "Start Onboarding"}{" "}
+                  <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
+            </div>
+          ) : isAuthed === null ? (
+            // Auth is still resolving. Showing the sign-up wall here would read
+            // as having been logged out, so hold the space until it settles.
+            <div className="bg-card border border-border rounded p-6 flex items-center gap-3">
+              <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <p className="text-sm text-muted-foreground font-sans">
+                Checking your account…
+              </p>
             </div>
           ) : (
             <>
