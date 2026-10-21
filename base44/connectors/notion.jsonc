@@ -1,7 +1,0 @@
-{
-  "type": "notion",
-  "scopes": [
-    "read:page",
-    "read:database"
-  ]
-}
