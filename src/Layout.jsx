@@ -64,12 +64,14 @@ export default function Layout({ children, currentPageName }) {
       } catch (_e) { /* non-fatal */ }
 
       // Claim any readiness quiz this user took before they had an account —
-      // this is what makes the quiz → signup conversion measurable.
+      // this is what makes the quiz → signup conversion measurable. The signed
+      // session token is sent rather than the bare id, so the claim proves the
+      // quiz was actually taken in this browser.
       try {
-        const quizSession = localStorage.getItem("rp_quiz_session");
+        const quizSessionToken = sessionStorage.getItem("rp_quiz_session_token");
         const claimedKey = `rallypack_quiz_claimed_${userData.id}`;
-        if (quizSession && !localStorage.getItem(claimedKey)) {
-          await base44.functions.invoke("linkQuizResults", { session_id: quizSession });
+        if (quizSessionToken && !localStorage.getItem(claimedKey)) {
+          await base44.functions.invoke("linkQuizResults", { session_token: quizSessionToken });
           localStorage.setItem(claimedKey, "1");
         }
       } catch (_e) { /* non-fatal */ }

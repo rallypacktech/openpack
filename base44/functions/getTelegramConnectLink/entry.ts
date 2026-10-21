@@ -1,5 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
+// How long a freshly issued connect link stays usable. Long enough to open
+// Telegram and send the message, short enough that a leaked link goes stale.
+const CONNECT_TOKEN_TTL_MS = 30 * 60 * 1000;
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -10,14 +14,18 @@ Deno.serve(async (req) => {
     const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
     let profile = profiles.length > 0 ? profiles[0] : null;
 
-    // Generate a connect token if the profile doesn't have one yet
-    const token = profile?.telegram_connect_token || crypto.randomUUID();
+    // The connect link is a bearer credential for the user's alert channel, so the
+    // token is minted fresh on every request — rotating any previous one — and
+    // carries its own expiry as "<expiryMs>-<uuid>". telegramWebhook enforces that
+    // expiry and clears the token on the first successful pairing, so a leaked
+    // link cannot be replayed.
+    const token = `${Date.now() + CONNECT_TOKEN_TTL_MS}-${crypto.randomUUID()}`;
 
     if (!profile) {
       profile = await base44.entities.UserProfile.create({
         telegram_connect_token: token
       });
-    } else if (!profile.telegram_connect_token) {
+    } else {
       await base44.entities.UserProfile.update(profile.id, { telegram_connect_token: token });
       profile.telegram_connect_token = token;
     }

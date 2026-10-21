@@ -1,5 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { secrets } from 'base44:runtime';
 import { geoFieldsFromProfile, clearReadinessMapCache } from '../../shared/readinessProfileGeo.ts';
+import { verifyQuizSession } from '../../shared/quizSession.ts';
+
+// Claiming happens after sign-up, which can be long after the quiz was taken, so
+// the token is only checked for authenticity plus a generous outer age bound.
+const MAX_SESSION_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 // Claims readiness quiz results that were saved before the taker had an account.
 // The quiz stores a stable session id in localStorage; after the user signs up
@@ -19,10 +25,18 @@ export default async function (req) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { session_id } = await req.json().catch(() => ({}));
-    if (!session_id) {
+    // The session id is chosen and signed by the server. Verifying the token proves
+    // this caller actually took the quiz, instead of naming an arbitrary session id
+    // and re-attributing someone else's anonymous result to their own account.
+    const { session_token } = await req.json().catch(() => ({}));
+    const session = await verifyQuizSession(secrets.get('QUIZ_SESSION_SECRET'), session_token, {
+      minAgeMs: 0,
+      maxAgeMs: MAX_SESSION_AGE_MS,
+    });
+    if (!session) {
       return Response.json({ linked: 0 });
     }
+    const session_id = session.sessionId;
 
     const results = await base44.asServiceRole.entities.QuizResult.filter({ session_id });
     const unlinked = results.filter((r) => !r.is_registered_user);

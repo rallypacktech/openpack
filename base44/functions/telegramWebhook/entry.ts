@@ -54,16 +54,24 @@ Deno.serve(async (req) => {
         const token = parts.length > 1 ? parts[1].trim() : '';
 
         if (token) {
+          // Connect tokens are "<expiryMs>-<uuid>". The link is a bearer credential
+          // for the user's alert channel, so an expired (or malformed) token is
+          // refused outright instead of pairing a chat to someone else's profile.
+          const expiresAt = Number(token.split('-')[0]);
+          const expired = !Number.isFinite(expiresAt) || expiresAt < Date.now();
+
           // Find the profile that issued this connect token (service role — webhook is unauthenticated)
-          const profiles = await base44.asServiceRole.entities.UserProfile.filter({
+          const profiles = expired ? [] : await base44.asServiceRole.entities.UserProfile.filter({
             telegram_connect_token: token
           });
 
           if (profiles.length > 0) {
             const profile = profiles[0];
+            // Consume the token on first pairing so a leaked link cannot be replayed.
             await base44.asServiceRole.entities.UserProfile.update(profile.id, {
               telegram_chat_id: String(chatId),
-              telegram_username: fromUser?.username || ''
+              telegram_username: fromUser?.username || '',
+              telegram_connect_token: null
             });
 
             await reply(
