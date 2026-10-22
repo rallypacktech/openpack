@@ -16,6 +16,10 @@ const BOT_PATTERNS = [
   /postman/i, /insomnia/i, /httpclient/i, /java\//i, /okhttp/i, /go-http-client/i,
 ];
 
+// Public site origin used for links in the email. A fixed constant — never
+// derived from request headers, which a caller controls.
+const PUBLIC_ORIGIN = 'https://rallypack.org';
+
 function checkSuspicious(req) {
   const ua = req.headers.get('user-agent') || '';
   const referer = req.headers.get('referer') || '';
@@ -247,8 +251,7 @@ Deno.serve(async (req) => {
       return Response.json({ notified: false, reason: 'not_suspicious' });
     }
 
-    const origin = req.headers.get('origin') || req.headers.get('x-forwarded-origin') ||
-      `https://${req.headers.get('host') || 'rallypack.base44.com'}`;
+    const origin = PUBLIC_ORIGIN;
     const html = buildEmailHtml(reasons, botName, origin);
     const textBody = `RallyPack Account Notice: Data Integrity & Chain of Command
 
