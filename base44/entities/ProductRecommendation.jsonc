@@ -26,10 +26,16 @@
       "enum": [
         "go_bag",
         "automobile",
-        "general",
-        "first_aid_kit"
+        "general"
       ],
-      "description": "Which cache type this is recommended for"
+      "description": "Which kind of cache this item is recommended for"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Free-form tags for this product. \"first_aid\" marks a first aid supply \u2014 a category that can be filtered on, never a cache type of its own."
     },
     "is_required": {
       "type": "boolean",

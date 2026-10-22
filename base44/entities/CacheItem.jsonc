@@ -33,6 +33,17 @@
     },
     "notes": {
       "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Free-form tags for this item. \"first_aid\" marks a first aid supply \u2014 a tag on an ordinary cache item, never a cache of its own."
+    },
+    "recommendation_id": {
+      "type": "string",
+      "description": "Reference to the ProductRecommendation this item was added from, so the same product is never added to one cache twice"
     }
   },
   "required": [
