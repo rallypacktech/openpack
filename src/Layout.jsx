@@ -20,11 +20,13 @@ import {
   Users,
   Building2,
   TrendingUp,
+  Languages,
   Lock } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import AccessibilityProvider from "./components/AccessibilityProvider";
+import LanguageSwitcher from "./components/i18n/LanguageSwitcher";
 
 // Pages that render for signed-out visitors.
 const PUBLIC_PAGES = ["Home", "PrivacyPolicy", "TermsAndConditions", "LearnMore", "ReadinessQuiz", "Shopping", "Equine", "Canine", "Feline", "Infant", "Avian", "Reptile", "Livestock", "BusinessOnboarding", "Donate", "AffiliatePartnerPolicy", "Feedback", "Wildfire", "Hurricane", "Flood", "Tornado", "About", "WildfireTrends", "ReadinessMap", "GlobalCompliance", "ResponderTraining", "Faq", "Sitemap", "Volunteer", "ComplianceQuiz", "Drills"];
@@ -129,7 +131,8 @@ export default function Layout({ children, currentPageName }) {
   if (isAdmin) {
     allNavItems.push(
       { name: "Monitor", page: "AdminMonitor", icon: Users, requiresAuth: true },
-      { name: "Roadmap", page: "GrowthRoadmap", icon: TrendingUp, requiresAuth: true }
+      { name: "Roadmap", page: "GrowthRoadmap", icon: TrendingUp, requiresAuth: true },
+      { name: "Translations", page: "AdminTranslations", icon: Languages, requiresAuth: true }
     );
   }
 
@@ -201,6 +204,7 @@ export default function Layout({ children, currentPageName }) {
 
                 {/* Right Section */}
                 <div className="flex items-center gap-4">
+                  <LanguageSwitcher />
                   {user ?
                 <Button
                   variant="ghost"
@@ -235,6 +239,9 @@ export default function Layout({ children, currentPageName }) {
                     <SheetContent side="right" className="w-72" aria-label="Mobile navigation">
                       <nav className="flex flex-col gap-2 mt-8">
                         <NavLinks onClick={() => setMobileMenuOpen(false)} />
+                        <div className="px-3 pt-2">
+                          <LanguageSwitcher />
+                        </div>
                         <hr className="my-4" />
                         {user ?
                       <Button

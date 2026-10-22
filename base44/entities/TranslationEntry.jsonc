@@ -1,0 +1,85 @@
+{
+  "name": "TranslationEntry",
+  "type": "object",
+  "properties": {
+    "source_text": {
+      "type": "string",
+      "description": "The English source string exactly as it appears on the page"
+    },
+    "source_hash": {
+      "type": "string",
+      "description": "Stable hash of the source string, so the same text is never queued or billed twice for a locale"
+    },
+    "locale": {
+      "type": "string",
+      "description": "Target language code (fr, es, de, it, zh, ja)"
+    },
+    "page_key": {
+      "type": "string",
+      "description": "Route the string was first collected from, e.g. '/' or '/about'"
+    },
+    "machine_text": {
+      "type": "string",
+      "description": "Machine draft returned by DeepL for this string"
+    },
+    "human_text": {
+      "type": "string",
+      "description": "Reviewer-edited translation. When present it is served instead of the machine draft."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "draft",
+        "approved",
+        "rejected"
+      ],
+      "default": "queued",
+      "description": "queued = collected but not yet translated, draft = machine translation awaiting review, approved = served to visitors, rejected = not used"
+    },
+    "char_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Source characters billed to DeepL for this entry"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Email of the reviewer who approved or rejected this entry"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "note": {
+      "type": "string",
+      "description": "Reviewer note about this translation"
+    }
+  },
+  "required": [
+    "source_text",
+    "source_hash",
+    "locale"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

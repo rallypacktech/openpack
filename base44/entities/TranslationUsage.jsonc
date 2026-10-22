@@ -1,0 +1,55 @@
+{
+  "name": "TranslationUsage",
+  "type": "object",
+  "properties": {
+    "month_key": {
+      "type": "string",
+      "description": "Calendar month this ledger row covers, formatted YYYY-MM"
+    },
+    "page_chars_used": {
+      "type": "number",
+      "default": 0,
+      "description": "Source characters billed this month for public page translation"
+    },
+    "chat_chars_used": {
+      "type": "number",
+      "default": 0,
+      "description": "Source characters billed this month for chatbot translation (reserved, not yet used)"
+    },
+    "page_char_limit": {
+      "type": "number",
+      "default": 30000,
+      "description": "Maximum source characters page translation may bill in this month"
+    },
+    "chat_reserve": {
+      "type": "number",
+      "default": 20000,
+      "description": "Characters held back from page translation for future chatbot use"
+    }
+  },
+  "required": [
+    "month_key"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -17,6 +17,11 @@ import OAuthConsent from './pages/OAuthConsent';
 import ConsentBanner from '@/components/ConsentBanner';
 import { hasConsent, subscribeConsent } from '@/lib/consent';
 import { loadGtag } from '@/lib/gtag';
+import { TranslationProvider } from '@/lib/TranslationContext';
+import DomTranslation from '@/components/i18n/DomTranslation';
+import TranslationCollector from '@/components/i18n/TranslationCollector';
+
+const AdminTranslations = lazy(() => import('./pages/AdminTranslations'));
 
 const AffiliatePartnerPolicy = lazy(() => import('./pages/AffiliatePartnerPolicy'));
 const Equine = lazy(() => import('./pages/Equine'));
@@ -125,6 +130,7 @@ const AuthenticatedApp = () => {
           <Route path="/GrowthRoadmap" element={<LayoutWrapper currentPageName="GrowthRoadmap"><GrowthRoadmap /></LayoutWrapper>} />
           <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
           <Route path="/AgentAssistant" element={<LayoutWrapper currentPageName="AgentAssistant"><AgentAssistant /></LayoutWrapper>} />
+        <Route path="/AdminTranslations" element={<LayoutWrapper currentPageName="AdminTranslations"><AdminTranslations /></LayoutWrapper>} />
       </Route>
 
       {/* Public business onboarding */}
@@ -163,10 +169,14 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <NavigationTracker />
-          <AuthenticatedApp />
-        </Router>
+        <TranslationProvider>
+          <Router>
+            <NavigationTracker />
+            <DomTranslation />
+            <TranslationCollector />
+            <AuthenticatedApp />
+          </Router>
+        </TranslationProvider>
         <Toaster />
         <ConsentBanner />
         <VisualEditAgent />
