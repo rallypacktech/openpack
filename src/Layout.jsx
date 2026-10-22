@@ -8,7 +8,6 @@ import { getConsent } from "@/lib/consent";
 import { trackFunnel, FUNNEL } from "@/lib/funnel";
 import { COUNTRY_EMERGENCY_DATA } from "@/components/settings/CountryEmergencySettings";
 import {
-  LayoutDashboard,
   Package,
   AlertTriangle,
   WifiOff,
@@ -119,7 +118,6 @@ export default function Layout({ children, currentPageName }) {
   }
 
   const allNavItems = [
-  { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard, requiresAuth: true },
   { name: "Resources", page: "Resources", icon: Package, requiresAuth: true },
   { name: "Shopping", page: "Shopping", icon: Package, requiresAuth: false },
   { name: "Emergency", page: "Emergency", icon: AlertTriangle, requiresAuth: true },
