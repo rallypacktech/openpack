@@ -7,14 +7,28 @@ const TOTAL_LIMIT = 50000;
 const PAGE_LIMIT = 30000;
 const CHAT_RESERVE = 20000;
 
-// DeepL target language codes. English is the source, never a target.
+// DeepL target language codes, keyed by the locale code stored on each entry.
+// Every DeepL target is covered so any visitor country can be translated.
+// English is the source language, so it is never a target.
 const LOCALE_TO_DEEPL = {
-  fr: 'FR',
-  es: 'ES',
-  de: 'DE',
-  it: 'IT',
-  zh: 'ZH',
-  ja: 'JA',
+  af: 'AF', sq: 'SQ', ar: 'AR', an: 'AN', hy: 'HY', as: 'AS', ay: 'AY', az: 'AZ',
+  ba: 'BA', eu: 'EU', be: 'BE', bn: 'BN', bho: 'BHO', bs: 'BS', br: 'BR', bg: 'BG',
+  my: 'MY', yue: 'YUE', ca: 'CA', ceb: 'CEB',
+  'zh-Hans': 'ZH-HANS', 'zh-Hant': 'ZH-HANT', zh: 'ZH',
+  hr: 'HR', cs: 'CS', da: 'DA', prs: 'PRS', nl: 'NL', eo: 'EO', et: 'ET', fi: 'FI',
+  fr: 'FR', 'fr-CA': 'FR-CA', 'fr-FR': 'FR-FR', gl: 'GL', ka: 'KA',
+  de: 'DE', 'de-DE': 'DE-DE', 'de-CH': 'DE-CH', el: 'EL', gn: 'GN', gu: 'GU',
+  ht: 'HT', ha: 'HA', he: 'HE', hi: 'HI', hu: 'HU', is: 'IS', ig: 'IG', id: 'ID',
+  ga: 'GA', it: 'IT', ja: 'JA', jv: 'JV', pam: 'PAM', kk: 'KK', gom: 'GOM', ko: 'KO',
+  kmr: 'KMR', ckb: 'CKB', ky: 'KY', la: 'LA', lv: 'LV', ln: 'LN', lt: 'LT', lmo: 'LMO',
+  lb: 'LB', mk: 'MK', mai: 'MAI', mg: 'MG', ms: 'MS', ml: 'ML', mt: 'MT', mi: 'MI',
+  mr: 'MR', mn: 'MN', ne: 'NE', nb: 'NB', oc: 'OC', om: 'OM', pag: 'PAG', ps: 'PS',
+  fa: 'FA', pl: 'PL', 'pt-BR': 'PT-BR', 'pt-PT': 'PT-PT', pt: 'PT', pa: 'PA', qu: 'QU',
+  ro: 'RO', ru: 'RU', sa: 'SA', sr: 'SR', st: 'ST', scn: 'SCN', sk: 'SK', sl: 'SL',
+  es: 'ES', 'es-ES': 'ES-ES', 'es-419': 'ES-419', su: 'SU', sw: 'SW', sv: 'SV',
+  tl: 'TL', tg: 'TG', ta: 'TA', tt: 'TT', te: 'TE', th: 'TH', ts: 'TS', tn: 'TN',
+  tr: 'TR', tk: 'TK', uk: 'UK', ur: 'UR', uz: 'UZ', vi: 'VI', cy: 'CY', wo: 'WO',
+  xh: 'XH', yi: 'YI', zu: 'ZU',
 };
 
 const BATCH_SIZE = 25;

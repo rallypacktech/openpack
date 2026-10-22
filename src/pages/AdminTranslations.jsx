@@ -5,6 +5,7 @@ import { TARGET_LOCALES } from "@/lib/translationLocales";
 import { COLLECT_MODE_KEY } from "@/components/i18n/TranslationCollector";
 import TranslationBudgetPanel from "@/components/admin/TranslationBudgetPanel";
 import TranslationRow from "@/components/admin/TranslationRow";
+import LanguagePicker from "@/components/i18n/LanguagePicker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -187,18 +188,14 @@ export default function AdminTranslations() {
           <div className="flex flex-wrap items-end gap-3">
             <div>
               <Label className="text-xs text-muted-foreground">Language</Label>
-              <Select value={locale} onValueChange={setTargetLocale}>
-                <SelectTrigger className="w-44 mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TARGET_LOCALES.map((option) => (
-                    <SelectItem key={option.code} value={option.code}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <LanguagePicker
+                locales={TARGET_LOCALES}
+                value={locale}
+                onChange={setTargetLocale}
+                ariaLabel="Choose the language to translate"
+                align="start"
+                className="mt-1 h-10 w-52 justify-between border border-input bg-background px-3 text-sm text-foreground hover:text-foreground"
+              />
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Show</Label>
