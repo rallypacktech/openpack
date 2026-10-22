@@ -16,7 +16,7 @@ const LOCALE_TO_DEEPL = {
   my: 'MY', yue: 'YUE', ca: 'CA', ceb: 'CEB',
   'zh-Hans': 'ZH-HANS', 'zh-Hant': 'ZH-HANT', zh: 'ZH',
   hr: 'HR', cs: 'CS', da: 'DA', prs: 'PRS', nl: 'NL', eo: 'EO', et: 'ET', fi: 'FI',
-  fr: 'FR', 'fr-CA': 'FR-CA', 'fr-FR': 'FR-FR', gl: 'GL', ka: 'KA',
+  fr: 'FR', gl: 'GL', ka: 'KA',
   de: 'DE', 'de-DE': 'DE-DE', 'de-CH': 'DE-CH', el: 'EL', gn: 'GN', gu: 'GU',
   ht: 'HT', ha: 'HA', he: 'HE', hi: 'HI', hu: 'HU', is: 'IS', ig: 'IG', id: 'ID',
   ga: 'GA', it: 'IT', ja: 'JA', jv: 'JV', pam: 'PAM', kk: 'KK', gom: 'GOM', ko: 'KO',
