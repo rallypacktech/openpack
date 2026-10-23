@@ -27,7 +27,10 @@ function isSkippable(node) {
 function textNodesIn(root) {
   const nodes = [];
   if (!root) return nodes;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+  // The root can belong to another document (the footer sweep walks an
+  // off-screen iframe), so build the walker from the root's own document.
+  const doc = root.ownerDocument || document;
+  const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
       if (isSkippable(node)) return NodeFilter.FILTER_REJECT;

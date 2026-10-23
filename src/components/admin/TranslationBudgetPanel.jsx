@@ -48,10 +48,10 @@ export default function TranslationBudgetPanel({ usage, monthLabel }) {
           hint={`${pageRemaining.toLocaleString()} characters left for pages this month.`}
         />
         <Line
-          label="Reserved for chatbot translation"
+          label="Held-back reserve"
           used={chatUsed}
           limit={chatReserve}
-          hint="Held back from page translation so chat translation always has room."
+          hint={`${Math.max(0, chatReserve - chatUsed).toLocaleString()} characters of reserve left — available to pages or the chatbot.`}
         />
       </CardContent>
     </Card>

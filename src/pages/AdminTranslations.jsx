@@ -4,6 +4,8 @@ import { useTranslation } from "@/lib/TranslationContext";
 import { TARGET_LOCALES } from "@/lib/translationLocales";
 import { COLLECT_MODE_KEY } from "@/components/i18n/TranslationCollector";
 import TranslationBudgetPanel from "@/components/admin/TranslationBudgetPanel";
+import FooterSweepPanel from "@/components/admin/FooterSweepPanel";
+import FooterTranslatePanel from "@/components/admin/FooterTranslatePanel";
 import TranslationRow from "@/components/admin/TranslationRow";
 import LanguagePicker from "@/components/i18n/LanguagePicker";
 import { Button } from "@/components/ui/button";
@@ -150,6 +152,10 @@ export default function AdminTranslations() {
       </div>
 
       <TranslationBudgetPanel usage={usage} monthLabel={monthLabel} />
+
+      <FooterSweepPanel onFinished={load} />
+
+      <FooterTranslatePanel usage={usage} onFinished={load} />
 
       <Card>
         <CardContent className="pt-6 space-y-4">

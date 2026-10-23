@@ -9,12 +9,12 @@
     "page_chars_used": {
       "type": "number",
       "default": 0,
-      "description": "Source characters billed this month for public page translation"
+      "description": "Source characters billed this month against the public page budget"
     },
     "chat_chars_used": {
       "type": "number",
       "default": 0,
-      "description": "Source characters billed this month for chatbot translation (reserved, not yet used)"
+      "description": "Source characters billed this month against the held-back reserve \u2014 spent on public pages or the chatbot"
     },
     "page_char_limit": {
       "type": "number",
@@ -24,7 +24,7 @@
     "chat_reserve": {
       "type": "number",
       "default": 20000,
-      "description": "Characters held back from page translation for future chatbot use"
+      "description": "Characters held back from the page budget. Drawn on only by an explicit run that asks for the reserve."
     }
   },
   "required": [

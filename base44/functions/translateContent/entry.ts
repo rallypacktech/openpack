@@ -150,17 +150,28 @@ export default async function (req) {
         });
       }
 
+      // The page budget itself is fixed by configuration. `allow_reserve` lets
+      // one explicit run dip into the characters held back for the chatbot
+      // without changing that configuration — the reserve has its own ledger
+      // field, so the monthly total stays honest either way.
+      const allowReserve = payload.allow_reserve === true;
       const pageUsed = usage.page_chars_used || 0;
       const chatUsed = usage.chat_chars_used || 0;
       const pageRemaining = Math.max(0, (usage.page_char_limit ?? PAGE_LIMIT) - pageUsed);
+      const reserveRemaining = Math.max(0, (usage.chat_reserve ?? CHAT_RESERVE) - chatUsed);
       const totalRemaining = Math.max(0, TOTAL_LIMIT - pageUsed - chatUsed);
-      const budget = Math.min(pageRemaining, totalRemaining);
+      const budget = allowReserve
+        ? Math.min(pageRemaining + reserveRemaining, totalRemaining)
+        : Math.min(pageRemaining, totalRemaining);
 
       if (budget <= 0) {
         return Response.json({
           translated: 0,
-          reason: 'Monthly page translation budget is fully used. It resets on the 1st.',
+          reason: allowReserve
+            ? 'The whole monthly allowance is used up. It resets on the 1st.'
+            : 'Monthly page translation budget is fully used. It resets on the 1st.',
           page_remaining: pageRemaining,
+          reserve_remaining: reserveRemaining,
         });
       }
 
@@ -177,20 +188,36 @@ export default async function (req) {
         return Response.json({ translated: 0, reason: 'Nothing is waiting to be translated.' });
       }
 
-      // Spend the budget in queue order so a partial month still makes progress.
+      // Take one string from each requested language in turn, so the budget is
+      // shared evenly instead of draining into whichever locale happens to come
+      // first. Every language asked for therefore makes progress, and a partial
+      // month still leaves the rest queued for next time.
+      const pools = new Map();
+      for (const entry of queued) {
+        if (!pools.has(entry.locale)) pools.set(entry.locale, []);
+        pools.get(entry.locale).push(entry);
+      }
+
       const byLocale = new Map();
       let planned = 0;
-      let deferred = 0;
-      for (const entry of queued) {
-        const cost = (entry.source_text || '').length;
-        if (planned + cost > budget) {
-          deferred += 1;
-          continue;
+      let picked = 0;
+      let progress = true;
+      while (progress) {
+        progress = false;
+        for (const [locale, pool] of pools) {
+          if (!pool.length) continue;
+          const entry = pool[0];
+          const cost = (entry.source_text || '').length;
+          if (planned + cost > budget) continue;
+          pool.shift();
+          planned += cost;
+          picked += 1;
+          progress = true;
+          if (!byLocale.has(locale)) byLocale.set(locale, []);
+          byLocale.get(locale).push(entry);
         }
-        planned += cost;
-        if (!byLocale.has(entry.locale)) byLocale.set(entry.locale, []);
-        byLocale.get(entry.locale).push(entry);
       }
+      const deferred = queued.length - picked;
 
       let translatedCount = 0;
       let billedChars = 0;
@@ -226,15 +253,25 @@ export default async function (req) {
         }
       }
 
+      // Whatever the page budget cannot cover is drawn from the reserve, so the
+      // two ledgers together never exceed the monthly allowance.
+      const pagePortion = Math.min(billedChars, pageRemaining);
+      const reservePortion = billedChars - pagePortion;
+
       if (billedChars > 0) {
-        await db.TranslationUsage.update(usage.id, { page_chars_used: pageUsed + billedChars });
+        await db.TranslationUsage.update(usage.id, {
+          page_chars_used: pageUsed + pagePortion,
+          chat_chars_used: chatUsed + reservePortion,
+        });
       }
 
       return Response.json({
         translated: translatedCount,
         billed_chars: billedChars,
+        reserve_used: reservePortion,
         deferred,
-        page_remaining: Math.max(0, pageRemaining - billedChars),
+        page_remaining: Math.max(0, pageRemaining - pagePortion),
+        reserve_remaining: Math.max(0, reserveRemaining - reservePortion),
         errors,
       });
     }
