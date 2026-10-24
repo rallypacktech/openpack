@@ -331,8 +331,11 @@ export default function Layout({ children, currentPageName }) {
                     <Link to="/ReadinessQuiz" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Readiness Quiz</Link>
                     <Link to="/compliance-quiz" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Business Compliance Check</Link>
                     <Link to="/readiness-map" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Readiness Map</Link>
-                    <Link to="/wildfire-trends" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire Trend Report</Link>
                     <Link to="/sitemap" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Sitemap</Link>
+                  </nav>
+                  <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-2 mt-4 py-2">Trend Reports</h3>
+                  <nav className="space-y-2" aria-label="Disaster trend reports">
+                    <Link to="/wildfire-trends" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire Trends</Link>
                   </nav>
                   <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3 mt-6">Follow Us</h3>
                   <div className="flex items-center gap-4">

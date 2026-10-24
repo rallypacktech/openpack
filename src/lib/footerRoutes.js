@@ -34,7 +34,7 @@ export const FOOTER_ROUTES = [
   { path: "/ReadinessQuiz", label: "Readiness Quiz" },
   { path: "/compliance-quiz", label: "Business Compliance Check" },
   { path: "/readiness-map", label: "Readiness Map" },
-  { path: "/wildfire-trends", label: "Wildfire Trend Report" },
+  { path: "/wildfire-trends", label: "Wildfire Trends" },
   { path: "/sitemap", label: "Sitemap" },
 ];
 
