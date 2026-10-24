@@ -20,7 +20,8 @@ import {
   Building2,
   TrendingUp,
   Languages,
-  Lock } from
+  Lock,
+  BarChart3 } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -130,7 +131,8 @@ export default function Layout({ children, currentPageName }) {
     allNavItems.push(
       { name: "Monitor", page: "AdminMonitor", icon: Users, requiresAuth: true },
       { name: "Roadmap", page: "GrowthRoadmap", icon: TrendingUp, requiresAuth: true },
-      { name: "Translations", page: "AdminTranslations", icon: Languages, requiresAuth: true }
+      { name: "Translations", page: "AdminTranslations", icon: Languages, requiresAuth: true },
+      { name: "Search", page: "AdminSearchPerformance", icon: BarChart3, requiresAuth: true }
     );
   }
 

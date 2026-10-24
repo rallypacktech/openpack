@@ -22,6 +22,7 @@ import DomTranslation from '@/components/i18n/DomTranslation';
 import TranslationCollector from '@/components/i18n/TranslationCollector';
 
 const AdminTranslations = lazy(() => import('./pages/AdminTranslations'));
+const AdminSearchPerformance = lazy(() => import('./pages/AdminSearchPerformance'));
 
 const AffiliatePartnerPolicy = lazy(() => import('./pages/AffiliatePartnerPolicy'));
 const Equine = lazy(() => import('./pages/Equine'));
@@ -131,6 +132,7 @@ const AuthenticatedApp = () => {
           <Route path="/BusinessDashboard" element={<LayoutWrapper currentPageName="BusinessDashboard"><BusinessDashboard /></LayoutWrapper>} />
           <Route path="/AgentAssistant" element={<LayoutWrapper currentPageName="AgentAssistant"><AgentAssistant /></LayoutWrapper>} />
         <Route path="/AdminTranslations" element={<LayoutWrapper currentPageName="AdminTranslations"><AdminTranslations /></LayoutWrapper>} />
+        <Route path="/AdminSearchPerformance" element={<LayoutWrapper currentPageName="AdminSearchPerformance"><AdminSearchPerformance /></LayoutWrapper>} />
       </Route>
 
       {/* Public business onboarding */}
