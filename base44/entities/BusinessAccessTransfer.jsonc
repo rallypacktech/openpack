@@ -1,0 +1,141 @@
+{
+  "name": "BusinessAccessTransfer",
+  "type": "object",
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to the BusinessSubscription whose business access is moving"
+    },
+    "organization_name": {
+      "type": "string",
+      "description": "Snapshot of the organization name so the offer reads correctly even after a rename"
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "organization",
+        "location"
+      ],
+      "default": "organization",
+      "description": "Whether the whole organization's ownership or a single location's management is moving"
+    },
+    "location_id": {
+      "type": "string",
+      "description": "Reference to the OrganizationLocation when scope is 'location'"
+    },
+    "location_name": {
+      "type": "string",
+      "description": "Snapshot of the location name when scope is 'location'"
+    },
+    "from_email": {
+      "type": "string",
+      "description": "Business email currently holding this access"
+    },
+    "from_name": {
+      "type": "string"
+    },
+    "to_email": {
+      "type": "string",
+      "description": "Business email of the person receiving the access"
+    },
+    "to_name": {
+      "type": "string"
+    },
+    "initiated_by_email": {
+      "type": "string",
+      "description": "Email of the org admin or current owner who started the transfer"
+    },
+    "initiated_by_role": {
+      "type": "string",
+      "enum": [
+        "owner",
+        "org_admin"
+      ],
+      "description": "Whether the initiator acted as the current owner or as an organization admin"
+    },
+    "note": {
+      "type": "string",
+      "description": "Optional message from the initiator to the person receiving access"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "The replacement must accept before ownership actually changes"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "response_note": {
+      "type": "string",
+      "description": "Optional note left by the person accepting or declining"
+    }
+  },
+  "required": [
+    "subscription_id",
+    "scope",
+    "to_email",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.to_email": "{{user.email}}"
+        },
+        {
+          "data.from_email": "{{user.email}}"
+        },
+        {
+          "data.initiated_by_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.to_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

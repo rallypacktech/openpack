@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Shield, AlertTriangle, CheckCircle2, Package, Trash2, Edit, Building2 } from "lucide-react";
 
-export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
+export default function BusinessKitsPanel({ subscription, kits, onRefresh, locations = [], defaultLocationId = "" }) {
   const [kitItems, setKitItems] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -69,7 +69,7 @@ export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
 
   const openCreate = () => {
     if (kits.length >= maxKits) { alert(`Your plan allows up to ${maxKits} kits. Upgrade to add more.`); return; }
-    setForm({ name: "", location: "", cache_type: "general", description: "" });
+    setForm({ name: "", location: "", cache_type: "general", description: "", subscription_id: subscription?.id || "", location_id: defaultLocationId || "" });
     setEditing(null);
     setShowForm(true);
   };
@@ -162,6 +162,23 @@ export default function BusinessKitsPanel({ subscription, kits, onRefresh }) {
                 </SelectContent>
               </Select>
             </div>
+            {locations.length > 0 && (
+              <div>
+                <Label>Location</Label>
+                <Select
+                  value={form.location_id || "all"}
+                  onValueChange={v => setForm(f => ({ ...f, location_id: v === "all" ? "" : v }))}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Whole organization</SelectItem>
+                    {locations.map(loc => (
+                      <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div><Label>Notes</Label><Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Optional notes" /></div>
             <div className="flex gap-3 pt-1">
               <Button onClick={handleSave} className="flex-1" disabled={!form.name || !form.location}>{editing ? "Save" : "Add Kit"}</Button>

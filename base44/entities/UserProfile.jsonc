@@ -199,6 +199,15 @@
       "type": "string",
       "format": "date-time",
       "description": "Timestamp of the user's last activity in the app \u2014 updated by the activity heartbeat hook, used by the admin system monitor to track online users"
+    },
+    "business_email": {
+      "type": "string",
+      "description": "Work address this person uses for organization business access. It is a contact identity only \u2014 their personal plans, caches and meet spots stay with their personal login."
+    },
+    "business_email_linked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the business email was connected to this personal account"
     }
   },
   "required": [],

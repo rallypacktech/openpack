@@ -20,6 +20,9 @@ import CommunityOneSheet from "@/components/business/CommunityOneSheet";
 import FireSafetyChecklist from "@/components/business/FireSafetyChecklist";
 import ExpiryTrackerPanel from "@/components/business/ExpiryTrackerPanel";
 import IcsTerminologyPanel from "@/components/business/IcsTerminologyPanel";
+import LocationsPanel from "@/components/business/LocationsPanel";
+import BusinessAccessPanel from "@/components/business/BusinessAccessPanel";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function BusinessDashboard() {
   const [subscription, setSubscription] = useState(null);
@@ -32,6 +35,9 @@ export default function BusinessDashboard() {
   const [country, setCountry] = useState(null);
   const [showProUpgrade, setShowProUpgrade] = useState(false);
   const [subConversionFired, setSubConversionFired] = useState(false);
+  const [locations, setLocations] = useState([]);
+  const [bizContext, setBizContext] = useState(null);
+  const [locationFilter, setLocationFilter] = useState("all");
 
   useEffect(() => {
     loadAll();
@@ -63,12 +69,17 @@ export default function BusinessDashboard() {
     const me = await base44.auth.me();
     setUser(me);
 
-    const [subs, membersData, caches, plansData] = await Promise.all([
+    const [subs, membersData, caches, plansData, locationsData, ctxRes] = await Promise.all([
       base44.entities.BusinessSubscription.list(),
       base44.entities.OrganizationMember.list(),
       base44.entities.EmergencyCache.list(),
       base44.entities.EvacuationPlan.list(),
+      base44.entities.OrganizationLocation.list(),
+      base44.functions.invoke("getBusinessContext", {}).catch(() => ({ data: null })),
     ]);
+
+    const ctx = ctxRes?.data || null;
+    setBizContext(ctx);
 
     let activeSub;
     if (me.role === "admin") {
@@ -89,11 +100,26 @@ export default function BusinessDashboard() {
       }
     } else {
       activeSub = subs.find(s => s.status === "active" || s.status === "trialing") || subs[0] || null;
+      // A member who reached the organization through a business email alias
+      // sees the shared organization profile even though they don't own it.
+      if (!activeSub && ctx?.organizations?.length) {
+        activeSub = ctx.organizations[0].subscription;
+      }
     }
+
+    // Prefer what the signed-in person can read directly; fall back to the
+    // organization context for members whose access comes from their business email.
+    const orgCtx = ctx?.organizations?.find(o => o.subscription?.id === activeSub?.id);
+
     setSubscription(activeSub);
-    setMembers(membersData);
-    setKits(caches);
-    setPlans(plansData);
+    setMembers(membersData.length ? membersData : (orgCtx?.members || []));
+    setKits(caches.length ? caches : (orgCtx?.kits || []));
+    setPlans(plansData.length ? plansData : (orgCtx?.plans || []));
+    setLocations(
+      orgCtx?.locations?.length
+        ? orgCtx.locations
+        : locationsData.filter(l => !activeSub || l.subscription_id === activeSub.id),
+    );
 
     // Country drives which fire & life safety framework the org is checked against.
     let countryCode = activeSub?.country || null;
@@ -138,6 +164,19 @@ export default function BusinessDashboard() {
           Team member tracking, first aid kit management, chain-of-command alerts, and evacuation planning are available on a Business subscription.
         </p>
         <ProfessionalUpgradeCard organizationName={subscription?.organization_name} onSubscribed={loadAll} />
+
+        {/* A replacement offered business access can connect their work email
+            and accept the handoff right here, before the organization's plan
+            is attached to them. */}
+        <div className="mt-10 text-left">
+          <BusinessAccessPanel
+            subscription={null}
+            locations={[]}
+            context={bizContext}
+            onRefresh={loadAll}
+          />
+        </div>
+
         <p className="text-xs text-muted-foreground mt-6">
           Looking for other plans?{" "}
           <button
@@ -243,13 +282,37 @@ export default function BusinessDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="members">
+      {locations.length > 0 && (
+        <div className="flex items-center gap-3 mb-4 flex-wrap">
+          <span className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">
+            Viewing
+          </span>
+          <Select value={locationFilter} onValueChange={setLocationFilter}>
+            <SelectTrigger className="w-56">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All locations</SelectItem>
+              {locations.map(loc => (
+                <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span className="text-xs text-muted-foreground">
+            Plans, kits and records stay separate for each location.
+          </span>
+        </div>
+      )}
+
+      <Tabs defaultValue="locations">
         <TabsList className="mb-4">
+          <TabsTrigger value="locations">Locations</TabsTrigger>
           <TabsTrigger value="members">Members & Alerts</TabsTrigger>
           <TabsTrigger value="kits">First Aid Kits</TabsTrigger>
           <TabsTrigger value="expiry">Expiry &amp; Compliance</TabsTrigger>
           <TabsTrigger value="evacuation">Evacuation Plans</TabsTrigger>
           <TabsTrigger value="subscription">Subscription</TabsTrigger>
+          <TabsTrigger value="access">Access &amp; Transfer</TabsTrigger>
           {hasDelegation && <TabsTrigger value="alerts">Emergency Alerts</TabsTrigger>}
           <TabsTrigger value="needs">Needs Board</TabsTrigger>
           <TabsTrigger value="wildfire">Incidents</TabsTrigger>
@@ -259,17 +322,46 @@ export default function BusinessDashboard() {
           <TabsTrigger value="ics">ICS Reference</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="locations">
+          <LocationsPanel subscription={subscription} locations={locations} onRefresh={loadAll} />
+        </TabsContent>
         <TabsContent value="members">
-          <OrgMembersPanel subscription={subscription} members={members} onRefresh={loadAll} />
+          <OrgMembersPanel
+            subscription={subscription}
+            members={locationFilter === "all" ? members : members.filter(m => m.location_id === locationFilter)}
+            onRefresh={loadAll}
+            locations={locations}
+            defaultLocationId={locationFilter === "all" ? "" : locationFilter}
+          />
         </TabsContent>
         <TabsContent value="kits">
-          <BusinessKitsPanel subscription={subscription} kits={kits} onRefresh={loadAll} />
+          <BusinessKitsPanel
+            subscription={subscription}
+            kits={locationFilter === "all" ? kits : kits.filter(k => k.location_id === locationFilter)}
+            onRefresh={loadAll}
+            locations={locations}
+            defaultLocationId={locationFilter === "all" ? "" : locationFilter}
+          />
         </TabsContent>
         <TabsContent value="expiry">
           <ExpiryTrackerPanel subscription={subscription} kits={kits} />
         </TabsContent>
         <TabsContent value="evacuation">
-          <EvacuationPlanPanel subscription={subscription} plans={plans} onRefresh={loadAll} />
+          <EvacuationPlanPanel
+            subscription={subscription}
+            plans={locationFilter === "all" ? plans : plans.filter(p => p.location_id === locationFilter)}
+            onRefresh={loadAll}
+            locations={locations}
+            defaultLocationId={locationFilter === "all" ? "" : locationFilter}
+          />
+        </TabsContent>
+        <TabsContent value="access">
+          <BusinessAccessPanel
+            subscription={subscription}
+            locations={locations}
+            context={bizContext}
+            onRefresh={loadAll}
+          />
         </TabsContent>
         {hasDelegation && (
           <TabsContent value="alerts">

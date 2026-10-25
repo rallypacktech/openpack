@@ -31,6 +31,9 @@ const ROLES = [
 const BLANK = {
   full_name: "",
   email: "",
+  business_email: "",
+  personal_email: "",
+  location_id: "",
   phone: "",
   role: "member",
   department: "",
@@ -40,7 +43,7 @@ const BLANK = {
   notification_method: "email",
 };
 
-export default function OrgMembersPanel({ subscription, members, onRefresh }) {
+export default function OrgMembersPanel({ subscription, members, onRefresh, locations = [], defaultLocationId = "" }) {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(BLANK);
@@ -55,7 +58,7 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
   );
 
   const openCreate = () => {
-    setForm({ ...BLANK, subscription_id: subscription?.id || "" });
+    setForm({ ...BLANK, subscription_id: subscription?.id || "", location_id: defaultLocationId || "" });
     setEditing(null);
     setShowForm(true);
   };
@@ -175,9 +178,15 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
                         Pending
                       </Badge>
                     )}
+                    {m.location_id && (
+                      <Badge variant="outline" className="text-xs">
+                        {locations.find((l) => l.id === m.location_id)?.name || "Location"}
+                      </Badge>
+                    )}
                   </div>
-                  <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground flex-wrap">
                     <span>{m.email}</span>
+                    {m.business_email && <span>Work: {m.business_email}</span>}
                     {m.phone && <span>{m.phone}</span>}
                     <span>
                       Alerts: {m.notify_on_evacuation ? "✓ Incident" : "—"}{" "}
@@ -256,6 +265,52 @@ export default function OrgMembersPanel({ subscription, members, onRefresh }) {
                 />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Business Email</Label>
+                <Input
+                  type="email"
+                  value={form.business_email}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, business_email: e.target.value }))
+                  }
+                  placeholder="work@company.com"
+                />
+              </div>
+              <div>
+                <Label>Personal Email</Label>
+                <Input
+                  type="email"
+                  value={form.personal_email}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, personal_email: e.target.value }))
+                  }
+                  placeholder="home@email.com"
+                />
+              </div>
+            </div>
+            {locations.length > 0 && (
+              <div>
+                <Label>Location</Label>
+                <Select
+                  value={form.location_id || "all"}
+                  onValueChange={(v) => setForm((f) => ({ ...f, location_id: v === "all" ? "" : v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Whole organization</SelectItem>
+                    {locations.map((loc) => (
+                      <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  A person's business email links them to the organization; their personal email stays with their own account.
+                </p>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Role</Label>

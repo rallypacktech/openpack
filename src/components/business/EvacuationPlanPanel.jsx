@@ -13,6 +13,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus, MapPin, Trash2, Edit, Calendar, MapPinned } from "lucide-react";
 
 const BLANK = {
@@ -33,13 +40,15 @@ export default function EvacuationPlanPanel({
   subscription,
   plans,
   onRefresh,
+  locations = [],
+  defaultLocationId = "",
 }) {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(BLANK);
 
   const openCreate = () => {
-    setForm({ ...BLANK, subscription_id: subscription?.id || "" });
+    setForm({ ...BLANK, subscription_id: subscription?.id || "", location_id: defaultLocationId || "" });
     setEditing(null);
     setShowForm(true);
   };
@@ -207,6 +216,25 @@ export default function EvacuationPlanPanel({
                 placeholder="e.g. Fire Evacuation Plan"
               />
             </div>
+            {locations.length > 0 && (
+              <div>
+                <Label>Location</Label>
+                <Select
+                  value={form.location_id || "all"}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, location_id: v === "all" ? "" : v }))
+                  }
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Whole organization</SelectItem>
+                    {locations.map((loc) => (
+                      <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div>
               <Label>Description</Label>
               <Textarea

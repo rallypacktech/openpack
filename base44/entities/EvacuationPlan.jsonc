@@ -6,6 +6,10 @@
       "type": "string",
       "description": "Reference to BusinessSubscription"
     },
+    "location_id": {
+      "type": "string",
+      "description": "Reference to the OrganizationLocation this plan covers. Each location keeps its own plan."
+    },
     "plan_name": {
       "type": "string"
     },

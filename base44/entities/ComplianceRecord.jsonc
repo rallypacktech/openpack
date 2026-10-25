@@ -11,6 +11,14 @@
       ],
       "description": "Whether this tracks a staff certification, a workplace fire/life-safety asset, or a household safety device"
     },
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to the BusinessSubscription this record belongs to. Empty for household devices."
+    },
+    "location_id": {
+      "type": "string",
+      "description": "Reference to the OrganizationLocation this record belongs to. Each location keeps its own records."
+    },
     "title": {
       "type": "string",
       "description": "What is being tracked (e.g. 'CPR / AED Certification', 'Fire extinguisher \u2014 Kitchen')"
@@ -64,10 +72,6 @@
     "interval_months": {
       "type": "number",
       "description": "How often this needs checking, in months. Drives the one-tap 'log check' action that advances the next due date automatically."
-    },
-    "subscription_id": {
-      "type": "string",
-      "description": "Reference to the BusinessSubscription this record belongs to. Empty for household devices."
     },
     "notes": {
       "type": "string"

@@ -11,11 +11,24 @@
       "type": "string",
       "description": "Reference to BusinessSubscription"
     },
+    "location_id": {
+      "type": "string",
+      "description": "Reference to the OrganizationLocation this person belongs to. Empty means the whole organization."
+    },
     "full_name": {
       "type": "string"
     },
     "email": {
-      "type": "string"
+      "type": "string",
+      "description": "Primary contact address for alerts"
+    },
+    "business_email": {
+      "type": "string",
+      "description": "Work address used for the organization's business access. Distinct from the person's personal account."
+    },
+    "personal_email": {
+      "type": "string",
+      "description": "The person's personal RallyPack login. Kept separate from business access and never used for business ownership."
     },
     "phone": {
       "type": "string"
@@ -29,6 +42,15 @@
         "member"
       ],
       "default": "member"
+    },
+    "is_org_admin": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this person is a designated organization admin who can manage locations and initiate ownership transfers"
+    },
+    "linked_user_id": {
+      "type": "string",
+      "description": "The RallyPack user id this member linked via their business email. Linking business access never moves their personal plans, caches or meet spots."
     },
     "department": {
       "type": "string"
@@ -89,6 +111,9 @@
         },
         {
           "data.email": "{{user.email}}"
+        },
+        {
+          "data.business_email": "{{user.email}}"
         },
         {
           "user_condition": {

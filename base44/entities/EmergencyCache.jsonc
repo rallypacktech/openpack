@@ -9,6 +9,14 @@
       "type": "string",
       "description": "Where the cache is stored (e.g., Garage, Barn, Basement)"
     },
+    "location_id": {
+      "type": "string",
+      "description": "Reference to the OrganizationLocation this business cache belongs to. Empty for personal caches."
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to the BusinessSubscription this cache belongs to. Empty for personal caches."
+    },
     "cache_type": {
       "type": "string",
       "enum": [

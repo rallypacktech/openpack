@@ -8,7 +8,8 @@
       "description": "Optional free-form description (up to 1000 characters)"
     },
     "organization_name": {
-      "type": "string"
+      "type": "string",
+      "description": "The shared organization profile name used everywhere the organization speaks publicly"
     },
     "country": {
       "type": "string",
@@ -16,7 +17,30 @@
     },
     "owner_email": {
       "type": "string",
-      "description": "Email of the account owner"
+      "description": "Business email of the person who currently holds this organization's ownership"
+    },
+    "org_admin_emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Business emails of designated organization admins. They can manage locations and initiate an ownership transfer alongside the current owner."
+    },
+    "public_contact_email": {
+      "type": "string",
+      "description": "Shared public contact address used on the Needs Board and community-facing material"
+    },
+    "public_contact_phone": {
+      "type": "string",
+      "description": "Shared public contact phone used on community-facing material"
+    },
+    "public_description": {
+      "type": "string",
+      "description": "Short public description of the organization, shared across all of its locations"
+    },
+    "website": {
+      "type": "string",
+      "description": "Organization website, shared across all locations"
     },
     "tier": {
       "type": "string",
