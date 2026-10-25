@@ -1,4 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
+import {
+  norm,
+  filterOrEmpty,
+  dedupeRows,
+  verifiedBusinessEmails,
+  trustedCreatorIds,
+  findTrustedMembership,
+  resolveStanding,
+} from '../../shared/businessAccess.ts';
 
 // Returns everything the Business dashboard needs to know about the signed-in
 // person's relationship to an organization: the shared organization profile,
@@ -6,33 +15,13 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 // this through their own personal login, either as the owner or as a member who
 // linked a business email alias — their personal plans, caches and meet spots
 // are never touched or moved.
+//
+// Nothing here is taken on the caller's word. A business email counts only once
+// its owner confirmed a code sent to it, and a roster row counts only when the
+// organization's own trusted side created it. Without that, anyone could write
+// themselves a membership row and read an organization's private records.
 
 const MAX_ROWS = 200;
-
-function norm(value) {
-  return (value || '').trim().toLowerCase();
-}
-
-async function filterOrEmpty(entity, query) {
-  try {
-    const rows = await entity.filter(query);
-    return Array.isArray(rows) ? rows : (rows?.items || []);
-  } catch (_e) {
-    return [];
-  }
-}
-
-function dedupeByEmail(rows) {
-  const seen = new Set();
-  const out = [];
-  for (const row of rows) {
-    const key = row?.id || `${norm(row?.email)}|${row?.subscription_id}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(row);
-  }
-  return out;
-}
 
 export default async function (req) {
   try {
@@ -41,27 +30,19 @@ export default async function (req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const personalEmail = norm(user.email);
+    const businessEmails = await verifiedBusinessEmails(base44, user.id);
+    const emails = Array.from(new Set([personalEmail, ...businessEmails].filter(Boolean)));
 
-    // The business email alias lives on the person's profile — it is a contact
-    // identity, not a second account.
-    const profiles = await filterOrEmpty(
-      base44.asServiceRole.entities.UserProfile,
-      { created_by_id: user.id },
-    );
-    const businessEmail = norm(profiles[0]?.business_email);
-
-    const emails = Array.from(new Set([personalEmail, businessEmail].filter(Boolean)));
-
-    // Subscriptions this person owns, by either address.
+    // Subscriptions this person owns, by any address they have proved.
     const ownedLists = await Promise.all(
       emails.map((email) =>
         filterOrEmpty(base44.asServiceRole.entities.BusinessSubscription, { owner_email: email }),
       ),
     );
-    const ownedSubs = dedupeByEmail(ownedLists.flat());
+    const ownedSubs = dedupeRows(ownedLists.flat());
 
-    // Memberships tied to this person: linked directly, or matched by any of
-    // their addresses.
+    // Roster rows that mention any of this person's addresses. These are only
+    // candidates — each one is checked against who created it below.
     const memberLists = await Promise.all([
       filterOrEmpty(base44.asServiceRole.entities.OrganizationMember, { linked_user_id: user.id }),
       ...emails.map((email) =>
@@ -71,9 +52,8 @@ export default async function (req) {
         filterOrEmpty(base44.asServiceRole.entities.OrganizationMember, { email }),
       ),
     ]);
-    const memberships = dedupeByEmail(memberLists.flat());
+    const memberships = dedupeRows(memberLists.flat());
 
-    // Pull in the organizations those memberships point at.
     const memberSubIds = Array.from(
       new Set(memberships.map((m) => m.subscription_id).filter(Boolean)),
     );
@@ -83,24 +63,17 @@ export default async function (req) {
         })
       : [];
 
-    const allSubs = dedupeByEmail([...ownedSubs, ...memberSubs]);
+    const candidates = dedupeRows([...ownedSubs, ...memberSubs]);
 
     const organizations = [];
-    for (const sub of allSubs) {
-      const membership =
-        memberships.find(
-          (m) =>
-            m.subscription_id === sub.id &&
-            (m.linked_user_id === user.id ||
-              emails.includes(norm(m.business_email)) ||
-              emails.includes(norm(m.email))),
-        ) || null;
+    for (const sub of candidates) {
+      const creatorIds = await trustedCreatorIds(base44, sub);
+      const membership = findTrustedMembership(memberships, user.id, emails, sub, creatorIds);
+      const { isOwner, isOrgAdmin, hasStanding } = resolveStanding(sub, emails, membership);
 
-      const isOwner = emails.includes(norm(sub.owner_email));
-      const isOrgAdmin =
-        isOwner ||
-        (sub.org_admin_emails || []).some((e) => emails.includes(norm(e))) ||
-        membership?.is_org_admin === true;
+      // Nothing verifiable ties this person to the organization, so its
+      // records are neither read nor returned.
+      if (!hasStanding) continue;
 
       const [locations, members, kits, plans] = await Promise.all([
         filterOrEmpty(base44.asServiceRole.entities.OrganizationLocation, { subscription_id: sub.id }),
@@ -138,12 +111,12 @@ export default async function (req) {
     }
 
     return Response.json({
-      is_linked: emails.length > 1,
-      business_email: businessEmail || '',
+      is_linked: businessEmails.length > 0,
+      business_email: businessEmails[0] || '',
       personal_email: personalEmail,
       organizations,
-      incoming_transfers: dedupeByEmail(incoming),
-      outgoing_transfers: dedupeByEmail(outgoing),
+      incoming_transfers: dedupeRows(incoming),
+      outgoing_transfers: dedupeRows(outgoing),
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

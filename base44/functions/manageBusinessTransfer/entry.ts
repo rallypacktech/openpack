@@ -1,26 +1,43 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
+import {
+  norm,
+  isEmail,
+  filterOrEmpty,
+  verifiedBusinessEmails,
+  trustedCreatorIds,
+  membershipIsTrusted,
+  findTrustedMembership,
+  resolveStanding,
+} from '../../shared/businessAccess.ts';
 
 // Business access handoff. When someone leaves, either the current owner or a
 // designated organization admin can offer the business side of the account to a
 // replacement. Nothing moves until the replacement accepts. Personal plans,
 // caches, meet spots and other personal records belong to the person's own
 // account and are never touched by a transfer.
+//
+// Authorization is anchored to facts the caller cannot write: the
+// subscription's own owner/org-admin records, a roster row created by the
+// organization's trusted side, and a business address whose owner confirmed a
+// code sent to it. A self-asserted alias or a roster row someone wrote for
+// themselves grants nothing.
 
-function norm(value) {
-  return (value || '').trim().toLowerCase();
+const CODE_TTL_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 5;
+
+function makeCode() {
+  const bytes = new Uint32Array(1);
+  crypto.getRandomValues(bytes);
+  return String(bytes[0] % 1000000).padStart(6, '0');
 }
 
-function isEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((value || '').trim());
-}
-
-async function filterOrEmpty(entity, query) {
-  try {
-    const rows = await entity.filter(query);
-    return Array.isArray(rows) ? rows : (rows?.items || []);
-  } catch (_e) {
-    return [];
-  }
+function sameCode(a, b) {
+  const x = norm(a);
+  const y = norm(b);
+  if (!x || x.length !== y.length) return false;
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x.charCodeAt(i) ^ y.charCodeAt(i);
+  return diff === 0;
 }
 
 export default async function (req) {
@@ -33,15 +50,12 @@ export default async function (req) {
     const action = body.action;
 
     const personalEmail = norm(user.email);
-    const profiles = await filterOrEmpty(
-      base44.asServiceRole.entities.UserProfile,
-      { created_by_id: user.id },
-    );
-    const profile = profiles[0] || null;
-    const businessEmail = norm(profile?.business_email);
-    const emails = Array.from(new Set([personalEmail, businessEmail].filter(Boolean)));
+    const businessEmails = await verifiedBusinessEmails(base44, user.id);
+    const emails = Array.from(new Set([personalEmail, ...businessEmails].filter(Boolean)));
 
     // ---- Connect a business email alias to this personal login -------------
+    // A code goes to the address first. Until it comes back, the address is not
+    // part of this person's identity and grants nothing.
     if (action === 'link_alias') {
       const alias = norm(body.business_email);
       if (!isEmail(alias)) {
@@ -53,39 +67,143 @@ export default async function (req) {
           { status: 400 },
         );
       }
-
-      const fields = { business_email: alias, business_email_linked_at: new Date().toISOString() };
-      if (profile) {
-        await base44.asServiceRole.entities.UserProfile.update(profile.id, fields);
-      } else {
-        await base44.asServiceRole.entities.UserProfile.create(fields);
+      if (businessEmails.includes(alias)) {
+        return Response.json({ ok: true, verified: true, business_email: alias });
       }
 
-      // Attach any member records already waiting on that work address.
+      const code = makeCode();
+      await base44.asServiceRole.entities.BusinessEmailLink.deleteMany({
+        linked_user_id: user.id,
+        status: 'pending',
+      });
+      await base44.asServiceRole.entities.BusinessEmailLink.create({
+        linked_user_id: user.id,
+        email: alias,
+        code,
+        status: 'pending',
+        expires_at: new Date(Date.now() + CODE_TTL_MS).toISOString(),
+        attempts: 0,
+      });
+
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: alias,
+          template_name: 'BusinessEmailVerification',
+          variables: { business_email: alias, code },
+        });
+      } catch (_e) {
+        await base44.asServiceRole.entities.BusinessEmailLink.deleteMany({
+          linked_user_id: user.id,
+          status: 'pending',
+        });
+        return Response.json(
+          {
+            error:
+              'We could not send a confirmation code to that address. Check the spelling and try again.',
+          },
+          { status: 502 },
+        );
+      }
+
+      return Response.json({ ok: true, pending: true, business_email: alias });
+    }
+
+    // ---- Confirm the code sent to the business address --------------------
+    if (action === 'confirm_alias') {
+      const alias = norm(body.business_email);
+      const code = String(body.code || '').trim();
+      if (!isEmail(alias) || !code) {
+        return Response.json({ error: 'Enter the code we sent to that address.' }, { status: 400 });
+      }
+
+      const rows = await filterOrEmpty(base44.asServiceRole.entities.BusinessEmailLink, {
+        linked_user_id: user.id,
+        email: alias,
+        status: 'pending',
+      });
+      const link = rows[0];
+      if (!link) {
+        return Response.json({ error: 'Request a new code for that address.' }, { status: 400 });
+      }
+      if (link.expires_at && new Date(link.expires_at).getTime() < Date.now()) {
+        await base44.asServiceRole.entities.BusinessEmailLink.delete(link.id);
+        return Response.json({ error: 'That code has expired. Request a new one.' }, { status: 400 });
+      }
+      if ((link.attempts || 0) >= MAX_ATTEMPTS) {
+        await base44.asServiceRole.entities.BusinessEmailLink.delete(link.id);
+        return Response.json({ error: 'Too many attempts. Request a new code.' }, { status: 429 });
+      }
+      if (!sameCode(link.code, code)) {
+        await base44.asServiceRole.entities.BusinessEmailLink.update(link.id, {
+          attempts: (link.attempts || 0) + 1,
+        });
+        return Response.json({ error: 'That code is not correct.' }, { status: 400 });
+      }
+
+      await base44.asServiceRole.entities.BusinessEmailLink.update(link.id, {
+        status: 'verified',
+        verified_at: new Date().toISOString(),
+        code: '',
+      });
+
+      // The profile field is a display mirror only — nothing authorizes on it.
+      const profiles = await filterOrEmpty(base44.asServiceRole.entities.UserProfile, {
+        created_by_id: user.id,
+      });
+      const mirror = {
+        business_email: alias,
+        business_email_linked_at: new Date().toISOString(),
+      };
+      if (profiles[0]) {
+        await base44.asServiceRole.entities.UserProfile.update(profiles[0].id, mirror);
+      } else {
+        await base44.asServiceRole.entities.UserProfile.create(mirror);
+      }
+
+      // Attach roster rows the organization's trusted side already created for
+      // this address. Rows someone wrote for themselves are left alone.
       const pendingMembers = [
         ...(await filterOrEmpty(base44.asServiceRole.entities.OrganizationMember, { business_email: alias })),
         ...(await filterOrEmpty(base44.asServiceRole.entities.OrganizationMember, { email: alias })),
       ];
       const seen = new Set();
+      const creatorCache = new Map();
       for (const member of pendingMembers) {
         if (seen.has(member.id)) continue;
         seen.add(member.id);
+        if (!member.subscription_id) continue;
+
+        let creatorIds = creatorCache.get(member.subscription_id);
+        if (!creatorIds) {
+          const subs = await filterOrEmpty(base44.asServiceRole.entities.BusinessSubscription, {
+            id: member.subscription_id,
+          });
+          creatorIds = subs[0] ? await trustedCreatorIds(base44, subs[0]) : new Set();
+          creatorCache.set(member.subscription_id, creatorIds);
+        }
+        if (!membershipIsTrusted(member, user.id, creatorIds)) continue;
+
         await base44.asServiceRole.entities.OrganizationMember.update(member.id, {
           linked_user_id: user.id,
           status: 'active',
         });
       }
 
-      return Response.json({ ok: true, business_email: alias, linked_memberships: seen.size });
+      return Response.json({ ok: true, verified: true, business_email: alias });
     }
 
     if (action === 'unlink_alias') {
-      if (profile) {
-        await base44.asServiceRole.entities.UserProfile.update(profile.id, {
+      const profiles = await filterOrEmpty(base44.asServiceRole.entities.UserProfile, {
+        created_by_id: user.id,
+      });
+      if (profiles[0]) {
+        await base44.asServiceRole.entities.UserProfile.update(profiles[0].id, {
           business_email: '',
           business_email_linked_at: '',
         });
       }
+      await base44.asServiceRole.entities.BusinessEmailLink.deleteMany({ linked_user_id: user.id });
+
       const linked = await filterOrEmpty(base44.asServiceRole.entities.OrganizationMember, {
         linked_user_id: user.id,
       });
@@ -115,20 +233,12 @@ export default async function (req) {
       const sub = subs[0];
       if (!sub) return Response.json({ error: 'Organization not found.' }, { status: 404 });
 
-      const isOwner = emails.includes(norm(sub.owner_email));
       const adminMembers = await filterOrEmpty(base44.asServiceRole.entities.OrganizationMember, {
         subscription_id: subscriptionId,
       });
-      const membership = adminMembers.find(
-        (m) =>
-          m.linked_user_id === user.id ||
-          emails.includes(norm(m.business_email)) ||
-          emails.includes(norm(m.email)),
-      );
-      const isOrgAdmin =
-        isOwner ||
-        (sub.org_admin_emails || []).some((e) => emails.includes(norm(e))) ||
-        membership?.is_org_admin === true;
+      const creatorIds = await trustedCreatorIds(base44, sub);
+      const membership = findTrustedMembership(adminMembers, user.id, emails, sub, creatorIds);
+      const { isOwner, isOrgAdmin } = resolveStanding(sub, emails, membership);
 
       if (!isOrgAdmin) {
         return Response.json(
@@ -148,6 +258,9 @@ export default async function (req) {
         );
         location = locations[0] || null;
         if (!location) return Response.json({ error: 'Location not found.' }, { status: 404 });
+        if (location.subscription_id !== subscriptionId) {
+          return Response.json({ error: 'That location belongs to a different organization.' }, { status: 403 });
+        }
       }
 
       // One live offer per subscription/scope at a time.
@@ -217,7 +330,7 @@ export default async function (req) {
 
       if (!isRecipient) {
         return Response.json(
-          { error: 'This transfer was addressed to a different business email. Connect that address first.' },
+          { error: 'This transfer was addressed to a different business email. Connect and confirm that address first.' },
           { status: 403 },
         );
       }

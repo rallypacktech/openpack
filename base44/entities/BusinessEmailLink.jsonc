@@ -1,0 +1,69 @@
+{
+  "name": "BusinessEmailLink",
+  "type": "object",
+  "properties": {
+    "linked_user_id": {
+      "type": "string",
+      "description": "The personal RallyPack account this business email belongs to"
+    },
+    "email": {
+      "type": "string",
+      "description": "The business address being verified, stored lowercase"
+    },
+    "code": {
+      "type": "string",
+      "description": "One-time confirmation code sent to the business address"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "verified"
+      ],
+      "default": "pending",
+      "description": "pending = a code was sent and is waiting to be entered, verified = the person proved they control the address"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the pending code stops being accepted"
+    },
+    "verified_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the address was confirmed"
+    },
+    "attempts": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times a code has been tried, used to stop guessing"
+    }
+  },
+  "required": [
+    "linked_user_id",
+    "email",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

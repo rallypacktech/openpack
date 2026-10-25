@@ -21,6 +21,8 @@ import {
 export default function BusinessAccessPanel({ subscription, locations, context, onRefresh }) {
   const { toast } = useToast();
   const [alias, setAlias] = useState("");
+  const [code, setCode] = useState("");
+  const [pendingAlias, setPendingAlias] = useState("");
   const [busy, setBusy] = useState("");
   const [showTransfer, setShowTransfer] = useState(false);
   const [form, setForm] = useState({ scope: "organization", location_id: "", to_email: "", to_name: "", note: "" });
@@ -46,16 +48,40 @@ export default function BusinessAccessPanel({ subscription, locations, context, 
   const handleLink = async () => {
     try {
       const data = await call({ action: "link_alias", business_email: alias }, "link");
+      if (data.verified) {
+        toast({
+          title: "Business email already confirmed",
+          description: "Your personal data is untouched.",
+        });
+        setAlias("");
+        setPendingAlias("");
+        onRefresh();
+        return;
+      }
+      setPendingAlias(data.business_email || alias);
+      setCode("");
       toast({
-        title: "Business email connected",
-        description: data.linked_memberships
-          ? `Linked to ${data.linked_memberships} organization record(s). Your personal data is untouched.`
-          : "Your business email is now on file. Your personal data is untouched.",
+        title: "Confirmation code sent",
+        description: `Enter the code we sent to ${data.business_email || alias} to finish connecting it.`,
       });
+    } catch (e) {
+      toast({ title: "Could not connect", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const handleConfirm = async () => {
+    try {
+      await call({ action: "confirm_alias", business_email: pendingAlias, code }, "confirm");
+      toast({
+        title: "Business email confirmed",
+        description: "It is now linked to the organization's business side. Your personal data is untouched.",
+      });
+      setPendingAlias("");
+      setCode("");
       setAlias("");
       onRefresh();
     } catch (e) {
-      toast({ title: "Could not connect", description: e.message, variant: "destructive" });
+      toast({ title: "Could not confirm", description: e.message, variant: "destructive" });
     }
   };
 
@@ -184,7 +210,8 @@ export default function BusinessAccessPanel({ subscription, locations, context, 
           <p className="text-xs text-muted-foreground mt-1 max-w-xl">
             Your personal account keeps your own plans, caches, meet spots and family details. The
             business email below is just a contact identity that links you to this organization's
-            business side — connecting or disconnecting it never moves your personal data.
+            business side — connecting or disconnecting it never moves your personal data. We email
+            a code to that address first, so only its owner can attach it to an account.
           </p>
           <div className="mt-3 space-y-2 text-sm">
             <div className="flex items-center gap-2">
@@ -223,6 +250,36 @@ export default function BusinessAccessPanel({ subscription, locations, context, 
               </Button>
             )}
           </div>
+
+          {pendingAlias && (
+            <div className="mt-4 rounded border border-primary/30 bg-primary/5 p-3">
+              <p className="text-xs text-muted-foreground">
+                We sent a 6-digit code to <strong className="text-foreground">{pendingAlias}</strong>.
+                Enter it to prove the address is yours.
+              </p>
+              <div className="flex items-end gap-2 mt-2 flex-wrap">
+                <div className="flex-1 min-w-[160px]">
+                  <Label>Confirmation code</Label>
+                  <Input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="123456"
+                    inputMode="numeric"
+                    maxLength={6}
+                  />
+                </div>
+                <Button
+                  onClick={handleConfirm}
+                  disabled={code.trim().length < 6 || busy === "confirm"}
+                  className="gap-2"
+                >
+                  {busy === "confirm" ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                  Confirm
+                </Button>
+                <Button variant="ghost" onClick={() => setPendingAlias("")}>Cancel</Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
