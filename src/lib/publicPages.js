@@ -9,6 +9,9 @@ export const PUBLIC_PAGE_GROUPS = [
       { path: "/faq", label: "FAQ", description: "Direct answers to the questions people ask most about preparing for disasters." },
       { path: "/volunteer", label: "Volunteer", description: "Train with the organizations that deploy volunteers when disasters strike." },
       { path: "/drills", label: "Drill Directory", description: "Upcoming community safety drills you can join and train at." },
+      { path: "/trend-reports", label: "Trend Reports", description: "Open-data reports on wildfire and flood trends, and what the data does not show." },
+      { path: "/wildfire-trends", label: "Wildfire Trend Report", description: "Ten years of open wildfire data — causes, burned area and holiday ignitions." },
+      { path: "/flood-trends", label: "Flood Trend Report", description: "Recorded floods, repeat locations, reported damage and coverage gaps." },
     ],
   },
   {
@@ -18,14 +21,6 @@ export const PUBLIC_PAGE_GROUPS = [
       { path: "/hurricane", label: "Hurricane", description: "Evacuation zones, storm surge and seven-day supply planning." },
       { path: "/flood", label: "Flood", description: "Flash-flood response, flood zones and insurance documentation." },
       { path: "/tornado", label: "Tornado", description: "Shelter locations, warning lead times and vehicle safety." },
-    ],
-  },
-  {
-    group: "Trend reports",
-    pages: [
-      { path: "/trend-reports", label: "All Trend Reports", description: "Open-data reports on wildfire and flood trends, and what the data does not show." },
-      { path: "/wildfire-trends", label: "Wildfire Trend Report", description: "Ten years of open wildfire data — causes, burned area and holiday ignitions." },
-      { path: "/flood-trends", label: "Flood Trend Report", description: "Recorded floods, repeat locations, reported damage and coverage gaps." },
     ],
   },
   {
