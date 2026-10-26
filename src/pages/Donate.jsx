@@ -13,6 +13,7 @@ import {
   CreditCard,
   Code2,
   Megaphone,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -21,14 +22,13 @@ const AMOUNTS = [5, 10, 25, 50, 100];
 const _trackedDonationComplete = new Set();
 
 const COST_ICONS = {
-  "Founder & Developer Salary": User,
-  "Software Engineer": Code2,
-  "Outreach Coordinator": Users,
-  "Ad Budget": Megaphone,
-  "Base44 Builder Subscription": Server,
-  "Domain Registration (Name.com)": Globe,
-  "Email & Communication Tools": Mail,
-  "Payment Processing & Buffer": CreditCard,
+  "Founder-led product & engineering": User,
+  "Hosting & platform": Server,
+  "Disaster data & API feeds": Globe,
+  "Security, legal & compliance": ShieldCheck,
+  "Go-to-market & organization pilots": Megaphone,
+  "Design & content contractors": Code2,
+  "Contingency reserve": CreditCard,
 };
 
 export default function Donate() {
@@ -155,10 +155,10 @@ export default function Donate() {
           <span className="text-[#D64A2E]">free for everyone.</span>
         </h1>
         <p className="text-white/60 font-sans max-w-xl mx-auto leading-relaxed text-base">
-          Community-funded, not venture-backed. No ads on your safety data. No
-          paywalled features. We're raising a $500,000 preseed to hire the
-          engineers and outreach staff who keep RallyPack free for the families
-          who need it most.
+          Preparedness for families is free, always — no ads, no paywalled
+          safety features. The organizations required to prove they are prepared
+          pay for the platform. We're raising a $150,000 pre-seed to reach our
+          first 250 of them.
         </p>
       </div>
 
@@ -174,7 +174,7 @@ export default function Donate() {
                 {progressLoading ? "—" : progress?.total_raised_display || "$0"}
                 <span className="text-base text-[#1C1C1A]/40 font-sans font-normal">
                   {" "}
-                  / {progress?.goal_display || "$500,000"}
+                  / {progress?.goal_display || "$150,000"}
                 </span>
               </p>
             </div>
@@ -202,14 +202,99 @@ export default function Donate() {
         </div>
       </div>
 
+      {/* Business model */}
+      <div className="max-w-3xl mx-auto px-4 mb-12">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3 text-center">
+          The business
+        </p>
+        <h2 className="font-serif text-2xl font-bold text-[#1C1C1A] mb-3 text-center">
+          Free for families. Paid by organizations.
+        </h2>
+        <p className="text-sm text-[#1C1C1A]/60 font-sans leading-relaxed text-center max-w-xl mx-auto mb-8">
+          Personal preparedness is the distribution engine, not the product. Revenue
+          comes from organizations that have to prove they are prepared — multi-location
+          employers, schools, property managers and fire districts.
+        </p>
+
+        <div className="space-y-px bg-[#D8D2C6] mb-8">
+          <div className="bg-white p-5 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="font-sans font-semibold text-sm text-[#1C1C1A]">Personal — free forever</h3>
+              <p className="text-xs text-[#1C1C1A]/50 font-sans mt-1">
+                Caches, plans, meet spots and alerts. No ads, no upsell. Every employee who
+                uses it personally is a warm lead for the organization that employs them.
+              </p>
+            </div>
+            <span className="font-serif text-lg font-bold text-[#1C1C1A] whitespace-nowrap">$0</span>
+          </div>
+          <div className="bg-white p-5 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="font-sans font-semibold text-sm text-[#1C1C1A]">Basic — per location</h3>
+              <p className="text-xs text-[#1C1C1A]/50 font-sans mt-1">
+                Caches, member roster and drill planning for a single site.
+              </p>
+            </div>
+            <span className="font-serif text-lg font-bold text-[#1C1C1A] whitespace-nowrap">$29<span className="text-xs font-sans font-normal text-[#1C1C1A]/40">/mo</span></span>
+          </div>
+          <div className="bg-white p-5 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="font-sans font-semibold text-sm text-[#1C1C1A]">Professional — multi-site</h3>
+              <p className="text-xs text-[#1C1C1A]/50 font-sans mt-1">
+                Compliance hub, staff certifications, equipment checks and expiry evidence
+                across every location.
+              </p>
+            </div>
+            <span className="font-serif text-lg font-bold text-[#1C1C1A] whitespace-nowrap">$99<span className="text-xs font-sans font-normal text-[#1C1C1A]/40">/mo</span></span>
+          </div>
+          <div className="bg-white p-5 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="font-sans font-semibold text-sm text-[#1C1C1A]">Enterprise — chain of command</h3>
+              <p className="text-xs text-[#1C1C1A]/50 font-sans mt-1">
+                Delegated emergency alerts, unlimited locations, evacuation plans and the
+                audit trail litigation and insurers ask for.
+              </p>
+            </div>
+            <span className="font-serif text-lg font-bold text-[#1C1C1A] whitespace-nowrap">$299<span className="text-xs font-sans font-normal text-[#1C1C1A]/40">/mo</span></span>
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-3 gap-px bg-[#D8D2C6]">
+          <div className="bg-[#1C1C1A] text-white p-5">
+            <p className="font-serif text-2xl font-bold text-[#D64A2E]">$297K</p>
+            <p className="text-xs text-white/60 font-sans mt-1 leading-relaxed">
+              ARR at 250 organizations averaging $99 a month — the entire pre-seed budget,
+              earned back in a single year of that base.
+            </p>
+          </div>
+          <div className="bg-white p-5">
+            <p className="font-serif text-2xl font-bold text-[#1C1C1A]">~90%</p>
+            <p className="text-xs text-[#1C1C1A]/50 font-sans mt-1 leading-relaxed">
+              Gross margin. Hosting and open disaster data cost a few dollars per
+              organization per month; the software is written once and served many times.
+            </p>
+          </div>
+          <div className="bg-white p-5">
+            <p className="font-serif text-2xl font-bold text-[#1C1C1A]">Mandated</p>
+            <p className="text-xs text-[#1C1C1A]/50 font-sans mt-1 leading-relaxed">
+              Fire and life-safety checks are legally required on a schedule, so the budget
+              already exists and renews every year instead of churning.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Operating costs breakdown */}
       <div className="max-w-3xl mx-auto px-4 mb-12">
         <p className="text-[10px] uppercase tracking-[0.3em] text-[#D64A2E] font-sans mb-3 text-center">
           Where your money goes
         </p>
-        <h2 className="font-serif text-2xl font-bold text-[#1C1C1A] mb-6 text-center">
-          Transparent preseed budget
+        <h2 className="font-serif text-2xl font-bold text-[#1C1C1A] mb-3 text-center">
+          A 12-month pre-seed budget
         </h2>
+        <p className="text-sm text-[#1C1C1A]/50 font-sans text-center max-w-lg mx-auto mb-6">
+          Deliberately small and founder-led: no salaried hires, no ad spend on a market we
+          already reach for free. Every line is a cost we can point at.
+        </p>
         <div className="space-y-px bg-[#D8D2C6]">
           {(progress?.operating_costs || []).map((cost) => {
             const Icon = COST_ICONS[cost.label] || Server;
@@ -242,7 +327,7 @@ export default function Donate() {
               Total Preseed Goal
             </span>
             <span className="font-serif text-2xl font-bold text-[#D64A2E]">
-              ${(progress?.total_costs || 500000).toLocaleString()}
+              ${(progress?.total_costs || 150000).toLocaleString()}
             </span>
           </div>
         </div>

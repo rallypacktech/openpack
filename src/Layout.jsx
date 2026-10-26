@@ -334,8 +334,6 @@ export default function Layout({ children, currentPageName }) {
                     <Link to="/compliance-quiz" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Business Compliance Check</Link>
                     <Link to="/readiness-map" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Readiness Map</Link>
                     <Link to="/trend-reports" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Trend Reports</Link>
-                    <Link to="/wildfire-trends" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Wildfire Trends</Link>
-                    <Link to="/flood-trends" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Flood Trends</Link>
                     <Link to="/sitemap" className="block text-sm text-muted-foreground hover:text-foreground font-sans transition-colors">Sitemap</Link>
                   </nav>
                   <h3 className="text-xs uppercase tracking-widest font-sans font-semibold text-muted-foreground mb-3 mt-6">Follow Us</h3>

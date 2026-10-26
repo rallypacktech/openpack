@@ -8,19 +8,19 @@ import { readCachedPayload, writeCachedPayload } from '../../shared/reportCache.
 // is snapshotted so anonymous traffic cannot drive one aggregate per visitor.
 
 // Preseed funding goal — transparent breakdown of real costs
-const ANNUAL_GOAL_CENTS = 500000 * 100;
+const ANNUAL_GOAL_CENTS = 150000 * 100;
 const CACHE_KEY = 'donation_progress';
 const TTL_MS = 10 * 60 * 1000; // 10 minutes
 
+// A lean, founder-led pre-seed: 12 months of runway with no full-time hires.
 const OPERATING_COSTS = [
-  { label: "Founder & Developer Salary", amount: 120000, description: "Full-time development, maintenance, and user support" },
-  { label: "Software Engineer", amount: 77000, description: "Engineering hire to build and harden the preparedness platform" },
-  { label: "Outreach Coordinator", amount: 55000, description: "Partnerships with agencies, schools, and community organizations" },
-  { label: "Ad Budget", amount: 243000, description: "Paid acquisition to reach families before the next disaster" },
-  { label: "Base44 Builder Subscription", amount: 2400, description: "App hosting, database, backend functions, and integrations (~$200/mo)" },
-  { label: "Domain Registration (Name.com)", amount: 50, description: "Annual domain renewal" },
-  { label: "Email & Communication Tools", amount: 350, description: "Resend, Telegram Bot infrastructure, and notification delivery" },
-  { label: "Payment Processing & Buffer", amount: 2200, description: "Stripe transaction fees and contingency reserve. We participate in the Stripe Climate program — a portion of every transaction funds carbon removal projects." },
+  { label: "Founder-led product & engineering", amount: 45000, description: "Part-time founder stipend covering product, engineering and support — no headcount this year" },
+  { label: "Hosting & platform", amount: 6000, description: "Base44 app hosting, database, backend functions, maps and file storage (~$500/mo)" },
+  { label: "Disaster data & API feeds", amount: 9000, description: "OpenFEMA, NOAA, wildfire and weather feeds plus translation and AI integration credits" },
+  { label: "Security, legal & compliance", amount: 12000, description: "Privacy policy, data processing agreements, entity setup and a security review organizations ask for before they buy" },
+  { label: "Go-to-market & organization pilots", amount: 48000, description: "Pilots with fire districts, schools and multi-location employers, plus content and search — the cheapest acquisition channel we have" },
+  { label: "Design & content contractors", amount: 12000, description: "Contract design and copy work, no full-time hires" },
+  { label: "Contingency reserve", amount: 18000, description: "Roughly one month of runway held back for the unexpected. A portion of every payment also funds carbon removal through the Stripe Climate program." },
 ];
 
 Deno.serve(async (req) => {

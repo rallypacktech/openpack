@@ -41,8 +41,6 @@ function buildReport(records) {
     if (r.hurricane_related || r.hazard_type === 'hurricane_flood') totals.hurricane_events++;
 
     if (year) years.add(year);
-    if (r.country_name || r.country_code) countries.set(r.country_code || r.country_name, true);
-    if (r.admin1_name) states.set(r.admin1_name, true);
 
     const hazardLabel =
       r.hazard_type === 'flash_flood'
@@ -69,20 +67,28 @@ function buildReport(records) {
       byYear.set(year, bucket);
     }
 
-    const countryBucket = countries.get(r.country_code) || { name: r.country_name || r.country_code, count: 0 };
-    if (typeof countryBucket === 'object') {
+    const countryKey = r.country_code || r.country_name;
+    if (countryKey) {
+      const countryBucket = countries.get(countryKey) || {
+        code: r.country_code || null,
+        name: r.country_name || r.country_code,
+        count: 0,
+      };
       countryBucket.count++;
-      countries.set(r.country_code || r.country_name, countryBucket);
+      countries.set(countryKey, countryBucket);
     }
 
     if (r.admin1_name) {
-      const stateBucket = states.get(r.admin1_name) || { name: r.admin1_name, count: 0, deaths: 0, damage_usd: 0 };
-      if (typeof stateBucket === 'object') {
-        stateBucket.count++;
-        stateBucket.deaths += deaths;
-        stateBucket.damage_usd += damage;
-        states.set(r.admin1_name, stateBucket);
-      }
+      const stateBucket = states.get(r.admin1_name) || {
+        name: r.admin1_name,
+        count: 0,
+        deaths: 0,
+        damage_usd: 0,
+      };
+      stateBucket.count++;
+      stateBucket.deaths += deaths;
+      stateBucket.damage_usd += damage;
+      states.set(r.admin1_name, stateBucket);
     }
   }
 
@@ -159,16 +165,21 @@ export default async function (req) {
     const records = await loadActiveFloods(base44);
     const report = buildReport(records);
 
-    try {
-      const existing = await base44.asServiceRole.entities.ReportCache.filter({ cache_key: CACHE_KEY });
-      const now = new Date().toISOString();
-      if (existing.length > 0) {
-        await base44.asServiceRole.entities.ReportCache.update(existing[0].id, { payload: report, built_at: now });
-      } else {
-        await base44.asServiceRole.entities.ReportCache.create({ cache_key: CACHE_KEY, payload: report, built_at: now });
+    // An empty report is never cached: it is what an unpopulated database looks
+    // like, and pinning it for six hours would keep the page blank long after
+    // flood records were imported.
+    if (report.totals.total_events > 0) {
+      try {
+        const existing = await base44.asServiceRole.entities.ReportCache.filter({ cache_key: CACHE_KEY });
+        const now = new Date().toISOString();
+        if (existing.length > 0) {
+          await base44.asServiceRole.entities.ReportCache.update(existing[0].id, { payload: report, built_at: now });
+        } else {
+          await base44.asServiceRole.entities.ReportCache.create({ cache_key: CACHE_KEY, payload: report, built_at: now });
+        }
+      } catch (e) {
+        console.error('Flood report cache write failed (non-fatal):', e?.message);
       }
-    } catch (e) {
-      console.error('Flood report cache write failed (non-fatal):', e?.message);
     }
 
     return Response.json(report);
