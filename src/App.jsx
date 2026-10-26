@@ -45,6 +45,8 @@ const Flood = lazy(() => import('./pages/Flood'));
 const Tornado = lazy(() => import('./pages/Tornado'));
 const AgentAssistant = lazy(() => import('./pages/AgentAssistant'));
 const WildfireTrends = lazy(() => import('./pages/WildfireTrends'));
+const FloodTrends = lazy(() => import('./pages/FloodTrends'));
+const TrendReports = lazy(() => import('./pages/TrendReports'));
 const ReadinessMap = lazy(() => import('./pages/ReadinessMap'));
 const GlobalCompliance = lazy(() => import('./pages/GlobalCompliance'));
 const ResponderTraining = lazy(() => import('./pages/ResponderTraining'));
@@ -142,7 +144,9 @@ const AuthenticatedApp = () => {
       <Route path="/hurricane" element={<LayoutWrapper currentPageName="Hurricane"><Hurricane /></LayoutWrapper>} />
       <Route path="/flood" element={<LayoutWrapper currentPageName="Flood"><Flood /></LayoutWrapper>} />
       <Route path="/tornado" element={<LayoutWrapper currentPageName="Tornado"><Tornado /></LayoutWrapper>} />
+      <Route path="/trend-reports" element={<LayoutWrapper currentPageName="TrendReports"><TrendReports /></LayoutWrapper>} />
       <Route path="/wildfire-trends" element={<LayoutWrapper currentPageName="WildfireTrends"><WildfireTrends /></LayoutWrapper>} />
+      <Route path="/flood-trends" element={<LayoutWrapper currentPageName="FloodTrends"><FloodTrends /></LayoutWrapper>} />
       <Route path="/readiness-map" element={<LayoutWrapper currentPageName="ReadinessMap"><ReadinessMap /></LayoutWrapper>} />
       <Route path="/global-compliance" element={<LayoutWrapper currentPageName="GlobalCompliance"><GlobalCompliance /></LayoutWrapper>} />
       <Route path="/responder-training" element={<LayoutWrapper currentPageName="ResponderTraining"><ResponderTraining /></LayoutWrapper>} />

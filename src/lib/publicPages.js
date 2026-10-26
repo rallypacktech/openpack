@@ -18,7 +18,14 @@ export const PUBLIC_PAGE_GROUPS = [
       { path: "/hurricane", label: "Hurricane", description: "Evacuation zones, storm surge and seven-day supply planning." },
       { path: "/flood", label: "Flood", description: "Flash-flood response, flood zones and insurance documentation." },
       { path: "/tornado", label: "Tornado", description: "Shelter locations, warning lead times and vehicle safety." },
+    ],
+  },
+  {
+    group: "Trend reports",
+    pages: [
+      { path: "/trend-reports", label: "All Trend Reports", description: "Open-data reports on wildfire and flood trends, and what the data does not show." },
       { path: "/wildfire-trends", label: "Wildfire Trend Report", description: "Ten years of open wildfire data — causes, burned area and holiday ignitions." },
+      { path: "/flood-trends", label: "Flood Trend Report", description: "Recorded floods, repeat locations, reported damage and coverage gaps." },
     ],
   },
   {

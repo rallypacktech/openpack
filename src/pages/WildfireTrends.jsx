@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Share2, Info } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Loader2, Share2, Info, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import KeyNumbersBand from "@/components/wildfire/KeyNumbersBand";
 import YearTrendChart from "@/components/wildfire/YearTrendChart";
@@ -118,6 +119,12 @@ export default function WildfireTrends() {
       {/* Hero — static, renders immediately */}
       <div className="bg-foreground text-cream">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+          <Link
+            to="/trend-reports"
+            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-cream/60 hover:text-cream font-sans mb-5 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> All trend reports
+          </Link>
           <p className="text-xs uppercase tracking-widest text-cream/60 font-sans mb-3">RallyPack Climate Data Report</p>
           <h1 className="text-4xl sm:text-5xl font-serif font-bold leading-tight">10 Years of Global Wildfires</h1>
           <p className="mt-4 text-base sm:text-lg text-cream/80 font-sans max-w-2xl">

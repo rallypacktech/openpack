@@ -8,7 +8,7 @@ export default function Sitemap() {
   usePublicHead({
     title: "Sitemap | RallyPack",
     description:
-      "Every public page on RallyPack — hazard guides, species plans, readiness tools, the wildfire trend report, organization features and legal pages.",
+      "Every public page on RallyPack — hazard guides, species plans, readiness tools, the wildfire and flood trend reports, organization features and legal pages.",
     path: "/sitemap",
   });
 
