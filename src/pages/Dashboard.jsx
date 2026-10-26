@@ -23,7 +23,11 @@ import TermsAgreement, {
 } from "../components/onboarding/TermsAgreement";
 import { safeSessionGet, safeSessionSet } from "../lib/utils";
 import { useFirstCacheMilestone } from "@/hooks/useFirstCacheMilestone";
-import { getCurrentUser, getMyProfile } from "@/lib/currentUser";
+import {
+  getCurrentUser,
+  getMyProfile,
+  invalidateMyProfile,
+} from "@/lib/currentUser";
 import { shareFieldsFor } from "@/lib/planShare";
 
 export default function Dashboard() {
@@ -68,19 +72,25 @@ export default function Dashboard() {
     });
   };
 
+  // These used to reload the whole dashboard (a dozen requests) after every
+  // small change. The list is already in state, so it is updated in place.
   const handleAddHandler = async (data) => {
-    await base44.entities.AuthorizedHandler.create(data);
-    await loadData();
+    const created = await base44.entities.AuthorizedHandler.create(data);
+    if (created?.id) setHandlers((prev) => [...prev, created]);
   };
 
   const handleUpdateHandler = async (id, data) => {
     await base44.entities.AuthorizedHandler.update(id, data);
-    await loadData();
+    setHandlers((prev) =>
+      prev.map((handler) =>
+        handler.id === id ? { ...handler, ...data } : handler,
+      ),
+    );
   };
 
   const handleDeleteHandler = async (id) => {
     await base44.entities.AuthorizedHandler.delete(id);
-    await loadData();
+    setHandlers((prev) => prev.filter((handler) => handler.id !== id));
   };
 
   const handleSaveAddress = async () => {
@@ -136,6 +146,7 @@ export default function Dashboard() {
       } else {
         await base44.entities.UserProfile.create(cleanedData);
       }
+      invalidateMyProfile();
       console.log("Address saved successfully");
       if (typeof pendo !== "undefined") {
         pendo.track("onboarding_address_saved", {
@@ -170,6 +181,7 @@ export default function Dashboard() {
         onboarding_completed: true,
       })
         .then(() => {
+          invalidateMyProfile();
           setUserProfile({ ...userProfile, onboarding_completed: true });
           if (typeof pendo !== "undefined") {
             pendo.track("onboarding_completed", {
@@ -740,6 +752,7 @@ export default function Dashboard() {
                 terms_agreed_date: date,
               });
             }
+            invalidateMyProfile();
             if (typeof pendo !== "undefined") {
               pendo.track("terms_agreement_accepted", {
                 terms_version: version,

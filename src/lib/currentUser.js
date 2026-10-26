@@ -44,11 +44,24 @@ export async function getCurrentUser() {
 }
 
 let profileInFlight = null;
+let cachedProfile = null;
+let profileCacheUntil = 0;
+
+// The profile is read by the header, the beacon, the heartbeat and the page
+// itself within the same second of every navigation — four reads of one record.
+// It is therefore reused for a moment: long enough that one page load shares a
+// single read, short enough that an edit is never masked. Writers call
+// invalidateMyProfile() so a save shows up immediately.
+const PROFILE_TTL_MS = 5000;
+
+export function invalidateMyProfile() {
+  cachedProfile = null;
+  profileCacheUntil = 0;
+}
 
 // The signed-in user's profile record, or null if they don't have one yet.
-// Deliberately not cached: the profile is edited all over the app, so every
-// call gets a fresh answer. Only simultaneous callers share one request.
 export async function getMyProfile() {
+  if (profileCacheUntil > Date.now()) return cachedProfile;
   if (!profileInFlight) {
     profileInFlight = (async () => {
       const user = await getCurrentUser();
@@ -56,7 +69,14 @@ export async function getMyProfile() {
       const profiles = await base44.entities.UserProfile.filter({
         created_by: user.email,
       });
-      return profiles[0] || null;
+      const profile = profiles[0] || null;
+      // A missing record is never cached: the dashboard bootstraps one, and the
+      // next check has to see it instead of a remembered "no profile".
+      if (profile) {
+        cachedProfile = profile;
+        profileCacheUntil = Date.now() + PROFILE_TTL_MS;
+      }
+      return profile;
     })().finally(() => {
       profileInFlight = null;
     });
