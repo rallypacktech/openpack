@@ -1,0 +1,142 @@
+{
+  "name": "FloodIncident",
+  "type": "object",
+  "properties": {
+    "event_name": {
+      "type": "string",
+      "description": "Name of the flood event as the source reported it (e.g. 'Severe Storms, Flooding and Mudslides')"
+    },
+    "hazard_type": {
+      "type": "string",
+      "enum": [
+        "flood",
+        "flash_flood",
+        "coastal_flood",
+        "riverine_flood",
+        "hurricane_flood",
+        "other"
+      ],
+      "default": "flood",
+      "description": "Flood sub-type. Kept distinct from hurricane and wildfire so overlapping impacts are never double-counted in trend totals."
+    },
+    "hurricane_related": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when the flooding was caused by a named tropical cyclone. Lets a report show hurricane-caused flooding separately from ordinary flooding."
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-3 country code (USA, COL, DEU\u2026)"
+    },
+    "country_name": {
+      "type": "string"
+    },
+    "admin1_name": {
+      "type": "string",
+      "description": "State, province or territory where the flooding was recorded"
+    },
+    "admin2_name": {
+      "type": "string",
+      "description": "County, district or forecast zone"
+    },
+    "locality": {
+      "type": "string",
+      "description": "Nearest town or named place, when the source reports one"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "First day of the flooding"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "deaths": {
+      "type": "number",
+      "description": "Direct deaths attributed to the flooding by the source"
+    },
+    "injured": {
+      "type": "number",
+      "description": "Direct injuries attributed to the flooding by the source"
+    },
+    "affected_people": {
+      "type": "number",
+      "description": "People reported affected, when the source provides a figure"
+    },
+    "damage_usd": {
+      "type": "number",
+      "description": "Reported damage converted to US dollars, kept as the source published it (not inflation-adjusted). Zero means the source reported no dollar figure."
+    },
+    "damage_year": {
+      "type": "number",
+      "description": "Year the dollar figure refers to, so inflation can be applied at analysis time instead of overwriting the original value"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "OPENFEMA",
+        "NOAA_STORM_EVENTS",
+        "EM_DAT",
+        "UNDRR_DESINVENTAR",
+        "MANUAL"
+      ],
+      "description": "Agency dataset this record came from"
+    },
+    "source_record_id": {
+      "type": "string",
+      "description": "Stable identifier inside the source dataset (FEMA disaster number, NOAA event id, EM-DAT DisNo). Used to stop the same event being imported twice."
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Direct link to the source record for verification"
+    },
+    "source_description": {
+      "type": "string",
+      "description": "Short description kept from the source (declaration type, event narrative excerpt)"
+    },
+    "original_values": {
+      "type": "object",
+      "description": "The source's own fields exactly as returned, preserved so no detail is lost in normalization"
+    },
+    "is_merged_away": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this record was merged into another flood record (soft-deleted). Excluded from totals but retained for audit and restore."
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_name",
+    "hazard_type",
+    "country_code",
+    "start_date",
+    "source"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
