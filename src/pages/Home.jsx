@@ -3,9 +3,10 @@ import { Link, Navigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { ClipboardList, ArrowRight, Heart, X, Github, AlertTriangle, Users, Clock, MapPin, Home as HomeIcon, Backpack, Mountain, Shield, DollarSign, CheckCircle, Flame, Wind, CloudRain, Zap } from "lucide-react";
+import { ClipboardList, ArrowRight, Heart, X, Github, AlertTriangle, Users, Clock, MapPin, Home as HomeIcon, Backpack, Mountain, Shield, DollarSign, CheckCircle, Flame, Wind, CloudRain, Zap, Globe, Lock } from "lucide-react";
 import FooterContactForm from "../components/FooterContactForm";
 import ReadinessMapCta from "../components/home/ReadinessMapCta";
+import PublicVsDashboard from "../components/home/PublicVsDashboard";
 import { useHeroShot } from "@/hooks/useHeroShot";
 
 export default function Home() {
@@ -30,20 +31,23 @@ export default function Home() {
     }).catch(() => {});
   }, []);
 
+  // The homepage is the public homepage for everyone — signed-in or not. Only an
+  // explicit preference for Offline or Resources forwards a visitor elsewhere;
+  // the dashboard is reached from the homepage, never by a silent forward.
   useEffect(() => {
     if (isLoadingAuth || !user) return;
     (async () => {
       try {
         const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
         const profile = profiles[0];
-        const defaultHome = profile?.default_home_page || "dashboard";
-        if (profile?.onboarding_completed && (defaultHome === "offline" || defaultHome === "resources")) {
-          setHomeRedirect(defaultHome);
-        } else {
-          setHomeRedirect("dashboard");
-        }
+        const preferred = profile?.default_home_page;
+        setHomeRedirect(
+          profile?.onboarding_completed && (preferred === "offline" || preferred === "resources")
+            ? preferred
+            : "home",
+        );
       } catch {
-        setHomeRedirect("dashboard");
+        setHomeRedirect("home");
       }
     })();
   }, [user, isLoadingAuth]);
@@ -56,9 +60,8 @@ export default function Home() {
     );
   }
 
-  if (homeRedirect) {
-    const path = homeRedirect === "offline" ? "/Offline" : homeRedirect === "resources" ? "/Resources" : "/Dashboard";
-    return <Navigate to={path} replace />;
+  if (homeRedirect === "offline" || homeRedirect === "resources") {
+    return <Navigate to={homeRedirect === "offline" ? "/Offline" : "/Resources"} replace />;
   }
 
   const goalReached = donationProgress?.progress_pct >= 100;
@@ -135,7 +138,11 @@ export default function Home() {
                 <ClipboardList className="w-4 h-4" /> Free readiness quiz
               </button>
             </Link>
-            {!user && (
+            {user ? (
+              <Link to={createPageUrl("Dashboard")} className="inline-flex items-center gap-3 border border-white/50 text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-white/10 transition-colors text-sm tracking-widest uppercase">
+                Go to my dashboard <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
               <button onClick={handleSignUp} className="inline-flex items-center gap-3 border border-white/50 text-white font-sans font-semibold px-8 py-4 rounded-none hover:bg-white/10 transition-colors text-sm tracking-widest uppercase">
                 Build your plan <ArrowRight className="w-4 h-4" />
               </button>
@@ -243,6 +250,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Public info vs. private dashboard ── */}
+      <PublicVsDashboard isSignedIn={!!user} onSignUp={handleSignUp} />
 
       {/* ── Every plan includes them: pets & animals ── */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-0">

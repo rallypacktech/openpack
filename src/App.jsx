@@ -97,9 +97,8 @@ const AuthenticatedApp = () => {
       <Route path="/Feedback" element={<Feedback />} />
       <Route path="/Donate" element={<LayoutWrapper currentPageName="Donate"><Donate /></LayoutWrapper>} />
 
-      {/* /home redirect → Home lives at / */}
-      <Route path="/home" element={<Navigate to="/" replace />} />
-      <Route path="/Home" element={<Navigate to="/" replace />} />
+      {/* / is the only homepage URL. The old /home and /Home duplicates are gone
+          so crawlers see one homepage instead of several forwarding aliases. */}
       <Route path="/LearnMore" element={<Navigate to="/" replace />} />
       <Route path="/learnmore" element={<Navigate to="/" replace />} />
 

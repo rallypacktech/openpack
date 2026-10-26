@@ -73,8 +73,20 @@ export default function WildfireTrends() {
       description: `Recorded wildfire incidents ${years[0]?.year}–${years[years.length - 1]?.year}: ${report.totals.total_incidents} fires across ${report.totals.countries_affected} countries, ${new Intl.NumberFormat("en-US").format(report.totals.total_hectares)} hectares burned.`,
       creator: { "@type": "Organization", name: "RallyPack", url: publicUrl("/") },
       isAccessibleForFree: true,
+      // Open data: the report is published under the same MIT license as the app.
+      license: "https://opensource.org/license/mit",
       keywords: "wildfire, wildfire trends, preparedness, disaster data, fire statistics",
-      distribution: years.map((y) => `${y.year}: ${y.count} fires, ${y.hectares} ha`).join("; "),
+      temporalCoverage: `${years[0]?.year}/${years[years.length - 1]?.year}`,
+      // Distribution must be a DataDownload (not a string) and carry both
+      // contentUrl and encodingFormat for Google's dataset validation.
+      distribution: [
+        {
+          "@type": "DataDownload",
+          name: "RallyPack 10-Year Global Wildfire Trend Report",
+          contentUrl: publicUrl("/wildfire-trends"),
+          encodingFormat: "text/html",
+        },
+      ],
       dateModified: report.data_as_of,
     };
   }, [report]);
