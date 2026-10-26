@@ -8,6 +8,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Send, Download, Sparkles, Mail } from "lucide-react";
 
+// Every value written into the print window is HTML-encoded here — the subject,
+// recipient name and body all originate from editable fields (or the LLM draft),
+// so none of them may be interpolated into the printed document raw.
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 // PR letter generator: drafts a tailored letter from the public report
 // aggregate via InvokeLLM, then lets the admin edit, print, or email it.
 // `report` is optional — if omitted, the tool fetches it itself (Admin Monitor use).
@@ -76,8 +87,8 @@ export default function PrLetterTool({ report: reportProp }) {
     win.document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>PR Letter — RallyPack</title>
     <style>body{font-family:Georgia,serif;max-width:720px;margin:36px auto;padding:0 24px;color:#111;line-height:1.6}h1{font-size:18px}.meta{font-size:12px;color:#666;margin-bottom:20px;font-family:sans-serif}.logo{font-weight:bold;font-size:18px;margin-bottom:4px}@media print{.noprint{display:none}}</style></head>
     <body><div class="logo">RallyPack</div><p class="noprint">File → Print → Save as PDF</p>
-    <h1>${subject}</h1><div class="meta">${recipientType === "press" ? "To: Press" : "To: Municipal official"}${recipientName ? " — " + recipientName : ""}</div>
-    <pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:14px">${(draft || "").replace(/</g, "&lt;")}</pre>
+    <h1>${escapeHtml(subject)}</h1><div class="meta">${recipientType === "press" ? "To: Press" : "To: Municipal official"}${recipientName ? " — " + escapeHtml(recipientName) : ""}</div>
+    <pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:14px">${escapeHtml(draft)}</pre>
     </body></html>`);
     win.document.close();
     win.focus();
