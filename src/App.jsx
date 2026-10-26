@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import VisualEditAgent from '@/lib/VisualEditAgent'
 import NavigationTracker from '@/lib/NavigationTracker'
+import AnalyticsPageViews from '@/components/AnalyticsPageViews';
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
@@ -174,6 +175,7 @@ function App() {
         <TranslationProvider>
           <Router>
             <NavigationTracker />
+            <AnalyticsPageViews />
             <DomTranslation />
             <TranslationCollector />
             <AuthenticatedApp />
