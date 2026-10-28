@@ -46,6 +46,12 @@ export default async function(req: Request): Promise<Response> {
       return Response.json({ error: 'Invalid state_code', valid_codes: US_STATES.map(s => s.code) }, { status: 400 });
     }
 
+    // Which outreach email these offices should receive.
+    const audienceType = (body.audience_type || 'fire_marshal').trim();
+    if (!['fire_marshal', 'compliance_quiz'].includes(audienceType)) {
+      return Response.json({ error: 'Invalid audience_type', valid: ['fire_marshal', 'compliance_quiz'] }, { status: 400 });
+    }
+
     // 1. Find local fire marshal / fire prevention offices via web search
     const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Find up to 150 LOCAL fire marshal, fire prevention, and fire code enforcement offices in ${target.name} (US state code ${target.code}), USA. Include county fire marshal offices, city and municipal fire prevention bureaus, township fire inspection departments, and the state fire marshal office. For each, return the office name and a publicly listed OFFICE, ADMIN, or INSPECTION email address (a general department inbox or fire prevention contact). Only include real offices with real, publicly listed email addresses — do not invent or guess any email. Return as many distinct offices as you can find, up to 150.`,
@@ -81,9 +87,10 @@ export default async function(req: Request): Promise<Response> {
       try { found = (JSON.parse(llmRes).offices) || []; } catch (_) { found = []; }
     }
 
-    // 2. Load existing fire marshal referrals for this state for dedup
+    // 2. Load every existing referral for this state for dedup, whatever its
+    // audience, so one office is never added twice and never emailed twice.
     const existing = await base44.asServiceRole.entities.BusinessReferral.filter(
-      { audience_type: 'fire_marshal', state: target.code }, null, 5000
+      { state: target.code }, null, 5000
     );
     const existingEmails = new Set(existing.map((r: any) => (r.referee_email || '').trim().toLowerCase()));
 
@@ -100,8 +107,9 @@ export default async function(req: Request): Promise<Response> {
         referee_email: email,
         referee_name: (o.contact_name || '').trim(),
         organization_name: org,
-        audience_type: 'fire_marshal',
+        audience_type: audienceType,
         state: target.code,
+        source: 'fire_marshal_seed',
         status: 'pending',
         referrer_name: 'RallyPack Fire Marshal Outreach',
         referrer_email: '',
@@ -121,6 +129,7 @@ export default async function(req: Request): Promise<Response> {
       success: true,
       state: target.code,
       state_name: target.name,
+      audience_type: audienceType,
       found: found.length,
       created,
       message: `${target.name} (${target.code}): found ${found.length} fire offices, imported ${created} new referrals.`

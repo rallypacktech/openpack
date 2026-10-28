@@ -6,6 +6,8 @@
 // residents/members vs. the paid business dashboard — stays identical across
 // every audience and only has to be edited once.
 
+import { VOUCHER_CODE } from './fireMarshalVoucher.ts';
+
 export const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
 export const ORIGIN = 'https://rallypack.org';
 
@@ -98,6 +100,13 @@ export function buildReferralEmailHtml(config: any, origin: string = ORIGIN, per
             </td>
           </tr>
 
+          ${config.heroImageUrl ? `
+          <tr>
+            <td style="padding:0;line-height:0;">
+              <img src="${config.heroImageUrl}" alt="" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+            </td>
+          </tr>` : ''}
+
           <tr>
             <td style="padding:32px 24px;">
 
@@ -152,8 +161,9 @@ export function buildReferralEmailHtml(config: any, origin: string = ORIGIN, per
               </p>
 
               <p style="margin:0;font-size:14px;color:#1c1c1a;">
-                Stay safe,<br>
-                <strong>RallyPack Team</strong>
+                ${config.signatureName
+                  ? `Best regards,<br><strong>${escapeHtml(config.signatureName)}</strong>${config.signatureTitle ? `<br>${escapeHtml(config.signatureTitle)}` : ''}${config.signatureEmail ? `<br><a href="mailto:${escapeHtml(config.signatureEmail)}" style="color:#d64a2e;">${escapeHtml(config.signatureEmail)}</a>` : ''}`
+                  : 'Stay safe,<br><strong>RallyPack Team</strong>'}
               </p>
 
             </td>
@@ -208,8 +218,10 @@ export function buildReferralEmailText(config: any, origin: string = ORIGIN, per
     ] : []),
     'Business plans include multi-location kit tracking, AED and certification expiry alerts, evacuation plan documentation, and emergency team notifications.',
     '',
-    'Stay safe,',
-    'RallyPack Team',
+    config.signatureName ? 'Best regards,' : 'Stay safe,',
+    config.signatureName ? config.signatureName : 'RallyPack Team',
+    ...(config.signatureTitle ? [config.signatureTitle] : []),
+    ...(config.signatureEmail ? [config.signatureEmail] : []),
     '',
     '—',
     '© 2026 RallyPack · MIT License · GDPR & CCPA Compliant',
@@ -393,6 +405,26 @@ export const AUDIENCE_CONFIG: Record<string, any> = {
     voucherLabel: 'Free year for fire safety teams',
     voucherNote: 'Your first year of the Professional plan is on us.',
     businessCtaLabel: 'Start the free year — no card required',
+  },
+  compliance_quiz: {
+    label: 'Compliance Quiz — Fire Departments',
+    learnPath: '/compliance-quiz',
+    subject: 'A preparedness resource for your community',
+    opener: 'I am writing to introduce RallyPack, an emergency preparedness resource for households, organizations, and businesses.',
+    intro: 'RallyPack helps people prepare for hazards such as wildfires, hurricanes, floods, and tornadoes by organizing readiness information, responsibilities, and next steps in one place. Businesses can keep preparedness planning and compliance records organized too, including first aid kits, AEDs, staff certifications, and fire equipment checks, with reminders before anything expires.\n\nWould your department consider sharing RallyPack with businesses and community members as an optional preparedness resource? We can provide a short description or a link you could include in a newsletter, resource page, or follow-up materials, whatever best fits your department policies.\n\nRallyPack is not a substitute for local codes, inspections, or direction from your department. We hope it can complement your work by encouraging people to plan ahead and keep important readiness tasks organized.',
+    freeTitle: 'Free — a compliance quiz for local businesses',
+    freeBody: 'A short, no-obligation quiz that shows a business where its preparedness plan is already strong and where it still needs attention. It takes a few minutes and is free to share with the businesses in your community.',
+    freeCtaLabel: 'Take the compliance quiz',
+    businessTitle: 'Paid — for your department and local businesses',
+    businessBody: 'The business dashboard keeps preparedness planning and compliance records organized: first aid kits, AEDs, staff certifications and fire equipment checks across every location, with reminders before anything expires and documented evacuation plans.',
+    businessCtaLabel: 'Explore business accounts — 7 days free',
+    voucherCode: VOUCHER_CODE,
+    voucherLabel: 'Free year for fire safety teams',
+    voucherNote: 'Your first year of the Professional plan is on us.',
+    heroImageUrl: 'https://media.base44.com/images/public/69dc170f0871ac017d79debb/43630c023_BusinessPreparednessPlan.png',
+    signatureName: 'Lore Taylor',
+    signatureTitle: 'Director, RallyPack.org',
+    signatureEmail: 'lore@rallypack.tech',
   },
 };
 

@@ -49,10 +49,11 @@
         "hoa",
         "commercial_property",
         "insurance_broker",
-        "fire_marshal"
+        "fire_marshal",
+        "compliance_quiz"
       ],
       "default": "general",
-      "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page. The fire_marshal value covers all fire safety and prevention audiences; it is kept for existing records."
+      "description": "Species or audience type this business serves \u2014 customizes the referral email and landing page. The fire_marshal value covers all fire safety and prevention audiences; it is kept for existing records. compliance_quiz sends the compliance quiz outreach to fire departments."
     },
     "state": {
       "type": "string",

@@ -114,6 +114,14 @@ const DEFAULT_TEMPLATES = [
     voucher_code: VOUCHER_CODE,
   },
   {
+    audience_key: "compliance_quiz",
+    label: "Compliance Quiz — Fire Departments",
+    subject: "A preparedness resource for your community",
+    intro: "RallyPack helps people prepare for hazards such as wildfires, hurricanes, floods, and tornadoes by organizing readiness information, responsibilities, and next steps in one place. Businesses can keep preparedness planning and compliance records organized too, including first aid kits, AEDs, staff certifications, and fire equipment checks, with reminders before anything expires.\n\nWould your department consider sharing RallyPack with businesses and community members as an optional preparedness resource? We can provide a short description or a link you could include in a newsletter, resource page, or follow-up materials, whatever best fits your department policies.\n\nRallyPack is not a substitute for local codes, inspections, or direction from your department. We hope it can complement your work by encouraging people to plan ahead and keep important readiness tasks organized.",
+    learn_path: "/compliance-quiz",
+    voucher_code: VOUCHER_CODE,
+  },
+  {
     audience_key: "commercial_property",
     label: "Commercial Property Preparedness",
     subject: "Fire safety readiness & emergency tracking for your properties",

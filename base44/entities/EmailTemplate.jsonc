@@ -25,7 +25,8 @@
         "hoa",
         "commercial_property",
         "insurance_broker",
-        "fire_marshal"
+        "fire_marshal",
+        "compliance_quiz"
       ],
       "description": "Audience key matching BusinessReferral.audience_type"
     },
@@ -43,7 +44,7 @@
     },
     "learn_path": {
       "type": "string",
-      "description": "Path for the Learn More button (e.g. /BusinessOnboarding, /equine)"
+      "description": "Path for the Learn More button (e.g. /BusinessOnboarding, /equine, /compliance-quiz)"
     },
     "voucher_code": {
       "type": "string",
