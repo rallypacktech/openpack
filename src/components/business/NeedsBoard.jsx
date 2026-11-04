@@ -97,7 +97,9 @@ export default function NeedsBoard({ subscription }) {
     try {
       const res = await base44.functions.invoke('claimOrganizationNeed', { need_id: need.id });
       const contact = {
-        email: res.data?.contact_email || need.contact_email || need.posted_by_email,
+        // The poster's account email is private now; the function returns the
+        // contact address to use instead of it.
+        email: res.data?.contact_email || need.contact_email,
         phone: res.data?.contact_phone || need.contact_phone,
         org: need.organization_name,
         title: need.need_title,
@@ -252,9 +254,6 @@ export default function NeedsBoard({ subscription }) {
                   {need.status === "claimed" && need.claimed_by_org && (
                     <div className="bg-amber-50 border border-amber-200 rounded p-2 text-xs text-amber-800 mb-3">
                       <strong>Claimed by:</strong> {need.claimed_by_org}
-                      {isMine && need.claimed_by_email && (
-                        <span> · <a href={`mailto:${need.claimed_by_email}`} className="underline">{need.claimed_by_email}</a></span>
-                      )}
                     </div>
                   )}
 

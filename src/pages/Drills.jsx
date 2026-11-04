@@ -47,15 +47,20 @@ export default function Drills() {
       if (!cancelled) setUser(me);
 
       // Filter options come from the listings themselves, so they only ever offer
-      // values that actually return results.
+      // values that actually return results. The listings carry a field-level read
+      // rule, which rules out `distinct` queries, so the values are de-duplicated here.
       try {
-        const [c, r] = await Promise.all([
-          base44.entities.CommunityDrill.list({ distinct: "country_code" }),
-          base44.entities.CommunityDrill.list({ distinct: "admin1_name" }),
-        ]);
+        const all = [];
+        let cur = null;
+        for (let i = 0; i < 10; i++) {
+          const page = await base44.entities.CommunityDrill.list({ limit: 200, cursor: cur });
+          all.push(...page.items);
+          if (!page.has_more) break;
+          cur = page.next_cursor;
+        }
         if (!cancelled) {
-          setCountries((c.items || []).filter(Boolean).sort());
-          setRegions((r.items || []).filter(Boolean).sort());
+          setCountries([...new Set(all.map((d) => d.country_code).filter(Boolean))].sort());
+          setRegions([...new Set(all.map((d) => d.admin1_name).filter(Boolean))].sort());
         }
       } catch (_e) {
         /* filters simply stay empty */

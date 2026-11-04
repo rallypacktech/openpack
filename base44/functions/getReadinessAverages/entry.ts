@@ -44,7 +44,13 @@ export default async function(req) {
     // Cache key includes level + parent filters so each drill-down view is cached independently
     const cacheKey = buildCacheKey(level, countryName, admin1Name, admin2Name);
     const TTL_MS = 60 * 60 * 1000; // 1 hour
-    const SCHEMA_VERSION = 1;
+    // Bumped so cached payloads built before the k-anonymity threshold below
+    // are retired instead of served with sparse cells in them.
+    const SCHEMA_VERSION = 2;
+    // This endpoint is public and promises aggregate-only figures. A cell backed
+    // by one or two respondents is an individual (their score, tied to a postal
+    // area and its centroid), so cells under this many responses are withheld.
+    const MIN_CELL_RESPONSES = 5;
 
     // Serve cached snapshot if fresh
     try {
@@ -147,7 +153,7 @@ export default async function(req) {
       if (typeof r.longitude === 'number') groups[key].lngs.push(r.longitude);
     }
 
-    const locations = Object.values(groups).map(g => {
+    const cells = Object.values(groups).map(g => {
       const avg = g.scores.length > 0
         ? Math.round(g.scores.reduce((a, b) => a + b, 0) / g.scores.length)
         : 0;
@@ -164,7 +170,11 @@ export default async function(req) {
       };
     });
 
-    // Sort for top 5 best / worst (require at least 1 response)
+    // k-anonymity: only cells with enough respondents are published, and the
+    // top lists are drawn from those same cells so neither can expose one person.
+    const locations = cells.filter(c => c.count >= MIN_CELL_RESPONSES);
+
+    // Sort for top 5 best / worst
     const sorted = [...locations].sort((a, b) => b.avg_score - a.avg_score);
     const top5Best = sorted.slice(0, 5);
     const top5Worst = sorted.length > 5 ? sorted.slice(-5).reverse() : [];
@@ -200,6 +210,7 @@ export default async function(req) {
     return Response.json(payload);
   } catch (error) {
     console.error('getReadinessAverages error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    // Public endpoint: never return internal exception text to an anonymous caller.
+    return Response.json({ error: 'Something went wrong' }, { status: 500 });
   }
 }

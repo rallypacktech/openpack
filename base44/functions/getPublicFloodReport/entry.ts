@@ -185,6 +185,7 @@ export default async function (req) {
     return Response.json(report);
   } catch (error) {
     console.error('getPublicFloodReport error:', error?.message, error?.stack);
-    return Response.json({ error: error?.message || 'Failed to build the flood report' }, { status: 500 });
+    // Public endpoint: details stay in the log, never in the response.
+    return Response.json({ error: 'Something went wrong' }, { status: 500 });
   }
 }

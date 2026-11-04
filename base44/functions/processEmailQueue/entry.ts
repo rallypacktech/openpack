@@ -3,6 +3,17 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 const FROM_EMAIL = 'RallyPack <no-reply@rallypack.org>';
 const BATCH_LIMIT = 3000;
 
+// Queue rows are ordinary entity records, so a row is only trusted when it names
+// one of the app's own sending flows. Anything else is refused instead of being
+// relayed from the branded no-reply address to an arbitrary recipient.
+const TRUSTED_SOURCE_FUNCTIONS = new Set([
+  'sendStatusAlert',
+  'seedDailyHoaReferrals',
+  'adminReferBusiness',
+  'contactPendingReferrals',
+  'sendGeneralEmailCatchup',
+]);
+
 function isQuotaError(status, errorMessage) {
   if (status === 429) return true;
   const lower = (errorMessage || '').toLowerCase();
@@ -78,6 +89,12 @@ Deno.serve(async (req) => {
 
     for (const email of toProcess) {
       try {
+        // Provenance check: skip rows that did not come from a known internal sender.
+        if (!TRUSTED_SOURCE_FUNCTIONS.has(String(email.source_function || ''))) {
+          updates.push({ id: email.id, status: 'failed', error_message: 'Untrusted queue source' });
+          failed++;
+          continue;
+        }
         await sendViaResend(email.recipient_email, email.subject, email.html_body, email.text_body);
         updates.push({ id: email.id, status: 'sent', sent_at: new Date().toISOString() });
         sent++;

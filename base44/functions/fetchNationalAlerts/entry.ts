@@ -99,6 +99,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    // Public endpoint: details stay in the log, never in the response.
+    return Response.json({ error: 'Something went wrong' }, { status: 500 });
   }
 });

@@ -90,7 +90,21 @@
     },
     "submitted_by_email": {
       "type": "string",
-      "description": "Email of the organization representative who submitted this listing"
+      "description": "Email of the organization representative who submitted this listing",
+      "rls": {
+        "read": {
+          "$or": [
+            {
+              "created_by_id": "{{user.id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      }
     }
   },
   "required": [

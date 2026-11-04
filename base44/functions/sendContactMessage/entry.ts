@@ -52,6 +52,7 @@ export default async function (req) {
     return Response.json({ success: true });
   } catch (error) {
     console.error('sendContactMessage error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    // Public endpoint: details stay in the log, never in the response.
+    return Response.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

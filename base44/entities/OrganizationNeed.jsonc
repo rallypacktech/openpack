@@ -12,7 +12,21 @@
     },
     "posted_by_email": {
       "type": "string",
-      "description": "Email of the user who posted the need"
+      "description": "Email of the user who posted the need",
+      "rls": {
+        "read": {
+          "$or": [
+            {
+              "created_by_id": "{{user.id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      }
     },
     "contact_email": {
       "type": "string",
@@ -137,7 +151,21 @@
     },
     "claimed_by_email": {
       "type": "string",
-      "description": "Email of the user who claimed the need"
+      "description": "Email of the user who claimed the need",
+      "rls": {
+        "read": {
+          "$or": [
+            {
+              "created_by_id": "{{user.id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      }
     },
     "claimed_at": {
       "type": "string",

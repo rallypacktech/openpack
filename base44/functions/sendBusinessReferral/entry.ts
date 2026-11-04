@@ -146,6 +146,7 @@ Deno.serve(async (req) => {
         return Response.json({ success: true, referral_id: referral.id, message: 'Referral submitted' });
     } catch (error) {
         console.error('sendBusinessReferral error:', error);
-        return Response.json({ error: error.message }, { status: 500 });
+        // Public endpoint: details stay in the log, never in the response.
+        return Response.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
     }
 });
