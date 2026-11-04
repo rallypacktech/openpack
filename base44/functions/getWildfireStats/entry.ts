@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.59';
 import { COUNTRY_NAMES, COVERAGE_YEARS } from '../../shared/wildfireCountries.ts';
 
 const COUNTRIES = COUNTRY_NAMES;
@@ -30,12 +30,10 @@ export default async function (req) {
         {
           sort: '-start_date',
           limit: 500,
-          fields: ['country_code', 'hectares_burned', 'source', 'admin1_name', 'start_date', 'is_merged_away'],
           ...(cursor ? { cursor } : {}),
         },
       );
-      console.log('DEBUG page shape', { isArray: Array.isArray(page), items: page?.items?.length, has_more: page?.has_more, keys: Array.isArray(page) ? null : Object.keys(page || {}) });
-      allIncidents.push(...(page.items || []));
+      allIncidents.push(...(page?.items || []));
       cursor = page.next_cursor;
       hasMore = !!page.has_more && !!cursor;
       pages++;
@@ -98,12 +96,8 @@ export default async function (req) {
     }
 
     return Response.json({
-      _debug: {
-        pages,
-        fetched: allIncidents.length,
-        firstKeys: allIncidents[0] ? Object.keys(allIncidents[0]) : null,
-        first: allIncidents[0] || null,
-      },
+      scanned: allIncidents.length,
+      pages_read: pages,
       totals: {
         total_incidents: totalIncidents,
         total_hectares: Math.round(totalHectares),

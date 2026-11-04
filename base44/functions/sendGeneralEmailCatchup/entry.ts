@@ -12,9 +12,13 @@ import {
 
 const DEFAULT_GENERAL_CONFIG = {
     label: 'Workplace Preparedness',
-    learnPath: '/readiness-map',
-    subject: 'Free for your team — and a first month free on the business dashboard',
-    intro: 'RallyPack gives your business one place to stay inspection-ready: log first aid kits across every floor, AEDs, staff CPR/first aid certifications and fire equipment checks, and get reminded before anything expires. That is the paid side — and your first month is on us with the code below.\n\nThe free side is for your people: anyone can look up how their county, territory, state, province or country ranks for emergency preparedness, and build a go-bag and evacuation plan at no cost.',
+    learnPath: '/compliance-quiz',
+    subject: 'A free compliance check for your workplace — and a first month free',
+    opener: 'The RallyPack Team thought your business would benefit from a free way to check where its emergency preparedness stands.',
+    intro: 'RallyPack has a free compliance check for workplaces: a short quiz that shows where your first aid kits, AEDs, staff certifications and fire equipment records are already in good shape, and where something could lapse before your next inspection.\n\nIt takes a few minutes and needs no account. If you want all of it tracked in one place, the business dashboard does that — and your first month is on us with the code below.',
+    freeTitle: 'Free — the workplace compliance check',
+    freeBody: 'A short, no-obligation quiz that scores your workplace preparedness and shows exactly which supplies and records need attention, from first aid kits and AED pads to staff certifications and equipment checks.',
+    freeCtaLabel: 'Take the compliance check',
     voucherCode: 'FIRSTMONTHFREE',
     voucherLabel: 'First month free',
     voucherNote: 'Your first month of the Professional plan is on us.',

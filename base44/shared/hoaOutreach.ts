@@ -11,7 +11,6 @@
 import {
   FROM_EMAIL,
   ORIGIN,
-  READINESS_MAP_PATH,
   buildReferralEmailHtml,
   buildReferralEmailText,
   isQuotaError,
@@ -48,13 +47,13 @@ export const SEEDED_STATES = ['WA', 'UT', 'NY', 'CA', 'TX', 'OR'];
 
 export const DEFAULT_HOA_CONFIG = {
   label: 'Homeowner Association (HOA)',
-  learnPath: READINESS_MAP_PATH,
-  subject: 'Free for every resident — and a first month free on the HOA business plan',
-  opener: 'The RallyPack Team thought your neighborhood would benefit from a free emergency preparedness resource you can share with every resident.',
-  intro: "RallyPack is a free, open-source emergency preparedness platform. Every one of your members can build go-bags, document evacuation plans, and log emergency supply caches at no cost — and the Readiness Map shows each resident how their neighborhood ranks against the rest of the world.\n\nIf the association itself wants the business side, the first month is on us with the code below.",
-  freeTitle: 'Free — for every member of your association',
-  freeBody: 'RallyPack is free for all of your residents. They can build go-bags, document evacuation plans, log emergency supply caches, get real-time hazard alerts, and see how prepared their neighborhood is compared to the rest of the world. No cost, and no account required.',
-  freeCtaLabel: 'See how prepared you are compared to the rest of the world',
+  learnPath: '/compliance-quiz',
+  subject: 'A free compliance check for your association — and a first month free',
+  opener: 'The RallyPack Team thought your association would benefit from a free way to check its emergency preparedness.',
+  intro: "RallyPack has a free compliance check: a short quiz that shows where your association's records and equipment are already in good shape — first aid kits, AEDs, staff certifications, fire equipment checks — and where something could lapse before an inspection.\n\nIt takes a few minutes and needs no account. If the association wants all of it tracked in one place, the business dashboard does that, and the first month is on us with the code below.",
+  freeTitle: 'Free — the compliance check for your association',
+  freeBody: 'A short, no-obligation quiz that scores the association\'s preparedness and shows which supplies and records need attention, from first aid kits and AEDs to fire equipment checks and staff certifications.',
+  freeCtaLabel: 'Take the compliance check',
   businessTitle: 'Paid — for the association',
   businessBody: 'If the HOA wants the business side — tracking first aid kits, AEDs, staff certifications and fire equipment across every location, with expiry reminders, documented evacuation plans and association-wide emergency alerts — that is a paid plan. Your first month is free with the code below.',
   businessCtaLabel: 'Start the business plan — first month free',

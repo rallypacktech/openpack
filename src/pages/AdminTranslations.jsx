@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Sparkles, ScanSearch, AlertTriangle } from "lucide-react";
+import { Loader2, Sparkles, ScanSearch, AlertTriangle, CheckCheck } from "lucide-react";
 
 const STATUSES = [
   { value: "draft", label: "Awaiting review" },
@@ -43,6 +43,8 @@ export default function AdminTranslations() {
     }
   });
   const [message, setMessage] = useState(null);
+  const [approvingAll, setApprovingAll] = useState(false);
+  const [confirmApproveAll, setConfirmApproveAll] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -120,6 +122,43 @@ export default function AdminTranslations() {
       setMessage({ tone: "warn", text: error.message });
     } finally {
       setTranslating(false);
+    }
+  };
+
+  // Publishes every machine draft the reviewer has not got to yet. The machine
+  // draft is kept as-is (human_text stays empty), so approving in bulk is exactly
+  // what approving each row by hand would do.
+  const handleApproveAll = async () => {
+    setApprovingAll(true);
+    setMessage(null);
+    const pending = counts.draft || 0;
+    let approved = 0;
+    try {
+      let more = true;
+      while (more) {
+        const res = await base44.entities.TranslationEntry.updateMany(
+          { locale, status: "draft" },
+          {
+            $set: {
+              status: "approved",
+              reviewed_by: reviewerEmail,
+              reviewed_at: new Date().toISOString(),
+            },
+          }
+        );
+        approved += res?.updated ?? res?.count ?? 0;
+        more = !!res?.has_more;
+      }
+      setConfirmApproveAll(false);
+      setMessage({
+        tone: "ok",
+        text: `${approved || pending} drafts approved and published.`,
+      });
+      await load();
+    } catch (error) {
+      setMessage({ tone: "warn", text: error.message });
+    } finally {
+      setApprovingAll(false);
     }
   };
 
@@ -227,6 +266,36 @@ export default function AdminTranslations() {
               )}
               Generate DeepL drafts
             </Button>
+            {status === "draft" && counts.draft > 0 && (
+              confirmApproveAll ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    Approve all {counts.draft} awaiting review?
+                  </span>
+                  <Button size="sm" onClick={handleApproveAll} disabled={approvingAll}>
+                    {approvingAll ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <CheckCheck className="w-4 h-4 mr-2" />
+                    )}
+                    Yes, approve all
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setConfirmApproveAll(false)}
+                    disabled={approvingAll}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button variant="outline" onClick={() => setConfirmApproveAll(true)}>
+                  <CheckCheck className="w-4 h-4 mr-2" />
+                  Approve all pending ({counts.draft})
+                </Button>
+              )
+            )}
           </div>
 
           {message && (
