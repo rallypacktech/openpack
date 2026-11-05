@@ -8,9 +8,15 @@ export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json().catch(() => ({}));
-    const locale = typeof payload.locale === 'string' ? payload.locale : '';
+    const locale = typeof payload.locale === 'string' ? payload.locale.trim() : '';
     if (!locale || locale === 'en') {
       return Response.json({ locale: 'en', entries: [] });
+    }
+    // The language tag comes straight from the browser, so anything that is not a
+    // well-formed tag is answered exactly like an untranslated language. Junk input
+    // can no longer reach the table as a query value.
+    if (!/^[a-z]{2,3}(-[A-Za-z0-9]{2,4})?$/.test(locale)) {
+      return Response.json({ locale, entries: [] });
     }
 
     const entries = await base44.asServiceRole.entities.TranslationEntry.filter({

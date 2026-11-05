@@ -1,11 +1,24 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// This endpoint answers without a sign-in, so a burst of calls must not become a
+// burst of upstream requests. One module-level memo serves every caller inside the
+// window, and the result is capped so a single call can never return an unbounded body.
+const MEMO_TTL_MS = 60 * 1000;
+const MAX_ALERTS = 400;
+const MAX_DESCRIPTION = 2000;
+
+let memo = { at: 0, payload: null };
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
     // Allow admin access or service-role (scheduled) — this is read-only public data
     const srBase44 = base44.asServiceRole;
+
+    if (memo.payload && Date.now() - memo.at < MEMO_TTL_MS) {
+      return Response.json(memo.payload);
+    }
 
     // Fetch ALL active NWS alerts nationwide — filter client-side for map relevance
     const alertsRes = await fetch(
@@ -70,7 +83,7 @@ Deno.serve(async (req) => {
         id: props.id,
         event,
         headline: props.headline || event,
-        description: props.description || '',
+        description: String(props.description || '').slice(0, MAX_DESCRIPTION),
         areaDesc: props.areaDesc || '',
         severity: props.severity || 'Unknown',
         urgency: props.urgency || 'Unknown',
@@ -91,12 +104,15 @@ Deno.serve(async (req) => {
       return new Date(b.sent || 0).getTime() - new Date(a.sent || 0).getTime();
     });
 
-    return Response.json({
-      alerts,
-      total: alerts.length,
+    const capped = alerts.slice(0, MAX_ALERTS);
+    const payload = {
+      alerts: capped,
+      total: capped.length,
       fetched_at: new Date().toISOString(),
       source: 'NWS API - api.weather.gov/alerts/active',
-    });
+    };
+    memo = { at: Date.now(), payload };
+    return Response.json(payload);
 
   } catch (error) {
     // Public endpoint: details stay in the log, never in the response.
