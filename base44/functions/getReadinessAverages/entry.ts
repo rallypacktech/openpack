@@ -1,19 +1,24 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 
-// Public, unauthenticated endpoint: aggregates QuizResult records by
-// geographic level (global/country → state → county → postal) and returns
-// each location's average score, response count, and centroid lat/lng,
-// plus top-5 best and top-5 worst prepared at that level.
-// Cached via ReportCache (1h TTL) to avoid recomputing on every page load.
+// Public, unauthenticated endpoint: publishes aggregate readiness scores by
+// geography (world → country → state → county → postal).
+//
+// Every figure is served from ONE cached snapshot of per-area totals, so a visitor
+// walking the map's drill-downs costs a single cached read however many areas they
+// open. The snapshot is rebuilt at most once an hour from one pass over the quiz
+// results — request volume can no longer drive database work.
 const VALID_LEVELS = new Set(['global', 'country', 'state', 'county', 'postal']);
-
-const buildCacheKey = (lvl, c, a1, a2) =>
-  `readiness_avg_${lvl}_${c || ''}_${a1 || ''}_${a2 || ''}`;
+const SNAPSHOT_KEY = 'readiness_totals_v1';
+const TTL_MS = 60 * 60 * 1000; // 1 hour
+const SCHEMA_VERSION = 3;
+// Aggregate-only figures: a cell backed by fewer than this many respondents is an
+// individual (their score tied to a postal area and its centroid), so the cell is
+// withheld until enough people share that area.
+const MIN_CELL_RESPONSES = 5;
 
 // This endpoint is public, so the geo filters arrive straight from the request
-// body. Accept only a short, control-character-free string — otherwise an
-// attacker can mint unlimited cache keys and drive unbounded database work.
-function sanitizeGeoName(value) {
+// body. Accept only a short, control-character-free string.
+function sanitizeGeoName(value: string | null) {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
   if (!trimmed || trimmed.length > 80) return null;
@@ -21,7 +26,83 @@ function sanitizeGeoName(value) {
   return trimmed;
 }
 
-export default async function(req) {
+// One pass over the quiz results, reduced to per-geography totals. Only sums and
+// counts are kept — never an individual score, id or answer.
+async function buildSnapshot(sr) {
+  const chains = new Map();
+  let totalCount = 0;
+  let totalSum = 0;
+
+  const LIMIT = 500;
+  let skip = 0;
+  while (true) {
+    const batch = await sr.entities.QuizResult.list('-created_date', LIMIT, skip);
+    for (const r of batch) {
+      if (r.is_bot) continue;
+      if (typeof r.score !== 'number') continue;
+
+      totalCount++;
+      totalSum += r.score;
+
+      const country = r.country_name || '';
+      const admin1 = r.admin1_name || '';
+      const admin2 = r.admin2_name || '';
+      const postal = r.postal_code || '';
+      const key = `${country}|${admin1}|${admin2}|${postal}`;
+
+      let chain = chains.get(key);
+      if (!chain) {
+        chain = { country, admin1, admin2, postal, count: 0, score_sum: 0, lat_sum: 0, lng_sum: 0, geo_count: 0 };
+        chains.set(key, chain);
+      }
+      chain.count++;
+      chain.score_sum += r.score;
+      if (typeof r.latitude === 'number' && typeof r.longitude === 'number') {
+        chain.lat_sum += r.latitude;
+        chain.lng_sum += r.longitude;
+        chain.geo_count++;
+      }
+    }
+    if (batch.length < LIMIT) break;
+    skip += LIMIT;
+  }
+
+  return {
+    schema_version: SCHEMA_VERSION,
+    built_at: new Date().toISOString(),
+    total_responses: totalCount,
+    total_score_sum: totalSum,
+    chains: [...chains.values()],
+  };
+}
+
+// Fresh snapshot or a rebuild. A failed cache write is non-fatal — the caller still
+// gets its answer, it just costs another build later.
+async function readSnapshot(sr) {
+  try {
+    const cached = await sr.entities.ReportCache.filter({ cache_key: SNAPSHOT_KEY });
+    if (cached.length > 0 && cached[0].payload?.schema_version === SCHEMA_VERSION) {
+      if (Date.now() - new Date(cached[0].built_at).getTime() < TTL_MS) {
+        return cached[0].payload;
+      }
+    }
+  } catch (_) {}
+
+  const snapshot = await buildSnapshot(sr);
+  try {
+    const existing = await sr.entities.ReportCache.filter({ cache_key: SNAPSHOT_KEY });
+    if (existing.length > 0) {
+      await sr.entities.ReportCache.update(existing[0].id, { payload: snapshot, built_at: snapshot.built_at });
+    } else {
+      await sr.entities.ReportCache.create({ cache_key: SNAPSHOT_KEY, payload: snapshot, built_at: snapshot.built_at });
+    }
+  } catch (e) {
+    console.error('ReportCache write failed (non-fatal):', e);
+  }
+  return snapshot;
+}
+
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
 
@@ -41,173 +122,69 @@ export default async function(req) {
       } catch (_) {}
     }
 
-    // Cache key includes level + parent filters so each drill-down view is cached independently
-    const cacheKey = buildCacheKey(level, countryName, admin1Name, admin2Name);
-    const TTL_MS = 60 * 60 * 1000; // 1 hour
-    // Bumped so cached payloads built before the k-anonymity threshold below
-    // are retired instead of served with sparse cells in them.
-    const SCHEMA_VERSION = 2;
-    // This endpoint is public and promises aggregate-only figures. A cell backed
-    // by one or two respondents is an individual (their score, tied to a postal
-    // area and its centroid), so cells under this many responses are withheld.
-    const MIN_CELL_RESPONSES = 5;
+    const snapshot = await readSnapshot(base44.asServiceRole);
 
-    // Serve cached snapshot if fresh
-    try {
-      const cached = await base44.asServiceRole.entities.ReportCache.filter({ cache_key: cacheKey });
-      if (cached.length > 0) {
-        const age = Date.now() - new Date(cached[0].built_at).getTime();
-        if (age < TTL_MS && cached[0].payload?.schema_version === SCHEMA_VERSION) {
-          return Response.json(cached[0].payload);
-        }
-      }
-    } catch (_) {}
+    // Narrow to the requested branch of the drill-down. A made-up place simply
+    // matches nothing, so it costs nothing.
+    const chains = (snapshot.chains || []).filter((c) =>
+      (!countryName || c.country === countryName) &&
+      (!admin1Name || c.admin1 === admin1Name) &&
+      (!admin2Name || c.admin2 === admin2Name)
+    );
 
-    // Drill-down filters must point at data that actually exists. A cheap
-    // filtered probe rejects bogus/random names without a full-table scan and
-    // without persisting a junk cache row for every invented key.
-    const filterQuery = {};
-    if (countryName) filterQuery.country_name = countryName;
-    if (admin1Name) filterQuery.admin1_name = admin1Name;
-    if (admin2Name) filterQuery.admin2_name = admin2Name;
-    const hasFilter = Object.keys(filterQuery).length > 0;
+    const groupField =
+      level === 'global' || level === 'country' ? 'country'
+        : level === 'state' ? 'admin1'
+          : level === 'county' ? 'admin2'
+            : 'postal';
 
-    if (hasFilter) {
-      // The query goes in on its own: this SDK build returns an empty result when
-      // filter() is handed an options object, which silently emptied every
-      // drill-down view.
-      const probe = await base44.asServiceRole.entities.QuizResult.filter({
-        ...filterQuery,
-        is_bot: { $ne: true },
-      });
-      const probeItems = Array.isArray(probe) ? probe : (probe?.items || []);
-      if (probeItems.length === 0) {
-        // Nothing matches — serve the global figures from the cached global
-        // snapshot (a single indexed read) and cache nothing.
-        let globalAverage = 0;
-        let totalResponses = 0;
-        try {
-          const globalCached = await base44.asServiceRole.entities.ReportCache.filter({
-            cache_key: buildCacheKey('global', null, null, null),
-          });
-          if (globalCached.length > 0) {
-            globalAverage = globalCached[0].payload?.global_average ?? 0;
-            totalResponses = globalCached[0].payload?.total_responses ?? 0;
-          }
-        } catch (_) {}
-        return Response.json({
-          level,
-          locations: [],
-          top5_best: [],
-          top5_worst: [],
-          global_average: globalAverage,
-          total_responses: totalResponses,
-          filtered_count: 0,
-          built_at: new Date().toISOString(),
-          schema_version: SCHEMA_VERSION,
-        });
-      }
-    }
+    const groups = new Map();
+    let filteredCount = 0;
 
-    // Load all non-bot quiz results (paginated to avoid truncation)
-    const allResults = [];
-    const LIMIT = 500;
-    let skip = 0;
-    while (true) {
-      const batch = await base44.asServiceRole.entities.QuizResult.list('-created_date', LIMIT, skip);
-      for (const r of batch) {
-        if (r.is_bot) continue;
-        allResults.push(r);
-      }
-      if (batch.length < LIMIT) break;
-      skip += LIMIT;
-    }
-
-    // Overall average across ALL non-bot results (for quiz results page)
-    const allScores = allResults.map(r => r.score).filter(s => typeof s === 'number');
-    const globalAverage = allScores.length > 0
-      ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length)
-      : 0;
-
-    // Filter by parent geography for drill-down
-    let filtered = allResults;
-    if (countryName) filtered = filtered.filter(r => r.country_name === countryName);
-    if (admin1Name) filtered = filtered.filter(r => r.admin1_name === admin1Name);
-    if (admin2Name) filtered = filtered.filter(r => r.admin2_name === admin2Name);
-
-    // Determine grouping field based on level
-    let groupField;
-    if (level === 'global' || level === 'country') groupField = 'country_name';
-    else if (level === 'state') groupField = 'admin1_name';
-    else if (level === 'county') groupField = 'admin2_name';
-    else groupField = 'postal_code';
-
-    // Group and aggregate
-    const groups = {};
-    for (const r of filtered) {
-      const key = r[groupField];
+    for (const c of chains) {
+      filteredCount += c.count;
+      const key = c[groupField];
       if (!key) continue;
-      if (!groups[key]) groups[key] = { name: key, scores: [], lats: [], lngs: [] };
-      groups[key].scores.push(r.score);
-      if (typeof r.latitude === 'number') groups[key].lats.push(r.latitude);
-      if (typeof r.longitude === 'number') groups[key].lngs.push(r.longitude);
+
+      let g = groups.get(key);
+      if (!g) {
+        g = { name: key, count: 0, score_sum: 0, lat_sum: 0, lng_sum: 0, geo_count: 0 };
+        groups.set(key, g);
+      }
+      g.count += c.count;
+      g.score_sum += c.score_sum;
+      g.lat_sum += c.lat_sum;
+      g.lng_sum += c.lng_sum;
+      g.geo_count += c.geo_count;
     }
 
-    const cells = Object.values(groups).map(g => {
-      const avg = g.scores.length > 0
-        ? Math.round(g.scores.reduce((a, b) => a + b, 0) / g.scores.length)
-        : 0;
-      return {
+    // k-anonymity: only cells with enough respondents are published, and the top
+    // lists are drawn from those same cells so neither can expose one person.
+    const locations = [...groups.values()]
+      .filter((g) => g.count >= MIN_CELL_RESPONSES)
+      .map((g) => ({
         name: g.name,
-        avg_score: avg,
-        count: g.scores.length,
-        latitude: g.lats.length > 0
-          ? Math.round((g.lats.reduce((a, b) => a + b, 0) / g.lats.length) * 10000) / 10000
-          : null,
-        longitude: g.lngs.length > 0
-          ? Math.round((g.lngs.reduce((a, b) => a + b, 0) / g.lngs.length) * 10000) / 10000
-          : null,
-      };
-    });
+        avg_score: Math.round(g.score_sum / g.count),
+        count: g.count,
+        latitude: g.geo_count > 0 ? Math.round((g.lat_sum / g.geo_count) * 10000) / 10000 : null,
+        longitude: g.geo_count > 0 ? Math.round((g.lng_sum / g.geo_count) * 10000) / 10000 : null,
+      }));
 
-    // k-anonymity: only cells with enough respondents are published, and the
-    // top lists are drawn from those same cells so neither can expose one person.
-    const locations = cells.filter(c => c.count >= MIN_CELL_RESPONSES);
-
-    // Sort for top 5 best / worst
     const sorted = [...locations].sort((a, b) => b.avg_score - a.avg_score);
-    const top5Best = sorted.slice(0, 5);
-    const top5Worst = sorted.length > 5 ? sorted.slice(-5).reverse() : [];
 
-    const payload = {
+    return Response.json({
       level,
       locations,
-      top5_best: top5Best,
-      top5_worst: top5Worst,
-      global_average: globalAverage,
-      total_responses: allScores.length,
-      filtered_count: filtered.length,
-      built_at: new Date().toISOString(),
+      top5_best: sorted.slice(0, 5),
+      top5_worst: sorted.length > 5 ? sorted.slice(-5).reverse() : [],
+      global_average: snapshot.total_responses > 0
+        ? Math.round(snapshot.total_score_sum / snapshot.total_responses)
+        : 0,
+      total_responses: snapshot.total_responses || 0,
+      filtered_count: filteredCount,
+      built_at: snapshot.built_at,
       schema_version: SCHEMA_VERSION,
-    };
-
-    // Cache (upsert) — non-fatal on failure. Never persist a key that matched no
-    // data, so invented filters cannot bloat the cache table.
-    if (filtered.length > 0) {
-      try {
-        const existing = await base44.asServiceRole.entities.ReportCache.filter({ cache_key: cacheKey });
-        const now = new Date().toISOString();
-        if (existing.length > 0) {
-          await base44.asServiceRole.entities.ReportCache.update(existing[0].id, { payload, built_at: now });
-        } else {
-          await base44.asServiceRole.entities.ReportCache.create({ cache_key: cacheKey, payload, built_at: now });
-        }
-      } catch (e) {
-        console.error('ReportCache write failed (non-fatal):', e);
-      }
-    }
-
-    return Response.json(payload);
+    });
   } catch (error) {
     console.error('getReadinessAverages error:', error);
     // Public endpoint: never return internal exception text to an anonymous caller.

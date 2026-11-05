@@ -7,9 +7,17 @@
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// How many messages one browser may send per day, and the ceiling for the whole app.
+// How many messages one browser may send per day, how many one sender address may
+// generate, and the ceiling for the whole app. The session id comes from the
+// browser and is trivial to rotate, so the address cap is the one a script cannot
+// sidestep just by reloading.
 export const MAX_PER_SESSION_PER_DAY = 3;
+export const MAX_PER_EMAIL_PER_DAY = 2;
 export const MAX_TOTAL_PER_DAY = 30;
+
+function emailKey(value) {
+  return String(value || '').trim().toLowerCase();
+}
 
 async function recentRows(sr) {
   const since = new Date(Date.now() - DAY_MS).toISOString();
@@ -23,7 +31,7 @@ async function recentRows(sr) {
  * Returns { ok: true } when the submission may proceed, otherwise { ok: false, error }.
  * `sr` is the service-role client — the counts must not be scoped to a signed-in user.
  */
-export async function checkContactThrottle(sr, sessionId) {
+export async function checkContactThrottle(sr, sessionId, email) {
   const rows = await recentRows(sr);
 
   if (rows.length >= MAX_TOTAL_PER_DAY) {
@@ -31,6 +39,10 @@ export async function checkContactThrottle(sr, sessionId) {
   }
   if (rows.filter((r) => r.session_id === sessionId).length >= MAX_PER_SESSION_PER_DAY) {
     return { ok: false, error: 'You have reached the daily message limit. Please try again tomorrow.' };
+  }
+  const sender = emailKey(email);
+  if (sender && rows.filter((r) => emailKey(r.email) === sender).length >= MAX_PER_EMAIL_PER_DAY) {
+    return { ok: false, error: 'You have reached the daily message limit for this email address. Please try again tomorrow.' };
   }
   return { ok: true };
 }
@@ -44,17 +56,20 @@ export async function checkContactThrottle(sr, sessionId) {
  * Returns { ok: true, id } or { ok: false, error }.
  */
 export async function claimContactSlot(sr, record) {
-  const pre = await checkContactThrottle(sr, record.session_id);
+  const pre = await checkContactThrottle(sr, record.session_id, record.email);
   if (!pre.ok) return pre;
 
   const created = await sr.entities.ContactMessage.create(record);
 
   const rows = await recentRows(sr);
+  const sender = emailKey(record.email);
   const overSession =
     rows.filter((r) => r.session_id === record.session_id).length > MAX_PER_SESSION_PER_DAY;
+  const overEmail =
+    sender && rows.filter((r) => emailKey(r.email) === sender).length > MAX_PER_EMAIL_PER_DAY;
   const overTotal = rows.length > MAX_TOTAL_PER_DAY;
 
-  if (overTotal || overSession) {
+  if (overTotal || overSession || overEmail) {
     try {
       await sr.entities.ContactMessage.delete(created.id);
     } catch (_) {
@@ -63,7 +78,7 @@ export async function claimContactSlot(sr, record) {
     }
     return {
       ok: false,
-      error: overSession
+      error: overSession || overEmail
         ? 'You have reached the daily message limit. Please try again tomorrow.'
         : 'Too many messages submitted right now — please try again later.',
     };

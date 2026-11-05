@@ -5,7 +5,11 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 // caps the size of every field before anything is stored or emailed.
 const EMAIL_PATTERN = /^[^\s@,;<>"']+@[^\s@,;<>"']+\.[^\s@,;<>"']+$/;
 const MAX_PER_EMAIL_PER_DAY = 3;
+const MAX_PER_REFERRER_PER_DAY = 3;
 const MAX_TOTAL_PER_DAY = 50;
+// A fixed team inbox for new-referral notices. Resolving recipients from the user
+// table made every anonymous submission page through every account in the app.
+const NOTIFY_EMAIL = 'beta@rallypack.tech';
 const FIELD_LIMITS = {
     referee_email: 320,
     referee_name: 200,
@@ -60,6 +64,16 @@ Deno.serve(async (req) => {
         if (sameEmailToday >= MAX_PER_EMAIL_PER_DAY) {
             return Response.json({ error: 'This business has already been referred recently.' }, { status: 429 });
         }
+        // One referrer address may only seed a few referrals a day, so a script
+        // cannot cycle through different businesses to flood the pipeline.
+        if (referrer_email) {
+            const sameReferrerToday = recentToday.filter(
+                (r) => String(r.referrer_email || '').toLowerCase() === referrer_email.toLowerCase(),
+            ).length;
+            if (sameReferrerToday >= MAX_PER_REFERRER_PER_DAY) {
+                return Response.json({ error: 'Too many referrals from this email address today.' }, { status: 429 });
+            }
+        }
 
         // HTML-escape all user-provided fields to prevent injection in email templates
         const escapeHtml = (str) => {
@@ -103,17 +117,22 @@ Deno.serve(async (req) => {
         const overEmail = afterRows.filter(
             (r) => String(r.referee_email || '').toLowerCase() === referee_email.toLowerCase(),
         ).length > MAX_PER_EMAIL_PER_DAY;
-        if (overTotal || overEmail) {
+        const overReferrer = referrer_email
+            ? afterRows.filter(
+                (r) => String(r.referrer_email || '').toLowerCase() === referrer_email.toLowerCase(),
+            ).length > MAX_PER_REFERRER_PER_DAY
+            : false;
+        if (overTotal || overEmail || overReferrer) {
             try {
                 await base44.asServiceRole.entities.BusinessReferral.delete(referral.id);
             } catch (_) { /* the row still counts against the next caller */ }
             return Response.json({ error: 'Too many referrals submitted right now — please try again later.' }, { status: 429 });
         }
 
-        // Notify admins who have accounts in the app
+        // Notify the team. One fixed address, so an anonymous submission never reads
+        // the user table and posts exactly one notice instead of one per admin.
         try {
-            const admins = await base44.asServiceRole.entities.User.list();
-            const adminEmails = admins.filter(u => u.role === 'admin' && u.email).map(u => u.email);
+            const adminEmails = [NOTIFY_EMAIL];
             if (adminEmails.length > 0) {
                 const emailBody = `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1C1C1A;">
