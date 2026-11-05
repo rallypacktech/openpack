@@ -12,15 +12,15 @@ const ANNUAL_GOAL_CENTS = 150000 * 100;
 const CACHE_KEY = 'donation_progress';
 const TTL_MS = 10 * 60 * 1000; // 10 minutes
 
-// A lean, founder-led pre-seed: 12 months of runway with no full-time hires.
+// A lean, founder-led pre-seed: 12 months of runway with no new hires. These are the
+// same line items the pitch deck quotes, so every public surface shows one budget.
 const OPERATING_COSTS = [
-  { label: "Founder-led product & engineering", amount: 45000, description: "Part-time founder stipend covering product, engineering and support — no headcount this year" },
-  { label: "Hosting & platform", amount: 6000, description: "Base44 app hosting, database, backend functions, maps and file storage (~$500/mo)" },
-  { label: "Disaster data & API feeds", amount: 9000, description: "OpenFEMA, NOAA, wildfire and weather feeds plus translation and AI integration credits" },
-  { label: "Security, legal & compliance", amount: 12000, description: "Privacy policy, data processing agreements, entity setup and a security review organizations ask for before they buy" },
-  { label: "Go-to-market & organization pilots", amount: 48000, description: "Pilots with fire districts, schools and multi-location employers, plus content and search — the cheapest acquisition channel we have" },
-  { label: "Design & content contractors", amount: 12000, description: "Contract design and copy work, no full-time hires" },
-  { label: "Contingency reserve", amount: 18000, description: "Roughly one month of runway held back for the unexpected. A portion of every payment also funds carbon removal through the Stripe Climate program." },
+  { label: "Founder & Developer Salary", amount: 60000, description: "Lean founder salary: build, maintain and support the app full-time" },
+  { label: "Ad Budget", amount: 85000, description: "Paid acquisition to reach families before the next disaster" },
+  { label: "Base44 Builder Subscription", amount: 2400, description: "App hosting, database, backend functions and integrations (~$200/mo)" },
+  { label: "Domain Registration (Name.com)", amount: 50, description: "Annual domain renewal" },
+  { label: "Email & Communication Tools", amount: 350, description: "Resend, Telegram bot infrastructure and notification delivery" },
+  { label: "Payment Processing & Buffer", amount: 2200, description: "Stripe transaction fees and contingency reserve" },
 ];
 
 Deno.serve(async (req) => {

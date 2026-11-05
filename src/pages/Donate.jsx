@@ -22,13 +22,12 @@ const AMOUNTS = [5, 10, 25, 50, 100];
 const _trackedDonationComplete = new Set();
 
 const COST_ICONS = {
-  "Founder-led product & engineering": User,
-  "Hosting & platform": Server,
-  "Disaster data & API feeds": Globe,
-  "Security, legal & compliance": ShieldCheck,
-  "Go-to-market & organization pilots": Megaphone,
-  "Design & content contractors": Code2,
-  "Contingency reserve": CreditCard,
+  "Founder & Developer Salary": User,
+  "Ad Budget": Megaphone,
+  "Base44 Builder Subscription": Server,
+  "Domain Registration (Name.com)": Globe,
+  "Email & Communication Tools": Mail,
+  "Payment Processing & Buffer": CreditCard,
 };
 
 export default function Donate() {
@@ -292,8 +291,8 @@ export default function Donate() {
           A 12-month pre-seed budget
         </h2>
         <p className="text-sm text-[#1C1C1A]/50 font-sans text-center max-w-lg mx-auto mb-6">
-          Deliberately small and founder-led: no salaried hires, no ad spend on a market we
-          already reach for free. Every line is a cost we can point at.
+          Deliberately small and founder-led: no new hires, a founder salary instead of a
+          team, and every line is a cost we can point at.
         </p>
         <div className="space-y-px bg-[#D8D2C6]">
           {(progress?.operating_costs || []).map((cost) => {
