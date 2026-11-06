@@ -11,10 +11,11 @@ const VALID_LEVELS = new Set(['global', 'country', 'state', 'county', 'postal'])
 const SNAPSHOT_KEY = 'readiness_totals_v1';
 const TTL_MS = 60 * 60 * 1000; // 1 hour
 const SCHEMA_VERSION = 3;
-// Aggregate-only figures: a cell backed by fewer than this many respondents is an
-// individual (their score tied to a postal area and its centroid), so the cell is
-// withheld until enough people share that area.
-const MIN_CELL_RESPONSES = 5;
+// Every cell is published, however few responses back it: the quiz is anonymous, a
+// cell carries only an area's average plus its centroid, and each area reports its
+// own response count so a thinly-backed figure reads as thin. Raising this value
+// hides small areas from the map and from the top lists.
+const MIN_CELL_RESPONSES = 1;
 
 // This endpoint is public, so the geo filters arrive straight from the request
 // body. Accept only a short, control-character-free string.
@@ -176,7 +177,9 @@ export default async function (req) {
       level,
       locations,
       top5_best: sorted.slice(0, 5),
-      top5_worst: sorted.length > 5 ? sorted.slice(-5).reverse() : [],
+      // With a single area the same place would top both lists, so the "least
+      // prepared" list only appears once there is something to compare against.
+      top5_worst: sorted.length > 1 ? sorted.slice(-5).reverse() : [],
       global_average: snapshot.total_responses > 0
         ? Math.round(snapshot.total_score_sum / snapshot.total_responses)
         : 0,
