@@ -23,6 +23,7 @@ const SOURCE_ORGS = [
   "CDC",
   "American Heart Association",
   "Ready.gov",
+  "UK Government (Be Ready)",
   "DHS",
   "OSHA",
   "ANSI",

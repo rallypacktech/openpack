@@ -7,6 +7,7 @@ const ORG_WEIGHTS = {
   "CDC":                        20,
   "American Heart Association": 20,
   "Ready.gov":                  15,
+  "UK Government (Be Ready)":   20,
   "DHS":                        15,
   "OSHA":                       15,
   "ANSI":                       12,
